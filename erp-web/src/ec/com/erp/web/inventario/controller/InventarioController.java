@@ -14,10 +14,12 @@ import javax.faces.bean.ViewScoped;
 import javax.faces.event.ActionEvent;
 
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import ec.com.erp.cliente.common.constantes.ERPConstantes;
 import ec.com.erp.cliente.common.exception.ERPException;
 import ec.com.erp.cliente.common.factory.ERPFactory;
+import ec.com.erp.cliente.mdl.dto.ArticuloDTO;
 import ec.com.erp.cliente.mdl.dto.InventarioDTO;
 import ec.com.erp.web.commons.controller.CommonsController;
 import ec.com.erp.web.commons.controller.MensajesController;
@@ -47,6 +49,7 @@ public class InventarioController extends CommonsController implements Serializa
 	
 	// Variables
 	private InventarioDTO inventarioDTO;
+	private ArticuloDTO articuloDTO;
 	private Collection<InventarioDTO> inventarioDTOCols;
 	private String codigoBarras;
 	private Integer page;
@@ -61,6 +64,7 @@ public class InventarioController extends CommonsController implements Serializa
 	public void postConstruct() {
 		this.inventarioCreado = Boolean.FALSE;
 		this.inventarioDTO = new InventarioDTO();
+		this.articuloDTO = new ArticuloDTO();
 
 		this.page = 0;
 		if(inventarioDataManager.getInventarioDTOEditar() != null && inventarioDataManager.getInventarioDTOEditar().getId().getCodigoInventario() != null)
@@ -90,18 +94,26 @@ public class InventarioController extends CommonsController implements Serializa
 	 */
 	public void busquedaInventario(ActionEvent e){
 		try {
-			Calendar fechaInicio = Calendar.getInstance();
-			Calendar fechaFin = Calendar.getInstance();
-			fechaInicio.setTime(fechaInicioBusqueda);
-			fechaFin.setTime(fechaFinBusqueda);
-			UtilitarioWeb.cleanDate(fechaInicio);
-			UtilitarioWeb.cleanDate(fechaFin);
-			fechaFin.add(Calendar.DATE, 1);
-			
-			this.inventarioDTOCols = ERPFactory.inventario.getInventarioServicio().findObtenerListaInventarioByArticuloFechas(Integer.parseInt(ERPConstantes.ESTADO_ACTIVO_NUMERICO), codigoBarras, new Timestamp(fechaInicio.getTime().getTime()), new Timestamp(fechaFin.getTime().getTime()));
-			if(CollectionUtils.isEmpty(this.inventarioDTOCols)){
+			if(StringUtils.isNotEmpty(codigoBarras)) {
+				Calendar fechaInicio = Calendar.getInstance();
+				Calendar fechaFin = Calendar.getInstance();
+				fechaInicio.setTime(fechaInicioBusqueda);
+				fechaFin.setTime(fechaFinBusqueda);
+				UtilitarioWeb.cleanDate(fechaInicio);
+				UtilitarioWeb.cleanDate(fechaFin);
+				fechaFin.add(Calendar.DATE, 1);
+				
+				this.inventarioDTOCols = ERPFactory.inventario.getInventarioServicio().findObtenerListaInventarioByArticuloFechas(Integer.parseInt(ERPConstantes.ESTADO_ACTIVO_NUMERICO), codigoBarras, new Timestamp(fechaInicio.getTime().getTime()), new Timestamp(fechaFin.getTime().getTime()));
+				if(CollectionUtils.isEmpty(this.inventarioDTOCols)){
+					this.setShowMessagesBar(Boolean.TRUE);
+					MensajesController.addInfo(null, ERPWebResources.getString("ec.com.erp.etiqueta.mensaje.lista.resultado"));
+				}
+				else {
+					this.setArticuloDTO(this.inventarioDTOCols.iterator().next().getArticuloDTO());
+				}
+			}else{
 				this.setShowMessagesBar(Boolean.TRUE);
-				MensajesController.addInfo(null, ERPWebResources.getString("ec.com.erp.etiqueta.mensaje.lista.resultado"));
+				MensajesController.addError(null, ERPWebResources.getString("ec.com.erp.etiqueta.inventario.mensaje.codigo.barras.requerido"));
 			}
 		} catch (ERPException e1) {
 			this.setShowMessagesBar(Boolean.TRUE);
@@ -123,10 +135,42 @@ public class InventarioController extends CommonsController implements Serializa
 				this.inventarioDTO.setDetalleMoviento(this.inventarioDTO.getDetalleMoviento().toUpperCase());
 				this.inventarioDTO.setUsuarioRegistro(loginController.getUsuariosDTO().getId().getUserId());
 				this.inventarioDTO.getId().setCodigoCompania(Integer.parseInt(ERPConstantes.ESTADO_ACTIVO_NUMERICO));
+				// Se obtiene existencia actual
+				InventarioDTO inventarioDTOAux = ERPFactory.inventario.getInventarioServicio().findObtenerUltimoInventarioByArticulo(Integer.parseInt(ERPConstantes.ESTADO_ACTIVO_NUMERICO), this.codigoBarrasNuevo);
+				
+				if(this.tipoMovimiento.equals(ERPConstantes.ESTADO_INACTIVO_NUMERICO)) {
+					this.inventarioDTO.setCantidadSalida(this.inventarioDTO.getCantidadEntrada());
+					this.inventarioDTO.setValorUnidadSalida(this.inventarioDTO.getValorUnidadEntrada());
+					this.inventarioDTO.setValorTotalSalida(this.inventarioDTO.getValorTotalSalida());
+					if(inventarioDTOAux == null) {
+						MensajesController.addError(null, ERPWebResources.getString("ec.com.erp.etiqueta.inventario.mensaje.sin.existencias"));
+						return;
+					}else {
+						if(this.inventarioDTO.getCantidadSalida().intValue() > inventarioDTOAux.getCantidadExistencia().intValue()) {
+							MensajesController.addError(null, ERPWebResources.getString("ec.com.erp.etiqueta.inventario.mensaje.sin.existencias"));
+							return;
+						}
+					}
+					this.inventarioDTO.setCantidadExistencia(inventarioDTOAux.getCantidadExistencia().intValue() - this.inventarioDTO.getCantidadSalida());
+					this.inventarioDTO.setValorUnidadExistencia(this.inventarioDTO.getValorUnidadSalida());
+					this.inventarioDTO.setValorTotalExistencia(inventarioDTOAux.getValorTotalExistencia().subtract(this.inventarioDTO.getValorTotalSalida()));
+					this.inventarioDTO.setCantidadEntrada(null);
+					this.inventarioDTO.setValorUnidadEntrada(null);
+					this.inventarioDTO.setValorTotalEntrada(null);
+				}else {
+					if(inventarioDTOAux == null) {
+						this.inventarioDTO.setCantidadExistencia(this.inventarioDTO.getCantidadEntrada());
+						this.inventarioDTO.setValorTotalExistencia(this.inventarioDTO.getValorTotalEntrada());
+					}else {
+						this.inventarioDTO.setCantidadExistencia(inventarioDTOAux.getCantidadExistencia().intValue() + this.inventarioDTO.getCantidadEntrada());
+						this.inventarioDTO.setValorTotalExistencia(inventarioDTOAux.getValorTotalExistencia().add(this.inventarioDTO.getValorTotalEntrada()));
+					}
+					this.inventarioDTO.setValorUnidadExistencia(this.inventarioDTO.getValorUnidadEntrada());
+				}
 				ERPFactory.inventario.getInventarioServicio().transCrearActualizarInventario(this.inventarioDTO);
 				this.setShowMessagesBar(Boolean.TRUE);
 				this.setInventarioCreado(Boolean.TRUE);
-				MensajesController.addInfo(null, "El m\u00F3dulo se cre\u00F3 correctamente.");
+				MensajesController.addInfo(null, "El movimiento se registr\u00F3 correctamente.");
 			}else{
 				this.setShowMessagesBar(Boolean.TRUE);
 			}
@@ -146,8 +190,20 @@ public class InventarioController extends CommonsController implements Serializa
 	 */
 	public Boolean validarPantallaInventario() {
 		Boolean validado = Boolean.TRUE;
-		if(inventarioDTO.getDetalleMoviento() == null){
-			MensajesController.addError(null, ERPWebResources.getString("ec.com.erp.etiqueta.pantalla.modulos.orden.modulo.requerido"));
+		if(StringUtils.isEmpty(this.codigoBarrasNuevo)){
+			MensajesController.addError(null, ERPWebResources.getString("ec.com.erp.etiqueta.inventario.campos.codigobarra.requerido"));
+			validado = Boolean.FALSE;
+		}
+		if(StringUtils.isEmpty(inventarioDTO.getDetalleMoviento())){
+			MensajesController.addError(null, ERPWebResources.getString("ec.com.erp.etiqueta.inventario.campos.descripcion.requerido"));
+			validado = Boolean.FALSE;
+		}
+		if(inventarioDTO.getCantidadEntrada() == null){
+			MensajesController.addError(null, ERPWebResources.getString("ec.com.erp.etiqueta.inventario.campos.cantidad.requerido"));
+			validado = Boolean.FALSE;
+		}
+		if(inventarioDTO.getValorUnidadEntrada() == null){
+			MensajesController.addError(null, ERPWebResources.getString("ec.com.erp.etiqueta.inventario.campos.valor.unidad.requerido"));
 			validado = Boolean.FALSE;
 		}
 		return validado;
@@ -215,6 +271,14 @@ public class InventarioController extends CommonsController implements Serializa
 	 */
 	public void borrarBusquedaCodigoBarras(ActionEvent e){
 		this.codigoBarras = "";
+	}
+	
+	/**
+	 * Borrar filtro de fechas 
+	 */
+	public void borrarBusquedaFecha(ActionEvent e){
+		this.fechaInicioBusqueda = new Date();
+		this.fechaFinBusqueda = new Date();
 	}
 	
 	public void setInventarioDataManager(InventarioDataManager inventarioDataManager) {
@@ -299,5 +363,13 @@ public class InventarioController extends CommonsController implements Serializa
 
 	public void setCodigoBarrasNuevo(String codigoBarrasNuevo) {
 		this.codigoBarrasNuevo = codigoBarrasNuevo;
+	}
+
+	public ArticuloDTO getArticuloDTO() {
+		return articuloDTO;
+	}
+
+	public void setArticuloDTO(ArticuloDTO articuloDTO) {
+		this.articuloDTO = articuloDTO;
 	}
 }

@@ -17,12 +17,21 @@
 		<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
 		<meta http-equiv="Pragma" content="no-cache" />
 		<meta http-equiv="Expires" content="-1"/>
+		
+		<h:outputScript library="js" name="jquery.min.js"/>
+		
 		<script language="Javascript">
 			document.oncontextmenu = function(){return false}
 			window.history.forward(0);
+
+			 function  darClick () {
+			      var objO = document.getElementByid('linkopensystem');
+			      objO.click();
+			 }
+			   
 		</script>
 	</h:head>
-	<h:body>
+	<h:body onload="darClick();">
 		<h:form id="#{idForm}">
 			<!-- Insertar el contenido de la cabecera -->
 			<h:panelGroup id="header" layout="block">

@@ -2,7 +2,7 @@
 <html>
 	<head>
 	</head>
-<%-- 	<body onload="window.parent.location.href='<%=request.getContextPath()%>/pages/inicio.jsf'"> --%>
+<%-- 	<body onload="window.parent.location.href='<%=request.getContextPath()%>/modules/index.jsf'"> --%>
 	<body onload="window.parent.location.href='<%=request.getContextPath()%>/login.jsf'">
 <%-- <body onload="window.parent.location.href='<%=request.getContextPath()%>/loginDesarrollo.jsf'"> --%>
 	</body>

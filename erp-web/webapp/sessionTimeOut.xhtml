@@ -1,18 +1,24 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!DOCTYPE html PUBLIC
+ "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml"
 	xmlns:h="http://java.sun.com/jsf/html"
 	xmlns:rich="http://richfaces.org/rich"
 	xmlns:a4j="http://richfaces.org/a4j">
 	<h:head></h:head>
 	<h:body onload="#{rich:component('stow')}.show();">
-		<!-- la ventana modal -->
 	    <rich:popupPanel id="stow" width="375" height="130" resizeable="false" header="Session finalizada">
 			<table width="100%" border="0">
-				<tr><td><h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.mensaje.sesion.caducada']}"/></td></tr>
-				<tr><td height="15px"></td></tr>
-				<tr><td align="center"
-				><h:commandButton value="Aceptar" onclick="window.location.href='login.jsf';"/>
-				</td></tr>
+				<tr>
+					<td><h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.mensaje.sesion.caducada']}"/></td>
+				</tr>
+				<tr>
+					<td height="15px"></td>
+				</tr>
+				<tr>
+					<td align="center">
+						<h:commandButton value="Aceptar" onclick="window.location.href='login.jsf';"/>
+					</td>
+				</tr>
 			</table>
 	    </rich:popupPanel>
 	</h:body>

@@ -12,7 +12,7 @@
 	<ui:param name="westLength" value="250" />
 	
 	<ui:define name="title">
-		Modulos
+		Kardex
 	</ui:define>
 	
 	<ui:define name="header">	
@@ -24,7 +24,25 @@
 	</ui:define>
 	
 	<ui:define name="contentCenter">
-		<rich:panel id="listaInventario" styleClass="panelListaArticulos" header="#{msg_erpweb['ec.com.erp.etiqueta.titulo.lista.modulos']}" style="height: 94.5%; width:100% !important;">	
+		<rich:panel id="listaInventario" styleClass="panelListaArticulos" header="#{msg_erpweb['ec.com.erp.etiqueta.inventario.label.header.title']}" style="height: 94.5%; width:100% !important;">
+		
+			<fieldset>
+			 	<legend>#{msg_erpweb['ec.com.erp.etiqueta.header.tabla.detalle.articulo']}</legend>
+			 	<h:panelGrid id="pnlGridModulos" columns="5" cellspacing="2" cellpadding="5">
+			 		<h:outputText class="styleNegritas" value="#{msg_erpweb['ec.com.erp.etiqueta.header.tabla.codigo.barras']}: " />
+			 		<h:outputText class="styleUpperCase" style="width:260px" value="#{inventarioController.articuloDTO.codigoBarras}"/>
+			 		<h:outputText value=""/>
+			 		<h:outputText class="styleNegritas" value="#{msg_erpweb['ec.com.erp.etiqueta.header.tabla.descripcion.articulo']}:" />
+			 		<h:outputText class="styleUpperCase" style="width:260px" value="#{inventarioController.articuloDTO.nombreArticulo}" />
+			 		
+			 		<h:outputText class="styleNegritas" value="#{msg_erpweb['ec.com.erp.etiqueta.header.tabla.articulo.peso']}: " />
+			 		<h:outputText class="styleUpperCase" style="width:260px" value="#{inventarioController.articuloDTO.peso}"/>
+			 		<h:outputText value=""/>
+			 		<h:outputText class="styleNegritas" value="#{msg_erpweb['ec.com.erp.etiqueta.header.tabla.articulo.precio']}:" />
+			 		<h:outputText class="styleUpperCase" style="width:260px" value="#{inventarioController.articuloDTO.precio}" />
+			 	</h:panelGrid>
+			</fieldset>
+				
 			<h:panelGrid id="tablaVacia" columns="1" rendered="#{empty inventarioController.inventarioDTOCols}" style="width:100%; text-align: center; padding-top: 220px">
 				<h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.mensaje.lista.vacio']}"/>
 			</h:panelGrid>
@@ -131,7 +149,14 @@
 			function openLinkSystem(){
 				$('.linkopensystem').trigger('click');
 			}	
-								
+
+			function validarEnteros(e) {
+				tecla = (document.all) ? e.keyCode : e.which; 
+				if (tecla==8) return true; 
+				patron =/[0-9\s]/; 
+				te = String.fromCharCode(tecla);
+				return patron.test(te);
+			}					
 		/*]]>*/			
 		</script>
 		<h:outputStylesheet>

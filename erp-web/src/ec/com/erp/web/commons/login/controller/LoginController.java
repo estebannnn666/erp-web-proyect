@@ -244,6 +244,15 @@ public class LoginController extends CommonsController implements Serializable{
 	public void refrescarPantalla(ActionEvent e){
 		System.out.println("Ingreso a refrescar pantalla");
 	}
+	
+	/**
+	 * Metodo para refrescar pantalla
+	 * @param e
+	 */
+	public String refrescar(){
+		System.out.println("Ingreso a refrescar pantalla");
+		return "";
+	}
 
 	// ------------------------------
 	// Getters & Setters 

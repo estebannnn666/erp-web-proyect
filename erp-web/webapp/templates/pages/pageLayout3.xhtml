@@ -17,6 +17,9 @@
 		<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
 		<meta http-equiv="Pragma" content="no-cache" />
 		<meta http-equiv="Expires" content="-1"/>
+		
+		<h:outputScript library="js" name="jquery.min.js"/>
+		
 		<script language="Javascript">
 			document.oncontextmenu = function(){return false}
 			window.history.forward(0);
@@ -33,8 +36,8 @@
 								<h:graphicImage value="#{resource['images/erp.png']}" height="60" width="60"/> 
 							</h:panelGrid>
 							<h:panelGrid columns="1">
-								<!-- <h:outputLabel style="font-size: 26px; color: red; font-weight: bold; font-family: sans-serif;" value="SGPYMES" /> 
-								<h:outputLabel style="font-size: 15px; font-family: sans-serif;" value="NOMBRE DE LA EMPRESA" />  -->
+								<h:outputLabel style="font-size: 26px; color: red; font-weight: bold; font-family: sans-serif;" value="SGPYMES" /> 
+								<h:outputLabel style="font-size: 15px; font-family: sans-serif;" value="NOMBRE DE LA EMPRESA" />
 							</h:panelGrid>
 						</h:panelGrid>			
 					</div>
