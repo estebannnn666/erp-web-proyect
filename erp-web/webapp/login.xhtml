@@ -1,0 +1,38 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:a4j="http://richfaces.org/a4j"
+	xmlns:rich="http://richfaces.org/rich"
+	template="/templates/main/loginLayout.xhtml">
+
+	<ui:param name="idForm" value="frmAdminFurgon" />
+	<ui:param name="form" value="#{loginController.form}" />	
+	<ui:param name="controller" value="#{loginController}" />
+	<ui:define name="contentCenter">
+		<h:form id="login-form">
+    		<rich:panel header="Login" style="width:300px !important;"> 
+	    		<h:panelGrid columns="2">
+		    		<h:outputText value="username:"/>
+		    	   	<h:inputText value="#{loginController.usuariosDTO.nombreUsuario}" id="nombreUsuario"/>
+		    	   	<h:outputText value="password:"/>
+		    	   	<h:inputSecret value="#{loginController.usuariosDTO.passwordUsuario}" id="passwordUsuario"/>
+	    	    </h:panelGrid>
+	   			<a4j:commandButton id="button" value="Login" render="pnlMensajes" action="#{loginController.doLogin}"/>
+    	  	</rich:panel>
+	    	<script>
+				/*<![CDATA[*/
+				$(document).ready(function(){				
+					 openLinkSystem();				
+				});
+				function openLinkSystem(){
+					$('.linkopensystem').trigger('click');
+				}	
+									
+				/*]]>*/			
+			</script>
+	   	   	<a4j:commandLink id="linkopensystem" styleClass="linkopensystem" execute="@this" actionListener="#{loginController.refrescarPantalla}">
+			</a4j:commandLink>	
+    	</h:form>
+	</ui:define>
+</ui:composition>

@@ -1,0 +1,82 @@
+<!DOCTYPE html PUBLIC
+ "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" 
+	xmlns:h="http://java.sun.com/jsf/html" 
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets" 
+	xmlns:a4j="http://richfaces.org/a4j" 
+	xmlns:rich="http://richfaces.org/rich">
+<f:view contentType="text/html">
+	<h:head>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+		<meta http-equiv="Expires" content="0" />
+		<meta http-equiv="Pragma" content="no-cache" />
+		<meta http-equiv="cache-control" content="no-cache, no-store, must-revalidate" />
+		<meta http-equiv="Expires" content="Mon, 01 Jan 1990 00:00:01 GMT" />
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+		<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+		<meta http-equiv="Pragma" content="no-cache" />
+		<meta http-equiv="Expires" content="-1"/>
+		<script language="Javascript">
+			document.oncontextmenu = function(){return false}
+			window.history.forward(0);
+		</script>
+	</h:head>
+	<h:body>
+		<h:form id="#{idForm}">
+			<!-- Insertar el contenido de la cabecera -->
+			<h:panelGroup id="header" layout="block">
+				<div id="topBusqueda">
+					<div align="left" style="float: left; width:21.8%; border-right: 1px solid #a6a6a6; border-right-style: dashed;">
+						<h:panelGrid columns="2">
+							<h:panelGrid columns="1">
+								<h:graphicImage value="#{resource['images/erp.png']}" height="60" width="60"/> 
+							</h:panelGrid>
+							<h:panelGrid columns="1">
+								<!-- <h:outputLabel style="font-size: 26px; color: red; font-weight: bold; font-family: sans-serif;" value="SGPYMES" /> 
+								<h:outputLabel style="font-size: 15px; font-family: sans-serif;" value="NOMBRE DE LA EMPRESA" />  -->
+							</h:panelGrid>
+						</h:panelGrid>			
+					</div>
+					<div align="right" style="float: right; width:78.1%" class="panelToolBar">
+						<rich:toolbar height="36" itemSeparator="line" itemStyle="width:2px">
+							<ui:insert name="header">
+							</ui:insert>
+					    	
+					    	<rich:toolbarGroup location="right">
+					    		<h:panelGrid columns="2" cellpadding="0" cellspacing="0" id="pgr" style="padding-top: 1px !important;">
+						    		<h:panelGroup layout="block" styleClass="styleAyuda">
+										<a4j:commandLink styleClass="guardarA"/>
+									</h:panelGroup>
+									<h:panelGroup layout="block" styleClass="styleCerrar">
+										<a4j:commandLink styleClass="guardarA" action="#{loginController.doLogout}"/>
+									</h:panelGroup>
+								</h:panelGrid>
+							</rich:toolbarGroup>
+						</rich:toolbar>
+					</div>
+				</div>
+			</h:panelGroup>
+			<!-- Insertar el contenido central -->
+			<div id="contenedorPrincipalNuevo">
+				<ui:insert name="contentCenter">
+				</ui:insert>
+			</div>
+			<!-- Insertar el contenido del menu inferior -->
+			<h:panelGroup layout="block"  style="padding:0px;overflow:hidden;border:0px">
+				<div  id="bottom">
+					<ui:insert name="contentBottom">
+						<ui:include src="/templates/main/bottom.xhtml" />
+					</ui:insert>
+				</div>
+			</h:panelGroup>
+			<ui:debug hotkey="l" />
+		</h:form>
+		 <ui:include src="/templates/main/messages.xhtml">
+			<ui:param name="controller" value="#{controller}"/>
+		</ui:include>
+	</h:body>
+	<h:outputStylesheet library="css" name="login.css" />
+	<h:outputStylesheet library="css" name="articulos.css" />
+</f:view>
+</html>

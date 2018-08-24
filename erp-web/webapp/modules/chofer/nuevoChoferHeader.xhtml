@@ -1,0 +1,37 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:a4j="http://richfaces.org/a4j"
+	xmlns:rich="http://richfaces.org/rich"
+	xmlns:c="http://java.sun.com/jstl/core">
+        <rich:toolbarGroup>
+        	<!-- BOTON: NUEVO-->
+			<h:panelGroup layout="block" styleClass="botonComun">
+				<a4j:commandLink value="Nuevo" execute="@this" render="pnlGridChofer pnlGridPersona pnlGridContacto pnlMensajes"
+					styleClass="botonNuevo" actionListener="#{choferController.clearNuevoChofer}"/>
+			</h:panelGroup>
+		</rich:toolbarGroup>
+		
+		<rich:toolbarGroup>
+			<!-- BOTON: GUARDAR-->
+			<h:panelGroup layout="block" styleClass="botonComun">
+				<a4j:commandLink oncomplete="if(#{choferController.choferCreado})#{rich:component('mpConfirmacion')}.show();"  
+					value="#{msg_erpweb['ec.com.erp.etiqueta.boton.guardar']}"
+					styleClass="botonGuardar" actionListener="#{choferController.guadarActualizarChofer}"
+					execute="pnlGridChofer pnlGridPersona pnlGridContacto" render="pnlMensajes"/>
+			</h:panelGroup>
+		</rich:toolbarGroup>
+		
+		<rich:toolbarGroup>
+			<!-- BOTON: BUSQUEDA-->
+			<h:panelGroup layout="block" styleClass="botonComun">
+				<a4j:commandLink value="#{msg_erpweb['ec.com.erp.etiqueta.boton.busqueda']}"
+					styleClass="botonBuscar" action="#{choferController.regresarBusquedaChoferes}"
+					immediate="true" execute="@this" />
+			</h:panelGroup>
+		</rich:toolbarGroup>
+		
+		<rich:toolbarGroup>	
+		</rich:toolbarGroup>
+</ui:composition>

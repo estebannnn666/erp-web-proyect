@@ -1,0 +1,81 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:a4j="http://richfaces.org/a4j"
+	xmlns:rich="http://richfaces.org/rich"
+	xmlns:c="http://java.sun.com/jstl/core">			
+	
+	<rich:panel id="panel-content-left" style="height: 94%"	styleClass="panel-content-left">
+		<f:facet name="header">			
+			<h:panelGrid columns="2" width="99%" columnClasses="align-left, align-right" cellpadding="0" cellspacing="0">
+				<h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.criterios.busqueda']}" style="white-space:nowrap" />
+			</h:panelGrid>
+		</f:facet>		
+	
+		<h:panelGroup id="filtrosCliente" layout="block" styleClass="listaReporte">
+			<h:panelGrid columns="1" width="99%" cellpadding="0" cellspacing="2">
+				<h:panelGrid width="100%" columns="2" columnClasses="columnaIzquierda, columnaDerecha">
+					<h:panelGroup>
+		    	   		<h:outputText class="styleNegritas" value="#{msg_erpweb['ec.com.erp.etiqueta.label.lista.cabecera.factura.numero.documento']}"/>
+		    	   	</h:panelGroup>
+		    	   	<h:panelGroup styleClass="styleBorrar">
+						<a4j:commandLink styleClass="guardarA" execute="@this" render="listaReporte" actionListener="#{cuentasController.borrarBusquedaNumeroFactura}"/>
+					</h:panelGroup>
+				</h:panelGrid>
+		    	<h:inputText class="styleUpperCase" style="width:216px" value="#{cuentasController.numeroFactura}" id="numeroFacturaBusqueda" maxlength="16"/>
+		    	
+		    	<h:panelGrid width="100%" columns="2" columnClasses="columnaIzquierda, columnaDerecha">
+					<h:panelGroup>
+		    	   		<h:outputText class="styleNegritas" value="#{msg_erpweb['ec.com.erp.etiqueta.label.lista.cabecera.factura.fecha']}"/>
+		    	   	</h:panelGroup>
+		    	   	<h:panelGroup styleClass="styleBorrar">
+						<a4j:commandLink styleClass="guardarA" execute="@this" render="listaReporte" actionListener="#{cuentasController.borrarBusquedaFechaFactura}"/>
+					</h:panelGroup>
+				</h:panelGrid>
+				<rich:calendar inputStyle="width:197px !important;" value="#{cuentasController.fechaFacturaInicio}" datePattern="yyyy-MM-dd"></rich:calendar>
+				<rich:calendar inputStyle="width:197px !important;" value="#{cuentasController.fechaFacturaFin}" datePattern="yyyy-MM-dd"></rich:calendar>
+				
+				<h:panelGrid width="100%" columns="2" columnClasses="columnaIzquierda, columnaDerecha">
+					<h:panelGroup>
+		    	   		<h:outputText class="styleNegritas" value="#{msg_erpweb['ec.com.erp.etiqueta.label.lista.cabecera.factura.ruc.documento']}"/>
+		    	   	</h:panelGroup>
+		    	   	<h:panelGroup styleClass="styleBorrar">
+						<a4j:commandLink styleClass="guardarA" execute="@this" render="listaReporte" actionListener="#{cuentasController.borrarBusquedaDocumento}"/>
+					</h:panelGroup>
+				</h:panelGrid>
+				<h:inputText class="styleUpperCase" style="width:216px" value="#{cuentasController.docClienteProveedor}" id="numDocumento" maxlength="13" onkeypress="return validarEnteros(event);"/>
+				
+				<h:panelGrid width="100%" columns="2" columnClasses="columnaIzquierda, columnaDerecha">
+					<h:panelGroup>
+		    	   		<h:outputText class="styleNegritas" value="#{msg_erpweb['ec.com.erp.etiqueta.label.lista.cabecera.factura.cliente.proveedor']}"/>
+		    	   	</h:panelGroup>
+		    	   	<h:panelGroup styleClass="styleBorrar">
+						<a4j:commandLink styleClass="guardarA" execute="@this" render="listaReporte" actionListener="#{cuentasController.borrarBusquedaClienteProveedor}"/>
+					</h:panelGroup>
+				</h:panelGrid>
+				<h:inputText class="styleUpperCase" style="width:216px" value="#{cuentasController.nombClienteProveedor}" id="razonSocialBusqueda" maxlength="64"/>
+				
+				<h:panelGrid width="100%" columns="2" columnClasses="columnaIzquierda, columnaDerecha">
+					<h:panelGroup>
+		    	   		<h:outputText class="styleNegritas" value="#{msg_erpweb['ec.com.erp.etiqueta.label.lista.cabecera.factura.tipo.documento']}"/>
+		    	   	</h:panelGroup>
+		    	   	<h:panelGroup styleClass="styleBorrar">
+					</h:panelGroup>
+				</h:panelGrid>
+		    	<h:selectOneMenu value="#{cuentasController.tipoDocumento}" style="width:217px">
+		    		<f:selectItems value="#{cuentasController.tipoFacturaCatalogoValorDTOCols}" var="catalog" itemLabel="#{catalog.nombreCatalogoValor}" itemValue="#{catalog.id.codigoCatalogoValor}"/>
+		    	</h:selectOneMenu>
+			</h:panelGrid>						
+		</h:panelGroup>	
+		
+	</rich:panel>
+	<h:panelGrid style="text-align: center">
+		<a4j:commandButton id="btnBuscarCliente" value="Buscar" render="panelCuentasTabla, tableCuentas, pnlMensajes" execute="filtrosCliente" actionListener="#{cuentasController.busquedaCuentasFacturas}"/>
+	</h:panelGrid>
+	<h:outputStylesheet>
+		.estiloCalendario{
+			width:197px !important;
+		}
+	</h:outputStylesheet>
+</ui:composition>

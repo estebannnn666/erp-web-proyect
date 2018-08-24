@@ -1,0 +1,31 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" 
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core" 
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:rich="http://richfaces.org/rich" 
+	xmlns:a4j="http://richfaces.org/a4j">
+	<div>
+		<div align="left" style="float: left;">
+			<h:panelGrid columns="2">
+				<h:panelGrid columns="1">
+					<h:graphicImage value="#{resource['images/erp.png']}" height="60" width="60"/>
+				</h:panelGrid>
+				<h:panelGrid columns="1">
+					<h:outputLabel style="font-size: 26px; color: red; font-weight: bold; font-family: sans-serif;" value="SGPYMES" /> 
+					<h:outputLabel style="font-size: 15px; font-family: sans-serif;" value="NOMBRE DE LA EMPRESA" />
+				</h:panelGrid>
+			</h:panelGrid>			
+		</div>
+		<!-- MENU GENERAL PARA TODAS LAS PANTALLA -->
+	    <div align="right" style="float: right;">
+	    	<h:panelGrid columns="2">
+	    		<h:panelGroup layout="block" styleClass="styleAyuda">
+					<a4j:commandLink styleClass="guardarA"/>
+				</h:panelGroup>
+				<h:panelGroup layout="block" styleClass="styleCerrar">
+					<a4j:commandLink styleClass="guardarA" action="#{loginController.doLogout}"/>
+				</h:panelGroup>
+	   	   	</h:panelGrid>
+	    </div>
+    </div>
+</ui:composition>

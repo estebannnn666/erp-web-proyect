@@ -1,0 +1,92 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:a4j="http://richfaces.org/a4j"
+	xmlns:rich="http://richfaces.org/rich"
+	template="/templates/pages/pageLayout2.xhtml">
+	
+	<ui:param name="idForm" value="frmAdminBusqueda" />
+	<ui:param name="form" value="#{perfilController.form}" />	
+	<ui:param name="controller" value="#{perfilController}" />
+	<ui:param name="westLength" value="250" />
+	
+	<ui:define name="title">
+		Modulos
+	</ui:define>
+	
+	<ui:define name="header">	
+		<ui:include src="adminBusquedaPerfilHeader.xhtml" />
+	</ui:define>
+	
+	<ui:define name="contentLeft">
+		<ui:include src="adminBusquedaPerfilLeft.xhtml" />
+	</ui:define>
+	
+	<ui:define name="contentCenter">
+		<rich:panel id="listaPerfiles" styleClass="panelListaArticulos" header="#{msg_erpweb['ec.com.erp.etiqueta.titulo.lista.perfiles']}" style="height: 94.5%; width:100% !important;">	
+			<h:panelGrid id="tablaVacia" columns="1" rendered="#{empty perfilController.perfilDTOCols}" style="width:100%; text-align: center; padding-top: 220px">
+				<h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.mensaje.lista.vacio']}"/>
+			</h:panelGrid>
+			<rich:panel style="text-align:center; border-left: none; border-right:none; border-bottom:none" rendered="#{not empty perfilController.perfilDTOCols}">
+				<rich:dataScroller page="#{perfilController.page}" fastStep="3" for="tablePerfil" maxPages="5" rendered="#{not empty perfilController.perfilDTOCols}" renderIfSinglePage="false"/>
+			</rich:panel>	
+				
+			 <rich:dataTable style="width:100%" rendered="#{not empty perfilController.perfilDTOCols}" value="#{perfilController.perfilDTOCols}" var="perfil" iterationStatusVar="it" id="tablePerfil" rows="15">
+	            <rich:column>
+	                <f:facet name="header">Nro.</f:facet>
+	                #{it.index+1}
+	            </rich:column>
+	            <rich:column>
+	                <f:facet name="header"><h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.pantalla.perfiles.nombre']}"/></f:facet>
+	                <h:outputText value="#{perfil.nombrePerfil}" />
+	            </rich:column>
+	            <rich:column>
+	                <f:facet name="header"><h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.pantalla.perfiles.descripcion']}"/></f:facet>
+	                <h:outputText value="#{perfil.descripcion}" />
+	            </rich:column>
+	            <rich:column>
+	                <f:facet name="header"><h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.pantalla.perfiles.tipo.perfil']}"/></f:facet>
+	                <h:outputText value="#{perfil.perfilCatalogoValorDTO.nombreCatalogoValor}" />
+	            </rich:column>
+	            <rich:column>
+	                <f:facet name="header"><h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.pantalla.perfiles.estado.perfil']}"/></f:facet>
+	                <h:outputText value="#{perfil.estado}" />
+	            </rich:column>
+	            <rich:column styleClass="columna10">
+	                <f:facet name="header">Editar</f:facet>
+	                <a4j:commandLink id="botonEditar" render="pnlGridPerfil" action="#{perfilController.cargarPerfil()}"	execute="@this" >
+						<h:graphicImage name="btnEditar.png" library="images" style="border:none;border-color:white;" height="16" width="16"/>
+						<f:setPropertyActionListener value="#{perfil}" target="#{perfilController.perfilDTO}" />											
+					</a4j:commandLink>	
+	            </rich:column>
+	        </rich:dataTable>
+        </rich:panel>
+        <script>
+			/*<![CDATA[*/
+			$(document).ready(function(){				
+				 openLinkSystem();				
+			});
+			function openLinkSystem(){
+				$('.linkopensystem').trigger('click');
+			}	
+								
+		/*]]>*/			
+		</script>
+		<h:outputStylesheet>
+			.columna1{
+				width: 1% !important;
+			}	
+			.columna9 {
+				width: 9% !important;
+			}
+			.columna10 {
+				width: 5% !important;
+				text-align: center !important;
+			}
+		</h:outputStylesheet>
+		<a4j:commandLink id="linkopensystem" styleClass="linkopensystem" execute="@this" actionListener="#{perfilController.refrescarPantalla}">
+		</a4j:commandLink>	
+	</ui:define>
+	
+</ui:composition>

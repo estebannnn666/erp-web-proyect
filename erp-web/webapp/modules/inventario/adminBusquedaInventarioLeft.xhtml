@@ -1,0 +1,35 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:a4j="http://richfaces.org/a4j"
+	xmlns:rich="http://richfaces.org/rich"
+	xmlns:c="http://java.sun.com/jstl/core">			
+	
+	<rich:panel id="panel-content-left" style="height: 94%"	styleClass="panel-content-left">
+		<f:facet name="header">			
+			<h:panelGrid columns="2" width="99%" columnClasses="align-left, align-right" cellpadding="0" cellspacing="0">
+				<h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.criterios.busqueda']}" style="white-space:nowrap" />
+			</h:panelGrid>
+		</f:facet>		
+	
+		<h:panelGroup id="listaReporte" layout="block" styleClass="listaReporte">
+			<h:panelGrid columns="1" width="99%" cellpadding="0" cellspacing="2">
+				<h:panelGrid width="100%" columns="2" columnClasses="columnaIzquierda, columnaDerecha">
+					<h:panelGroup>
+		    	   		<h:outputText class="styleNegritas" value="#{msg_erpweb['ec.com.erp.etiqueta.header.tabla.codigo.barras']}"/>
+		    	   	</h:panelGroup>
+		    	   	<h:panelGroup styleClass="styleBorrar">
+						<a4j:commandLink styleClass="guardarA" execute="@this" render="listaReporte" actionListener="#{inventarioController.borrarBusquedaCodigoBarras}"/>
+					</h:panelGroup>
+				</h:panelGrid>
+		    	<h:inputText class="styleUpperCase" style="width:216px" value="#{inventarioController.codigoBarras}" id="codigoBarras"/>
+			</h:panelGrid>						
+		</h:panelGroup>	
+		
+	</rich:panel>
+	<h:panelGrid style="text-align: center">
+		<a4j:commandButton id="btnBuscar" value="Buscar" render="listaInventario tableInventario pnlMensajes" execute="listaReporte" actionListener="#{inventarioController.busquedaInventario}"/>
+	</h:panelGrid>
+	
+</ui:composition>

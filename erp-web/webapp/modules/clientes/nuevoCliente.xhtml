@@ -1,0 +1,170 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:a4j="http://richfaces.org/a4j"
+	xmlns:rich="http://richfaces.org/rich"
+	template="/templates/pages/pageLayout3.xhtml">
+	
+	<ui:param name="idForm" value="frmNuevoCliente" />
+	<ui:param name="form" value="#{clientesController.form}" />	
+	<ui:param name="controller" value="#{clientesController}" />
+	<ui:param name="westLength" value="250" />
+	
+	<ui:define name="title">
+		Nuevo cliente
+	</ui:define>
+	
+	<ui:define name="header">		
+		<ui:include src="nuevoClienteHeader.xhtml" />
+	</ui:define>
+	
+	<ui:define name="contentCenter">
+		<rich:panel header="Registro de nuevos clientes" style="width: 100%; background-color: #F5FAFF;">
+			<fieldset>
+				<legend class="styleLegend">#{msg_erpweb['ec.com.erp.etiqueta.header.datos.cliente']}</legend>
+				<h:panelGrid id="pnlGridCliente" columns="2" cellspacing="2" cellpadding="5">
+					<h:outputText class="styleNegritas" value="#{msg_erpweb['ec.com.erp.etiqueta.header.tabla.tipo.cliente']}: *" />
+					<h:selectOneRadio value="#{clientesController.clienteDTO.codigoValorTipoCliente}">
+					   	<f:selectItem itemValue="PER" itemLabel="PERSONA" />
+					   	<f:selectItem itemValue="EMP" itemLabel="EMPRESA" />
+					   	<a4j:ajax event="click" execute="@this" render="pnlDatosBasicosCliente"></a4j:ajax>
+					</h:selectOneRadio>
+				</h:panelGrid>
+			</fieldset>
+			<fieldset>
+				<legend class="styleLegend">#{msg_erpweb['ec.com.erp.etiqueta.header.datos.basicos']}</legend>
+				<h:panelGroup id="pnlDatosBasicosCliente">
+					<h:panelGrid id="pnlGridPersona" columns="5" cellspacing="2" cellpadding="5" rendered="#{clientesController.clienteDTO.codigoValorTipoCliente == 'PER'}">
+				 		<h:outputText class="styleNegritas" value="#{msg_erpweb['ec.com.erp.etiqueta.label.nuevo.cliente.documento']}: *" />
+				 		<h:inputText class="styleUpperCase" style="background-color:#f9f9d5; background-image: none; width:260px" value="#{clientesController.personaDTO.numeroDocumento}" id="numeroDocumento"/>
+				 		<div style="width:20px"></div>
+				 		<h:outputText value=""/>
+				 		<h:outputText value=""/>
+				 		
+				 		<h:outputText class="styleNegritas" value="#{msg_erpweb['ec.com.erp.etiqueta.label.nuevo.cliente.nombre.completo']}:" />
+				 		<h:outputText id="nombreCompleto" class="styleUpperCase" value="#{clientesController.personaDTO.nombreCompleto}" />
+				 		<div style="width:20px"></div>
+				 		<h:outputText value=""/>
+				 		<h:outputText value=""/>
+				 		
+				 		<h:outputText class="styleNegritas" value="#{msg_erpweb['ec.com.erp.etiqueta.label.nuevo.cliente.primer.apellido']}: *" />
+				 		<h:inputText class="styleUpperCase" style="background-color:#f9f9d5; background-image: none; width:260px" value="#{clientesController.personaDTO.primerApellido}" id="primerApellido">
+				 			<f:ajax render="nombreCompleto" event="keyup" execute="@this" listener="#{clientesController.concatenarNombrePersona}"></f:ajax>
+				 		</h:inputText>
+				 		<div style="width:20px"></div>
+				 		<h:outputText class="styleNegritas" value="#{msg_erpweb['ec.com.erp.etiqueta.label.nuevo.cliente.segundo.apellido']}: " />
+				 		<h:inputText class="styleUpperCase" style="width:260px" value="#{clientesController.personaDTO.segundoApellido}" id="segundoApellido" required="false">
+				 			<f:ajax render="nombreCompleto" event="keyup" execute="@this" listener="#{clientesController.concatenarNombrePersona}"></f:ajax>
+				 		</h:inputText>
+				 		
+				 		<h:outputText class="styleNegritas" value="#{msg_erpweb['ec.com.erp.etiqueta.label.nuevo.cliente.primer.nombre']}: *" />
+				 		<h:inputText class="styleUpperCase" style="background-color:#f9f9d5; background-image: none; width:260px" value="#{clientesController.personaDTO.primerNombre}" id="primerNombre">
+				 			<f:ajax render="nombreCompleto" event="keyup" execute="@this" listener="#{clientesController.concatenarNombrePersona}"></f:ajax>
+				 		</h:inputText>
+				 		<div style="width:20px"></div>
+				 		<h:outputText class="styleNegritas" value="#{msg_erpweb['ec.com.erp.etiqueta.label.nuevo.cliente.segundo.nombre']}: " />
+				 		<h:inputText class="styleUpperCase" style="width:260px" value="#{clientesController.personaDTO.segundoNombre}" id="segundoNombre" required="false">
+				 			<f:ajax render="nombreCompleto" event="keyup" execute="@this" listener="#{clientesController.concatenarNombrePersona}"></f:ajax>
+				 		</h:inputText>
+				 	</h:panelGrid>
+				 	
+				 	<h:panelGrid id="pnlGridEmpresa" columns="2" cellspacing="2" cellpadding="5" rendered="#{clientesController.clienteDTO.codigoValorTipoCliente == 'EMP'}">
+				 		<h:outputText class="styleNegritas" value="#{msg_erpweb['ec.com.erp.etiqueta.label.nuevo.cliente.empresa.numeroruc']}: *" />
+				 		<h:inputText class="styleUpperCase" style="background-color:#f9f9d5; background-image: none; width:260px" value="#{clientesController.empresaDTO.numeroRuc}" id="numeroRuc"/>
+				 		
+				 		<h:outputText class="styleNegritas" value="#{msg_erpweb['ec.com.erp.etiqueta.label.nuevo.cliente.empresa.razonSocial']}: *" />
+				 		<h:inputText class="styleUpperCase" style="background-color:#f9f9d5; background-image: none; width:260px" value="#{clientesController.empresaDTO.razonSocial}" id="razonSocial"/>
+				 		
+				 		<h:outputText class="styleNegritas" value="#{msg_erpweb['ec.com.erp.etiqueta.label.nuevo.cliente.empresa.Descripcion']}: " />
+				 		<h:inputText class="styleUpperCase" style="width:260px" value="#{clientesController.empresaDTO.descripcionEmpresa}" id="descripcionEmpresa" required="false"/>
+				 	</h:panelGrid>
+				 </h:panelGroup>
+			</fieldset>
+			
+			<fieldset>
+				<legend class="styleLegend">#{msg_erpweb['ec.com.erp.etiqueta.header.datos.contacto']}</legend>
+				<h:panelGrid id="pnlGridContacto" columns="5" cellspacing="2" cellpadding="5">
+			 		<h:outputText class="styleNegritas" value="#{msg_erpweb['ec.com.erp.etiqueta.label.nuevo.cliente.contacto.direccion']}:" />
+			 		<h:outputText id="direccion" class="styleUpperCase" value="#{clientesController.contactoDTO.direccionPrincipal}" />
+			 		<div style="width:20px"></div>
+			 		<h:outputText value=""/>
+			 		<h:outputText value=""/>
+			 		
+			 		<h:outputText class="styleNegritas" value="#{msg_erpweb['ec.com.erp.etiqueta.label.nuevo.cliente.contacto.calle.principal']}: *" />
+			 		<h:inputText class="styleUpperCase" style="background-color:#f9f9d5; background-image: none; width:260px" value="#{clientesController.contactoDTO.callePrincipal}" id="callePrincipal">
+			 			<f:ajax render="direccion" event="keyup" execute="@this" listener="#{clientesController.concatenarDireccion}"></f:ajax>
+			 		</h:inputText>
+			 		<div style="width:20px"></div>
+			 		<h:outputText class="styleNegritas" value="#{msg_erpweb['ec.com.erp.etiqueta.label.nuevo.cliente.contacto.numero.casa']}: *" />
+			 		<h:inputText class="styleUpperCase" style="background-color:#f9f9d5; background-image: none; width:260px" value="#{clientesController.contactoDTO.numeroCasa}" id="numeroCasa">
+			 			<f:ajax render="direccion" event="keyup" execute="@this" listener="#{clientesController.concatenarDireccion}"></f:ajax>
+			 		</h:inputText>
+			 		
+			 		<h:outputText class="styleNegritas" value="#{msg_erpweb['ec.com.erp.etiqueta.label.nuevo.cliente.contacto.calle.secundaria']}:" />
+			 		<h:inputText class="styleUpperCase" style="width:260px" value="#{clientesController.contactoDTO.calleSecundaria}" id="calleSecundaria">
+			 			<f:ajax render="direccion" event="keyup" execute="@this" listener="#{clientesController.concatenarDireccion}"></f:ajax>
+			 		</h:inputText>
+			 		<div style="width:20px"></div>
+			 		<h:outputText class="styleNegritas" value="#{msg_erpweb['ec.com.erp.etiqueta.label.nuevo.cliente.contacto.referencia']}: " />
+			 		<h:inputText class="styleUpperCase" style="width:260px" value="#{clientesController.contactoDTO.referencia}" id="referencia"/>
+			 		
+			 		<h:outputText class="styleNegritas" value="#{msg_erpweb['ec.com.erp.etiqueta.label.nuevo.cliente.contacto.telefono.convencional']}: *" />
+			 		<h:inputText class="styleUpperCase" style="background-color:#f9f9d5; background-image: none; width:260px" value="#{clientesController.contactoDTO.telefonoPrincipal}" id="telefonoConvencional"/>
+			 		<div style="width:20px"></div>
+			 		<h:outputText class="styleNegritas" value="#{msg_erpweb['ec.com.erp.etiqueta.label.nuevo.cliente.contacto.telefono.celular']}: " />
+			 		<h:inputText class="styleUpperCase" style="width:260px" value="#{clientesController.contactoDTO.telefonoCelular}" id="telefonoCelular"/>
+			 		
+			 		<h:outputText class="styleNegritas" value="#{msg_erpweb['ec.com.erp.etiqueta.label.nuevo.cliente.contacto.ciudad']}: *" />
+			 		<h:inputText class="styleUpperCase" style="background-color:#f9f9d5; background-image: none; width:260px" value="#{clientesController.contactoDTO.ciudad}" id="ciudad"/>
+			 		<div style="width:20px"></div>
+			 		<h:outputText value=""/>
+			 		<h:outputText value=""/>
+			 		
+			 	</h:panelGrid>
+			</fieldset>
+		</rich:panel>
+		
+		<!-- Popup para confirmar que se guardo el cliente -->
+		<rich:popupPanel id="mpConfirmacion" header="#{msg_erpweb['ec.com.erp.etiqueta.mensaje.confirmacion']}" width="345" height="145" modal="true" domElementAttachment="form">
+			<f:facet name="controls">
+				<h:outputLink value="#"	onclick="#{rich:component('mpConfirmacion')}.hide();">
+					<h:graphicImage library="images" name="close.png" style="border:0px"/>
+				</h:outputLink>
+			</f:facet>
+			
+			<rich:panel style="height: 94%">
+				<h:panelGrid columns="3">
+					<h:graphicImage name="succes.png" library="images" style="border:none;border-color:white;" height="48" width="48"/>
+					<h:panelGroup style="margin-right:20px;">
+					</h:panelGroup>
+					<h:panelGroup style="text-align:justify;">
+						<h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.mensaje.popUp.confirmacion']}" />
+					</h:panelGroup>
+				</h:panelGrid>
+		    </rich:panel>
+			
+			<!-- Botones de PopUp -->
+			<h:panelGrid style="margin:auto; padding-top: 5px;" columns="3" cellpadding="0" cellspacing="0">
+				<h:panelGroup layout="block" styleClass="botonD" style="margin-top:5px; margin-right:20px;">
+					<a4j:commandLink styleClass="cancelarD" execute="@this" render="pnlGridCliente pnlDatosBasicosCliente pnlGridContacto pnlMensajes" actionListener="#{clientesController.clearNuevoCliente}" oncomplete="#{rich:component('mpConfirmacion')}.hide(); return false;">
+						<h:panelGrid columns="2" cellpadding="3" cellspacing="0">
+							<h:graphicImage name="btnNuevoA.png" library="images" style="border:none;border-color:white;" height="16" width="16"/>
+							<h:outputText value="Nuevo" />
+						</h:panelGrid>
+					</a4j:commandLink>
+				</h:panelGroup>
+				
+				<h:panelGroup layout="block" styleClass="botonD" style="margin-top:5px;">
+					<a4j:commandLink action="#{clientesController.regresarBusquedaClientes}" styleClass="cancelarD" oncomplete="#{rich:component('mpConfirmacion')}.hide(); return false;" immediate="true">
+						<h:panelGrid columns="2" cellpadding="3" cellspacing="0">
+							<h:graphicImage name="btnCancel.png" library="images" style="border:none;border-color:white;" height="16" width="16"/>
+							<h:outputText value="Cancelar" />
+						</h:panelGrid>
+					</a4j:commandLink>
+				</h:panelGroup>
+			</h:panelGrid>
+		</rich:popupPanel>
+	</ui:define>
+	
+</ui:composition>

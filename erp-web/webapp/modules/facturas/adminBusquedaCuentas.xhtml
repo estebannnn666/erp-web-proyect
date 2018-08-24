@@ -1,0 +1,112 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:a4j="http://richfaces.org/a4j"
+	xmlns:rich="http://richfaces.org/rich"
+	template="/templates/pages/pageLayout2.xhtml">
+	
+	<ui:param name="idForm" value="frmAdminCuentas" />
+	<ui:param name="form" value="#{cuentasController.form}" />	
+	<ui:param name="controller" value="#{cuentasController}" />
+	<ui:param name="westLength" value="250" />
+	
+	<ui:define name="title">
+		Facturas
+	</ui:define>
+	
+	<ui:define name="header">	
+		<ui:include src="adminBusquedaCuentasHeader.xhtml" />
+	</ui:define>
+	
+	<ui:define name="contentLeft">
+		<ui:include src="adminBusquedaCuentasLeft.xhtml" />
+	</ui:define>
+	
+	<ui:define name="contentCenter">
+		<rich:panel id="panelCuentasTabla" header="Lista de documentos" styleClass="panelPedidos" style="width:100%; height: 94.5%">	
+			<h:panelGrid id="tablaVaciaPedidos" columns="1" rendered="#{empty cuentasController.facturaCabeceraDTOCols}" style="width:100%; text-align: center; padding-top: 230px">
+				<h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.mensaje.lista.vacio']}"/>
+			</h:panelGrid>	
+			<rich:panel style="text-align:center; border-left: none; border-right:none;" rendered="#{not empty cuentasController.facturaCabeceraDTOCols}">
+				<rich:dataScroller page="#{cuentasController.page}" fastStep="3" for="tableCuentas" maxPages="5" rendered="#{not empty cuentasController.facturaCabeceraDTOCols}" renderIfSinglePage="true"/>
+			</rich:panel>
+			 <rich:dataTable style="width:100%" value="#{cuentasController.facturaCabeceraDTOCols}" rendered="#{not empty cuentasController.facturaCabeceraDTOCols}" var="cuenta" iterationStatusVar="it" id="tableCuentas" rows="20">
+	            <rich:column>
+	                <f:facet name="header">Nro.</f:facet>
+	                #{it.index+1}
+	            </rich:column>
+	            <rich:column>
+	                <f:facet name="header"><h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.label.lista.cabecera.factura.referencia.documento']}"/></f:facet>
+	                <h:outputText value="#{cuenta.codigoReferenciaFactura}" />
+	            </rich:column>
+	            <rich:column>
+	                <f:facet name="header"><h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.label.lista.cabecera.factura.numero.documento']}"/></f:facet>
+	                <h:outputText value="#{cuenta.numeroDocumento}" />
+	            </rich:column>
+	            <rich:column>
+	                <f:facet name="header"><h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.label.lista.cabecera.factura.fecha']}"/></f:facet>
+	                <h:outputText value="#{cuenta.fechaDocumento}" />
+	            </rich:column>
+	            <rich:column>
+	                <f:facet name="header"><h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.label.lista.cabecera.factura.tipo.documento']}"/></f:facet>
+	                <h:outputText value="#{cuenta.tipoDocumentoCatalogoValorDTO.nombreCatalogoValor}" />
+	            </rich:column>
+	            <rich:column>
+	                <f:facet name="header"><h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.label.lista.cabecera.factura.ruc.documento']}"/></f:facet>
+	                <h:outputText value="#{cuenta.rucDocumento}" />
+	            </rich:column>
+	            <rich:column>
+	                <f:facet name="header"><h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.label.lista.cabecera.factura.razonSocial']}"/></f:facet>
+	                <h:outputText value="#{cuenta.nombreClienteProveedor}" />
+	            </rich:column>
+	            <rich:column>
+	                <f:facet name="header"><h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.label.lista.cabecera.factura.direccion']}"/></f:facet>
+	                <h:outputText value="#{cuenta.direccion}" />
+	            </rich:column>
+	            <rich:column>
+	                <f:facet name="header"><h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.label.lista.cabecera.factura.telefono']}"/></f:facet>
+	                <h:outputText value="#{cuenta.telefono}" />
+	            </rich:column>
+	            <rich:column>
+	                <f:facet name="header"><h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.label.lista.cabecera.factura.total.factura']}"/></f:facet>
+	                <h:outputText value="#{cuenta.totalCuenta}" />
+	            </rich:column>
+	            <rich:column>
+	                <f:facet name="header"><h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.label.lista.cabecera.factura.pagada']}"/></f:facet>
+	                <h:outputText value="#{cuenta.pagado}" />
+	            </rich:column>
+	            <rich:column>
+	                <a4j:commandLink value="Ver detalle"></a4j:commandLink>
+	            </rich:column>
+	            <rich:column styleClass="columna5">
+	                <f:facet name="header">Editar</f:facet>
+	                <a4j:commandLink id="botonEditar" render="pnlGridDespacho panelTablaPedidos panelTablaAdicional" action="#{despachoController.cargarGuiaEditar}"	execute="@this" >
+						<h:graphicImage name="btnEditar.png" library="images" style="border:none;border-color:white;" height="16" width="16"/>
+						<f:setPropertyActionListener value="#{despacho}" target="#{despachoController.guiaDespachoDTO}" />											
+					</a4j:commandLink>	
+	            </rich:column> 
+	        </rich:dataTable>
+        </rich:panel>
+        <script>
+			/*<![CDATA[*/
+			$(document).ready(function(){				
+				 openLinkSystem();				
+			});
+			function openLinkSystem(){
+				$('.linkopensystem').trigger('click');
+			}	
+			function validarEnteros(e) {
+				tecla = (document.all) ? e.keyCode : e.which; 
+				if (tecla==8) return true; 
+				patron =/[0-9\s]/; 
+				te = String.fromCharCode(tecla);
+				return patron.test(te);
+			}
+		/*]]>*/			
+		</script>
+		<a4j:commandLink id="linkopensystem" styleClass="linkopensystem" execute="@this" actionListener="#{cuentasController.refrescarPantalla}">
+		</a4j:commandLink>	
+	</ui:define>
+	
+</ui:composition>

@@ -1,0 +1,95 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:a4j="http://richfaces.org/a4j"
+	xmlns:rich="http://richfaces.org/rich"
+	template="/templates/pages/pageLayout2.xhtml">
+	
+	<ui:param name="idForm" value="frmAdminPedidos" />
+	<ui:param name="form" value="#{pedidosController.form}" />	
+	<ui:param name="controller" value="#{pedidosController}" />
+	<ui:param name="westLength" value="250" />
+	
+	<ui:define name="title">
+		Pedidos
+	</ui:define>
+	
+	<ui:define name="header">	
+		<ui:include src="adminBusquedaPedidosHeader.xhtml" />
+	</ui:define>
+	
+	<ui:define name="contentLeft">
+		<ui:include src="adminBusquedaPedidosLeft.xhtml" />
+	</ui:define>
+	
+	<ui:define name="contentCenter">	
+		<rich:panel id="panelPedidosTabla" header="Lista de pedidos" styleClass="panelPedidos" style="width:100%; height: 94.5%">	
+			<h:panelGrid id="tablaVaciaPedidos" columns="1" rendered="#{empty pedidosController.pedidosDTOCols}" style="width:100%; text-align: center; padding-top: 230px">
+				<h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.mensaje.lista.vacio']}"/>
+			</h:panelGrid>	
+			<rich:panel style="text-align:center; border-left: none; border-right:none;" rendered="#{not empty pedidosController.pedidosDTOCols}">
+				<rich:dataScroller page="#{pedidosController.page}" fastStep="3" for="tablePedidos" maxPages="5" rendered="#{not empty pedidosController.pedidosDTOCols}" renderIfSinglePage="true"/>
+			</rich:panel>	
+			<rich:dataTable style="width:100%" value="#{pedidosController.pedidosDTOCols}" rendered="#{not empty pedidosController.pedidosDTOCols}" var="pedido" iterationStatusVar="it" id="tablePedidos" rows="20">
+	            <rich:column>
+	                <f:facet name="header">Nro.</f:facet>
+	                #{it.index+1}
+	            </rich:column>
+	            <rich:column>
+	                <f:facet name="header"><h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.header.tabla.tipo.cliente']}"/></f:facet>
+	                <h:outputText value="#{pedido.clienteDTO.tipoClienteCatalogoValorDTO.nombreCatalogoValor}" />
+	            </rich:column>
+	            <rich:column>
+	                <f:facet name="header"><h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.label.lista.cabecera.factura.numero.documento']}"/></f:facet>
+	                <h:outputText value="#{pedido.clienteDTO.personaDTO.numeroDocumento == null ? pedido.clienteDTO.empresaDTO.numeroRuc : pedido.clienteDTO.personaDTO.numeroDocumento}" />
+	            </rich:column>
+	            <rich:column>
+	                <f:facet name="header"><h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.header.tabla.nombre.cliente']}"/></f:facet>
+	                <h:outputText value="#{pedido.clienteDTO.personaDTO.nombreCompleto == null ? pedido.clienteDTO.empresaDTO.razonSocial : pedido.clienteDTO.personaDTO.nombreCompleto}" />
+	            </rich:column>
+	            <rich:column>
+	                <f:facet name="header"><h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.header.tabla.direccion.cliente']}"/></f:facet>
+	                <h:outputText value="#{pedido.clienteDTO.personaDTO == null ? pedido.clienteDTO.empresaDTO.contactoEmpresaDTO.direccionPrincipal : pedido.clienteDTO.personaDTO.contactoPersonaDTO.direccionPrincipal}" />
+	            </rich:column>
+	            <rich:column>
+	                <f:facet name="header"><h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.label.nuevo.pedidos.etiqueta.fechapedido']}"/></f:facet>
+	                <h:outputText value="#{pedido.fechaPedido}" />
+	            </rich:column>
+	            <rich:column>
+	                <f:facet name="header"><h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.label.nuevo.pedidos.etiqueta.fechaentrega']}"/></f:facet>
+	                <h:outputText value="#{pedido.fechaEntrega == null ? 'N/D' : pedido.fechaEntrega}" />
+	            </rich:column>
+	            <rich:column>
+	                <f:facet name="header"><h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.label.nuevo.pedidos.etiqueta.estadoPedido']}"/></f:facet>
+	                <h:outputText value="#{pedido.estadoPedidoDTO.estadoCatalogoValorDTO.nombreCatalogoValor}" />
+	            </rich:column>
+	            <rich:column>
+	                <f:facet name="header"><h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.label.nuevo.pedidos.etiqueta.detallepedido.resumen']}"/></f:facet>
+	                <a4j:commandLink value="Ver detalle"></a4j:commandLink>
+	            </rich:column>
+	            <rich:column styleClass="columna5">
+	                <f:facet name="header">Editar</f:facet>
+	                <a4j:commandLink id="botonEditar" render="pnlGridDatosCliente pnlGridDetallePedido" action="#{pedidosController.cargarPedidoEditar}"	execute="@this" >
+						<h:graphicImage name="btnEditar.png" library="images" style="border:none;border-color:white;" height="16" width="16"/>
+						<f:setPropertyActionListener value="#{pedido}" target="#{pedidosController.pedidoDTO}" />											
+					</a4j:commandLink>	
+	            </rich:column>
+	        </rich:dataTable>
+        </rich:panel>
+        <script>
+			/*<![CDATA[*/
+			$(document).ready(function(){				
+				 openLinkSystem();				
+			});
+			function openLinkSystem(){
+				$('.linkopensystem').trigger('click');
+			}	
+								
+		/*]]>*/			
+		</script>
+		<a4j:commandLink id="linkopensystem" styleClass="linkopensystem" execute="@this" actionListener="#{pedidosController.refrescarPantalla}">
+		</a4j:commandLink>	
+	</ui:define>
+	
+</ui:composition>

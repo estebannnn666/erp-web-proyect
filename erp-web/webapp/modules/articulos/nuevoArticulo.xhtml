@@ -1,0 +1,110 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:a4j="http://richfaces.org/a4j"
+	xmlns:rich="http://richfaces.org/rich"
+	template="/templates/pages/pageLayout3.xhtml">
+	
+	<ui:param name="idForm" value="frmAdminBusqueda" />
+	<ui:param name="form" value="#{articulosController.form}" />	
+	<ui:param name="controller" value="#{articulosController}" />
+	<ui:param name="westLength" value="250" />
+	
+	<ui:define name="title">
+		Nuevo articulo
+	</ui:define>
+	
+	<ui:define name="header">		
+		<ui:include src="nuevoArticuloHeader.xhtml" />
+	</ui:define>
+	
+	<ui:define name="contentCenter">		
+		 <rich:panel header="Registro de nuevo articulo" style="width: 100%; background-color: #F5FAFF;">
+	 		 <fieldset>
+			 	<legend>#{msg_erpweb['ec.com.erp.etiqueta.header.datos.basicos']}</legend>
+			 	<h:panelGrid id="pnlGridArticulos" columns="2" cellspacing="2" cellpadding="5">
+			 		<h:outputText class="styleNegritas" value="#{msg_erpweb['ec.com.erp.etiqueta.header.tabla.codigo.barras']}: *" />
+			 		<h:inputText class="styleUpperCase" style="width:260px" value="#{articulosController.articuloDTO.codigoBarras}" id="codigoBarras" onkeypress="return validarEnteros(event);"/>
+			 		
+			 		<h:outputText class="styleNegritas" value="#{msg_erpweb['ec.com.erp.etiqueta.header.tabla.descripcion.articulo']}: *" />
+			 		<h:inputText class="styleUpperCase" style="width:260px" value="#{articulosController.articuloDTO.nombreArticulo}" id="nombreArticulo" />
+			 		
+			 		<h:outputText class="styleNegritas" value="#{msg_erpweb['ec.com.erp.etiqueta.header.tabla.articulo.peso']}: *" />
+			 		<h:inputText style="width:260px" value="#{articulosController.articuloDTO.peso}" id="peso" onkeypress="return validarDecimal(event);"/>
+			 		
+			 		<h:outputText class="styleNegritas" value="#{msg_erpweb['ec.com.erp.etiqueta.header.tabla.articulo.precio']}: *" />
+			 		<h:inputText  style="width:260px" value="#{articulosController.articuloDTO.precio}" id="precio" onkeypress="return validarDecimal(event);"/>
+			 		
+			 		<h:outputText class="styleNegritas" value="#{msg_erpweb['ec.com.erp.etiqueta.header.tabla.articulo.stock']}: *" />
+			 		<h:inputText style="width:260px" value="#{articulosController.articuloDTO.cantidadStock}" id="cantidadStock" onkeypress="return validarEnteros(event);"/>
+			 	</h:panelGrid>
+			  </fieldset>
+		</rich:panel>
+		 
+		<!-- Popup para confirmar que se guardo el articulo -->
+		<rich:popupPanel id="mpConfirmacion" header="#{msg_erpweb['ec.com.erp.etiqueta.mensaje.confirmacion']}" width="345" height="145" modal="true" domElementAttachment="form">
+			<f:facet name="controls">
+				<h:outputLink value="#"	onclick="#{rich:component('mpConfirmacion')}.hide();">
+					<h:graphicImage library="images" name="close.png" style="border:0px"/>
+				</h:outputLink>
+			</f:facet>
+			
+			<rich:panel style="height: 94%">
+				<h:panelGrid columns="3">
+					<h:graphicImage name="succes.png" library="images" style="border:none;border-color:white;" height="48" width="48"/>
+					<h:panelGroup style="margin-right:20px;">
+					</h:panelGroup>
+					<h:panelGroup style="text-align:justify;">
+						<h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.mensaje.popUp.confirmacion']}" />
+					</h:panelGroup>
+				</h:panelGrid>
+		    </rich:panel>
+			
+			<!-- Botones de PopUp -->
+			<h:panelGrid style="margin:auto; padding-top: 5px;" columns="3" cellpadding="0" cellspacing="0">
+				<h:panelGroup layout="block" styleClass="botonD" style="margin-top:5px; margin-right:20px;">
+					<a4j:commandLink styleClass="cancelarD" execute="@this" render="pnlGridArticulos pnlMensajes" actionListener="#{articulosController.clearNuevoArticulo}" oncomplete="#{rich:component('mpConfirmacion')}.hide(); return false;">
+						<h:panelGrid columns="2" cellpadding="3" cellspacing="0">
+							<h:graphicImage name="btnNuevoA.png" library="images" style="border:none;border-color:white;" height="16" width="16"/>
+							<h:outputText value="Nueva" />
+						</h:panelGrid>
+					</a4j:commandLink>
+				</h:panelGroup>
+				
+				<h:panelGroup layout="block" styleClass="botonD" style="margin-top:5px;">
+					<a4j:commandLink action="#{articulosController.regresarBusquedaArticulos}" styleClass="cancelarD" oncomplete="#{rich:component('mpConfirmacion')}.hide(); return false;" immediate="true">
+						<h:panelGrid columns="2" cellpadding="3" cellspacing="0">
+							<h:graphicImage name="btnCancel.png" library="images" style="border:none;border-color:white;" height="16" width="16"/>
+							<h:outputText value="Cancelar" />
+						</h:panelGrid>
+					</a4j:commandLink>
+				</h:panelGroup>
+			</h:panelGrid>
+		</rich:popupPanel>
+		<script type="text/javascript">
+			/*<![CDATA[*/								
+				function validarEnteros(e) {
+					tecla = (document.all) ? e.keyCode : e.which; 
+					if (tecla==8) return true; 
+					patron =/[0-9\s]/; 
+					te = String.fromCharCode(tecla);
+					return patron.test(te);
+				}
+
+				function validarDecimal(e) {
+					tecla = (document.all) ? e.keyCode : e.which; 
+					if (tecla==8) return true; 
+					patron =/[0-9\s.0-9\s]/; 
+					te = String.fromCharCode(tecla);
+					return patron.test(te);
+				}
+				
+				function openLinkSystem(){
+					$('.linkopensystem').trigger('click');
+				}	
+			/*]]>*/
+		</script>
+	</ui:define>
+	
+</ui:composition>

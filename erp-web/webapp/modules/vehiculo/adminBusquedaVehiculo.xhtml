@@ -1,0 +1,91 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:a4j="http://richfaces.org/a4j"
+	xmlns:rich="http://richfaces.org/rich"
+	template="/templates/pages/pageLayout2.xhtml">
+	
+	<ui:param name="idForm" value="frmAdminVehicles" />
+	<ui:param name="form" value="#{vehiculoController.form}" />	
+	<ui:param name="controller" value="#{vehiculoController}" />
+	<ui:param name="westLength" value="250" />
+	
+	<ui:define name="title">
+		Vehiculos
+	</ui:define>
+	
+	<ui:define name="header">	
+		<ui:include src="adminBusquedaVehiculoHeader.xhtml" />
+	</ui:define>
+	
+	<ui:define name="contentLeft">
+		<ui:include src="adminBusquedaVehiculoLeft.xhtml" />
+	</ui:define>
+	
+	<ui:define name="contentCenter">	
+		<rich:panel id="listaVehiculos" styleClass="panelListaArticulos" header="Lista de transportistas" style="height: 94.5%; width:100% !important;">	
+			<h:panelGrid id="tablaVacia" columns="1" rendered="#{empty vehiculoController.vehiculoDTOCols}" style="width:100%; text-align: center; padding-top: 220px">
+				<h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.mensaje.lista.vacio']}"/>
+			</h:panelGrid>
+			<rich:panel style="text-align:center; border-left: none; border-right:none; border-bottom:none" rendered="#{not empty vehiculoController.vehiculoDTOCols}">
+				<rich:dataScroller page="#{vehiculoController.page}" fastStep="3" for="tabletransporte" maxPages="5" rendered="#{not empty vehiculoController.vehiculoDTOCols}" renderIfSinglePage="false"/>
+			</rich:panel>		
+			<rich:dataTable style="width:100%" rendered="#{not empty vehiculoController.vehiculoDTOCols}"  value="#{vehiculoController.vehiculoDTOCols}" var="vehic" iterationStatusVar="it" id="tableVehiculo" rows="15">
+	            <rich:column>
+	                <f:facet name="header">Nro.</f:facet>
+	                #{it.index+1}
+	            </rich:column>
+	            <rich:column>
+	                <f:facet name="header"><h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.pantall.vehiculos.placa']}"/></f:facet>
+	                <h:outputText value="#{vehic.placa}" />
+	            </rich:column>
+	            <rich:column>
+	                <f:facet name="header"><h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.pantall.vehiculos.marca']}"/></f:facet>
+	                <h:outputText value="#{vehic.marca}" />
+	            </rich:column>
+	             <rich:column>
+	                <f:facet name="header"><h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.pantall.vehiculos.color']}"/></f:facet>
+	                <h:outputText value="#{vehic.color}" />
+	            </rich:column>
+	             <rich:column>
+	                <f:facet name="header"><h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.pantall.vehiculos.model']}"/></f:facet>
+	                <h:outputText value="#{vehic.modelo}" />
+	            </rich:column>
+	            <rich:column>
+	                <f:facet name="header"><h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.pantall.vehiculos.tipov']}"/></f:facet>
+	                <h:outputText value="#{vehic.tipoVehiculoCatalogoValorDTO.nombreCatalogoValor}" />
+	            </rich:column>
+	            <rich:column>
+	                <f:facet name="header"><h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.label.lista.cabecera.documento.transportista']}"/></f:facet>
+	                 <h:outputText value="#{vehic.transportistaDTO.personaDTO == null ? vehic.transportistaDTO.empresaDTO.numeroRuc : vehic.transportistaDTO.personaDTO.numeroDocumento}" />
+	            </rich:column>
+	            <rich:column>
+	                <f:facet name="header"><h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.label.lista.cabecera.nombre.transportista']}"/></f:facet>
+	                <h:outputText value="#{vehic.transportistaDTO.personaDTO == null ? vehic.transportistaDTO.empresaDTO.razonSocial : vehic.transportistaDTO.personaDTO.nombreCompleto}" />
+	            </rich:column>    
+	            <rich:column styleClass="columna5">
+	                <f:facet name="header">Editar</f:facet>
+	                <a4j:commandLink id="botonEditar" render="pnlGridVehiculo panelTabla" action="#{vehiculoController.cargarVehiculoEditar}" execute="@this" >
+						<h:graphicImage name="btnEditar.png" library="images" style="border:none;border-color:white;" height="16" width="16"/>
+						<f:setPropertyActionListener value="#{vehic}" target="#{vehiculoController.transportistaDTO}" />											
+					</a4j:commandLink>	
+	            </rich:column>        
+	        </rich:dataTable>
+        </rich:panel>
+        <script>
+			/*<![CDATA[*/
+			$(document).ready(function(){				
+				 openLinkSystem();				
+			});
+			function openLinkSystem(){
+				$('.linkopensystem').trigger('click');
+			}	
+								
+		/*]]>*/			
+		</script>
+		<a4j:commandLink id="linkopensystem" styleClass="linkopensystem" execute="@this" actionListener="#{vehiculoController.refrescarPantalla}">
+		</a4j:commandLink>	
+	</ui:define>
+	
+</ui:composition>

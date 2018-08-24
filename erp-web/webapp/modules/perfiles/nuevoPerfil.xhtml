@@ -1,0 +1,201 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:a4j="http://richfaces.org/a4j"
+	xmlns:rich="http://richfaces.org/rich"
+	template="/templates/pages/pageLayout3.xhtml">
+	
+	<ui:param name="idForm" value="frmNuevoPerfil" />
+	<ui:param name="form" value="#{perfilController.form}" />	
+	<ui:param name="controller" value="#{perfilController}" />
+	<ui:param name="westLength" value="250" />
+	
+	<ui:define name="title">
+		Nuevo articulo
+	</ui:define>
+	
+	<ui:define name="header">		
+		<ui:include src="nuevoPerfilHeader.xhtml" />
+	</ui:define>
+	
+	<ui:define name="contentCenter">		
+		 <rich:panel header="Registro de nuevo perfil" style="width: 100%; background-color: #F5FAFF;">
+	 		 <fieldset>
+			 	<legend>#{msg_erpweb['ec.com.erp.etiqueta.header.datos.registro']}</legend>
+			 	<h:panelGrid id="pnlGridPerfil" columns="2" cellspacing="2" cellpadding="5">
+			 		<h:outputText class="styleNegritas" value="#{msg_erpweb['ec.com.erp.etiqueta.pantalla.perfiles.nombre']}: *" />
+			 		<h:inputText class="styleUpperCase" style="background-color:#f9f9d5; background-image: none; width:260px" value="#{perfilController.perfilDTO.nombrePerfil}" id="nombrePerfil"/>
+			 		
+			 		<h:outputText class="styleNegritas" value="#{msg_erpweb['ec.com.erp.etiqueta.pantalla.perfiles.descripcion']}: " />
+			 		<h:inputText class="styleUpperCase" style="width:260px" value="#{perfilController.perfilDTO.descripcion}" id="descripcionModulo"/>
+			 		
+			 		<h:outputText class="styleNegritas" value="#{msg_erpweb['ec.com.erp.etiqueta.pantalla.perfiles.tipo.perfil']}: *" />
+			 		<h:selectOneMenu value="#{perfilController.perfilDTO.codigoValorTipoPerfil}" style="background-color:#f9f9d5; background-image: none; width: 165px">
+						<f:selectItem itemLabel="SELECCIONE"/>
+						<f:selectItems value="#{perfilController.tipoPerfilCatalogoValorDTOCols}"  var="perfil" itemValue = "#{perfil.id.codigoCatalogoValor}" itemLabel = "#{perfil.nombreCatalogoValor}" />
+					</h:selectOneMenu>
+					
+			 		<h:outputText class="styleNegritas" value="#{msg_erpweb['ec.com.erp.etiqueta.pantalla.perfiles.estado.perfil']}: *" />
+			 		<h:selectOneMenu value="#{perfilController.perfilDTO.estado}" style="background-color:#f9f9d5; background-image: none; width: 165px">
+						<f:selectItem itemLabel="SELECCIONE"/>
+						<f:selectItem itemLabel="ACTIVO" itemValue="1"/>
+						<f:selectItem itemLabel="INACTIVO" itemValue="0"/>
+					</h:selectOneMenu>
+			 	</h:panelGrid>
+			</fieldset>
+			
+			 <fieldset>
+			 	<legend>#{msg_erpweb['ec.com.erp.etiqueta.pantalla.perfiles.asignacion.modulos']}</legend>
+			 	<h:panelGrid id="pnlGridModulosAsignados" style="width: 100%;" columns="3" cellspacing="2" cellpadding="5" columnClasses="columna1, columna2, columna3">
+			 		<rich:panel id="panelModTodos" header="Modulos disponibles" style="height: 250px; width: 100%; background-color: #F5FAFF;">
+			 			<h:panelGrid id="tablaVaciaMod" columns="1" rendered="#{empty perfilController.modulosDTOCols}" style="width:100%; text-align: center; padding-top: 100px">
+							<h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.mensaje.lista.vacio']}"/>
+						</h:panelGrid>
+						<rich:panel style="text-align:center; border-left: none; border-right:none; border-bottom:none" rendered="#{not empty perfilController.modulosDTOCols}">
+							<rich:dataScroller fastStep="3" for="tableModulos" maxPages="5" rendered="#{not empty perfilController.modulosDTOCols}" renderIfSinglePage="false"/>
+						</rich:panel>	
+						<rich:dataTable style="width:100%" rendered="#{not empty perfilController.modulosDTOCols}" value="#{perfilController.modulosDTOCols}" var="module" iterationStatusVar="it" id="tableModulos" rows="5">
+				            <rich:column>
+				                <f:facet name="header">Sel.</f:facet>
+				                <h:selectBooleanCheckbox rendered="#{!module.seleccionado}" id="myCheck" value="#{module.seleccionado}">
+				                </h:selectBooleanCheckbox>
+				            </rich:column>
+				            <rich:column>
+				                <f:facet name="header"><h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.pantalla.modulos.codigo.modulo']}"/></f:facet>
+				                <h:outputText value="#{module.codigoReferencia}" />
+				            </rich:column>
+				            <rich:column>
+				                <f:facet name="header"><h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.pantalla.modulos.orden.modulo']}"/></f:facet>
+				                <h:outputText value="#{module.orden}" />
+				            </rich:column>
+				            <rich:column>
+				                <f:facet name="header"><h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.pantalla.modulos.nombre.modulo']}"/></f:facet>
+				                <h:outputText value="#{module.nombreModulo}" />
+				            </rich:column>
+				    	</rich:dataTable>
+			 		</rich:panel>
+			 		<h:panelGrid style="width:100%; text-align: center !important;" columns="1">
+			 			<a4j:commandButton style="width: 70px" value="Agregar" render="panelModTodos panelModAsig pnlMensajes" execute="pnlGridModulosAsignados" actionListener="#{perfilController.agregarModulos}"/>
+			 			<a4j:commandButton style="width: 70px" value="Quitar" render="panelModTodos panelModAsig pnlMensajes" execute="pnlGridModulosAsignados" actionListener="#{perfilController.quitarModulos}"/>
+			 		</h:panelGrid>
+			 		<rich:panel id="panelModAsig" header="Modulos asignados" style="height: 250px; width: 100%; background-color: #F5FAFF;">
+			 			<h:panelGrid id="tablaVaciaAsig" columns="1" rendered="#{empty perfilController.modulosDTOAsignadosCols}" style="width:100%; text-align: center; padding-top: 100px">
+							<h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.mensaje.lista.vacio']}"/>
+						</h:panelGrid>
+						<rich:panel style="text-align:center; border-left: none; border-right:none; border-bottom:none" rendered="#{not empty perfilController.modulosDTOAsignadosCols}">
+							<rich:dataScroller fastStep="3" for="tableModulosAsig" maxPages="5" rendered="#{not empty perfilController.modulosDTOAsignadosCols}" renderIfSinglePage="false"/>
+						</rich:panel>	
+						<rich:dataTable style="width:100%" rendered="#{not empty perfilController.modulosDTOAsignadosCols}" value="#{perfilController.modulosDTOAsignadosCols}" var="asignado" iterationStatusVar="it" id="tableModulosAsig" rows="5">
+				            <rich:column>
+				                <h:selectBooleanCheckbox id="myCheck" value="#{asignado.seleccionado}">
+				                </h:selectBooleanCheckbox>
+				            </rich:column>
+				            <rich:column>
+				                <f:facet name="header"><h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.pantalla.modulos.codigo.modulo']}"/></f:facet>
+				                <h:outputText value="#{asignado.moduloDTO.codigoReferencia}" />
+				            </rich:column>
+				            <rich:column>
+				                <f:facet name="header"><h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.pantalla.modulos.orden.modulo']}"/></f:facet>
+				                <h:outputText value="#{asignado.moduloDTO.orden}" />
+				            </rich:column>
+				            <rich:column>
+				                <f:facet name="header"><h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.pantalla.modulos.nombre.modulo']}"/></f:facet>
+				                <h:outputText value="#{asignado.moduloDTO.nombreModulo}" />
+				            </rich:column>
+				    	</rich:dataTable>
+			 		</rich:panel>
+			 	</h:panelGrid>
+			</fieldset>
+		</rich:panel>
+		 
+		<!-- Popup para confirmar que se guardo el articulo -->
+		<rich:popupPanel id="mpConfirmacion" header="#{msg_erpweb['ec.com.erp.etiqueta.mensaje.confirmacion']}" width="345" height="145" modal="true" domElementAttachment="form">
+			<f:facet name="controls">
+				<h:outputLink value="#"	onclick="#{rich:component('mpConfirmacion')}.hide();">
+					<h:graphicImage library="images" name="close.png" style="border:0px"/>
+				</h:outputLink>
+			</f:facet>
+			
+			<rich:panel style="height: 94%">
+				<h:panelGrid columns="3">
+					<h:graphicImage name="succes.png" library="images" style="border:none;border-color:white;" height="48" width="48"/>
+					<h:panelGroup style="margin-right:20px;">
+					</h:panelGroup>
+					<h:panelGroup style="text-align:justify;">
+						<h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.mensaje.popUp.confirmacion']}" />
+					</h:panelGroup>
+				</h:panelGrid>
+		    </rich:panel>
+			
+			<!-- Botones de PopUp -->
+			<h:panelGrid style="margin:auto; padding-top: 5px;" columns="3" cellpadding="0" cellspacing="0">
+				<h:panelGroup layout="block" styleClass="botonD" style="margin-top:5px; margin-right:20px;">
+					<a4j:commandLink styleClass="cancelarD" execute="@this" render="pnlGridPerfil pnlMensajes" actionListener="#{perfilController.clearNuevoPerfil}" oncomplete="#{rich:component('mpConfirmacion')}.hide(); return false;">
+						<h:panelGrid columns="2" cellpadding="3" cellspacing="0">
+							<h:graphicImage name="btnNuevoA.png" library="images" style="border:none;border-color:white;" height="16" width="16"/>
+							<h:outputText value="Nuevo" />
+						</h:panelGrid>
+					</a4j:commandLink>
+				</h:panelGroup>
+				
+				<h:panelGroup layout="block" styleClass="botonD" style="margin-top:5px;">
+					<a4j:commandLink action="#{perfilController.regresarBusquedaPerfil}" styleClass="cancelarD" oncomplete="#{rich:component('mpConfirmacion')}.hide(); return false;" immediate="true">
+						<h:panelGrid columns="2" cellpadding="3" cellspacing="0">
+							<h:graphicImage name="btnCancel.png" library="images" style="border:none;border-color:white;" height="16" width="16"/>
+							<h:outputText value="Cancelar" />
+						</h:panelGrid>
+					</a4j:commandLink>
+				</h:panelGroup>
+			</h:panelGrid>
+		</rich:popupPanel>
+		<script type="text/javascript">
+			/*<![CDATA[*/	
+			
+				function checkBoxSelect(componente) {
+					var id = componente.name.substring(componente.name.lastIndexOf(':'));
+					var el = componente.form.elements;
+					for (var i = 0; i < el.length; i++) {
+						if (el[i].name.substring(el[i].name.lastIndexOf(':')) == id) {
+						el[i].checked = false;
+						}
+					}
+					componente.checked = true;
+				}
+										
+				function validarEnteros(e) {
+					tecla = (document.all) ? e.keyCode : e.which; 
+					if (tecla==8) return true; 
+					patron =/[0-9\s]/; 
+					te = String.fromCharCode(tecla);
+					return patron.test(te);
+				}
+
+				function validarDecimal(e) {
+					tecla = (document.all) ? e.keyCode : e.which; 
+					if (tecla==8) return true; 
+					patron =/[0-9\s.0-9\s]/; 
+					te = String.fromCharCode(tecla);
+					return patron.test(te);
+				}
+				
+				function openLinkSystem(){
+					$('.linkopensystem').trigger('click');
+				}	
+			/*]]>*/
+		</script>
+		<h:outputStylesheet>
+			.columna1{
+				width: 45% !important;
+			}	
+			.columna2 {
+				text-align:center;
+				width: 10% !important;
+			}
+			.columna3 {
+				width: 45% !important;
+			}
+		</h:outputStylesheet>
+	</ui:define>
+	
+</ui:composition>

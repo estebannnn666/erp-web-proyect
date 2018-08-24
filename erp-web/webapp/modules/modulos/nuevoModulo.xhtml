@@ -1,0 +1,123 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:a4j="http://richfaces.org/a4j"
+	xmlns:rich="http://richfaces.org/rich"
+	template="/templates/pages/pageLayout3.xhtml">
+	
+	<ui:param name="idForm" value="frmAdminBusqueda" />
+	<ui:param name="form" value="#{modulosController.form}" />	
+	<ui:param name="controller" value="#{modulosController}" />
+	<ui:param name="westLength" value="250" />
+	
+	<ui:define name="title">
+		Nuevo articulo
+	</ui:define>
+	
+	<ui:define name="header">		
+		<ui:include src="nuevoModuloHeader.xhtml" />
+	</ui:define>
+	
+	<ui:define name="contentCenter">		
+		 <rich:panel header="Registro de nuevo modulo" style="width: 100%; background-color: #F5FAFF;">
+	 		 <fieldset>
+			 	<legend>#{msg_erpweb['ec.com.erp.etiqueta.header.datos.registro']}</legend>
+			 	<h:panelGrid id="pnlGridModulos" columns="5" cellspacing="2" cellpadding="5">
+			 		<h:outputText class="styleNegritas" value="#{msg_erpweb['ec.com.erp.etiqueta.pantalla.modulos.codigo.modulo']}: *" />
+			 		<h:inputText class="styleUpperCase" style="background-color:#f9f9d5; background-image: none; width:260px" value="#{modulosController.moduloDTO.codigoReferencia}" id="codigoReferencia" disabled="true"/>
+			 		<h:outputText value=""/>
+			 		<h:outputText class="styleNegritas" value="#{msg_erpweb['ec.com.erp.etiqueta.pantalla.modulos.orden.modulo']}: *" />
+			 		<h:inputText class="styleUpperCase" style="background-color:#f9f9d5; background-image: none; width:260px" value="#{modulosController.moduloDTO.orden}" id="ordenModulo" maxlength="2" onkeypress="return validarEnteros(event);"/>
+			 		
+			 		<h:outputText class="styleNegritas" value="#{msg_erpweb['ec.com.erp.etiqueta.pantalla.modulos.nombre.modulo']}: *" />
+			 		<h:inputText class="styleUpperCase" style="background-color:#f9f9d5; background-image: none; width:260px" value="#{modulosController.moduloDTO.nombreModulo}" id="nombreModulo"/>
+			 		<h:outputText value=""/>
+			 		<h:outputText class="styleNegritas" value="#{msg_erpweb['ec.com.erp.etiqueta.pantalla.modulos.descripcion.modulo']}:" />
+			 		<h:inputText class="styleUpperCase" style="width:260px" value="#{modulosController.moduloDTO.descripcion}" id="descripModulo" />
+			 		
+			 		<h:outputText class="styleNegritas" value="#{msg_erpweb['ec.com.erp.etiqueta.pantalla.modulos.estilo.modulo']}: *" />
+			 		<h:inputText style="background-color:#f9f9d5; background-image: none; width:260px" value="#{modulosController.moduloDTO.estilo}" id="estilo"/>
+			 		<h:outputText value=""/>
+			 		<h:outputText class="styleNegritas" value="#{msg_erpweb['ec.com.erp.etiqueta.pantalla.modulos.url.modulo']}: *" />
+			 		<h:inputText  style="background-color:#f9f9d5; background-image: none; width:360px" value="#{modulosController.moduloDTO.url}" id="url"/>
+			 		
+			 		<h:outputText class="styleNegritas" value="#{msg_erpweb['ec.com.erp.etiqueta.pantalla.modulos.estado.modulo']}: *" />
+			 		<h:selectOneMenu value="#{modulosController.moduloDTO.estado}" style="background-color:#f9f9d5; background-image: none; width: 165px">
+						<f:selectItem itemLabel="SELECCIONE"/>
+						<f:selectItem itemLabel="ACTIVO" itemValue="1"/>
+						<f:selectItem itemLabel="INACTIVO" itemValue="0"/>
+					</h:selectOneMenu>
+			 		<h:outputText value=""/>
+			 		<h:outputText value=""/>
+			 		<h:outputText value=""/>
+			 	</h:panelGrid>
+			  </fieldset>
+		</rich:panel>
+		 
+		<!-- Popup para confirmar que se guardo el articulo -->
+		<rich:popupPanel id="mpConfirmacion" header="#{msg_erpweb['ec.com.erp.etiqueta.mensaje.confirmacion']}" width="345" height="145" modal="true" domElementAttachment="form">
+			<f:facet name="controls">
+				<h:outputLink value="#"	onclick="#{rich:component('mpConfirmacion')}.hide();">
+					<h:graphicImage library="images" name="close.png" style="border:0px"/>
+				</h:outputLink>
+			</f:facet>
+			
+			<rich:panel style="height: 94%">
+				<h:panelGrid columns="3">
+					<h:graphicImage name="succes.png" library="images" style="border:none;border-color:white;" height="48" width="48"/>
+					<h:panelGroup style="margin-right:20px;">
+					</h:panelGroup>
+					<h:panelGroup style="text-align:justify;">
+						<h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.mensaje.popUp.confirmacion']}" />
+					</h:panelGroup>
+				</h:panelGrid>
+		    </rich:panel>
+			
+			<!-- Botones de PopUp -->
+			<h:panelGrid style="margin:auto; padding-top: 5px;" columns="3" cellpadding="0" cellspacing="0">
+				<h:panelGroup layout="block" styleClass="botonD" style="margin-top:5px; margin-right:20px;">
+					<a4j:commandLink styleClass="cancelarD" execute="@this" render="pnlGridModulos pnlMensajes" actionListener="#{modulosController.clearNuevoModulo}" oncomplete="#{rich:component('mpConfirmacion')}.hide(); return false;">
+						<h:panelGrid columns="2" cellpadding="3" cellspacing="0">
+							<h:graphicImage name="btnNuevoA.png" library="images" style="border:none;border-color:white;" height="16" width="16"/>
+							<h:outputText value="Nuevo" />
+						</h:panelGrid>
+					</a4j:commandLink>
+				</h:panelGroup>
+				
+				<h:panelGroup layout="block" styleClass="botonD" style="margin-top:5px;">
+					<a4j:commandLink action="#{modulosController.regresarBusquedaModulos}" styleClass="cancelarD" oncomplete="#{rich:component('mpConfirmacion')}.hide(); return false;" immediate="true">
+						<h:panelGrid columns="2" cellpadding="3" cellspacing="0">
+							<h:graphicImage name="btnCancel.png" library="images" style="border:none;border-color:white;" height="16" width="16"/>
+							<h:outputText value="Cancelar" />
+						</h:panelGrid>
+					</a4j:commandLink>
+				</h:panelGroup>
+			</h:panelGrid>
+		</rich:popupPanel>
+		<script type="text/javascript">
+			/*<![CDATA[*/								
+				function validarEnteros(e) {
+					tecla = (document.all) ? e.keyCode : e.which; 
+					if (tecla==8) return true; 
+					patron =/[0-9\s]/; 
+					te = String.fromCharCode(tecla);
+					return patron.test(te);
+				}
+
+				function validarDecimal(e) {
+					tecla = (document.all) ? e.keyCode : e.which; 
+					if (tecla==8) return true; 
+					patron =/[0-9\s.0-9\s]/; 
+					te = String.fromCharCode(tecla);
+					return patron.test(te);
+				}
+				
+				function openLinkSystem(){
+					$('.linkopensystem').trigger('click');
+				}	
+			/*]]>*/
+		</script>
+	</ui:define>
+	
+</ui:composition>

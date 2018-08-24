@@ -1,0 +1,51 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:a4j="http://richfaces.org/a4j"
+	xmlns:rich="http://richfaces.org/rich"
+	template="/templates/main/menuLayout.xhtml">
+
+	<ui:param name="idForm" value="frmAdminMenu" />
+	<ui:param name="form" value="#{loginController.form}" />	
+	<ui:param name="controller" value="#{loginController}" />
+	<ui:define name="contentCenter">
+		<rich:panel class="styleRichPanelMenu">
+			<div style="padding-left: 80px">
+	    		<rich:dataGrid styleClass="estiloMenuDinamico" style="width:100% ; background-color: transparent; border: none;" value="#{loginController.usuariosDTO.perfilDTO.moduloPerfilDTOCols}" var="modulo" columns="6" elements="12">
+					<h:panelGroup layout="block" styleClass="stylePrincipal #{modulo.moduloDTO.estilo}">
+						<a4j:commandLink styleClass="guardarA" action="#{modulo.moduloDTO.url.toString()}" oncomplete="openLinkSystem();"/>
+					</h:panelGroup>
+	    	   	</rich:dataGrid>
+	    	   	
+	    	   	<ol>
+					<li><a4j:commandLink actionListener="#{loginController.redirectToArticulos}" value="Articulos" oncomplete="openLinkSystem();"/></li>
+					<li><a4j:commandLink action="#{loginController.redirectToClientes}" value="Clientes" oncomplete="openLinkSystem();"/></li>
+					<li><a4j:commandLink action="#{loginController.redirectToPedidos}" value="Pedidos" oncomplete="openLinkSystem();"/></li>
+					<li><a4j:commandLink action="#{loginController.redirectToTransportista}" value="Transportistas" oncomplete="openLinkSystem();"/></li>
+					<li><a4j:commandLink action="#{loginController.redirectToChofer}" value="Chofer" oncomplete="openLinkSystem();"/></li>
+					<li><a4j:commandLink action="#{loginController.redirectToVehiculos}" value="Vehiculos" oncomplete="openLinkSystem();"/></li>
+					<li><a4j:commandLink action="#{loginController.redirectToDespacho}" value="Despachos" oncomplete="openLinkSystem();"/></li>
+					<li><a4j:commandLink action="#{loginController.redirectToFacutas}" value="Facturas" oncomplete="openLinkSystem();"/></li>
+					<li><a4j:commandLink action="#{loginController.redirectToUsuarios}" value="Usuarios" oncomplete="openLinkSystem();"/></li>
+					<li><a4j:commandLink action="#{loginController.redirectToModulos}" value="Modulos" oncomplete="openLinkSystem();"/></li>
+					<li><a4j:commandLink action="#{loginController.redirectToPerfiles}" value="Perfiles" oncomplete="openLinkSystem();"/></li>
+					<li><a4j:commandLink action="#{loginController.redirectToKardex}" value="Perfiles" oncomplete="openLinkSystem();"/></li> 
+				 </ol> 
+    	   	</div>
+   	   	</rich:panel>
+   	   	<script>
+			/*<![CDATA[*/
+			$(document).ready(function(){				
+				 openLinkSystem();				
+			});
+			function openLinkSystem(){
+				$('.linkopensystem').trigger('click');
+			}	
+								
+			/*]]>*/			
+		</script>
+   	   	<a4j:commandLink id="linkopensystem" styleClass="linkopensystem" execute="@this" actionListener="#{loginController.refrescarPantalla}">
+		</a4j:commandLink>	
+	</ui:define>
+</ui:composition>

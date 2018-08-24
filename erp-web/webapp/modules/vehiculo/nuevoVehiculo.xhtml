@@ -1,0 +1,308 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:a4j="http://richfaces.org/a4j"
+	xmlns:rich="http://richfaces.org/rich"
+	template="/templates/pages/pageLayout3.xhtml">
+	
+	<ui:param name="idForm" value="frmNuevoVehiculo" />
+	<ui:param name="form" value="#{vehiculoController.form}" />	
+	<ui:param name="controller" value="#{vehiculoController}" />
+	<ui:param name="westLength" value="250" />
+	
+	<ui:define name="title">
+		#{msg_erpweb['ec.com.erp.etiqueta.mensaje.nuevo.vehiculo']}
+	</ui:define>
+	
+	<ui:define name="header">		
+		<ui:include src="nuevoVehiculoHeader.xhtml" />
+	</ui:define>
+	
+	<ui:define name="contentCenter">
+		<rich:panel header="Registro de nuevo chofer" style="width: 100%; background-color: #F5FAFF;">
+			<fieldset>
+				<legend class="styleLegend">#{msg_erpweb['ec.com.erp.etiqueta.pantall.vehiculos.datos.vehiculo']}</legend>
+				<h:panelGrid id="pnlGridVehiculo" columns="3" cellspacing="2" cellpadding="5">
+					
+					<h:outputText class="styleNegritas" value="#{msg_erpweb['ec.com.erp.etiqueta.pantall.vehiculos.placa']}: *" />
+				 	<h:inputText tabindex="1" class="styleUpperCase" style="width:163px" value="#{vehiculoController.vehiculoDTO.placa}" id="numeroPlaca" maxlength="8"
+				 				 onkeypress="if (event.keyCode == 13) return false; OnKeyPress(this, event);">
+				 		<a4j:ajax event="keyup" execute="@this" listener="#{vehiculoController.realizarConsultaVehiculoPlaca}" onbeforesubmit="if (event.keyCode != 13)  return false;" render="pnlGridVehiculo panelTabla"/>
+				 	</h:inputText>	
+				 	<h:panelGrid columns="2" cellpadding="3" cellspacing="0" style="padding-left:10px">
+						<h:graphicImage name="info.png" library="images" style="border:none;border-color:white;" height="16" width="16"/>
+						<h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.mensaje.informacion.consulta.placa']}" />
+					</h:panelGrid>
+				 	
+				 	<h:outputText class="styleNegritas" value="#{msg_erpweb['ec.com.erp.etiqueta.label.lista.cabecera.chofer.transportista']}: *" />
+					<h:inputText tabindex="2" class="styleUpperCase" style="width:163px" value="#{vehiculoController.numeroDocumentoTransportista}" id="numDocTransport" onkeypress="return validarEnteros(event);" maxlength="13" >
+				 		<a4j:ajax event="keyup" execute="@this" listener="#{vehiculoController.realizarConsultaTransportista}" onbeforesubmit="if (event.keyCode != 13)  return false;" render="numDocTransport nombreTransportista"/>
+				 	</h:inputText>	
+				 	<h:panelGrid columns="2" columnClasses="estiloCol1">
+					 	<h:panelGroup layout="block" styleClass="botonB" style="margin-top:5px;">
+							<a4j:commandLink oncomplete="#{rich:component('mpTransportista')}.show();" actionListener="#{vehiculoController.busquedaTransportistas}"  styleClass="botonBuscar" render="pnlListaTransportistas tabletransporte" execute="@this" title="Click para buscar transportistas">							
+							</a4j:commandLink>	
+						</h:panelGroup>
+						<h:outputText id="nombreTransportista" value="#{vehiculoController.transportistaDTO.personaDTO == null ? vehiculoController.transportistaDTO.empresaDTO.razonSocial : vehiculoController.transportistaDTO.personaDTO.nombreCompleto}"/>
+					</h:panelGrid>
+					
+				 				 		
+					<h:outputText class="styleNegritas" value="#{msg_erpweb['ec.com.erp.etiqueta.pantall.vehiculos.tipov']}: *" />
+					<h:selectOneMenu tabindex="3" value="#{vehiculoController.vehiculoDTO.codigoValorTipoVehiculo}" style="width: 165px">
+						<f:selectItem itemLabel="SELECCIONE"/>
+						<f:selectItems value="#{vehiculoController.tiposVehiculosCols}" var="tipoVeh" itemValue = "#{tipoVeh.id.codigoCatalogoValor}" itemLabel = "#{tipoVeh.nombreCatalogoValor}" /> 
+					</h:selectOneMenu>
+					<h:outputText value=""/>
+					
+					<h:outputText class="styleNegritas" value="#{msg_erpweb['ec.com.erp.etiqueta.pantall.vehiculos.marca']}: *" />	
+					<h:inputText tabindex="4" class="styleUpperCase" style="width:163px" value="#{vehiculoController.vehiculoDTO.marca}" maxlength="32">
+				 	</h:inputText>
+				 	<h:outputText value=""/>
+					
+					<h:outputText class="styleNegritas" value="#{msg_erpweb['ec.com.erp.etiqueta.pantall.vehiculos.color']}: *" />	
+					<h:inputText tabindex="5" class="styleUpperCase" style="width:163px" value="#{vehiculoController.vehiculoDTO.color}" maxlength="32">
+				 	</h:inputText>
+				 	<h:outputText value=""/>
+				 	
+				 	<h:outputText class="styleNegritas" value="#{msg_erpweb['ec.com.erp.etiqueta.pantall.vehiculos.model']}: *" />	
+					<h:inputText tabindex="6" class="styleUpperCase" style="width:163px" value="#{vehiculoController.vehiculoDTO.modelo}" maxlength="32">
+				 	</h:inputText>
+				 	<h:outputText value=""/>
+				</h:panelGrid>
+			</fieldset>
+			  
+			<!-- LISTA DE DE CHOFERES ASIGNADOS AL VEHICULO -->		
+			<rich:toolbar height="26" itemSeparator="grid" style="width:99.8% !important; margin-left: 0.2em;">
+				<rich:toolbarGroup>
+					<h:graphicImage name="listachofer.png" library="images" style="border:none;border-color:white;" height="16" width="16"/>
+					<h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.label.lista.titulo.lista.choferes']}"/>
+				</rich:toolbarGroup>
+				<rich:toolbarGroup location="right">	
+					<h:panelGroup layout="block" styleClass="botonD" style="padding-top: 3px; margin-top:0px;">
+						<a4j:commandLink oncomplete="#{rich:component('mpChoferes')}.show();" styleClass="agregarD" actionListener="#{vehiculoController.abrirPopUp}" render="mpChoferes pnlGridAddChofer" execute="@this" title="Click para agregar">
+							<h:panelGrid columns="2" cellpadding="3" cellspacing="0">
+								<h:graphicImage name="addChofer1.png" library="images" style="border:none;border-color:white;" height="16" width="16"/>
+								<h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.boton.agregar']}"/>
+							</h:panelGrid>
+						</a4j:commandLink>	
+					</h:panelGroup>	
+				</rich:toolbarGroup>						
+			</rich:toolbar>	
+			<rich:panel style="height: 140px; width:99.5% !important; margin-left: 0.2em;">
+				<h:panelGrid id="panelTabla" columns="1" style="width:100%;">
+					<h:panelGrid id="tablaVacia" columns="1" rendered="#{empty vehiculoController.vehiculoChoferDTOCols}" style="width:100%; text-align: center; padding-top: 60px">
+						<h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.mensaje.lista.vacio']}"/>
+					</h:panelGrid>						
+				
+					<rich:dataTable id="tableVehiculoChofer" style="width:100%" rendered="#{not empty vehiculoController.vehiculoChoferDTOCols}" value="#{vehiculoController.vehiculoChoferDTOCols}" var="vehChofer" rows="15">
+			            <rich:column>
+			                <f:facet name="header">Nro.</f:facet>
+			                #{it.index+1}
+			            </rich:column>
+			            <rich:column>
+			                <f:facet name="header"><h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.label.nuevo.cliente.documento']}"/></f:facet>
+			                <h:outputText value="#{vehChofer.choferDTO.personaDTO.numeroDocumento}" />
+			            </rich:column>
+			            <rich:column>
+			                <f:facet name="header"><h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.label.lista.cabecera.nombre.chofer']}"/></f:facet>
+			                <h:outputText value="#{vehChofer.choferDTO.personaDTO.nombreCompleto}" />
+			            </rich:column>
+			             <rich:column>
+			                <f:facet name="header"><h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.label.lista.cabecera.tipo.licencia']}"/></f:facet>
+			                <h:outputText value="#{vehChofer.choferDTO.tipoLicenciaCatalogoValorDTO.nombreCatalogoValor}" />
+			            </rich:column>
+			             <rich:column>
+			                <f:facet name="header"><h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.label.lista.cabecera.tipo.chofer']}"/></f:facet>
+			                <h:outputText value="#{vehChofer.tipoChoferCatalogoValorDTO.nombreCatalogoValor}" />
+			            </rich:column>
+			            <rich:column>
+			                <f:facet name="header"><h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.label.lista.cabecera.observacion.chofer']}"/></f:facet>
+			                <h:outputText value="#{vehChofer.descripcion}" />
+			            </rich:column>					         
+			            <rich:column>
+			                <f:facet name="header"><h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.boton.eliminar']}"/></f:facet>
+			                <a4j:commandLink id="botonEliminar" execute="@this" oncomplete="#{rich:component('mpEliminarChofer')}.show();">
+								<h:graphicImage library="images/icons" name="deleteReg.png" title="Borrar"/>
+								<f:setPropertyActionListener value="#{chofer}" target="#{vehiculoController.vehiculoChoferDTO}" />											
+							</a4j:commandLink>	
+			            </rich:column>            
+			        </rich:dataTable>						
+					<rich:panel style="text-align:center; border-left: none; border-right:none; border-bottom:none" rendered="#{not empty vehiculoController.vehiculoChoferDTOCols}">
+						<rich:dataScroller for="tableVehiculoChofer" maxPages="5" rendered="#{not empty vehiculoController.vehiculoChoferDTOCols}" renderIfSinglePage="false"/>
+					</rich:panel>
+				</h:panelGrid>
+			</rich:panel>
+		</rich:panel>
+		
+		<!-- Popup para agregar nuevo cliente -->
+		<rich:popupPanel id="mpTransportista" header="#{msg_erpweb['ec.com.erp.etiqueta.label.nuevo.etiqueta.lista.transportista']}" width="950" height="500" modal="true" domElementAttachment="form">
+			<f:facet name="controls">
+				<h:outputLink value="#"	onclick="#{rich:component('mpTransportista')}.hide();">
+					<h:graphicImage library="images" name="close.png" style="border:0px" id="closePopUpBodega" />
+				</h:outputLink>
+			</f:facet>
+			<h:panelGrid id="pnlListaTransportistas" cellpadding="3" cellspacing="3">				
+		        <rich:dataTable style="width:100%" value="#{vehiculoController.transportistaDTOCols}" var="transport" iterationStatusVar="it" id="tabletransporte" rows="15">
+		        	<rich:column style="padding:0px;padding-left:2px" >
+						<h:selectOneRadio onclick="radioButton(this);" id="myRadio" value="#{vehiculoController.codigoTransportistaSeleccionado}" valueChangeListener="#{vehiculoController.seleccionTransportista}">  
+							<f:selectItem itemValue="#{transport.id.codigoTransportista}"/> 
+							<a4j:ajax event="click" execute="@this" render="myRadio"/>								
+						</h:selectOneRadio>
+					</rich:column>
+		            <rich:column>
+		                <f:facet name="header">Nro.</f:facet>
+		                #{it.index+1}
+		            </rich:column>
+		            <rich:column>
+		                <f:facet name="header"><h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.header.tabla.tipo.transportista']}"/></f:facet>
+		                <h:outputText value="#{transport.tipoTransportistaCatalogoValorDTO.nombreCatalogoValor}" />
+		            </rich:column>
+		            <rich:column>
+		                <f:facet name="header"><h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.label.lista.cabecera.documento.transportista']}"/></f:facet>
+		                <h:outputText value="#{transport.personaDTO.numeroDocumento == null ? transport.empresaDTO.numeroRuc : transport.personaDTO.numeroDocumento}" />
+		            </rich:column>
+		            <rich:column>
+		                <f:facet name="header"><h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.label.lista.cabecera.nombre.transportista']}"/></f:facet>
+		                <h:outputText value="#{transport.personaDTO.nombreCompleto == null ? transport.empresaDTO.razonSocial : transport.personaDTO.nombreCompleto}" />
+		            </rich:column>
+		            <rich:column>
+		                <f:facet name="header"><h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.header.tabla.direccion.cliente']}"/></f:facet>
+		                <h:outputText value="#{transport.personaDTO == null ? transport.empresaDTO.contactoEmpresaDTO.direccionPrincipal : transport.personaDTO.contactoPersonaDTO.direccionPrincipal}" />
+		            </rich:column>
+		            <rich:column>
+		                <f:facet name="header"><h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.header.tabla.ciudad.cliente']}"/></f:facet>
+		                <h:outputText value="#{transport.personaDTO == null ? transport.empresaDTO.contactoEmpresaDTO.ciudad : transport.personaDTO.contactoPersonaDTO.ciudad}" />
+		            </rich:column>
+		             <rich:column>
+		                <f:facet name="header"><h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.header.tabla.telefono.cliente']}"/></f:facet>
+		                <h:outputText value="#{transport.personaDTO == null ? transport.empresaDTO.contactoEmpresaDTO.telefonoPrincipal : transport.personaDTO.contactoPersonaDTO.telefonoPrincipal}" />
+		            </rich:column>
+		        </rich:dataTable>
+		        <rich:panel style="text-align:center; border-left: none; border-right:none; border-bottom:none" rendered="#{not empty vehiculoController.vehiculoChoferDTOCols}">
+					<rich:dataScroller for="tabletransporte" maxPages="5" rendered="#{not empty vehiculoController.vehiculoChoferDTOCols}" renderIfSinglePage="false"/>
+				</rich:panel>
+			</h:panelGrid>
+			
+			<!-- Botones de PopUp -->
+			<h:panelGrid style="margin:auto;" columns="2" cellpadding="0" cellspacing="0">
+				<h:panelGroup layout="block" styleClass="botonD" style="margin-top:5px;margin-right:20px;">
+					<a4j:commandLink id="btnAceptarAgregarTransportista" execute="@this" render="nombreTransportista, numDocTransport" styleClass="aceptarD" actionListener="#{vehiculoController.agragarTransportista}" oncomplete="#{rich:component('mpTransportista')}.hide(); return false;">
+						<h:panelGrid columns="2" cellpadding="3" cellspacing="0">
+							<h:graphicImage name="btnAceptar.png" library="images" style="border:none;border-color:white;" height="16" width="16"/>
+							<h:outputText value="Aceptar" />
+						</h:panelGrid>
+					</a4j:commandLink>					
+				</h:panelGroup>
+	
+				<h:panelGroup layout="block" styleClass="botonD" style="margin-top:5px;">
+					<a4j:commandLink id="btnCancelarAgregarTransportista" styleClass="cancelarD" oncomplete="#{rich:component('mpTransportista')}.hide(); return false;" immediate="true">
+						<h:panelGrid columns="2" cellpadding="3" cellspacing="0">
+							<h:graphicImage name="btnCancel.png" library="images" style="border:none;border-color:white;" height="16" width="16"/>
+							<h:outputText value="Cancelar" />
+						</h:panelGrid>
+					</a4j:commandLink>
+				</h:panelGroup>
+	
+			</h:panelGrid>
+		</rich:popupPanel>
+		
+		
+		<!-- Popup para agregar nuevo chofer -->
+		<rich:popupPanel id="mpChoferes" header="#{msg_erpweb['ec.com.erp.etiqueta.label.lista.titulo.busqueda.chofer']}" width="552" height="250" modal="true" domElementAttachment="form">
+			<f:facet name="controls">
+				<h:outputLink value="#"	onclick="#{rich:component('mpChoferes')}.hide();">
+					<h:graphicImage library="images" name="close.png" style="border:0px" id="closePopUpChofer" />
+				</h:outputLink>
+			</f:facet>
+			<h:panelGrid id="pnlGridAddChofer" cellpadding="3" cellspacing="3">				
+		       <h:panelGrid columns="3" columnClasses="estiloColumnaPopUp">
+		       		<h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.label.nuevo.cliente.documento']}:* "/>
+					<h:inputText id="txtNumeroDocumento" maxlength="10" styleClass="styleUpperCase" onkeypress="if (event.keyCode == 13) return false; OnKeyPress(this, event);" value="#{vehiculoController.documentoBusqueda}">
+						<a4j:ajax event="keyup" listener="#{vehiculoController.buscarDatosPersona}" execute="@this" onbeforesubmit="if (event.keyCode != 13)  return false;" render="panelNombre nombreChofer pnlMensajes"/>
+					</h:inputText>
+					<h:panelGrid columns="2" cellpadding="3" cellspacing="0" style="padding-left:10px">
+						<h:graphicImage name="info.png" library="images" style="border:none;border-color:white;" height="16" width="16"/>
+						<h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.mensaje.informacion.busqueda.chofer']}" />
+					</h:panelGrid>
+	            </h:panelGrid>
+				<h:panelGrid columns="2" columnClasses="estiloColumnaPopUp" id="panelNombre">
+					<h:outputText rendered="#{not empty vehiculoController.vehiculoChoferDTO.choferDTO.personaDTO.nombreCompleto}" value="#{msg_erpweb['ec.com.erp.etiqueta.label.lista.cabecera.nombre.chofer']}: "/>
+					<h:outputText id="nombreChofer" rendered="#{not empty vehiculoController.vehiculoChoferDTO.choferDTO.personaDTO.nombreCompleto}" value="#{vehiculoController.vehiculoChoferDTO.choferDTO.personaDTO.nombreCompleto}"/>
+				</h:panelGrid>
+				<h:panelGrid columns="2" columnClasses="estiloColumnaPopUp">
+					<h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.label.lista.cabecera.tipo.chofer']}:* "/>
+					<h:selectOneMenu id="selTipoChofer" style="width: 242px;" value="#{vehiculoController.vehiculoChoferDTO.codigoValorTipoChofer}">
+						<f:selectItem itemLabel="Seleccione"/>
+						<f:selectItems var="catalogo" value="#{vehiculoController.tiposChoferCols}" itemLabel="#{catalogo.nombreCatalogoValor}" itemValue="#{catalogo.id.codigoCatalogoValor}"/>	                   	
+					</h:selectOneMenu>
+					<h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.label.lista.cabecera.guia.observacion']}: "/>
+					<h:inputTextarea id="txtObservacion" maxlength="100" styleClass="styleUpperCase estiloTextArea" value="#{vehiculoController.vehiculoChoferDTO.descripcion}"/>
+				</h:panelGrid>
+			</h:panelGrid>
+			
+			<!-- Botones de PopUp -->
+			<h:panelGrid style="margin:auto;" columns="2" cellpadding="0" cellspacing="0">
+				<h:panelGroup layout="block" styleClass="botonD" style="margin-top:5px;margin-right:20px;">
+					<a4j:commandLink id="btnAgregarChofer" execute="pnlGridAddChofer" render="panelTabla tablaVacia tableVehiculoChofer pnlMensajes" styleClass="aceptarD" actionListener="#{vehiculoController.agregarChofer}" oncomplete="if(#{vehiculoController.personaExistente and vehiculoController.controlPopUp})#{rich:component('mpChoferes')}.hide(); return false;">
+						<h:panelGrid columns="2" cellpadding="3" cellspacing="0">
+							<h:graphicImage name="btnAceptar.png" library="images" style="border:none;border-color:white;" height="16" width="16"/>
+							<h:outputText value="Aceptar" />
+						</h:panelGrid>
+					</a4j:commandLink>					
+				</h:panelGroup>
+	
+				<h:panelGroup layout="block" styleClass="botonD" style="margin-top:5px;">
+					<a4j:commandLink id="btnCancelarChofer" styleClass="cancelarD" oncomplete="#{rich:component('mpChoferes')}.hide(); return false;" immediate="true">
+						<h:panelGrid columns="2" cellpadding="3" cellspacing="0">
+							<h:graphicImage name="btnCancel.png" library="images" style="border:none;border-color:white;" height="16" width="16"/>
+							<h:outputText value="Cancelar" />
+						</h:panelGrid>
+					</a4j:commandLink>
+				</h:panelGroup>
+			</h:panelGrid>
+		</rich:popupPanel>
+		<h:outputStylesheet>
+			.estiloColumna1{
+				padding-right: 37px !important;
+			}	
+			
+			.estiloCol1{
+				padding-left: 10px !important;
+			}
+			
+			.estiloColumnaPopUp{
+				width:120px !important;
+			}
+			
+			.estiloTextArea{
+				width:236px !important;
+				height: 50px !important;
+			}		
+		</h:outputStylesheet>
+		
+		<script type="text/javascript">
+			/*<![CDATA[*/	
+				function radioButton(radio) {
+					var id = radio.name.substring(radio.name.lastIndexOf(':'));
+					var el = radio.form.elements;
+					for (var i = 0; i < el.length; i++) {
+						if (el[i].name.substring(el[i].name.lastIndexOf(':')) == id) {
+						el[i].checked = false;
+						}
+					}
+					radio.checked = true;
+				}
+					
+				function validarEnteros(e) {
+					tecla = (document.all) ? e.keyCode : e.which; 
+					if (tecla==8) return true; 
+					patron =/[0-9\s]/; 
+					te = String.fromCharCode(tecla);
+					return patron.test(te);
+				}
+			/*]]>*/
+		</script>
+	</ui:define>
+	
+</ui:composition>

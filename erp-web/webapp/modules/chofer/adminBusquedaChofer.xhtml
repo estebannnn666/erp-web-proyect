@@ -1,0 +1,87 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:a4j="http://richfaces.org/a4j"
+	xmlns:rich="http://richfaces.org/rich"
+	template="/templates/pages/pageLayout2.xhtml">
+	
+	<ui:param name="idForm" value="frmAdminChofer" />
+	<ui:param name="form" value="#{choferController.form}" />	
+	<ui:param name="controller" value="#{choferController}" />
+	<ui:param name="westLength" value="250" />
+	
+	<ui:define name="title">
+		Choferes
+	</ui:define>
+	
+	<ui:define name="header">	
+		<ui:include src="adminBusquedaChoferHeader.xhtml" />
+	</ui:define>
+	
+	<ui:define name="contentLeft">
+		<ui:include src="adminBusquedaChoferLeft.xhtml" />
+	</ui:define>
+	
+	<ui:define name="contentCenter">
+		<rich:panel id="listaChofer" styleClass="panelListaArticulos" header="Lista de choferes" style="height: 94.5%; width:100% !important;">	
+			<h:panelGrid id="tablaVacia" columns="1" rendered="#{empty choferController.choferDTOCols}" style="width:100%; text-align: center; padding-top: 220px">
+				<h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.mensaje.lista.vacio']}"/>
+			</h:panelGrid>
+			<rich:panel style="text-align:center; border-left: none; border-right:none; border-bottom:none" rendered="#{not empty choferController.choferDTOCols}">
+				<rich:dataScroller page="#{choferController.page}" fastStep="3" for="tableChofer" maxPages="5" rendered="#{not empty choferController.choferDTOCols}" renderIfSinglePage="false"/>
+			</rich:panel>		
+			<rich:dataTable style="width:100%" rendered="#{not empty choferController.choferDTOCols}" value="#{choferController.choferDTOCols}" var="chofer" iterationStatusVar="it" id="tableChofer" rows="15">
+	        	<rich:column>
+	                <f:facet name="header">Nro.</f:facet>
+	                #{it.index+1}
+	            </rich:column>
+	            <rich:column>
+	                <f:facet name="header"><h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.header.tabla.documento.cliente']}"/></f:facet>
+	                <h:outputText value="#{chofer.personaDTO.numeroDocumento == null ? N/D : chofer.personaDTO.numeroDocumento}" />
+	            </rich:column>
+	            <rich:column>
+	                <f:facet name="header"><h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.header.tabla.nombre.cliente']}"/></f:facet>
+	                <h:outputText value="#{chofer.personaDTO.nombreCompleto == null ? N/D : chofer.personaDTO.nombreCompleto}" />
+	            </rich:column>
+	            <rich:column>
+	                <f:facet name="header"><h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.label.lista.cabecera.tipo.licencia']}"/></f:facet>
+	                <h:outputText value="#{chofer.tipoLicenciaCatalogoValorDTO.nombreCatalogoValor}" />
+	            </rich:column>
+	            <rich:column>
+	                <f:facet name="header"><h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.label.lista.cabecera.caducidad.licencia']}"/></f:facet>
+	                <h:outputText value="#{chofer.fechaCaducidadLicencia}" />
+	            </rich:column>
+	            <rich:column>
+	                <f:facet name="header"><h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.label.lista.cabecera.documento.transportista']}"/></f:facet>
+	                 <h:outputText value="#{chofer.transportistaDTO.personaDTO == null ? chofer.transportistaDTO.empresaDTO.numeroRuc : chofer.transportistaDTO.personaDTO.numeroDocumento}" />
+	            </rich:column>
+	            <rich:column>
+	                <f:facet name="header"><h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.label.lista.cabecera.nombre.transportista']}"/></f:facet>
+	                <h:outputText value="#{chofer.transportistaDTO.personaDTO == null ? chofer.transportistaDTO.empresaDTO.razonSocial : chofer.transportistaDTO.personaDTO.nombreCompleto}" />
+	            </rich:column> 
+	            <rich:column styleClass="columna5">
+	                <f:facet name="header">Editar</f:facet>
+	                <a4j:commandLink id="botonEditar" render="pnlGridChofer pnlGridPersona pnlGridContacto" action="#{choferController.cargarChoferEditar}"	execute="@this" >
+						<h:graphicImage name="btnEditar.png" library="images" style="border:none;border-color:white;" height="16" width="16"/>
+						<f:setPropertyActionListener value="#{chofer}" target="#{choferController.choferDTO}" />											
+					</a4j:commandLink>	
+	            </rich:column>           
+	        </rich:dataTable>
+        </rich:panel>
+        <script>
+			/*<![CDATA[*/
+			$(document).ready(function(){				
+				 openLinkSystem();				
+			});
+			function openLinkSystem(){
+				$('.linkopensystem').trigger('click');
+			}	
+								
+		/*]]>*/			
+		</script>
+		<a4j:commandLink id="linkopensystem" styleClass="linkopensystem" execute="@this" actionListener="#{choferController.refrescarPantalla}">
+		</a4j:commandLink>	
+	</ui:define>
+	
+</ui:composition>

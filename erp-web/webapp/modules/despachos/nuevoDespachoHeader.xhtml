@@ -1,0 +1,44 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:a4j="http://richfaces.org/a4j"
+	xmlns:rich="http://richfaces.org/rich"
+	xmlns:c="http://java.sun.com/jstl/core">
+        <rich:toolbarGroup>
+        	<!-- BOTON: NUEVO-->
+			<h:panelGroup layout="block" styleClass="botonComun">
+				<a4j:commandLink value="Nuevo" execute="@this" render="pnlGridDespacho, panelTablaPedidos, panelTablaAdicional, pnlMensajes"
+					styleClass="botonNuevo" actionListener="#{despachoController.clearNuevoDespacho}"/>
+			</h:panelGroup>
+		</rich:toolbarGroup>
+		
+		<rich:toolbarGroup>	
+			<!-- BOTON: GUARDAR-->
+			<h:panelGroup layout="block" styleClass="botonComun">
+				<a4j:commandLink oncomplete="if(#{despachoController.despachoCreado})#{rich:component('mpConfirmacion')}.show();" 
+					value="#{msg_erpweb['ec.com.erp.etiqueta.boton.guardar']}"
+					styleClass="botonGuardar" actionListener="#{despachoController.guadarActualizarDespacho}" 
+					execute="pnlGridDespacho panelTablaPedidos panelTablaAdicional" render="pnlGridDespacho panelTablaPedidos panelTablaAdicional pnlMensajes">
+				</a4j:commandLink>
+			</h:panelGroup>
+		</rich:toolbarGroup>
+		
+		<rich:toolbarGroup>	
+			<h:panelGroup layout="block" styleClass="botonComun">
+				<h:commandLink value="Imprimir" styleClass="botonImprimir" action="#{despachoController.imprimirNotaDespacho}" target="_BLANK"/>
+			</h:panelGroup>
+		</rich:toolbarGroup>
+		
+		<rich:toolbarGroup>	
+			<!-- BOTON: BUSQUEDA-->
+			<h:panelGroup layout="block" styleClass="botonComun">
+				<a4j:commandLink value="#{msg_erpweb['ec.com.erp.etiqueta.boton.busqueda']}"
+					styleClass="botonBuscar" action="#{despachoController.regresarBusquedaDespachos}"
+					immediate="true" execute="@this" />
+			</h:panelGroup>
+		</rich:toolbarGroup>
+		
+		<rich:toolbarGroup>	
+		</rich:toolbarGroup>
+</ui:composition>
