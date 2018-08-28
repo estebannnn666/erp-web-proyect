@@ -77,9 +77,11 @@ public class VehiculoController extends CommonsController implements Serializabl
 	private String documentoBusqueda;
 	private boolean bandera;
 	private boolean personaExistente;
+	private Boolean vehiculoCreado;
 
 	@PostConstruct
 	public void postConstruct() {
+		this.vehiculoCreado = Boolean.FALSE;
 		this.controlPopUp = Boolean.FALSE;
 		this.choferDTO = new ChoferDTO();
 		this.vehiculoDTO = new VehiculoDTO();
@@ -346,6 +348,7 @@ public class VehiculoController extends CommonsController implements Serializabl
 	 */
 	public void guadarActualizarVehiculo(ActionEvent e){
 		try {
+			this.setVehiculoCreado(Boolean.FALSE);
 			this.setShowMessagesBar(Boolean.FALSE);
 			if(this.validarDatosCompletos()) {
 				this.vehiculoDTO.getId().setCodigoCompania(Integer.parseInt(ERPConstantes.ESTADO_ACTIVO_NUMERICO));
@@ -353,6 +356,7 @@ public class VehiculoController extends CommonsController implements Serializabl
 				this.vehiculoDTO.setUsuarioRegistro(this.loginController.getUsuariosDTO().getId().getUserId());
 				ERPFactory.vehiculo.getVehiculoServicio().transGuardarActualizarVehiculo(vehiculoDTO);
 				this.setShowMessagesBar(Boolean.TRUE);
+				this.setVehiculoCreado(Boolean.TRUE);
 		        MensajesController.addInfo(null, ERPWebResources.getString("ec.com.erp.etiqueta.pantall.vehiculos.mensaje.correcto"));
 			}
 			else {
@@ -415,6 +419,7 @@ public class VehiculoController extends CommonsController implements Serializabl
 	 * @param e
 	 */
 	public void clearNuevoVehiculo(ActionEvent e){
+		this.setVehiculoCreado(Boolean.FALSE);
 		this.setShowMessagesBar(Boolean.FALSE);
 		this.choferDTO = new ChoferDTO();
 		this.vehiculoDTO = new VehiculoDTO();
@@ -633,5 +638,13 @@ public class VehiculoController extends CommonsController implements Serializabl
 
 	public void setPersonaExistente(boolean personaExistente) {
 		this.personaExistente = personaExistente;
+	}
+
+	public Boolean getVehiculoCreado() {
+		return vehiculoCreado;
+	}
+
+	public void setVehiculoCreado(Boolean vehiculoCreado) {
+		this.vehiculoCreado = vehiculoCreado;
 	}
 }

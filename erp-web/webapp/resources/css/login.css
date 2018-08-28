@@ -184,6 +184,14 @@ body {
 .stylePerfil a {
     background-image: url("#{resource['images/perfil.png']}");
 }
+
+.styleInvetario a:hover {
+	background-image: url("#{resource['images/invetarios_hover.png']}");
+}
+
+.styleInvetario a {
+    background-image: url("#{resource['images/invetarios.png']}");
+}
 /** Fin estilos menus **/
 
 

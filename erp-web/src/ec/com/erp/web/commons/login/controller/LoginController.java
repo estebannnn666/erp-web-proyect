@@ -150,7 +150,7 @@ public class LoginController extends CommonsController implements Serializable{
 				
 				FacesContext.getCurrentInstance().getExternalContext().getSessionMap().put(ID_SESDATMAN, this.sessionDataManagerBase);
 				
-				String urlConexion = FacesContext.getCurrentInstance().getExternalContext().getRequestContextPath().concat("/modules/principal/menu.jsf");//ontextName();
+				String urlConexion = FacesContext.getCurrentInstance().getExternalContext().getRequestContextPath().concat("/modules/principal/menu.xhtml?faces-redirect=true");//ontextName();
 				FacesContext.getCurrentInstance().getExternalContext().redirect(urlConexion+"?nerptms="+ usuariosDTO.getId().getUserId());
 	//			return "/modules/principal/menu.xhtml?faces-redirect=true";
 			}
@@ -171,55 +171,55 @@ public class LoginController extends CommonsController implements Serializable{
 	}
 	
 	public String redirectToWelcome(){
-		return "/modules/principal/menu.xhtml";
+		return "/modules/principal/menu.xhtml?faces-redirect=true";
 	}
 	
 	public String redirectToArticulos(){
-		return "/modules/articulos/adminBusquedaArticulos.xhtml";
+		return "/modules/articulos/adminBusquedaArticulos.xhtml?faces-redirect=true";
 	}
 	
 	public String redirectToClientes(){
-		return "/modules/clientes/adminBusquedaClientes.xhtml";
+		return "/modules/clientes/adminBusquedaClientes.xhtml?faces-redirect=true";
 	}
 	
 	public String redirectToPedidos(){
-		return "/modules/pedidos/adminBusquedaPedidos.xhtml";
+		return "/modules/pedidos/adminBusquedaPedidos.xhtml?faces-redirect=true";
 	}
 	
 	public String redirectToTransportista(){
-		return "/modules/transportistas/adminBusquedaTransportista.xhtml";
+		return "/modules/transportistas/adminBusquedaTransportista.xhtml?faces-redirect=true";
 	}
 	
 	public String redirectToChofer(){
-		return "/modules/chofer/adminBusquedaChofer.xhtml";
+		return "/modules/chofer/adminBusquedaChofer.xhtml?faces-redirect=true";
 	}
 	
 	public String redirectToVehiculos(){
-		return "/modules/vehiculo/adminBusquedaVehiculo.xhtml";
+		return "/modules/vehiculo/adminBusquedaVehiculo.xhtml?faces-redirect=true";
 	}
 	
 	public String redirectToDespacho(){
-		return "/modules/despachos/adminBusquedaDespacho.xhtml";
+		return "/modules/despachos/adminBusquedaDespacho.xhtml?faces-redirect=true";
 	}
 	
 	public String redirectToFacutas(){
-		return "/modules/facturas/adminBusquedaCuentas.xhtml";
+		return "/modules/facturas/adminBusquedaCuentas.xhtml?faces-redirect=true";
 	}
 	
 	public String redirectToUsuarios() {
-		return "/modules/usuarios/adminBusquedaUsuarios.xhtml";
+		return "/modules/usuarios/adminBusquedaUsuarios.xhtml?faces-redirect=true";
 	}
 	
 	public String redirectToModulos() {
-		return "/modules/modulos/adminBusquedaModulos.xhtml";
+		return "/modules/modulos/adminBusquedaModulos.xhtml?faces-redirect=true";
 	}
 	
 	public String redirectToPerfiles() {
-		return "/modules/perfiles/adminBusquedaPerfil.xhtml";
+		return "/modules/perfiles/adminBusquedaPerfil.xhtml?faces-redirect=true";
 	}
 	
 	public String redirectToKardex() {
-		return "/modules/inventario/adminBusquedaInventario.xhtml";
+		return "/modules/inventario/adminBusquedaInventario.xhtml?faces-redirect=true";
 	}
 	/**
 	 * Logout operation.
@@ -234,7 +234,7 @@ public class LoginController extends CommonsController implements Serializable{
 		msg.setSeverity(FacesMessage.SEVERITY_INFO);
 		FacesContext.getCurrentInstance().addMessage(null, msg);
 		
-		return "/login.xhtml";
+		return "/login.xhtml?faces-redirect=true";
 	}
 	
 	/**

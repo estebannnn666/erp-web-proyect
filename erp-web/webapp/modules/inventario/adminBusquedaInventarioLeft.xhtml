@@ -24,19 +24,18 @@
 					</h:panelGroup>
 				</h:panelGrid>
 		    	<h:inputText class="styleUpperCase" style="width:216px" value="#{inventarioController.codigoBarras}" id="codigoBarras" maxlength="16" onkeypress="return validarEnteros(event);"/>
-			</h:panelGrid>	
-			
-			<h:panelGrid width="100%" columns="2" columnClasses="columnaIzquierda, columnaDerecha">
-				<h:panelGroup>
-	    	   		<h:outputText class="styleNegritas" value="#{msg_erpweb['ec.com.erp.etiqueta.inventario.label.header.fecha']}"/>
-	    	   	</h:panelGroup>
-	    	   	<h:panelGroup styleClass="styleBorrar">
-					<a4j:commandLink styleClass="guardarA" execute="@this" render="listaReporte" actionListener="#{inventarioController.borrarBusquedaFecha}"/>
-				</h:panelGroup>
-			</h:panelGrid>
-			<rich:calendar inputStyle="width:197px !important;" value="#{inventarioController.fechaInicioBusqueda}" datePattern="yyyy-MM-dd"></rich:calendar>
-			<rich:calendar inputStyle="width:197px !important;" value="#{inventarioController.fechaFinBusqueda}" datePattern="yyyy-MM-dd"></rich:calendar>
-									
+				
+				<h:panelGrid width="100%" columns="2" columnClasses="columnaIzquierda, columnaDerecha">
+					<h:panelGroup>
+		    	   		<h:outputText class="styleNegritas" value="#{msg_erpweb['ec.com.erp.etiqueta.inventario.label.header.fecha']}"/>
+		    	   	</h:panelGroup>
+		    	   	<h:panelGroup styleClass="styleBorrar">
+						<a4j:commandLink styleClass="guardarA" execute="@this" render="listaReporte" actionListener="#{inventarioController.borrarBusquedaFecha}"/>
+					</h:panelGroup>
+				</h:panelGrid>
+				<rich:calendar inputStyle="width:197px !important;" value="#{inventarioController.fechaInicioBusqueda}" datePattern="yyyy-MM-dd"></rich:calendar>
+				<rich:calendar inputStyle="width:197px !important;" value="#{inventarioController.fechaFinBusqueda}" datePattern="yyyy-MM-dd"></rich:calendar>
+			</h:panelGrid>					
 		</h:panelGroup>	
 		
 	</rich:panel>

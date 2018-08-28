@@ -2,6 +2,7 @@
 package ec.com.erp.web.inventario.controller;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.sql.Timestamp;
 import java.util.Calendar;
 import java.util.Collection;
@@ -12,6 +13,7 @@ import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.ViewScoped;
 import javax.faces.event.ActionEvent;
+import javax.faces.event.AjaxBehaviorEvent;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -62,6 +64,8 @@ public class InventarioController extends CommonsController implements Serializa
 
 	@PostConstruct
 	public void postConstruct() {
+		fechaInicioBusqueda = new Date();
+		fechaFinBusqueda = new Date();
 		this.inventarioCreado = Boolean.FALSE;
 		this.inventarioDTO = new InventarioDTO();
 		this.articuloDTO = new ArticuloDTO();
@@ -279,6 +283,35 @@ public class InventarioController extends CommonsController implements Serializa
 	public void borrarBusquedaFecha(ActionEvent e){
 		this.fechaInicioBusqueda = new Date();
 		this.fechaFinBusqueda = new Date();
+	}
+	
+	/**
+	 * Metodo para consultar articulo por codigo de barras 
+	 * @param e
+	 */
+	public void realizarConsultaArticulos(AjaxBehaviorEvent e) {
+		this.setShowMessagesBar(Boolean.FALSE);
+		Collection<ArticuloDTO> articuloDTOCols = ERPFactory.articulos.getArticuloServicio().findObtenerListaArticulos(Integer.parseInt(ERPConstantes.ESTADO_ACTIVO_NUMERICO), codigoBarrasNuevo, null);
+		if(CollectionUtils.isNotEmpty(articuloDTOCols)) {
+			ArticuloDTO  articuloTem = articuloDTOCols.iterator().next();
+			this.inventarioDTO.setValorUnidadEntrada(articuloTem.getPrecio());
+			this.inventarioDTO.setCodigoArticulo(articuloTem.getId().getCodigoArticulo());
+			this.inventarioDTO.setArticuloDTO(articuloTem);
+		}else {
+			this.setShowMessagesBar(Boolean.TRUE);
+			MensajesController.addError(null, ERPWebResources.getString("ec.com.erp.etiqueta.inventario.mensaje.informacion.articulo.noexiste"));
+		}
+	}
+	
+	/**
+	 * Calcular el total
+	 * @param e
+	 */
+	public void calcularTotalMovimientoKeyUp(AjaxBehaviorEvent e) {
+		if(this.inventarioDTO.getCantidadEntrada() != null && this.inventarioDTO.getValorUnidadEntrada() != null) {
+			BigDecimal subTotal = BigDecimal.valueOf(Double.valueOf(""+this.inventarioDTO.getCantidadEntrada())).multiply(this.inventarioDTO.getValorUnidadEntrada());
+			this.inventarioDTO.setValorTotalEntrada(subTotal);		
+		}
 	}
 	
 	public void setInventarioDataManager(InventarioDataManager inventarioDataManager) {

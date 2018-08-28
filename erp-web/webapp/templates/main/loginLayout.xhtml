@@ -22,16 +22,10 @@
 		
 		<script language="Javascript">
 			document.oncontextmenu = function(){return false}
-			window.history.forward(0);
-
-			 function  darClick () {
-			      var objO = document.getElementByid('linkopensystem');
-			      objO.click();
-			 }
-			   
+			window.history.forward(0);		   
 		</script>
 	</h:head>
-	<h:body onload="darClick();">
+	<h:body>
 		<h:form id="#{idForm}">
 			<!-- Insertar el contenido de la cabecera -->
 			<h:panelGroup id="header" layout="block">

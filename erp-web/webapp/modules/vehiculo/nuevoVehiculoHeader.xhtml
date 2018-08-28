@@ -16,7 +16,8 @@
 		<rich:toolbarGroup>
 			<!-- BOTON: GUARDAR-->
 			<h:panelGroup layout="block" styleClass="botonComun">
-				<a4j:commandLink value="#{msg_erpweb['ec.com.erp.etiqueta.boton.guardar']}"
+				<a4j:commandLink oncomplete="if(#{vehiculoController.vehiculoCreado})#{rich:component('mpConfirmacion')}.show();"
+					value="#{msg_erpweb['ec.com.erp.etiqueta.boton.guardar']}"
 					styleClass="botonGuardar" actionListener="#{vehiculoController.guadarActualizarVehiculo}"
 					execute="pnlGridVehiculo panelTabla" render="pnlMensajes"/>
 			</h:panelGroup>

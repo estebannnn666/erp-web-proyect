@@ -10,6 +10,7 @@
 	<ui:param name="form" value="#{loginController.form}" />	
 	<ui:param name="controller" value="#{loginController}" />
 	<ui:define name="contentCenter">
+		<h:form id="login-form">
     		<rich:panel header="Login" style="width:300px !important;"> 
 	    		<h:panelGrid columns="2">
 		    		<h:outputText value="username:"/>
@@ -19,8 +20,19 @@
 	    	    </h:panelGrid>
 	   			<a4j:commandButton id="button" value="Login" render="pnlMensajes" action="#{loginController.doLogin}"/>
     	  	</rich:panel>
-			<a4j:jsFunction name="cargarInfo" actionListener="#{loginController.refrescarPantalla}"></a4j:jsFunction>
-	   	   	<h:commandLink id="linkopensystem" styleClass="linkopensystem" execute="@this" action="#{loginController.refrescar}">
-			</h:commandLink>	
+	    	<script>
+				/*<![CDATA[*/
+				$(document).ready(function(){				
+					 openLinkSystem();				
+				});
+				function openLinkSystem(){
+					$('.linkopensystem').trigger('click');
+				}	
+									
+				/*]]>*/			
+			</script>
+	   	   	<a4j:commandLink id="linkopensystem" styleClass="linkopensystem" execute="@this" actionListener="#{loginController.refrescarPantalla}">
+			</a4j:commandLink>	
+    	</h:form>
 	</ui:define>
 </ui:composition>

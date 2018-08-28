@@ -14,24 +14,9 @@
 			<div style="padding-left: 80px">
 	    		<rich:dataGrid styleClass="estiloMenuDinamico" style="width:100% ; background-color: transparent; border: none;" value="#{loginController.usuariosDTO.perfilDTO.moduloPerfilDTOCols}" var="modulo" columns="6" elements="12">
 					<h:panelGroup layout="block" styleClass="stylePrincipal #{modulo.moduloDTO.estilo}">
-						<a4j:commandLink styleClass="guardarA" action="#{modulo.moduloDTO.url.toString()}" oncomplete="openLinkSystem();"/>
+						<a4j:commandLink styleClass="guardarA" action="#{modulo.moduloDTO.url.toString()}"/>
 					</h:panelGroup>
 	    	   	</rich:dataGrid>
-	    	   	
-	    	   	<ol>
-					<li><a4j:commandLink actionListener="#{loginController.redirectToArticulos}" value="Articulos" oncomplete="openLinkSystem();"/></li>
-					<li><a4j:commandLink action="#{loginController.redirectToClientes}" value="Clientes" oncomplete="openLinkSystem();"/></li>
-					<li><a4j:commandLink action="#{loginController.redirectToPedidos}" value="Pedidos" oncomplete="openLinkSystem();"/></li>
-					<li><a4j:commandLink action="#{loginController.redirectToTransportista}" value="Transportistas" oncomplete="openLinkSystem();"/></li>
-					<li><a4j:commandLink action="#{loginController.redirectToChofer}" value="Chofer" oncomplete="openLinkSystem();"/></li>
-					<li><a4j:commandLink action="#{loginController.redirectToVehiculos}" value="Vehiculos" oncomplete="openLinkSystem();"/></li>
-					<li><a4j:commandLink action="#{loginController.redirectToDespacho}" value="Despachos" oncomplete="openLinkSystem();"/></li>
-					<li><a4j:commandLink action="#{loginController.redirectToFacutas}" value="Facturas" oncomplete="openLinkSystem();"/></li>
-					<li><a4j:commandLink action="#{loginController.redirectToUsuarios}" value="Usuarios" oncomplete="openLinkSystem();"/></li>
-					<li><a4j:commandLink action="#{loginController.redirectToModulos}" value="Modulos" oncomplete="openLinkSystem();"/></li>
-					<li><a4j:commandLink action="#{loginController.redirectToPerfiles}" value="Perfiles" oncomplete="openLinkSystem();"/></li>
-					<li><a4j:commandLink action="#{loginController.redirectToKardex}" value="Perfiles" oncomplete="openLinkSystem();"/></li> 
-				 </ol> 
     	   	</div>
    	   	</rich:panel>
    	   	<script>

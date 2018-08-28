@@ -12,7 +12,7 @@
 	<ui:param name="westLength" value="250" />
 	
 	<ui:define name="title">
-		Nuevo articulo
+		Nuevo registro
 	</ui:define>
 	
 	<ui:define name="header">		
@@ -23,7 +23,7 @@
 		 <rich:panel header="Registro movimiento de mercaderia" style="width: 100%; background-color: #F5FAFF;">
 	 		 <fieldset>
 			 	<legend>#{msg_erpweb['ec.com.erp.etiqueta.header.datos.registro']}</legend>
-			 	<h:panelGrid id="pnlGridInventarios" columns="2" cellspacing="2" cellpadding="5">
+			 	<h:panelGrid id="pnlGridInventarios" columns="3" cellspacing="2" cellpadding="5">
 			 		
 			 		<h:outputText class="styleNegritas" value="#{msg_erpweb['ec.com.erp.etiqueta.inventario.label.header.tipomovimiento']}: *" />
 			 		<h:selectOneMenu value="#{inventarioController.tipoMovimiento}" style="background-color:#f9f9d5; background-image: none; width: 165px">
@@ -31,24 +31,41 @@
 						<f:selectItem itemLabel="ENTRADA" itemValue="1"/>
 						<f:selectItem itemLabel="SALIDA" itemValue="0"/>
 					</h:selectOneMenu>
+					<h:outputText value="" />
 					
+					<h:outputText class="styleNegritas" value="#{msg_erpweb['ec.com.erp.etiqueta.inventario.label.header.detalle']}: *" />
+			 		<h:inputText class="styleUpperCase" style="background-color:#f9f9d5; background-image: none; width:260px" value="#{inventarioController.inventarioDTO.detalleMoviento}" id="txtDetalle" maxlength="64"/>
+			 		<h:outputText value="" />
+			 		
 					<h:outputText class="styleNegritas" value="#{msg_erpweb['ec.com.erp.etiqueta.header.tabla.codigo.barras']}: *" />
-			 		<h:inputText class="styleUpperCase" style="background-color:#f9f9d5; background-image: none; width:260px" value="#{inventarioController.codigoBarrasNuevo}" id="codBarras" maxlength="32" onkeypress="return validarEnteros(event);"/>
+			 		<h:inputText class="styleUpperCase" style="background-color:#f9f9d5; background-image: none; width:260px" value="#{inventarioController.codigoBarrasNuevo}" id="codBarras" maxlength="32" onkeypress="return validarEnteros(event);">
+			 			<a4j:ajax event="keyup" execute="@this" listener="#{inventarioController.realizarConsultaArticulos}" onbeforesubmit="if (event.keyCode != 13)  return false;" render="pnlGridInventarios pnlMensajes" oncomplete="openLinkSystem();"/>
+			 		</h:inputText>
+			 		<h:panelGrid columns="2" cellpadding="3" cellspacing="0" style="padding-left:10px">
+						<h:graphicImage name="info.png" library="images" style="border:none;border-color:white;" height="16" width="16"/>
+						<h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.inventario.mensaje.informacion.consulta.articulo']}" />
+					</h:panelGrid>
 			 		
 			 		<h:outputText class="styleNegritas" value="#{msg_erpweb['ec.com.erp.etiqueta.inventario.label.header.cantidad']}: *" />
-			 		<h:inputText class="styleUpperCase" style="background-color:#f9f9d5; background-image: none; width:260px" value="#{inventarioController.inventarioDTO.cantidadEntrada}" id="cantidadMov" maxlength="9" onkeypress="return validarEnteros(event);"/>
+			 		<h:inputText class="styleUpperCase" style="background-color:#f9f9d5; background-image: none; width:260px" value="#{inventarioController.inventarioDTO.cantidadEntrada}" id="cantidadMov" maxlength="9" onkeypress="return validarEnteros(event);">
+			 			<a4j:ajax event="keyup" execute="@this" listener="#{inventarioController.calcularTotalMovimientoKeyUp}" render="pnlGridInventarios" oncomplete="fijarFocoCantidad('cantidadMov');"></a4j:ajax>
+			 		</h:inputText>
+			 		<h:outputText value="" />
 			 		
 			 		<h:outputText class="styleNegritas" value="#{msg_erpweb['ec.com.erp.etiqueta.inventario.label.header.valorunidad']}: *" />
-			 		<h:inputText class="styleUpperCase" style="background-color:#f9f9d5; background-image: none; width:260px" value="#{inventarioController.inventarioDTO.valorUnidadEntrada}" id="precioUniMov" maxlength="12" onkeypress="return validarDecimal(event);"/>
+			 		<h:inputText class="styleUpperCase" style="background-color:#f9f9d5; background-image: none; width:260px" value="#{inventarioController.inventarioDTO.valorUnidadEntrada}" id="precioUniMov" maxlength="12" onkeypress="return validarDecimal(event);" disabled="true"/>
+			 		<h:outputText value="" />
 			 		
 			 		<h:outputText class="styleNegritas" value="#{msg_erpweb['ec.com.erp.etiqueta.inventario.label.header.valortotal']}: *" />
-			 		<h:inputText class="styleUpperCase" style="background-color:#f9f9d5; background-image: none; width:260px" value="#{inventarioController.inventarioDTO.valorTotalEntrada}" id="precioTotMov" maxlength="12" onkeypress="return validarDecimal(event);"/>
+			 		<h:inputText class="styleUpperCase" style="background-color:#f9f9d5; background-image: none; width:260px" value="#{inventarioController.inventarioDTO.valorTotalEntrada}" id="precioTotMov" maxlength="12" onkeypress="return validarDecimal(event);" disabled="true"/>
+			 		<h:outputText value="" />
 			 	</h:panelGrid>
 			  </fieldset>
 		</rich:panel>
+		
 		 
 		<!-- Popup para confirmar que se guardo el articulo -->
-		<rich:popupPanel id="mpConfirmacion" header="#{msg_erpweb['ec.com.erp.etiqueta.mensaje.confirmacion']}" width="345" height="145" modal="true" domElementAttachment="form">
+		<rich:popupPanel id="mpConfirmacion" header="#{msg_erpweb['ec.com.erp.etiqueta.mensaje.confirmacion']}" width="345" height="160" modal="true" domElementAttachment="form">
 			<f:facet name="controls">
 				<h:outputLink value="#"	onclick="#{rich:component('mpConfirmacion')}.hide();">
 					<h:graphicImage library="images" name="close.png" style="border:0px"/>
@@ -108,6 +125,31 @@
 				function openLinkSystem(){
 					$('.linkopensystem').trigger('click');
 				}	
+
+				function fijarFocoCantidad(classInput) {
+					try {
+						debugger;
+						var ele = document.getElementById('frmNuevoInventario:cantidadMov');
+						element = document.getElementById('frmNuevoInventario:cantidadMov');
+						var lenghtInput = $(element).val();
+						setCursor(element,lenghtInput.length,lenghtInput.length);
+					}catch (e) {}
+				}
+
+				function setCursor(inputObject,selectionStart, selectionEnd) {
+					if(inputObject.setSelectionRange) {
+						inputObject.focus();
+						inputObject.setSelectionRange(selectionStart,selectionEnd);
+					}else {
+						if(inputObject.createTextRange) {
+							range=inputObject.createTextRange();
+							range.collapse(true);
+							range.moveEnd('character',selectionEnd); 
+							range.moveStart('character',selectionStart); 
+							range.select();
+						}
+					}
+				}
 			/*]]>*/
 		</script>
 	</ui:define>
