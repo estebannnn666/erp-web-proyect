@@ -82,6 +82,10 @@ public class TransportistaController extends CommonsController implements Serial
 			this.setPersonaDTO(transportistaDataManager.getTransportistaDTOEditar().getPersonaDTO());
 			this.setEmpresaDTO(transportistaDataManager.getTransportistaDTOEditar().getEmpresaDTO());
 			this.setContactoDTO(transportistaDataManager.getTransportistaDTOEditar().getPersonaDTO() == null ? transportistaDataManager.getTransportistaDTOEditar().getEmpresaDTO().getContactoEmpresaDTO() : transportistaDataManager.getTransportistaDTOEditar().getPersonaDTO().getContactoPersonaDTO());
+			if(transportistaDataManager.getTransportistaDTOEditar().getPersonaDTO() == null) {
+				this.personaDTO = new PersonaDTO();
+				this.personaDTO.setNumeroDocumento(transportistaDataManager.getTransportistaDTOEditar().getEmpresaDTO().getNumeroRuc());
+			}
 		}
 	}
 		
@@ -118,6 +122,10 @@ public class TransportistaController extends CommonsController implements Serial
 			else {
 				this.setContactoDTO(transportistaDTOTemp.getPersonaDTO().getContactoPersonaDTO());
 			}
+		}else
+		{
+			this.setShowMessagesBar(Boolean.TRUE);
+	        MensajesController.addWarn(null, "No se encontr\u00F3 el transportista con el documento ingresado.");
 		}
 	}
 	
@@ -155,9 +163,14 @@ public class TransportistaController extends CommonsController implements Serial
 		try {
 			this.setTransportistaCreado(Boolean.FALSE);
 			if(this.validarPantallaTransportistas()) {
-				this.empresaDTO.setNumeroRuc(this.personaDTO.getNumeroDocumento());
-				this.transportistaDTO.setPersonaDTO(this.personaDTO);
-				this.transportistaDTO.setEmpresaDTO(this.empresaDTO);
+				if(this.transportistaDTO.getCodigoValorTipoTransportista().equals(ERPConstantes.CODIGO_CATALOGO_VALOR_TIPO_CLIENTE_EMPRESA)) {
+					this.empresaDTO.setNumeroRuc(this.personaDTO.getNumeroDocumento());
+					this.transportistaDTO.setEmpresaDTO(this.empresaDTO);
+				}
+				if(this.transportistaDTO.getCodigoValorTipoTransportista().equals(ERPConstantes.CODIGO_CATALOGO_VALOR_TIPO_CLIENTE_PERSONA)) {
+					this.transportistaDTO.setPersonaDTO(this.personaDTO);
+				}
+				
 				this.transportistaDTO.setUsuarioRegistro(this.loginController.getUsuariosDTO().getId().getUserId());
 				
 				ERPFactory.transportista.getTransportistasServicio().transGuardarActualizarTransportista(this.transportistaDTO, this.contactoDTO);
@@ -168,22 +181,25 @@ public class TransportistaController extends CommonsController implements Serial
 				this.setShowMessagesBar(Boolean.TRUE);
 			}
 		} catch (ERPException e1) {
-			this.transportistaDTO.getPersonaDTO().getId().setCodigoPersona(null);
-			this.transportistaDTO.getEmpresaDTO().getId().setCodigoEmpresa(null);
+			if(this.transportistaDTO.getCodigoValorTipoTransportista().equals(ERPConstantes.CODIGO_CATALOGO_VALOR_TIPO_CLIENTE_PERSONA)) {
+				this.transportistaDTO.getPersonaDTO().getId().setCodigoPersona(null);
+			}
+			if(this.transportistaDTO.getCodigoValorTipoTransportista().equals(ERPConstantes.CODIGO_CATALOGO_VALOR_TIPO_CLIENTE_EMPRESA)) {
+				this.transportistaDTO.getEmpresaDTO().getId().setCodigoEmpresa(null);
+			}
 			this.transportistaDTO.setUsuarioRegistro(null);
 			this.setShowMessagesBar(Boolean.TRUE);
-			FacesMessage msg = new FacesMessage(e1.getMessage(), "ERROR MSG");
-	        msg.setSeverity(FacesMessage.SEVERITY_ERROR);
-	        FacesContext.getCurrentInstance().addMessage(null, msg);
+			MensajesController.addError(null, e1.getMessage());
 		} catch (Exception e2) {
-			this.transportistaDTO.getPersonaDTO().getId().setCodigoPersona(null);
-			this.transportistaDTO.getEmpresaDTO().getId().setCodigoEmpresa(null);
+			if(this.transportistaDTO.getCodigoValorTipoTransportista().equals(ERPConstantes.CODIGO_CATALOGO_VALOR_TIPO_CLIENTE_PERSONA)) {
+				this.transportistaDTO.getPersonaDTO().getId().setCodigoPersona(null);
+			}
+			if(this.transportistaDTO.getCodigoValorTipoTransportista().equals(ERPConstantes.CODIGO_CATALOGO_VALOR_TIPO_CLIENTE_EMPRESA)) {
+				this.transportistaDTO.getEmpresaDTO().getId().setCodigoEmpresa(null);
+			}
 			this.transportistaDTO.setUsuarioRegistro(null);
 			this.setShowMessagesBar(Boolean.TRUE);
-			FacesMessage msg = new FacesMessage(e2.getMessage(), "ERROR MSG");
-	        msg.setSeverity(FacesMessage.SEVERITY_ERROR);
-	        FacesContext.getCurrentInstance().addMessage(null, msg);
-	        System.out.println("Entro 2");
+			MensajesController.addError(null, e2.getMessage());
 		}
 	}
 
@@ -250,7 +266,7 @@ public class TransportistaController extends CommonsController implements Serial
 			return null;
 		}else{
 			this.transportistaDataManager.setTransportistaDTOEditar(this.transportistaDTO);
-			return "/modules/clientes/nuevoCliente.xhtml?faces-redirect=true";
+			return "/modules/transportistas/nuevoTransportista.xhtml?faces-redirect=true";
 		}
 	}
 	
@@ -261,9 +277,13 @@ public class TransportistaController extends CommonsController implements Serial
 	public void clearNuevoTransportista(ActionEvent e){
 		this.setTransportistaCreado(Boolean.FALSE);
 		this.setShowMessagesBar(Boolean.FALSE);
+		this.transportistaDataManager.setTransportistaDTOEditar(new TransportistaDTO());
 		this.transportistaDTO = new TransportistaDTO();
+		this.transportistaDTO.setCodigoValorTipoTransportista(ERPConstantes.CODIGO_CATALOGO_VALOR_TIPO_CLIENTE_PERSONA);
+		this.transportistaDTO.setCodigoTipoTransportista(ERPConstantes.CODIGO_CATALOGO_TIPOS_CLIENTES);
 		this.personaDTO = new PersonaDTO();
 		this.empresaDTO = new EmpresaDTO();
+		this.contactoDTO = new ContactoDTO();
 	}
 	
 	/**
@@ -280,6 +300,7 @@ public class TransportistaController extends CommonsController implements Serial
 	 */
 	public String regresarBusquedaTransportistas(){
 		this.setTransportistaCreado(Boolean.FALSE);
+		this.transportistaDataManager.setTransportistaDTOEditar(new TransportistaDTO());
 		return "/modules/transportistas/adminBusquedaTransportista.xhtml?faces-redirect=true";
 	}
 	

@@ -174,6 +174,47 @@ public class ClientesController extends CommonsController implements Serializabl
 	}
 	
 	/**
+	 * Metodo para consultar cliente por numero de documento 
+	 * @param e
+	 */
+	public void realizarConsultaDocumento(AjaxBehaviorEvent e) {
+		if(StringUtils.isEmpty(this.personaDTO.getNumeroDocumento()) &&  StringUtils.isEmpty(this.empresaDTO.getNumeroRuc())) {
+			this.setShowMessagesBar(Boolean.TRUE);
+	        MensajesController.addError(null, "El campo no debe estar vacio, ingrese el documento que desea buscar.");
+		}else {
+			String codigoValorTipoCliente = this.clienteDTO.getCodigoValorTipoCliente();
+			String numeroDocumento = "";
+			if(codigoValorTipoCliente.equals(ERPConstantes.CODIGO_CATALOGO_VALOR_TIPO_CLIENTE_PERSONA)) {
+				numeroDocumento = this.personaDTO.getNumeroDocumento();
+			}
+			
+			if(codigoValorTipoCliente.equals(ERPConstantes.CODIGO_CATALOGO_VALOR_TIPO_CLIENTE_EMPRESA)) {
+				numeroDocumento = this.empresaDTO.getNumeroRuc();
+			}
+			
+			ClienteDTO clienteDTOTemp = ERPFactory.clientes.getClientesServicio().findObtenerClienteByCodigo(Integer.parseInt(ERPConstantes.ESTADO_ACTIVO_NUMERICO), numeroDocumento, codigoValorTipoCliente);
+			
+			if(clienteDTOTemp != null) {
+				this.setClienteDTO(clienteDTOTemp);
+				this.setPersonaDTO(clienteDTOTemp.getPersonaDTO());
+				this.setEmpresaDTO(clienteDTOTemp.getEmpresaDTO());
+				if(clienteDTOTemp.getPersonaDTO() == null){
+					this.setContactoDTO(clienteDTOTemp.getEmpresaDTO().getContactoEmpresaDTO());
+					this.personaDTO = new PersonaDTO();
+					this.personaDTO.setNumeroDocumento(clienteDTOTemp.getEmpresaDTO().getNumeroRuc());
+				}
+				else {
+					this.setContactoDTO(clienteDTOTemp.getPersonaDTO().getContactoPersonaDTO());
+				}
+			}
+			else
+			{
+				this.setShowMessagesBar(Boolean.TRUE);
+		        MensajesController.addWarn(null, "No se encontr\u00F3 el cliente con el documento ingresado.");
+			}
+		}
+	}
+	/**
 	 * Validar datos ingresados
 	 * @return
 	 */
@@ -251,10 +292,12 @@ public class ClientesController extends CommonsController implements Serializabl
 		this.setClienteCreado(Boolean.FALSE);
 		this.setShowMessagesBar(Boolean.FALSE);
 		this.clienteDTO = new ClienteDTO();
+		this.clientesDataManager.setClienteDTOEditar(new ClienteDTO());
 		this.clienteDTO.setCodigoValorTipoCliente(ERPConstantes.CODIGO_CATALOGO_VALOR_TIPO_CLIENTE_PERSONA);
 		this.clienteDTO.setCodigoTipoCliente(ERPConstantes.CODIGO_CATALOGO_TIPOS_CLIENTES);
 		this.personaDTO = new PersonaDTO();
 		this.empresaDTO = new EmpresaDTO();
+		this.contactoDTO = new ContactoDTO();
 //		this.usuarioDTO = new UsuariosDTO();
 	}
 	

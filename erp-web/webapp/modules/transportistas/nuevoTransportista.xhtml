@@ -35,8 +35,8 @@
 					<h:outputText class="styleNegritas" value="#{msg_erpweb['ec.com.erp.etiqueta.label.lista.cabecera.documento.ruc']}: *" />
 				 	<h:inputText class="styleUpperCase" style="background-color:#f9f9d5; background-image: none; width:260px" 
 				 				 value="#{transportistaController.personaDTO.numeroDocumento}" id="numeroDocumento" maxlength="13"
-				 				 onkeypress="return validarEnteros(event);">
-				 		<a4j:ajax event="keyup" execute="@this" listener="#{transportistaController.realizarConsultaDocumento}" onbeforesubmit="if (event.keyCode != 13)  return false;" render="pnlDatosBasicosTransportista pnlGridContacto pnlGridTransportista"/>
+				 				 onkeypress="return validarEnteros(event); if (event.keyCode == 13) return false;">
+				 		<a4j:ajax event="keyup" execute="@this" listener="#{transportistaController.realizarConsultaDocumento}" onbeforesubmit="return verifyKeyEnter(event);" render="pnlDatosBasicosTransportista pnlGridContacto pnlGridTransportista"/>
 				 	</h:inputText>				 		
 			 		<h:panelGrid columns="2" cellpadding="3" cellspacing="0" style="padding-left:10px">
 						<h:graphicImage name="info.png" library="images" style="border:none;border-color:white;" height="16" width="16"/>

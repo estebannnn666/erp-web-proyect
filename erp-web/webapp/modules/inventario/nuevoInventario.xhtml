@@ -48,7 +48,7 @@
 			 		
 			 		<h:outputText class="styleNegritas" value="#{msg_erpweb['ec.com.erp.etiqueta.inventario.label.header.cantidad']}: *" />
 			 		<h:inputText class="styleUpperCase" style="background-color:#f9f9d5; background-image: none; width:260px" value="#{inventarioController.inventarioDTO.cantidadEntrada}" id="cantidadMov" maxlength="9" onkeypress="return validarEnteros(event);">
-			 			<a4j:ajax event="keyup" execute="@this" listener="#{inventarioController.calcularTotalMovimientoKeyUp}" render="pnlGridInventarios" oncomplete="fijarFocoCantidad('cantidadMov');"></a4j:ajax>
+			 			<a4j:ajax event="keyup" execute="@this" status="no" listener="#{inventarioController.calcularTotalMovimientoKeyUp}" render="pnlGridInventarios" oncomplete="fijarFocoCantidad('cantidadMov');"></a4j:ajax>
 			 		</h:inputText>
 			 		<h:outputText value="" />
 			 		
@@ -128,28 +128,12 @@
 
 				function fijarFocoCantidad(classInput) {
 					try {
-						debugger;
-						var ele = document.getElementById('frmNuevoInventario:cantidadMov');
 						element = document.getElementById('frmNuevoInventario:cantidadMov');
 						var lenghtInput = $(element).val();
 						setCursor(element,lenghtInput.length,lenghtInput.length);
 					}catch (e) {}
 				}
-
-				function setCursor(inputObject,selectionStart, selectionEnd) {
-					if(inputObject.setSelectionRange) {
-						inputObject.focus();
-						inputObject.setSelectionRange(selectionStart,selectionEnd);
-					}else {
-						if(inputObject.createTextRange) {
-							range=inputObject.createTextRange();
-							range.collapse(true);
-							range.moveEnd('character',selectionEnd); 
-							range.moveStart('character',selectionStart); 
-							range.select();
-						}
-					}
-				}
+				
 			/*]]>*/
 		</script>
 	</ui:define>

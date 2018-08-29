@@ -33,8 +33,8 @@
 					<h:outputText value="" />
 					
 					<h:outputText class="styleNegritas" value="#{msg_erpweb['ec.com.erp.etiqueta.label.nuevo.pedidos.etiqueta.documentocliente']}: *" />
-					<h:inputText style="width:150px" value="#{pedidosController.documentoCliente}" id="docCliente" maxlength="13" onkeypress="return validarEnteros(event);">
-						<a4j:ajax event="keyup" execute="@this" listener="#{pedidosController.realizarConsultaClienteByDocumento}" onbeforesubmit="if (event.keyCode != 13)  return false;" render="nombreCliente, direccionCliente, pnlMensajes"/>
+					<h:inputText style="width:150px" value="#{pedidosController.documentoCliente}" id="docCliente" maxlength="13" onkeypress="return validarEnteros(event); if (event.keyCode == 13) return false;">
+						<a4j:ajax event="keyup" execute="@this" listener="#{pedidosController.realizarConsultaClienteByDocumento}" onbeforesubmit="return verifyKeyEnter(event);" render="nombreCliente, direccionCliente, pnlMensajes"/>
 					</h:inputText>
 					<h:panelGroup layout="block" styleClass="botonB" style="margin-top:5px;">
 						<a4j:commandLink oncomplete="#{rich:component('mpClientes')}.show(); " styleClass="botonBuscar" actionListener="#{pedidosController.busquedaClientes}" render="pnlListaClientes tableClientes" execute="@this" title="Click para buscar clientes">							
@@ -56,8 +56,6 @@
 				</h:panelGrid>
 			</fieldset>
 	 		<fieldset>
-	 			<a4j:commandLink id="linkopensystem" render="pnlGridDetallePedido" styleClass="linkopensystem" execute="@this" actionListener="#{pedidosController.reloadPagina}">
-				</a4j:commandLink>
 				<legend class="styleLegend">#{msg_erpweb['ec.com.erp.etiqueta.label.nuevo.pedidos.etiqueta.detallepedido']}</legend>
 			 	<h:panelGrid id="pnlGridDetallePedido" style="width:100%">
 			 		<rich:toolbar height="26" itemSeparator="grid">
@@ -96,7 +94,8 @@
 				                <f:facet name="header"><h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.label.nuevo.pedidos.detalle.cantidad.pedido']}"/></f:facet>
 				                <h:inputText id="cantidadPedida" value="#{detalle.cantidad}" onkeypress="return validarEnteros(event);">
 				                	<a4j:ajax event="keyup" status="no" listener="#{pedidosController.calcularTotalPedido}"
-				                			  execute="@this" render="pnlGridDetallePedido" >
+				                			  execute="@this" render="pnlGridDetallePedido" 
+				                			  oncomplete="fijarFocoDetalleCantidad(this.id);">
 				                	</a4j:ajax>
 				                </h:inputText>
 				            </rich:column>			            
@@ -155,8 +154,8 @@
 					<h:graphicImage library="images" name="close.png" style="border:0px" id="closePopUpBodega" />
 				</h:outputLink>
 			</f:facet>
-			<h:panelGrid id="pnlListaClientes">	
-				<rich:panel style="width: 105.5%; height: 315px; " header="#{msg_erpweb['ec.com.erp.etiqueta.label.nuevo.pedidos.etiqueta.listaclientes']}">
+			<h:panelGrid id="pnlListaClientes" style="width: 100%;">	
+				<rich:panel style="width: 99.6%; height: 315px; " header="#{msg_erpweb['ec.com.erp.etiqueta.label.nuevo.pedidos.etiqueta.listaclientes']}">
 					
 					<h:panelGrid id="tablaVaciaClient" columns="1" rendered="#{empty pedidosController.clienteDTOCols}" style="width:100%; text-align: center; padding-top: 230px">
 						<h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.mensaje.lista.vacio']}"/>
@@ -288,10 +287,15 @@
 					te = String.fromCharCode(tecla);
 					return patron.test(te);
 				}
-				
-				function openLinkSystem(){
-					$('.linkopensystem').trigger('click');
-				}	
+
+				function fijarFocoDetalleCantidad(classInput) {
+					try {
+						debugger;
+						element = document.getElementById(classInput);
+						var lenghtInput = $(element).val();
+						setCursor(element,lenghtInput.length,lenghtInput.length);
+					}catch (e) {}
+				}
 			/*]]>*/
 		</script>
 		

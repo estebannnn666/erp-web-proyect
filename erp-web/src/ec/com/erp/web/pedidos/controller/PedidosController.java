@@ -113,6 +113,8 @@ public class PedidosController extends CommonsController implements Serializable
 		if(pedidosDataManager.getPedidoDTOEditar() != null && pedidosDataManager.getPedidoDTOEditar().getId().getCodigoPedido() != null)
 		{
 			this.setPedidoDTO(pedidosDataManager.getPedidoDTOEditar());
+			this.setClienteDTO(pedidosDataManager.getPedidoDTOEditar().getClienteDTO());
+			this.documentoCliente = this.clienteDTO.getPersonaDTO() == null ? this.clienteDTO.getEmpresaDTO().getNumeroRuc() : this.clienteDTO.getPersonaDTO().getNumeroDocumento();
 			this.setDetallePedidoDTOCols((List<DetallePedidoDTO>)pedidosDataManager.getPedidoDTOEditar().getDetallePedidoDTOCols());
 		}
 	}
@@ -386,6 +388,8 @@ public class PedidosController extends CommonsController implements Serializable
 		SecuenciaDTO secuenciaPedido = ERPFactory.secuencias.getSecuenciaServicio().findObtenerSecuenciaByNombre(PedidoID.NOMBRE_SECUENCIA);
 		this.pedidoDTO.setNumeroPedido("P-"+secuenciaPedido.getValorSecuencia());
 		this.pedidoDTO.setFechaPedido(new Date());
+		this.clienteDTO = new ClienteDTO();
+		this.documentoCliente = "";
 		this.detallePedidoDTO = new DetallePedidoDTO();
 		this.estadoPedidoDTO = new EstadoPedidoDTO();
 		this.detallePedidoDTOCols = new ArrayList<DetallePedidoDTO>();
@@ -414,6 +418,7 @@ public class PedidosController extends CommonsController implements Serializable
 	 */
 	public String regresarBusquedaPedidos(){
 		this.setPedidoGuardado(Boolean.FALSE);
+		this.pedidosDataManager.setPedidoDTOEditar(new PedidoDTO());
 		return "/modules/pedidos/adminBusquedaPedidos.xhtml?faces-redirect=true";
 	}
 	
@@ -435,8 +440,16 @@ public class PedidosController extends CommonsController implements Serializable
 			return null;
 		}else{
 			this.pedidosDataManager.setPedidoDTOEditar(this.pedidoDTO);
-			return "/modules/clientes/nuevoCliente.xhtml?faces-redirect=true";
+			return "/modules/pedidos/nuevoPedido.xhtml?faces-redirect=true";
 		}
+	}
+	
+	/**
+	 * Metodo para cargar datos detalle
+	 * @return
+	 */
+	public void cargarPedidoDetalle(ActionEvent e) {
+		System.out.println("Ingreso a cargar detalle");
 	}
 	
 	/**

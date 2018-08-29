@@ -35,13 +35,17 @@
 			<fieldset>
 				<legend class="styleLegend">#{msg_erpweb['ec.com.erp.etiqueta.header.datos.basicos']}</legend>
 				<h:panelGroup id="pnlDatosBasicosCliente">
-					<h:panelGrid id="pnlGridPersona" columns="5" cellspacing="2" cellpadding="5" rendered="#{clientesController.clienteDTO.codigoValorTipoCliente == 'PER'}">
+					<h:panelGrid id="pnlGridDocumento" columnClasses="columna1" columns="3" cellspacing="2" cellpadding="5" rendered="#{clientesController.clienteDTO.codigoValorTipoCliente == 'PER'}">
 				 		<h:outputText class="styleNegritas" value="#{msg_erpweb['ec.com.erp.etiqueta.label.nuevo.cliente.documento']}: *" />
-				 		<h:inputText class="styleUpperCase" style="background-color:#f9f9d5; background-image: none; width:260px" value="#{clientesController.personaDTO.numeroDocumento}" id="numeroDocumento"/>
-				 		<div style="width:20px"></div>
-				 		<h:outputText value=""/>
-				 		<h:outputText value=""/>
-				 		
+				 		<h:inputText class="styleUpperCase" style="background-color:#f9f9d5; background-image: none; width:260px" value="#{clientesController.personaDTO.numeroDocumento}" id="numeroDocumento" onkeypress="if (event.keyCode == 13) return false;">
+				 			<a4j:ajax event="keyup" execute="pnlDatosBasicosCliente" listener="#{clientesController.realizarConsultaDocumento}" onbeforesubmit="return verifyKeyEnter(event);" render="pnlDatosBasicosCliente, pnlGridDocumento, pnlGridPersona, pnlGridContacto, pnlMensajes"/>
+				 		</h:inputText>
+				 		<h:panelGrid columns="3" cellpadding="3" cellspacing="0" style="padding-left:10px">
+							<h:graphicImage name="info.png" library="images" style="border:none;border-color:white;" height="16" width="16"/>
+							<h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.mensaje.informacion.consulta.persona']}" />
+						</h:panelGrid>
+					</h:panelGrid>
+				 	<h:panelGrid id="pnlGridPersona" columnClasses="columna1" columns="5" cellspacing="2" cellpadding="5" rendered="#{clientesController.clienteDTO.codigoValorTipoCliente == 'PER'}">	
 				 		<h:outputText class="styleNegritas" value="#{msg_erpweb['ec.com.erp.etiqueta.label.nuevo.cliente.nombre.completo']}:" />
 				 		<h:outputText id="nombreCompleto" class="styleUpperCase" value="#{clientesController.personaDTO.nombreCompleto}" />
 				 		<div style="width:20px"></div>
@@ -69,15 +73,23 @@
 				 		</h:inputText>
 				 	</h:panelGrid>
 				 	
-				 	<h:panelGrid id="pnlGridEmpresa" columns="2" cellspacing="2" cellpadding="5" rendered="#{clientesController.clienteDTO.codigoValorTipoCliente == 'EMP'}">
+				 	<h:panelGrid id="pnlGridEmpresa" columns="3" cellspacing="2" cellpadding="5" rendered="#{clientesController.clienteDTO.codigoValorTipoCliente == 'EMP'}">
 				 		<h:outputText class="styleNegritas" value="#{msg_erpweb['ec.com.erp.etiqueta.label.nuevo.cliente.empresa.numeroruc']}: *" />
-				 		<h:inputText class="styleUpperCase" style="background-color:#f9f9d5; background-image: none; width:260px" value="#{clientesController.empresaDTO.numeroRuc}" id="numeroRuc"/>
+				 		<h:inputText class="styleUpperCase" style="background-color:#f9f9d5; background-image: none; width:260px" value="#{clientesController.empresaDTO.numeroRuc}" id="numeroRuc" onkeypress="if (event.keyCode == 13) return false;">
+				 			<a4j:ajax event="keyup" execute="@this" listener="#{clientesController.realizarConsultaDocumento}" onbeforesubmit="return verifyKeyEnter(event);" render="pnlGridEmpresa pnlGridContacto pnlMensajes"/>
+				 		</h:inputText>
+				 		<h:panelGrid columns="2" cellpadding="3" cellspacing="0" style="padding-left:10px">
+							<h:graphicImage name="info.png" library="images" style="border:none;border-color:white;" height="16" width="16"/>
+							<h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.mensaje.informacion.consulta.persona']}" />
+						</h:panelGrid>
 				 		
 				 		<h:outputText class="styleNegritas" value="#{msg_erpweb['ec.com.erp.etiqueta.label.nuevo.cliente.empresa.razonSocial']}: *" />
 				 		<h:inputText class="styleUpperCase" style="background-color:#f9f9d5; background-image: none; width:260px" value="#{clientesController.empresaDTO.razonSocial}" id="razonSocial"/>
+				 		<h:outputText value=""/>
 				 		
 				 		<h:outputText class="styleNegritas" value="#{msg_erpweb['ec.com.erp.etiqueta.label.nuevo.cliente.empresa.Descripcion']}: " />
 				 		<h:inputText class="styleUpperCase" style="width:260px" value="#{clientesController.empresaDTO.descripcionEmpresa}" id="descripcionEmpresa" required="false"/>
+				 		<h:outputText value=""/>
 				 	</h:panelGrid>
 				 </h:panelGroup>
 			</fieldset>
@@ -165,6 +177,12 @@
 				</h:panelGroup>
 			</h:panelGrid>
 		</rich:popupPanel>
+		
+		<h:outputStylesheet>
+			.columna1{
+				width: 135px !important;
+			}	
+		</h:outputStylesheet>
 	</ui:define>
 	
 </ui:composition>
