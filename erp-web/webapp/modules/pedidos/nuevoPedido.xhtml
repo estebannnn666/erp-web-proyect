@@ -33,7 +33,7 @@
 					<h:outputText value="" />
 					
 					<h:outputText class="styleNegritas" value="#{msg_erpweb['ec.com.erp.etiqueta.label.nuevo.pedidos.etiqueta.documentocliente']}: *" />
-					<h:inputText style="width:150px" value="#{pedidosController.documentoCliente}" id="docCliente" maxlength="13" onkeypress="return validarEnteros(event); if (event.keyCode == 13) return false;">
+					<h:inputText style="width:150px" value="#{pedidosController.documentoCliente}" id="docCliente" maxlength="13" onkeypress="if (event.keyCode == 13) return false; return validarEnteros(event);">
 						<a4j:ajax event="keyup" execute="@this" listener="#{pedidosController.realizarConsultaClienteByDocumento}" onbeforesubmit="return verifyKeyEnter(event);" render="nombreCliente, direccionCliente, pnlMensajes"/>
 					</h:inputText>
 					<h:panelGroup layout="block" styleClass="botonB" style="margin-top:5px;">

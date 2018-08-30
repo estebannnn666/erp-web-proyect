@@ -28,7 +28,7 @@
 					<h:outputText class="styleNegritas" value="#{msg_erpweb['ec.com.erp.etiqueta.label.nuevo.cliente.documento']}: *" />
 				 	<h:inputText class="styleUpperCase" style="background-color:#f9f9d5; background-image: none; width:163px" value="#{choferController.personaDTO.numeroDocumento}" id="numeroDocumento" maxlength="10" 
 				 				 onkeypress="if (event.keyCode == 13) return false; OnKeyPress(this, event); return validarEnteros(event);">
-				 		<a4j:ajax event="keyup" execute="@this" listener="#{choferController.realizarConsultaDocumento}" onbeforesubmit="return verifyKeyEnter(event);" render="pnlGridChofer pnlGridPersona pnlGridContacto pnlMensajes"/>
+				 		<a4j:ajax event="keyup" execute="@this" listener="#{choferController.realizarConsultaDocumento}" onbeforesubmit="if (event.keyCode != 13)  return false;" render="pnlGridChofer pnlGridPersona pnlGridContacto pnlMensajes"/>
 				 	</h:inputText>				 		
 			 		<h:panelGrid columns="2" cellpadding="3" cellspacing="0" style="padding-left:10px">
 						<h:graphicImage name="info.png" library="images" style="border:none;border-color:white;" height="16" width="16"/>

@@ -74,6 +74,7 @@ public class InventarioController extends CommonsController implements Serializa
 		if(inventarioDataManager.getInventarioDTOEditar() != null && inventarioDataManager.getInventarioDTOEditar().getId().getCodigoInventario() != null)
 		{
 			this.setInventarioDTO(inventarioDataManager.getInventarioDTOEditar());
+			this.setArticuloDTO(inventarioDataManager.getInventarioDTOEditar().getArticuloDTO());
 		}
 	}
 		
@@ -145,7 +146,7 @@ public class InventarioController extends CommonsController implements Serializa
 				if(this.tipoMovimiento.equals(ERPConstantes.ESTADO_INACTIVO_NUMERICO)) {
 					this.inventarioDTO.setCantidadSalida(this.inventarioDTO.getCantidadEntrada());
 					this.inventarioDTO.setValorUnidadSalida(this.inventarioDTO.getValorUnidadEntrada());
-					this.inventarioDTO.setValorTotalSalida(this.inventarioDTO.getValorTotalSalida());
+					this.inventarioDTO.setValorTotalSalida(this.inventarioDTO.getValorTotalEntrada());
 					if(inventarioDTOAux == null) {
 						MensajesController.addError(null, ERPWebResources.getString("ec.com.erp.etiqueta.inventario.mensaje.sin.existencias"));
 						return;
@@ -233,7 +234,7 @@ public class InventarioController extends CommonsController implements Serializa
 			return null;
 		}else{
 			this.inventarioDataManager.setInventarioDTOEditar(this.inventarioDTO);
-			return "/modules/modulos/nuevoModulo.xhtml?faces-redirect=true";
+			return "/modules/inventario/nuevoInventario.xhtml?faces-redirect=true";
 		}
 	}
 	
@@ -296,9 +297,14 @@ public class InventarioController extends CommonsController implements Serializa
 			ArticuloDTO  articuloTem = articuloDTOCols.iterator().next();
 			this.inventarioDTO.setValorUnidadEntrada(articuloTem.getPrecio());
 			this.inventarioDTO.setCodigoArticulo(articuloTem.getId().getCodigoArticulo());
+			this.inventarioDTO.setCantidadEntrada(null);
+			this.inventarioDTO.setValorTotalEntrada(null);
 			this.inventarioDTO.setArticuloDTO(articuloTem);
 		}else {
 			this.setShowMessagesBar(Boolean.TRUE);
+			this.inventarioDTO.setValorUnidadEntrada(null);
+			this.inventarioDTO.setCantidadEntrada(null);
+			this.inventarioDTO.setValorTotalEntrada(null);
 			MensajesController.addError(null, ERPWebResources.getString("ec.com.erp.etiqueta.inventario.mensaje.informacion.articulo.noexiste"));
 		}
 	}

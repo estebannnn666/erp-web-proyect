@@ -76,7 +76,7 @@ body {
 .style-div-menu{
 	padding-top: 15px !important;
 	padding-left: 10px !important;
-	background-image: url("#{resource['images/menu.png']}");
+	/*background-image: url("#{resource['images/menu.png']}");*/
 	background-size: cover;
 	height: 80vh !important;
 	background-image: rgba(0, 0, 0, 0.3);

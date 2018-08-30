@@ -382,6 +382,8 @@ public class CuentasController extends CommonsController implements Serializable
 		detalle.setCantidad(this.facturaDetalleDTO.getCantidad());
 		detalle.setDescripcion(this.facturaDetalleDTO.getDescripcion());
 		detalle.setValorUnidad(this.facturaDetalleDTO.getValorUnidad());
+		detalle.setCodigoArticulo(this.facturaDetalleDTO.getCodigoArticulo());
+		detalle.setArticuloDTO(this.facturaDetalleDTO.getArticuloDTO());
 		detalle.setSubTotal(this.facturaDetalleDTO.getSubTotal());
 		this.facturaDetalleDTOCols.add(detalle);
 		this.calcularTotalFactura();
@@ -403,6 +405,8 @@ public class CuentasController extends CommonsController implements Serializable
 	public void calcularValoresArticulo(){
 		for(ArticuloDTO articuloDTOSearch : this.articuloDTOCols) {
 			if(facturaDetalleDTO.getDescripcion().equals(articuloDTOSearch.getNombreArticulo())) {
+				this.facturaDetalleDTO.setArticuloDTO(articuloDTOSearch);
+				this.facturaDetalleDTO.setCodigoArticulo(articuloDTOSearch.getId().getCodigoArticulo());
 				this.facturaDetalleDTO.setValorUnidad(articuloDTOSearch.getPrecio());
 				this.facturaDetalleDTO.setSubTotal(BigDecimal.valueOf(facturaDetalleDTO.getCantidad()*facturaDetalleDTO.getValorUnidad().doubleValue()));
 				break;

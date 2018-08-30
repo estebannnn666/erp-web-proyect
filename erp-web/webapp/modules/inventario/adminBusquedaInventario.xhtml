@@ -25,10 +25,11 @@
 	
 	<ui:define name="contentCenter">
 		<rich:panel id="listaInventario" styleClass="panelListaArticulos" header="#{msg_erpweb['ec.com.erp.etiqueta.inventario.label.header.title']}" style="height: 94.5%; width:100% !important;">
-		
-			<fieldset>
-			 	<legend>#{msg_erpweb['ec.com.erp.etiqueta.header.tabla.detalle.articulo']}</legend>
-			 	<h:panelGrid id="pnlGridModulos" columns="5" cellspacing="2" cellpadding="5">
+			<h:panelGrid rendered="#{not empty inventarioController.inventarioDTOCols}" style="width: 100%; text-align:center; padding-top: 5px; padding-bottom: 5px">
+				<h:outputText style="font-size: 16px; font-weight: bold" value="KARDEX" />
+			</h:panelGrid>
+			<rich:panel style="width: 99.6%; margin-bottom: 0.2em;" rendered="#{not empty inventarioController.inventarioDTOCols}">
+			 	<h:panelGrid id="pnlGridModulos" columns="5" cellspacing="2" cellpadding="5" columnClasses="columnaTable1, columnaTable2, columnaTable3, columnaTable4, columnaTable5">
 			 		<h:outputText class="styleNegritas" value="#{msg_erpweb['ec.com.erp.etiqueta.header.tabla.codigo.barras']}: " />
 			 		<h:outputText class="styleUpperCase" style="width:260px" value="#{inventarioController.articuloDTO.codigoBarras}"/>
 			 		<h:outputText value=""/>
@@ -41,7 +42,7 @@
 			 		<h:outputText class="styleNegritas" value="#{msg_erpweb['ec.com.erp.etiqueta.header.tabla.articulo.precio']}:" />
 			 		<h:outputText class="styleUpperCase" style="width:260px" value="#{inventarioController.articuloDTO.precio}" />
 			 	</h:panelGrid>
-			</fieldset>
+			</rich:panel>
 				
 			<h:panelGrid id="tablaVacia" columns="1" rendered="#{empty inventarioController.inventarioDTOCols}" style="width:100%; text-align: center; padding-top: 220px">
 				<h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.mensaje.lista.vacio']}"/>
@@ -67,9 +68,6 @@
 		                </rich:column>
 		                <rich:column colspan="3">
 		                    <h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.inventario.label.header.existencias']}"/>
-		                </rich:column>
-		                <rich:column rowspan="2">
-		                	<h:outputText value="Editar"/>
 		                </rich:column>
 		                <rich:column breakRowBefore="true">
 		                    <h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.inventario.label.header.cantidad']}"/>
@@ -106,38 +104,44 @@
 	            <rich:column>
 	                <h:outputText value="#{inventario.detalleMoviento}" />
 	            </rich:column>
-	            <rich:column>
-	                <h:outputText value="#{inventario.cantidadEntrada}" />
+	            <rich:column style="text-align: right; padding-right: 5px">
+	                <h:outputText value="#{inventario.cantidadEntrada == null ? '-' : inventario.cantidadEntrada}" />
 	            </rich:column>
-	            <rich:column>
-	                <h:outputText value="#{inventario.valorUnidadEntrada}" />
+	            <rich:column style="text-align: right; padding-right: 5px">
+	                <h:outputText value="#{inventario.valorUnidadEntrada == null ? '-' : inventario.valorUnidadEntrada}">
+	                	<f:convertNumber pattern="0.00"/>
+	                </h:outputText>
 	            </rich:column>
-	            <rich:column>
-	                <h:outputText value="#{inventario.valorTotalEntrada}" />
+	            <rich:column style="text-align: right; padding-right: 5px">
+	                <h:outputText value="#{inventario.valorTotalEntrada == null ? '-' : inventario.valorTotalEntrada}" >
+	                	<f:convertNumber pattern="0.00"/>
+	                </h:outputText>
 	            </rich:column>
-	            <rich:column>
-	                <h:outputText value="#{inventario.cantidadSalida}" />
+	            <rich:column style="text-align: right; padding-right: 5px">
+	                <h:outputText value="#{inventario.cantidadSalida == null ? '-' : inventario.cantidadSalida}" />
 	            </rich:column>
-	            <rich:column>
-	                <h:outputText value="#{inventario.valorUnidadSalida}" />
+	            <rich:column style="text-align: right; padding-right: 5px">
+	                <h:outputText value="#{inventario.valorUnidadSalida == null ? '-' : inventario.valorUnidadSalida}" >
+	                	<f:convertNumber pattern="0.00"/>
+	                </h:outputText>
 	            </rich:column>
-	            <rich:column>
-	                <h:outputText value="#{inventario.valorTotalSalida}" />
+	            <rich:column style="text-align: right; padding-right: 5px">
+	                <h:outputText value="#{inventario.valorTotalSalida == null ? '-' : inventario.valorTotalSalida}" >
+	                	<f:convertNumber pattern="0.00"/>
+	                </h:outputText>
 	            </rich:column>
-	            <rich:column>
+	            <rich:column style="text-align: right; padding-right: 5px">
 	                <h:outputText value="#{inventario.cantidadExistencia}" />
 	            </rich:column>
-	            <rich:column>
-	                <h:outputText value="#{inventario.valorUnidadExistencia}" />
+	            <rich:column style="text-align: right; padding-right: 5px">
+	                <h:outputText value="#{inventario.valorUnidadExistencia}">
+	                	<f:convertNumber pattern="0.00"/>
+	                </h:outputText>
 	            </rich:column>
-	            <rich:column>
-	                <h:outputText value="#{inventario.valorTotalExistencia}" />
-	            </rich:column>
-	            <rich:column styleClass="columna10">
-	                <a4j:commandLink id="botonEditar" render="pnlGridModulos" action="#{inventarioController.cargarInventario}"	execute="@this" >
-						<h:graphicImage name="btnEditar.png" library="images" style="border:none;border-color:white;" height="16" width="16"/>
-						<f:setPropertyActionListener value="#{inventario}" target="#{inventarioController.inventarioDTO}" />											
-					</a4j:commandLink>	
+	            <rich:column style="text-align: right; padding-right: 5px">
+	                <h:outputText value="#{inventario.valorTotalExistencia}">
+	                	<f:convertNumber pattern="0.00"/>
+	                </h:outputText>
 	            </rich:column>
 	        </rich:dataTable>
         </rich:panel>
@@ -170,6 +174,23 @@
 				width: 5% !important;
 				text-align: center !important;
 			}
+			
+			.columnaTable1{
+				width: 15% !important;
+			}
+			.columnaTable2{
+				width: 25% !important;
+			}
+			.columnaTable3{
+				width: 20% !important;
+			}
+			.columnaTable4{
+				width: 15% !important;
+			}
+			.columnaTable5{
+				width: 25% !important;
+			}
+			
 		</h:outputStylesheet>
 		<a4j:commandLink id="linkopensystem" styleClass="linkopensystem" execute="@this" actionListener="#{inventarioController.refrescarPantalla}">
 		</a4j:commandLink>	
