@@ -38,8 +38,8 @@
 			 		<h:outputText value="" />
 			 		
 					<h:outputText class="styleNegritas" value="#{msg_erpweb['ec.com.erp.etiqueta.header.tabla.codigo.barras']}: *" />
-			 		<h:inputText class="styleUpperCase" style="background-color:#f9f9d5; background-image: none; width:260px" value="#{inventarioController.codigoBarrasNuevo}" id="codBarras" maxlength="32" onkeypress="return validarEnteros(event);">
-			 			<a4j:ajax event="keyup" execute="@this" listener="#{inventarioController.realizarConsultaArticulos}" onbeforesubmit="if (event.keyCode != 13)  return false;" render="pnlGridInventarios pnlMensajes" oncomplete="openLinkSystem();"/>
+			 		<h:inputText class="styleUpperCase" style="background-color:#f9f9d5; background-image: none; width:260px" value="#{inventarioController.codigoBarrasNuevo}" id="codBarras" maxlength="32" onkeypress="return validarEnteros(event); f (event.keyCode == 13) return false;">
+			 			<a4j:ajax event="keyup" execute="@this" listener="#{inventarioController.realizarConsultaArticulos}" onbeforesubmit="return verifyKeyEnter(event);" render="precioUniMov pnlMensajes"/>
 			 		</h:inputText>
 			 		<h:panelGrid columns="2" cellpadding="3" cellspacing="0" style="padding-left:10px">
 						<h:graphicImage name="info.png" library="images" style="border:none;border-color:white;" height="16" width="16"/>
