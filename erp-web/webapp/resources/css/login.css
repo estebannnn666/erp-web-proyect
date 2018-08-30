@@ -76,7 +76,7 @@ body {
 .style-div-menu{
 	padding-top: 15px !important;
 	padding-left: 10px !important;
-	/*background-image: url("#{resource['images/menu.png']}");*/
+	background-image: url("#{resource['images/menu.png']}");
 	background-size: cover;
 	height: 80vh !important;
 	background-image: rgba(0, 0, 0, 0.3);
@@ -235,6 +235,16 @@ body {
     background-image: url("#{resource['images/ayuda.png']}");
 }
 
+#contenedorPrincipal{
+	overflow: hidden;
+    width: 99.4%;
+    padding-top: 2px;
+    padding-left: 2px;
+    padding-right: 14px;
+    background-color: #FFF;
+    height: 80vh;
+}
+
 #contenedorPrincipalNuevo{
 	overflow: hidden;
     width: 99.4%;
@@ -276,7 +286,7 @@ body {
 	padding-bottom: 3px !important;
 	padding-top: 3px !important;
 	padding-left: 3px !important;
-	/*background-image: url("#{resource['images/menu.png']}");*/
+	background-image: url("#{resource['images/menu.png']}");
 	background-size: cover;
 	height: 80vh !important;
 	background-image: rgba(0, 0, 0, 0.3);
@@ -287,7 +297,7 @@ body {
     padding-top: 2px !important;
     padding-right: 3px !important;
 	padding-left: 1px !important;
-	/*background-image: url("#{resource['images/menu.png']}");*/
+	background-image: url("#{resource['images/menu.png']}");
 	background-size: cover;
 	height: 80vh !important;
 	background-image: rgba(0, 0, 0, 0.3);
@@ -295,9 +305,9 @@ body {
 
 .styleDivMenuBusquedasRigth{
 	padding-left: 2px !important;
-	/*background-image: url("#{resource['images/menu.png']}");*/
+	background-image: url("#{resource['images/menu.png']}");
 	background-size: cover;
-	height: 80vh !important;
+	height: 80.3vh !important;
 	background-image: rgba(0, 0, 0, 0.3);
 }
 
