@@ -77,17 +77,97 @@
 	                <h:outputText value="#{cuenta.pagado}" />
 	            </rich:column>
 	            <rich:column>
-	                <a4j:commandLink value="Ver detalle"></a4j:commandLink>
+	                <f:facet name="header">Detalle</f:facet>
+	                <a4j:commandLink id="botonDetalle" render="popUpDetalle pnlListaDetalleFactura" actionListener="#{cuentasController.cargarFacturaDetalle}" execute="@this" oncomplete="#{rich:component('popUpDetalle')}.show(); ">
+						<h:graphicImage name="btnDetalle.png" library="images" style="border:none;border-color:white;" height="16" width="16"/>
+						<f:setPropertyActionListener value="#{cuenta}" target="#{cuentasController.facturaCabeceraDTO}" />											
+					</a4j:commandLink>
 	            </rich:column>
 	            <rich:column styleClass="columna5">
 	                <f:facet name="header">Editar</f:facet>
-	                <a4j:commandLink id="botonEditar" render="pnlGridDespacho panelTablaPedidos panelTablaAdicional" action="#{despachoController.cargarGuiaEditar}"	execute="@this" >
+	                <a4j:commandLink id="botonEditar" render="pnlGridVentas, pnlGridDetalleFactura" action="#{cuentasController.cargarDocumentoEditar}"	execute="@this" >
 						<h:graphicImage name="btnEditar.png" library="images" style="border:none;border-color:white;" height="16" width="16"/>
-						<f:setPropertyActionListener value="#{despacho}" target="#{despachoController.guiaDespachoDTO}" />											
+						<f:setPropertyActionListener value="#{cuenta}" target="#{cuentasController.facturaCabeceraDTO}" />											
 					</a4j:commandLink>	
 	            </rich:column> 
 	        </rich:dataTable>
         </rich:panel>
+        
+        
+        <!-- Popup para ver el detalle del factura -->
+		<rich:popupPanel id="popUpDetalle" styleClass="panelPedidos" header="#{msg_erpweb['ec.com.erp.etiqueta.label.lista.cabecera.factura.titulo.detalle']}" width="935" height="400" modal="true" domElementAttachment="form">
+			<f:facet name="controls">
+				<h:outputLink value="#"	onclick="#{rich:component('popUpDetalle')}.hide();">
+					<h:graphicImage library="images" name="close.png" style="border:0px" id="closePopUpDetalle" />
+				</h:outputLink>
+			</f:facet>
+			<h:panelGrid id="pnlListaDetalleFactura" style="width: 100%;">	
+				<rich:panel style="width: 99.6%; height: 315px; " header="#{msg_erpweb['ec.com.erp.etiqueta.label.lista.cabecera.factura.popup.detalle']}">
+					
+					<h:panelGrid id="tablaVaciaDetalle" columns="1" rendered="#{empty cuentasController.facturaCabeceraDTO.facturaDetalleDTOCols}" style="width:100%; text-align: center; padding-top: 230px">
+						<h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.mensaje.lista.vacio']}"/>
+					</h:panelGrid>	
+					<rich:panel style="text-align:center; border-left: none; border-right:none; margin-bottom: 2px" rendered="#{not empty cuentasController.facturaCabeceraDTO.facturaDetalleDTOCols}">
+						<rich:dataScroller fastStep="3" for="tableDetalles" maxPages="5" rendered="#{not empty cuentasController.facturaCabeceraDTO.facturaDetalleDTOCols}" renderIfSinglePage="true"/>
+					</rich:panel>	
+					<rich:dataTable style="width:100%" value="#{cuentasController.facturaCabeceraDTO.facturaDetalleDTOCols}" rendered="#{not empty cuentasController.facturaCabeceraDTO.facturaDetalleDTOCols}" var="detalle" iterationStatusVar="it" id="tableDetalles" rows="7">
+			            <rich:column>
+			                <f:facet name="header">Nro.</f:facet>
+			                #{it.index+1}
+			            </rich:column>
+			            <rich:column style="text-align: center;">
+			                <f:facet name="header"><h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.label.nuevo.pedidos.detalle.cantidad.pedido']}"/></f:facet>
+			                <h:outputText value="#{detalle.cantidad}" />
+			            </rich:column>
+			            <rich:column>
+			                <f:facet name="header"><h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.header.tabla.detalle.articulo']}"/></f:facet>
+			                <h:outputText value="#{detalle.articuloDTO.codigoBarras}" />
+			            </rich:column>
+			            <rich:column>
+			                <f:facet name="header"><h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.header.tabla.descripcion.articulo']}"/></f:facet>
+			                <h:outputText value="#{detalle.articuloDTO.nombreArticulo}" />
+			            </rich:column>
+			            <rich:column style="text-align: right; padding-right: 5px">
+			                <f:facet name="header"><h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.header.tabla.articulo.peso']}"/></f:facet>
+			                <h:outputText value="#{detalle.articuloDTO.peso}">
+			                	<f:convertNumber pattern="0.00"/>
+			                </h:outputText>
+			            </rich:column>
+			            <rich:column style="text-align: right; padding-right: 5px">
+			                <f:facet name="header"><h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.header.tabla.articulo.stock']}"/></f:facet>
+			                <h:outputText value="#{detalle.articuloDTO.cantidadStock}">
+			                	<f:convertNumber pattern="0.00"/>
+			                </h:outputText>
+			            </rich:column>
+			            <rich:column style="text-align: right; padding-right: 5px">
+			                <f:facet name="header"><h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.label.nuevo.pedidos.articulo.precio.unitario']}"/></f:facet>
+			                <h:outputText value="#{detalle.articuloDTO.precio}">
+			                	<f:convertNumber pattern="0.00"/>
+			                </h:outputText>
+			            </rich:column>
+			            <rich:column style="text-align: right; padding-right: 5px">
+			                <f:facet name="header"><h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.label.nuevo.pedidos.detalle.subtotal']}"/></f:facet>
+			                <h:outputText value="#{detalle.subTotal}">
+			                	<f:convertNumber pattern="0.00"/>
+			                </h:outputText>
+			            </rich:column>
+			        </rich:dataTable>
+		        </rich:panel>
+			</h:panelGrid>
+			<!-- Botones de PopUp -->
+			<h:panelGrid style="margin:auto;" columns="1" cellpadding="0" cellspacing="0">
+				<h:panelGroup layout="block" styleClass="botonD" style="margin-top:5px;">
+					<a4j:commandLink id="btnCancelarDetalle" styleClass="cancelarD" oncomplete="#{rich:component('popUpDetalle')}.hide(); return false;" immediate="true">
+						<h:panelGrid columns="2" cellpadding="3" cellspacing="0">
+							<h:graphicImage name="btnCancel.png" library="images" style="border:none;border-color:white;" height="16" width="16"/>
+							<h:outputText value="Cancelar" />
+						</h:panelGrid>
+					</a4j:commandLink>
+				</h:panelGroup>
+			</h:panelGrid>
+		</rich:popupPanel>
+		
+		
         <script>
 			/*<![CDATA[*/
 			$(document).ready(function(){				

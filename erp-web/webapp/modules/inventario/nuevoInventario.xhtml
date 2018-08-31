@@ -23,7 +23,7 @@
 		 <rich:panel header="Registro movimiento de mercaderia" style="width: 100%; background-color: #F5FAFF;">
 	 		 <fieldset>
 			 	<legend>#{msg_erpweb['ec.com.erp.etiqueta.header.datos.registro']}</legend>
-			 	<h:panelGrid id="pnlGridInventarios" columns="3" cellspacing="2" cellpadding="5">
+			 	<h:panelGrid id="pnlGridInventarios" columns="4" cellspacing="2" cellpadding="5">
 			 		
 			 		<h:outputText class="styleNegritas" value="#{msg_erpweb['ec.com.erp.etiqueta.inventario.label.header.tipomovimiento']}: *" />
 			 		<h:selectOneMenu value="#{inventarioController.tipoMovimiento}" style="background-color:#f9f9d5; background-image: none; width: 165px">
@@ -32,15 +32,21 @@
 						<f:selectItem itemLabel="SALIDA" itemValue="0"/>
 					</h:selectOneMenu>
 					<h:outputText value="" />
+					<h:outputText value="" />
 					
 					<h:outputText class="styleNegritas" value="#{msg_erpweb['ec.com.erp.etiqueta.inventario.label.header.detalle']}: *" />
 			 		<h:inputText class="styleUpperCase" style="background-color:#f9f9d5; background-image: none; width:260px" value="#{inventarioController.inventarioDTO.detalleMoviento}" id="txtDetalle" maxlength="64"/>
+			 		<h:outputText value="" />
 			 		<h:outputText value="" />
 			 		
 					<h:outputText class="styleNegritas" value="#{msg_erpweb['ec.com.erp.etiqueta.header.tabla.codigo.barras']}: *" />
 			 		<h:inputText class="styleUpperCase" style="background-color:#f9f9d5; background-image: none; width:260px" value="#{inventarioController.codigoBarrasNuevo}" id="codBarras" maxlength="32" onkeypress="if (event.keyCode == 13) return false; return validarEnteros(event);">
 			 			<a4j:ajax event="keyup" execute="pnlGridInventarios" listener="#{inventarioController.realizarConsultaArticulos}" onbeforesubmit="return verifyKeyEnter(event);" render="pnlGridInventarios pnlMensajes"/>
 			 		</h:inputText>
+			 		<h:panelGroup layout="block" styleClass="botonB" style="margin-top:5px;">
+						<a4j:commandLink oncomplete="#{rich:component('popUpArticulos')}.show();" styleClass="botonBuscar" actionListener="#{inventarioController.busquedaArticulos}" render="pnlListaArticulos tableArticulos" execute="pnlGridInventarios" title="Click para buscar articulos">							
+						</a4j:commandLink>	
+					</h:panelGroup>	
 			 		<h:panelGrid columns="2" cellpadding="3" cellspacing="0" style="padding-left:10px">
 						<h:graphicImage name="info.png" library="images" style="border:none;border-color:white;" height="16" width="16"/>
 						<h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.inventario.mensaje.informacion.consulta.articulo']}" />
@@ -51,17 +57,20 @@
 			 			<a4j:ajax event="keyup" execute="@this" status="no" listener="#{inventarioController.calcularTotalMovimientoKeyUp}" render="pnlGridInventarios" oncomplete="fijarFocoCantidad('cantidadMov');"></a4j:ajax>
 			 		</h:inputText>
 			 		<h:outputText value="" />
+			 		<h:outputText value="" />
 			 		
 			 		<h:outputText class="styleNegritas" value="#{msg_erpweb['ec.com.erp.etiqueta.inventario.label.header.valorunidad']}: *" />
 			 		<h:inputText class="styleUpperCase" style="background-color:#f9f9d5; background-image: none; width:260px" value="#{inventarioController.inventarioDTO.valorUnidadEntrada}" id="precioUniMov" maxlength="12" onkeypress="return validarDecimal(event);" disabled="true">
 			 			<f:convertNumber pattern="0.00"/>
 			 		</h:inputText>
 			 		<h:outputText value="" />
+			 		<h:outputText value="" />
 			 		
 			 		<h:outputText class="styleNegritas" value="#{msg_erpweb['ec.com.erp.etiqueta.inventario.label.header.valortotal']}: *" />
 			 		<h:inputText class="styleUpperCase" style="background-color:#f9f9d5; background-image: none; width:260px" value="#{inventarioController.inventarioDTO.valorTotalEntrada}" id="precioTotMov" maxlength="12" onkeypress="return validarDecimal(event);" disabled="true">
 			 			<f:convertNumber pattern="0.00"/>
 			 		</h:inputText>
+			 		<h:outputText value="" />
 			 		<h:outputText value="" />
 			 	</h:panelGrid>
 			  </fieldset>
@@ -108,6 +117,85 @@
 				</h:panelGroup>
 			</h:panelGrid>
 		</rich:popupPanel>
+		
+		
+		<!-- Popup para ver el detalle del factura -->
+		<rich:popupPanel id="popUpArticulos" styleClass="panelPedidos" header="#{msg_erpweb['ec.com.erp.etiqueta.titulo.seleccionar.articulo']}" width="735" height="400" modal="true" domElementAttachment="form">
+			<f:facet name="controls">
+				<h:outputLink value="#"	onclick="#{rich:component('popUpArticulos')}.hide();">
+					<h:graphicImage library="images" name="close.png" style="border:0px" id="closepopUpArticulos" />
+				</h:outputLink>
+			</f:facet>
+			<h:panelGrid id="pnlListaArticulos" style="width: 100%;">	
+				<rich:panel style="width: 99.6%; height: 315px; " header="#{msg_erpweb['ec.com.erp.etiqueta.titulo.lista.articulos']}">
+					
+					<h:panelGrid id="tablaVaciaDetalle" columns="1" rendered="#{empty inventarioController.articuloDTOCols}" style="width:100%; text-align: center; padding-top: 230px">
+						<h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.mensaje.lista.vacio']}"/>
+					</h:panelGrid>	
+					<rich:panel style="text-align:center; border-left: none; border-right:none; margin-bottom: 2px" rendered="#{not empty inventarioController.articuloDTOCols}">
+						<rich:dataScroller fastStep="3" for="tableArticulos" maxPages="5" rendered="#{not empty inventarioController.articuloDTOCols}" renderIfSinglePage="true"/>
+					</rich:panel>	
+					<rich:dataTable style="width:100%" value="#{inventarioController.articuloDTOCols}" rendered="#{not empty inventarioController.articuloDTOCols}" var="articulo" iterationStatusVar="it" id="tableArticulos" rows="7">
+			             <rich:column style="padding:0px;padding-left:2px" >
+							<h:selectOneRadio onclick="radioButton(this);" id="myRadio" value="#{inventarioController.codigoArticuloSeleccionado}" valueChangeListener="#{inventarioController.seleccionarArticulo}">  
+								<f:selectItem itemValue="#{articulo.id.codigoArticulo}"/> 
+								<a4j:ajax event="click" execute="@this" render="myRadio"/>								
+							</h:selectOneRadio>
+						</rich:column>
+			            <rich:column style="text-align: center;">
+			                <f:facet name="header">Nro.</f:facet>
+			                #{it.index+1}
+			            </rich:column>
+			            <rich:column style="text-align: right; padding-right: 5px">
+			                <f:facet name="header"><h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.header.tabla.codigo.barras']}"/></f:facet>
+			                <h:outputText value="#{articulo.codigoBarras}" />
+			            </rich:column>
+			            <rich:column>
+			                <f:facet name="header"><h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.header.tabla.detalle.articulo']}"/></f:facet>
+			                <h:outputText value="#{articulo.nombreArticulo}" />
+			            </rich:column>
+			            <rich:column style="text-align: right; padding-right: 5px">
+			                <f:facet name="header"><h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.header.tabla.articulo.peso']}"/></f:facet>
+			                <h:outputText value="#{articulo.peso}">
+			                	<f:convertNumber pattern="0.00"/>
+			                </h:outputText>
+			            </rich:column>
+			            <rich:column style="text-align: right; padding-right: 5px">
+			                <f:facet name="header"><h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.header.tabla.articulo.stock']}"/></f:facet>
+			                <h:outputText value="#{articulo.cantidadStock}">
+			                	<f:convertNumber pattern="0.00"/>
+			                </h:outputText>
+			            </rich:column>
+			            <rich:column style="text-align: right; padding-right: 5px">
+			                <f:facet name="header"><h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.label.nuevo.pedidos.articulo.precio.unitario']}"/></f:facet>
+			                <h:outputText value="#{articulo.precio}">
+			                	<f:convertNumber pattern="0.00"/>
+			                </h:outputText>
+			            </rich:column>
+			        </rich:dataTable>
+		        </rich:panel>
+			</h:panelGrid>
+			<!-- Botones de PopUp -->
+			<h:panelGrid style="margin:auto;" columns="2" cellpadding="0" cellspacing="0">
+				<h:panelGroup layout="block" styleClass="botonD" style="margin-top:5px;margin-right:20px;">
+					<a4j:commandLink id="btnAceptarAgregarArticulo" execute="@this" render="pnlGridInventarios" styleClass="aceptarD" actionListener="#{inventarioController.agragarArticuloSeleccionado}" oncomplete="#{rich:component('popUpArticulos')}.hide(); return false;">
+						<h:panelGrid columns="2" cellpadding="3" cellspacing="0">
+							<h:graphicImage name="btnAceptar.png" library="images" style="border:none;border-color:white;" height="16" width="16"/>
+							<h:outputText value="Aceptar" />
+						</h:panelGrid>
+					</a4j:commandLink>					
+				</h:panelGroup>
+				
+				<h:panelGroup layout="block" styleClass="botonD" style="margin-top:5px;">
+					<a4j:commandLink id="btnCancelarDetalle" styleClass="cancelarD" oncomplete="#{rich:component('popUpArticulos')}.hide(); return false;" immediate="true">
+						<h:panelGrid columns="2" cellpadding="3" cellspacing="0">
+							<h:graphicImage name="btnCancel.png" library="images" style="border:none;border-color:white;" height="16" width="16"/>
+							<h:outputText value="Cancelar" />
+						</h:panelGrid>
+					</a4j:commandLink>
+				</h:panelGroup>
+			</h:panelGrid>
+		</rich:popupPanel>
 		<script type="text/javascript">
 			/*<![CDATA[*/								
 				function validarEnteros(e) {
@@ -132,6 +220,17 @@
 						var lenghtInput = $(element).val();
 						setCursor(element,lenghtInput.length,lenghtInput.length);
 					}catch (e) {}
+				}
+
+				function radioButton(radio) {
+					var id = radio.name.substring(radio.name.lastIndexOf(':'));
+					var el = radio.form.elements;
+					for (var i = 0; i < el.length; i++) {
+						if (el[i].name.substring(el[i].name.lastIndexOf(':')) == id) {
+						el[i].checked = false;
+						}
+					}
+					radio.checked = true;
 				}
 				
 			/*]]>*/

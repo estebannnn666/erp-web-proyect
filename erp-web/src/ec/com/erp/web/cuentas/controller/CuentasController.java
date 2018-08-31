@@ -24,6 +24,7 @@ import org.apache.commons.beanutils.BeanPredicate;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.Predicate;
 import org.apache.commons.collections.PredicateUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import ec.com.erp.cliente.common.constantes.ERPConstantes;
 import ec.com.erp.cliente.common.exception.ERPException;
@@ -216,13 +217,13 @@ public class CuentasController extends CommonsController implements Serializable
 	 */
 	private Boolean validarInformacionRequerida() {
 		Boolean valido = Boolean.TRUE;
-		if(this.facturaCabeceraDTO == null || this.facturaCabeceraDTO.getNumeroDocumento() == null) {
+		if(StringUtils.isEmpty(this.facturaCabeceraDTO.getNumeroDocumento())) {
 			MensajesController.addError(null, ERPWebResources.getString("ec.com.erp.etiqueta.mensaje.campo.requerido.numero.factura"));
 		}
-		if(this.facturaCabeceraDTO == null || this.facturaCabeceraDTO.getRucDocumento() == null) {
+		if(StringUtils.isEmpty(this.facturaCabeceraDTO.getRucDocumento())) {
 			MensajesController.addError(null, ERPWebResources.getString("ec.com.erp.etiqueta.mensaje.campo.requerido.ruccliente.factura"));
 		}
-		if(this.facturaCabeceraDTO == null || this.facturaCabeceraDTO.getNombreClienteProveedor() == null) {
+		if(StringUtils.isEmpty(this.facturaCabeceraDTO.getNombreClienteProveedor())) {
 			MensajesController.addError(null, ERPWebResources.getString("ec.com.erp.etiqueta.mensaje.campo.requerido.nombrecliente.factura"));
 		}
 		if(CollectionUtils.isEmpty(this.facturaDetalleDTOCols)) {
@@ -245,6 +246,15 @@ public class CuentasController extends CommonsController implements Serializable
 		
 		return valido;
 	}
+	
+	/**
+	 * Metodo para cargar datos detalle factura
+	 * @return
+	 */
+	public void cargarFacturaDetalle(ActionEvent e) {
+		System.out.println("Ingreso a cargar detalle");
+	}
+	
 	
 	/**
 	 * Metodo borrar pantalla y crear una nueva factura en venta
@@ -542,7 +552,13 @@ public class CuentasController extends CommonsController implements Serializable
 			return null;
 		}else{
 			this.cuentasDataManager.setFacturaCabeceraDTOEditar(this.facturaCabeceraDTO);
-			return "/modules/facturas/nuevaFacturaVenta.xhtml?faces-redirect=true";
+			if(this.facturaCabeceraDTO.getCodigoValorTipoDocumento().equals(ERPConstantes.CODIGO_CATALOGO_VALOR_DOCUMENTO_VENTAS)) {
+				return "/modules/facturas/nuevaFacturaVenta.xhtml?faces-redirect=true";
+			}
+			if(this.facturaCabeceraDTO.getCodigoValorTipoDocumento().equals(ERPConstantes.CODIGO_CATALOGO_VALOR_DOCUMENTO_COMPRAS)) {
+				return "/modules/facturas/nuevaFacturaCompra.xhtml?faces-redirect=true";
+			}
+			return null;
 		}
 	}
 	

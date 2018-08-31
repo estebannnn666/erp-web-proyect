@@ -4,9 +4,11 @@ package ec.com.erp.web.inventario.controller;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
+import java.util.HashMap;
 
 import javax.annotation.PostConstruct;
 import javax.faces.bean.ManagedBean;
@@ -14,8 +16,12 @@ import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.ViewScoped;
 import javax.faces.event.ActionEvent;
 import javax.faces.event.AjaxBehaviorEvent;
+import javax.faces.event.ValueChangeEvent;
 
+import org.apache.commons.beanutils.BeanPredicate;
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections.Predicate;
+import org.apache.commons.collections.PredicateUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import ec.com.erp.cliente.common.constantes.ERPConstantes;
@@ -23,6 +29,7 @@ import ec.com.erp.cliente.common.exception.ERPException;
 import ec.com.erp.cliente.common.factory.ERPFactory;
 import ec.com.erp.cliente.mdl.dto.ArticuloDTO;
 import ec.com.erp.cliente.mdl.dto.InventarioDTO;
+import ec.com.erp.utilitario.commons.util.HtmlPdf;
 import ec.com.erp.web.commons.controller.CommonsController;
 import ec.com.erp.web.commons.controller.MensajesController;
 import ec.com.erp.web.commons.datamanager.CommonDataManager;
@@ -60,6 +67,8 @@ public class InventarioController extends CommonsController implements Serializa
 	private Date fechaFinBusqueda;
 	private String tipoMovimiento;
 	private String codigoBarrasNuevo;
+	private Collection<ArticuloDTO> articuloDTOCols;
+	private Integer codigoArticuloSeleccionado;
 	
 
 	@PostConstruct
@@ -69,6 +78,7 @@ public class InventarioController extends CommonsController implements Serializa
 		this.inventarioCreado = Boolean.FALSE;
 		this.inventarioDTO = new InventarioDTO();
 		this.articuloDTO = new ArticuloDTO();
+		this.articuloDTOCols =  new ArrayList<ArticuloDTO>();
 
 		this.page = 0;
 		if(inventarioDataManager.getInventarioDTOEditar() != null && inventarioDataManager.getInventarioDTOEditar().getId().getCodigoInventario() != null)
@@ -190,6 +200,51 @@ public class InventarioController extends CommonsController implements Serializa
 	}
 	
 	/**
+	 * Metodo para buscar articulos
+	 * @param e
+	 */
+	public void busquedaArticulos(ActionEvent e){
+		try {
+			this.articuloDTOCols = ERPFactory.articulos.getArticuloServicio().findObtenerListaArticulos(Integer.parseInt(ERPConstantes.ESTADO_ACTIVO_NUMERICO), null, null);
+			if(CollectionUtils.isEmpty(this.articuloDTOCols)){
+				this.setShowMessagesBar(Boolean.TRUE);
+				MensajesController.addInfo(null, "No se encontraron resultados para la b\u00FAsqueda realizada.");
+			}
+		} catch (ERPException e1) {
+			this.setShowMessagesBar(Boolean.TRUE);
+	        MensajesController.addError(null, e1.getMessage());
+		} catch (Exception e2) {
+			this.setShowMessagesBar(Boolean.TRUE);
+			MensajesController.addError(null, e2.getMessage());
+		}
+	}
+	
+	/**
+	 * Seleccionar articulo del popUp
+	 * @param e
+	 */
+	public void seleccionarArticulo(ValueChangeEvent e)
+	{
+		this.codigoArticuloSeleccionado = (Integer)e.getNewValue();
+	}
+	
+	/**
+	 * Metodo para agragar el articulo a la vista
+	 */
+	public void agragarArticuloSeleccionado(ActionEvent e) {
+		// Verificar si existe en la coleccion el cliente
+		Predicate testPredicate = new BeanPredicate("id.codigoArticulo", PredicateUtils.equalPredicate(this.codigoArticuloSeleccionado));
+		// Validacion de objeto existente
+		this.articuloDTO  = (ArticuloDTO) CollectionUtils.find(this.articuloDTOCols, testPredicate);
+		this.inventarioDTO.setValorUnidadEntrada(this.articuloDTO.getPrecio());
+		this.inventarioDTO.setCodigoArticulo(this.articuloDTO.getId().getCodigoArticulo());
+		this.inventarioDTO.setCantidadEntrada(null);
+		this.inventarioDTO.setValorTotalEntrada(null);
+		this.inventarioDTO.setArticuloDTO(this.articuloDTO);
+		this.codigoBarrasNuevo = this.articuloDTO.getCodigoBarras();
+	}
+	
+	/**
 	 * Validar datos ingresados
 	 * @return
 	 */
@@ -223,6 +278,8 @@ public class InventarioController extends CommonsController implements Serializa
 		this.setShowMessagesBar(Boolean.FALSE);
 		this.inventarioDTO = new InventarioDTO();
 		this.inventarioDataManager.setInventarioDTOEditar(new InventarioDTO());
+		this.codigoBarrasNuevo = "";
+		this.articuloDTO = new ArticuloDTO();
 	}
 	
 	/**
@@ -320,6 +377,23 @@ public class InventarioController extends CommonsController implements Serializa
 		}
 	}
 	
+	/**
+	 * Metodo para imprimir lista de facturas
+	 */
+	public void imprimirKardex() {
+		HtmlPdf htmltoPDF;
+		try {
+			// Plantilla rpincipal que permite la conversion de xsl a pdf
+			htmltoPDF = new HtmlPdf(ERPConstantes.PLANTILLA_XSL_FOPRINCIPAL);
+			HashMap<String , String> parametros = new HashMap<String, String>();
+			byte contenido[] = htmltoPDF.convertir(ERPFactory.inventario.getInventarioServicio().findObtenerXMLReporteKardex(this.inventarioDTOCols, fechaInicioBusqueda, fechaFinBusqueda).replace("<?xml version=\"1.0\" encoding=\"UTF-8\"?>", ""), "", "",	parametros,	null);
+			UtilitarioWeb.mostrarPDF(contenido);				
+		} catch (Exception e) {
+			this.setShowMessagesBar(Boolean.TRUE);
+			MensajesController.addError(null, "Error al imprimir");
+		}
+	}
+	
 	public void setInventarioDataManager(InventarioDataManager inventarioDataManager) {
 		this.inventarioDataManager = inventarioDataManager;
 	}
@@ -410,5 +484,21 @@ public class InventarioController extends CommonsController implements Serializa
 
 	public void setArticuloDTO(ArticuloDTO articuloDTO) {
 		this.articuloDTO = articuloDTO;
+	}
+
+	public Collection<ArticuloDTO> getArticuloDTOCols() {
+		return articuloDTOCols;
+	}
+
+	public void setArticuloDTOCols(Collection<ArticuloDTO> articuloDTOCols) {
+		this.articuloDTOCols = articuloDTOCols;
+	}
+
+	public Integer getCodigoArticuloSeleccionado() {
+		return codigoArticuloSeleccionado;
+	}
+
+	public void setCodigoArticuloSeleccionado(Integer codigoArticuloSeleccionado) {
+		this.codigoArticuloSeleccionado = codigoArticuloSeleccionado;
 	}
 }
