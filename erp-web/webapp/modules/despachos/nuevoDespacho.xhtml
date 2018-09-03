@@ -195,15 +195,18 @@
 		</rich:panel>
 		
 		<!-- Popup para agregar nuevo chofer -->
-		<rich:popupPanel id="mpPedidos" header="#{msg_erpweb['ec.com.erp.etiqueta.label.nuevo.pedidos.titulo.lista.pedido']}" width="552" height="250" modal="true" domElementAttachment="form">
+		<rich:popupPanel id="mpPedidos" header="#{msg_erpweb['ec.com.erp.etiqueta.label.nuevo.pedidos.titulo.lista.pedido']}" width="1000" height="450" modal="true" domElementAttachment="form">
 			<f:facet name="controls">
 				<h:outputLink value="#"	onclick="#{rich:component('mpPedidos')}.hide();">
 					<h:graphicImage library="images" name="close.png" style="border:0px" id="closePopUpChofer" />
 				</h:outputLink>
 			</f:facet>
 			
-			<rich:panel header="Pedidos pendientes de entrega" style="height: 94%">
-				<rich:dataTable style="width:100%" value="#{despachoController.pedidosDTOCols}" var="pedido" iterationStatusVar="it" id="tablePedidos" rows="15">
+			<rich:panel header="Pedidos pendientes de entrega" style="height: 370px">
+				<rich:panel style="text-align:center; border-left: none; border-right:none; border-bottom:none" rendered="#{not empty despachoController.pedidosDTOCols}">
+					<rich:dataScroller for="tablePedidos" maxPages="5" rendered="#{not empty despachoController.pedidosDTOCols}" renderIfSinglePage="true"/>
+				</rich:panel>
+				<rich:dataTable style="width:100%" value="#{despachoController.pedidosDTOCols}" var="pedido" iterationStatusVar="it" id="tablePedidos" rows="8">
 					<rich:column style="padding:0px;padding-left:2px" >
 						<h:selectOneRadio onclick="radioButton(this);" id="myRadio" value="#{despachoController.codigoPedidoSeleccionado}" valueChangeListener="#{despachoController.seleccionPedido}">  
 							<f:selectItem itemValue="#{pedido.id.codigoPedido}"/> 
@@ -219,10 +222,6 @@
 		                <h:outputText value="#{pedido.clienteDTO.tipoClienteCatalogoValorDTO.nombreCatalogoValor}" />
 		            </rich:column>
 		            <rich:column>
-		                <f:facet name="header"><h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.header.tabla.documento.cliente']}"/></f:facet>
-		                <h:outputText value="#{pedido.clienteDTO.personaDTO.numeroDocumento == null ? pedido.clienteDTO.empresaDTO.numeroRuc : pedido.clienteDTO.personaDTO.numeroDocumento}" />
-		            </rich:column>
-		            <rich:column>
 		                <f:facet name="header"><h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.header.tabla.nombre.cliente']}"/></f:facet>
 		                <h:outputText value="#{pedido.clienteDTO.personaDTO.nombreCompleto == null ? pedido.clienteDTO.empresaDTO.razonSocial : pedido.clienteDTO.personaDTO.nombreCompleto}" />
 		            </rich:column>
@@ -232,24 +231,21 @@
 		            </rich:column>
 		            <rich:column>
 		                <f:facet name="header"><h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.label.nuevo.pedidos.etiqueta.fechapedido']}"/></f:facet>
-		                <h:outputText value="#{pedido.fechaPedido}" />
+		                <h:outputText value="#{pedido.fechaPedido}">
+		                	<f:convertDateTime pattern="yyyy-MM-dd"/>
+		                </h:outputText>
 		            </rich:column>
-		            <rich:column>
-		                <f:facet name="header"><h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.label.nuevo.pedidos.etiqueta.fechaentrega']}"/></f:facet>
-		                <h:outputText value="#{pedido.fechaEntrega}" />
+		            <rich:column style="width: 60px; text-align: right; padding-right: 3px;">
+		                <f:facet name="header"><h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.label.nuevo.pedidos.detalle.total']}"/></f:facet>
+		                <h:outputText value="#{pedido.totalCompra}">
+		                	<f:convertNumber pattern="0.00"/>
+		                </h:outputText>
 		            </rich:column>
 		            <rich:column>
 		                <f:facet name="header"><h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.label.nuevo.pedidos.etiqueta.estadoPedido']}"/></f:facet>
 		                <h:outputText value="#{pedido.estadoPedidoDTO.estadoCatalogoValorDTO.nombreCatalogoValor}" />
 		            </rich:column>
-		            <rich:column>
-		                <f:facet name="header"><h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.label.nuevo.pedidos.etiqueta.detallepedido']}"/></f:facet>
-		                <a4j:commandLink value="Ver detalle"></a4j:commandLink>
-		            </rich:column>
 		        </rich:dataTable>
-		        <rich:panel style="text-align:center; border-left: none; border-right:none; border-bottom:none" rendered="#{not empty despachoController.pedidosDTOCols}">
-					<rich:dataScroller for="tablePedidos" maxPages="5" rendered="#{not empty despachoController.pedidosDTOCols}" renderIfSinglePage="false"/>
-				</rich:panel>
 		    </rich:panel>
 			
 			<!-- Botones de PopUp -->

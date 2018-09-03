@@ -212,6 +212,26 @@ public class CuentasController extends CommonsController implements Serializable
 		}
 	}
 	
+	
+	/**
+	 * Metodo para cancelar factura
+	 * @param e
+	 */
+	public void cancelarFacturas(ActionEvent e){
+		try {
+			ERPFactory.facturas.getFacturaCabeceraServicio().transCancelarFacturaInactivar(this.facturaCabeceraDTO);
+			this.busquedaCuentasFacturas(e);
+			this.setShowMessagesBar(Boolean.TRUE);
+	        MensajesController.addInfo(null, ERPWebResources.getString("ec.com.erp.etiqueta.mensaje.informacion.cancelacion"));
+		} catch (ERPException e1) {
+			this.setShowMessagesBar(Boolean.TRUE);
+			MensajesController.addError(null, e1.getMessage());
+		} catch (Exception e2) {
+			this.setShowMessagesBar(Boolean.TRUE);
+			MensajesController.addError(null, e2.getMessage());
+		}
+	}
+	
 	/**
 	 * Metodo para validar la informacion requerida de la pantalla
 	 */

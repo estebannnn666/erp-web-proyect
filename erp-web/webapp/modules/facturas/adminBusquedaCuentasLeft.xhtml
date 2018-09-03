@@ -64,6 +64,7 @@
 					</h:panelGroup>
 				</h:panelGrid>
 		    	<h:selectOneMenu value="#{cuentasController.tipoDocumento}" style="width:217px">
+		    		<f:selectItem itemLabel="SELECCIONE"/>
 		    		<f:selectItems value="#{cuentasController.tipoFacturaCatalogoValorDTOCols}" var="catalog" itemLabel="#{catalog.nombreCatalogoValor}" itemValue="#{catalog.id.codigoCatalogoValor}"/>
 		    	</h:selectOneMenu>
 			</h:panelGrid>						
