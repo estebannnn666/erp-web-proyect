@@ -111,8 +111,8 @@ public class DespachoController extends CommonsController implements Serializabl
 		if(despachoDataManager.getGuiaDespachoDTOEditar() != null && despachoDataManager.getGuiaDespachoDTOEditar().getId().getCodigoGuiaDespacho() != null)
 		{
 			this.setGuiaDespachoDTO(despachoDataManager.getGuiaDespachoDTOEditar());
-			this.setGuiaDespachoExtrasDTOCols(despachoDataManager.getGuiaDespachoDTOEditar().getGuiaDespachoExtrasDTOCols());
-			this.setGuiaDespachoPedidoDTOCols(despachoDataManager.getGuiaDespachoDTOEditar().getGuiaDespachoPedidoDTOCols());
+			this.setGuiaDespachoExtrasDTOCols(ERPFactory.despacho.getGuiaDespachoServicio().findObtenerListaGuiaDespachoExtrasByNumeroGuia(Integer.parseInt(ERPConstantes.ESTADO_ACTIVO_NUMERICO), despachoDataManager.getGuiaDespachoDTOEditar().getNumeroGuiaDespacho()));
+			this.setGuiaDespachoPedidoDTOCols(ERPFactory.despacho.getGuiaDespachoServicio().findObtenerListaGuiaDespachoPedidosByNumeroGuiaDespacho(Integer.parseInt(ERPConstantes.ESTADO_ACTIVO_NUMERICO), despachoDataManager.getGuiaDespachoDTOEditar().getNumeroGuiaDespacho()));
 		}
 	}
 		
@@ -144,29 +144,20 @@ public class DespachoController extends CommonsController implements Serializabl
 	 * Metodo para agragar el pedido a la vista
 	 */
 	public void agragarPedido(ActionEvent e) {
-		// Verificar si existe en la coleccion el pedido
-		Predicate testPredicate = new BeanPredicate("id.codigoPedido", PredicateUtils.equalPredicate(this.codigoPedidoSeleccionado));
-		// Validacion de objeto existente
-		this.pedidoDTO  = (PedidoDTO) CollectionUtils.find(this.pedidosDTOCols, testPredicate);
-		this.guiaDespachoPedidoDTO = new GuiaDespachoPedidoDTO();
-		this.guiaDespachoPedidoDTO.setCodigoPedido(this.pedidoDTO.getId().getCodigoPedido());
-		this.guiaDespachoPedidoDTO.setPedidoDTO(this.pedidoDTO);
-		Boolean ban = Boolean.TRUE;
-		// Validar que el pedido no se asigne dos veces
-		for(GuiaDespachoPedidoDTO guiaDespachoPedidoDTOTemp : this.guiaDespachoPedidoDTOCols) {
-			if(this.pedidoDTO.getId().getCodigoPedido().longValue() == guiaDespachoPedidoDTOTemp.getCodigoPedido().longValue()) {
-				ban = Boolean.FALSE;
-				controlPopUp = Boolean.FALSE;
-				MensajesController.addError(null, ERPWebResources.getString("ec.com.erp.etiqueta.label.lista.guia.despacho.mensaje.agregar.pedido"));
-				break;
+		for(PedidoDTO pedido : this.pedidosDTOCols) {
+			if(pedido.getSeleccionado()) {
+				// Verificar si existe en la coleccion el pedido
+				Predicate testPredicate = new BeanPredicate("id.codigoPedido", PredicateUtils.equalPredicate(pedido.getId().getCodigoPedido()));
+				// Validacion de objeto existente
+				this.pedidoDTO  = (PedidoDTO) CollectionUtils.find(this.pedidosDTOCols, testPredicate);
+				this.guiaDespachoPedidoDTO = new GuiaDespachoPedidoDTO();
+				this.guiaDespachoPedidoDTO.setCodigoPedido(this.pedidoDTO.getId().getCodigoPedido());
+				this.guiaDespachoPedidoDTO.setPedidoDTO(this.pedidoDTO);
+				this.guiaDespachoPedidoDTO.setOrden(orden);
+				this.guiaDespachoPedidoDTOCols.add(guiaDespachoPedidoDTO);
+				orden++;
+				controlPopUp = Boolean.TRUE;
 			}
-		}
-		// Si el pedido no se encuentra se agraga a la lista
-		if(ban) {
-			controlPopUp = Boolean.TRUE;
-			this.guiaDespachoPedidoDTO.setOrden(orden);
-			this.guiaDespachoPedidoDTOCols.add(guiaDespachoPedidoDTO);
-			orden++;
 		}
 	}
 	
@@ -177,6 +168,23 @@ public class DespachoController extends CommonsController implements Serializabl
 	public void abrirPopUpPedidos(ActionEvent e){
 		controlPopUp = Boolean.FALSE;
 		this.pedidosDTOCols = ERPFactory.pedidos.getPedidoServicio().findObtenerPedidosRegistrados(Integer.parseInt(ERPConstantes.ESTADO_ACTIVO_NUMERICO), ERPConstantes.CODIGO_CATALOGO_VALOR_ESTADO_PEDIDO_REGISTRADO);
+		Collection<PedidoDTO> pedidoDTOAuxCols = new ArrayList<PedidoDTO>();
+		Boolean ban;
+		if(CollectionUtils.isNotEmpty(this.guiaDespachoPedidoDTOCols) && CollectionUtils.isNotEmpty(this.pedidosDTOCols)) {
+			for(PedidoDTO pedidoDTO : this.pedidosDTOCols) {
+				ban = Boolean.TRUE;
+				for(GuiaDespachoPedidoDTO guiaDespachoPedidoDTO: this.guiaDespachoPedidoDTOCols) {
+					if(guiaDespachoPedidoDTO.getCodigoPedido().longValue() == pedidoDTO.getId().getCodigoPedido().longValue()) {
+						ban = Boolean.FALSE;
+						break;
+					}
+				}
+				if(ban) {
+					pedidoDTOAuxCols.add(pedidoDTO);
+				}
+			}
+			this.setPedidosDTOCols(pedidoDTOAuxCols);
+		}
 	}
 	
 	/**

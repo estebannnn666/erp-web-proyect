@@ -205,15 +205,16 @@
 			</f:facet>
 			
 			<rich:panel header="Pedidos pendientes de entrega" style="height: 370px">
+				<h:panelGrid id="tablaVacia" columns="1" rendered="#{empty despachoController.pedidosDTOCols}" style="width:100%; text-align: center; padding-top: 160px">
+					<h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.mensaje.lista.vacio']}"/>
+				</h:panelGrid>
 				<rich:panel style="text-align:center; border-left: none; border-right:none; border-bottom:none" rendered="#{not empty despachoController.pedidosDTOCols}">
 					<rich:dataScroller for="tablePedidos" maxPages="5" rendered="#{not empty despachoController.pedidosDTOCols}" renderIfSinglePage="true"/>
 				</rich:panel>
-				<rich:dataTable style="width:100%" value="#{despachoController.pedidosDTOCols}" var="pedido" iterationStatusVar="it" id="tablePedidos" rows="8">
+				<rich:dataTable style="width:100%" value="#{despachoController.pedidosDTOCols}" rendered="#{not empty despachoController.pedidosDTOCols}" var="pedido" iterationStatusVar="it" id="tablePedidos" rows="8">
 					<rich:column style="padding:0px;padding-left:2px" >
-						<h:selectOneRadio onclick="radioButton(this);" id="myRadio" value="#{despachoController.codigoPedidoSeleccionado}" valueChangeListener="#{despachoController.seleccionPedido}">  
-							<f:selectItem itemValue="#{pedido.id.codigoPedido}"/> 
-							<a4j:ajax event="click" execute="@this" render="myRadio"/>								
-						</h:selectOneRadio>
+						<h:selectBooleanCheckbox id="myCheck" value="#{pedido.seleccionado}">
+				        </h:selectBooleanCheckbox>
 					</rich:column>
 		            <rich:column>
 		                <f:facet name="header">Nro.</f:facet>
@@ -253,7 +254,7 @@
 			<!-- Botones de PopUp -->
 			<h:panelGrid style="margin:auto;" columns="2" cellpadding="0" cellspacing="0">
 				<h:panelGroup layout="block" styleClass="botonD" style="margin-top:5px;margin-right:20px;">
-					<a4j:commandLink id="btnAceptarAgregarPedido" execute="@this" render="panelTablaPedidos" styleClass="aceptarD" actionListener="#{despachoController.agragarPedido}" oncomplete="if(#{despachoController.controlPopUp})#{rich:component('mpPedidos')}.hide(); return false;">
+					<a4j:commandLink id="btnAceptarAgregarPedido" execute="tablePedidos" render="panelTablaPedidos" styleClass="aceptarD" actionListener="#{despachoController.agragarPedido}" oncomplete="if(#{despachoController.controlPopUp})#{rich:component('mpPedidos')}.hide(); return false;">
 						<h:panelGrid columns="2" cellpadding="3" cellspacing="0">
 							<h:graphicImage name="btnAceptar.png" library="images" style="border:none;border-color:white;" height="16" width="16"/>
 							<h:outputText value="Aceptar" />
@@ -313,7 +314,7 @@
 				</h:panelGroup>
 				
 				<h:panelGroup layout="block" styleClass="botonD" style="margin-top:5px;">
-					<a4j:commandLink styleClass="cancelarD" oncomplete="#{rich:component('mpConfirmacion')}.hide(); return false;" immediate="true">
+					<a4j:commandLink styleClass="cancelarD" action="#{despachoController.regresarBusquedaDespachos}" oncomplete="#{rich:component('mpConfirmacion')}.hide(); return false;" immediate="true">
 						<h:panelGrid columns="2" cellpadding="3" cellspacing="0">
 							<h:graphicImage name="btnCancel.png" library="images" style="border:none;border-color:white;" height="16" width="16"/>
 							<h:outputText value="Cancelar" />
