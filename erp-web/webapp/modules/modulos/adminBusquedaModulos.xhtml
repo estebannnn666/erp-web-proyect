@@ -61,9 +61,9 @@
 	                <f:facet name="header"><h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.pantalla.modulos.url.modulo']}"/></f:facet>
 	                <h:outputText value="#{module.url}" />
 	            </rich:column>
-	            <rich:column>
+	            <rich:column style="text-align: center;">
 	                <f:facet name="header"><h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.pantalla.modulos.estado.modulo']}"/></f:facet>
-	                <h:outputText value="#{module.estado}" />
+	                <h:outputText value="#{module.estado == 1 ? 'ACTIVO' : 'INACTIVO'}" />
 	            </rich:column>
 	            <rich:column styleClass="columna10">
 	                <f:facet name="header">Editar</f:facet>

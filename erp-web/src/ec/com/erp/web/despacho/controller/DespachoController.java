@@ -188,6 +188,13 @@ public class DespachoController extends CommonsController implements Serializabl
 		this.guiaDespachoExtrasDTOCols.add(guiaDespachoExtrasDTOTemp);
 	}
 	
+	/**
+	 * Metodo para cargar 
+	 * @return
+	 */
+	public void cargarPedidoEliminar(ActionEvent e) {
+		System.out.println("Ingreso a cargar detalle");
+	}
 	
 	/**
 	 * Metodo para consultar vehiculos por placa 

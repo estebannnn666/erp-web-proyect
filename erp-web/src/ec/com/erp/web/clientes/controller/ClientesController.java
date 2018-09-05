@@ -111,7 +111,7 @@ public class ClientesController extends CommonsController implements Serializabl
 	 */
 	public void busquedaClientes(ActionEvent e){
 		try {
-			this.clienteDTOCols = ERPFactory.clientes.getClientesServicio().findObtenerListaClientes(Integer.parseInt(ERPConstantes.ESTADO_ACTIVO_NUMERICO), null, null);
+			this.clienteDTOCols = ERPFactory.clientes.getClientesServicio().findObtenerListaClientes(Integer.parseInt(ERPConstantes.ESTADO_ACTIVO_NUMERICO), numeroDocumentoBusqueda, nombreClienteBusqueda);
 			if(CollectionUtils.isEmpty(this.clienteDTOCols)){
 				this.setShowMessagesBar(Boolean.TRUE);
 				FacesMessage msg = new FacesMessage("No se encontraron resultados para la b\u00FAsqueda realizada.", "ERROR MSG");

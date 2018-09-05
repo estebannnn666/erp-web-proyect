@@ -53,9 +53,9 @@
 	                <f:facet name="header"><h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.label.lista.header.tipo.perfil']}"/></f:facet>
 	                <h:outputText value="#{usr.perfilDTO.perfilCatalogoValorDTO.nombreCatalogoValor}" />
 	            </rich:column>
-	            <rich:column>
+	            <rich:column style="text-align: center;">
 	                <f:facet name="header"><h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.label.lista.header.estado.usuario']}"/></f:facet>
-	                <h:outputText value="#{usr.estado}" />
+	                <h:outputText value="#{usr.estado == 1 ? 'ACTIVO' : 'INACTIVO'}" />
 	            </rich:column>
 	            <rich:column styleClass="columna10">
 	                <f:facet name="header">Editar</f:facet>

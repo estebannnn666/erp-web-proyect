@@ -122,19 +122,21 @@
 					                <f:facet name="header"><h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.label.lista.cabecera.guia.destino']}"/></f:facet>
 					                <h:outputText value="#{pedido.pedidoDTO.clienteDTO.personaDTO == null ? pedido.pedidoDTO.clienteDTO.empresaDTO.contactoEmpresaDTO.direccionPrincipal : pedido.pedidoDTO.clienteDTO.personaDTO.contactoPersonaDTO.direccionPrincipal}" />
 					            </rich:column>
-					             <rich:column>
+					            <rich:column style="width: 60px; text-align: right; padding-right: 3px;">
 					                <f:facet name="header"><h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.label.lista.cabecera.guia.total.pedido']}"/></f:facet>
-					                <h:outputText value="#{pedido.pedidoDTO.totalCompra}" />
+					                <h:outputText value="#{pedido.pedidoDTO.totalCompra}">
+					                	<f:convertNumber pattern="0.00"/>
+	                				</h:outputText>
 					            </rich:column>
 					            <rich:column>
 					                <f:facet name="header"><h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.label.lista.cabecera.guia.observacion']}"/></f:facet>
 					                <h:inputText value="#{pedido.observacion}" maxlength="64"/>
 					            </rich:column>					         
-					            <rich:column>
+					            <rich:column styleClass="columna5">
 					                <f:facet name="header"><h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.boton.eliminar']}"/></f:facet>
-					                <a4j:commandLink id="botonEliminar" execute="@this" oncomplete="#{rich:component('mpEliminarChofer')}.show();">
-										<h:graphicImage library="images" name="deleteReg.png" title="Borrar"/>
-										<f:setPropertyActionListener value="#{chofer}" target="#{despachoController.guiaDespachoPedidoDTO}" />											
+					                <a4j:commandLink id="botonEliminar" execute="@this" actionListener="#{despachoController.cargarPedidoEliminar}" oncomplete="#{rich:component('mpEliminarChofer')}.show();">
+										<h:graphicImage library="images" name="deleteReg.png" title="Borrar" width="16" height="16"/>
+										<f:setPropertyActionListener value="#{pedido}" target="#{despachoController.guiaDespachoPedidoDTO}" />											
 									</a4j:commandLink>	
 					            </rich:column>            
 					        </rich:dataTable>						

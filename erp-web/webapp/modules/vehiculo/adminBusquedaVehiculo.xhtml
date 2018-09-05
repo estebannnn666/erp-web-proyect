@@ -29,7 +29,7 @@
 				<h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.mensaje.lista.vacio']}"/>
 			</h:panelGrid>
 			<rich:panel style="text-align:center; border-left: none; border-right:none; border-bottom:none" rendered="#{not empty vehiculoController.vehiculoDTOCols}">
-				<rich:dataScroller page="#{vehiculoController.page}" fastStep="3" for="tabletransporte" maxPages="5" rendered="#{not empty vehiculoController.vehiculoDTOCols}" renderIfSinglePage="false"/>
+				<rich:dataScroller page="#{vehiculoController.page}" fastStep="3" for="tableVehiculo" maxPages="5" rendered="#{not empty vehiculoController.vehiculoDTOCols}" renderIfSinglePage="false"/>
 			</rich:panel>		
 			<rich:dataTable style="width:100%" rendered="#{not empty vehiculoController.vehiculoDTOCols}"  value="#{vehiculoController.vehiculoDTOCols}" var="vehic" iterationStatusVar="it" id="tableVehiculo" rows="15">
 	            <rich:column>

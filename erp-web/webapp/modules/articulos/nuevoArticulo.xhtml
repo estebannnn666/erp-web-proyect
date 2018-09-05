@@ -31,7 +31,9 @@
 			 		<h:inputText class="styleUpperCase" style="width:260px" value="#{articulosController.articuloDTO.nombreArticulo}" id="nombreArticulo" />
 			 		
 			 		<h:outputText class="styleNegritas" value="#{msg_erpweb['ec.com.erp.etiqueta.header.tabla.articulo.peso']}: *" />
-			 		<h:inputText style="width:260px" value="#{articulosController.articuloDTO.peso}" id="peso" onkeypress="return validarDecimal(event);"/>
+			 		<h:inputText style="width:260px" value="#{articulosController.articuloDTO.peso}" id="peso" onkeypress="return validarDecimal(event);">
+			 			<f:convertNumber pattern="0.00"/>
+			 		</h:inputText>
 			 		
 			 		<h:outputText class="styleNegritas" value="#{msg_erpweb['ec.com.erp.etiqueta.header.tabla.articulo.precio']}: *" />
 			 		<h:inputText  style="width:260px" value="#{articulosController.articuloDTO.precio}" id="precio" onkeypress="return validarDecimal(event);"/>

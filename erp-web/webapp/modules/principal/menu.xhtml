@@ -13,13 +13,13 @@
 		<rich:panel class="styleRichPanelMenu">
 			<div style="padding-left: 80px">
 	    		<rich:dataGrid styleClass="estiloMenuDinamico" style="width:100% ; background-color: transparent; border: none;" value="#{loginController.usuariosDTO.perfilDTO.moduloPerfilDTOCols}" var="modulo" columns="6" elements="12">
-					<!-- <h:panelGroup layout="block" styleClass="stylePrincipal #{modulo.moduloDTO.estilo}">
+					<h:panelGroup layout="block" styleClass="stylePrincipal #{modulo.moduloDTO.estilo}">
 						<a4j:commandLink styleClass="guardarA" action="#{modulo.moduloDTO.url.toString()}"/>
-					</h:panelGroup> -->
+					</h:panelGroup> 
 					
-					<h:panelGroup layout="block">
+					<!-- <h:panelGroup layout="block">
 						<a4j:commandLink styleClass="guardarA" action="#{modulo.moduloDTO.url.toString()}" value="#{modulo.moduloDTO.nombreModulo.toString()}"/>
-					</h:panelGroup>
+					</h:panelGroup> -->
 	    	   	</rich:dataGrid>
     	   	</div>
    	   	</rich:panel>
