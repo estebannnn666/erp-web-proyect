@@ -144,14 +144,14 @@
 					<h:graphicImage library="images" name="close.png" style="border:0px" id="closePopUpBodega" />
 				</h:outputLink>
 			</f:facet>
-			<rich:panel id="pnlListaTransportistas" header="Seleccionar transportista" style="height: 300px">	
+			<rich:panel id="pnlListaTransportistas" header="Seleccionar transportista" style="height: 415px">	
 				<h:panelGrid id="tablaVacia" columns="1" rendered="#{empty choferController.transportistaDTOCols}" style="width:100%; text-align: center; padding-top: 220px">
 					<h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.mensaje.lista.vacio']}"/>
 				</h:panelGrid>
 				<rich:panel style="text-align:center; border-left: none; border-right:none; border-bottom:none" rendered="#{not empty choferController.transportistaDTOCols}">
 					<rich:dataScroller page="#{choferController.page}" fastStep="3" for="tabletransporte" maxPages="5" rendered="#{not empty choferController.transportistaDTOCols}" renderIfSinglePage="false"/>
 				</rich:panel>			
-		        <rich:dataTable style="width:100%" value="#{choferController.transportistaDTOCols}" var="transport" iterationStatusVar="it" id="tabletransporte" rows="15">
+		        <rich:dataTable style="width:100%" value="#{choferController.transportistaDTOCols}" var="transport" iterationStatusVar="it" id="tabletransporte" rows="10">
 		        	<rich:column style="padding:0px;padding-left:2px" >
 						<h:selectOneRadio onclick="radioButton(this);" id="myRadio" value="#{choferController.codigoTransportistaSeleccionado}" valueChangeListener="#{choferController.seleccionTransportista}">  
 							<f:selectItem itemValue="#{transport.id.codigoTransportista}"/> 

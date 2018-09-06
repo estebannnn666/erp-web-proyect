@@ -199,8 +199,8 @@
 					<h:graphicImage library="images" name="close.png" style="border:0px" id="closePopUpCliente" />
 				</h:outputLink>
 			</f:facet>
-			<h:panelGrid id="pnlListaClientes">	
-				<rich:panel style="width: 105.5%; height: 315px; " header="#{msg_erpweb['ec.com.erp.etiqueta.label.nuevo.pedidos.etiqueta.listaclientes']}">
+			<h:panelGrid id="pnlListaClientes" style="width: 100%;">	
+				<rich:panel style="width: 99.6%; height: 315px;" header="#{msg_erpweb['ec.com.erp.etiqueta.label.nuevo.pedidos.etiqueta.listaclientes']}">
 					
 					<h:panelGrid id="tablaVaciaClient" columns="1" rendered="#{empty cuentasController.clienteDTOCols}" style="width:100%; text-align: center; padding-top: 230px">
 						<h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.mensaje.lista.vacio']}"/>
@@ -208,7 +208,7 @@
 					<rich:panel style="text-align:center; border-left: none; border-right:none; margin-bottom: 2px" rendered="#{not empty cuentasController.clienteDTOCols}">
 						<rich:dataScroller fastStep="3" for="tableClientes" maxPages="5" rendered="#{not empty cuentasController.clienteDTOCols}" renderIfSinglePage="true"/>
 					</rich:panel>	
-					<rich:dataTable style="width:100%" value="#{cuentasController.clienteDTOCols}" rendered="#{not empty cuentasController.clienteDTOCols}" var="client" iterationStatusVar="it" id="tableClientes" rows="7">
+					<rich:dataTable style="width:100%" value="#{cuentasController.clienteDTOCols}" rendered="#{not empty cuentasController.clienteDTOCols}" var="client" iterationStatusVar="it" id="tableClientes" rows="8">
 			            <rich:column style="padding:0px;padding-left:2px" >
 							<h:selectOneRadio onclick="radioButton(this);" id="myRadio" value="#{cuentasController.codigoClienteSeleccionado}" valueChangeListener="#{cuentasController.seleccionCliente}">  
 								<f:selectItem itemValue="#{client.id.codigoCliente}"/> 

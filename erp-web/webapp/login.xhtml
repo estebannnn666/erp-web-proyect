@@ -11,15 +11,26 @@
 	<ui:param name="controller" value="#{loginController}" />
 	<ui:define name="contentCenter">
 		<h:form id="login-form">
-    		<rich:panel header="Login" style="width:300px !important;"> 
-	    		<h:panelGrid columns="2">
-		    		<h:outputText value="username:"/>
-		    	   	<h:inputText value="#{loginController.usuariosDTO.nombreUsuario}" id="nombreUsuario"/>
-		    	   	<h:outputText value="password:"/>
-		    	   	<h:inputSecret value="#{loginController.usuariosDTO.passwordUsuario}" id="passwordUsuario"/>
+			<h:panelGrid columns="1" columnClasses="columnaCenter">
+				<h:panelGrid columns="1" style="width: 100%" columnClasses="columnaCenter">
+					<h:graphicImage name="login.png" library="images" style="border:none;border-color:white;" height="100" width="100"/>	
+				</h:panelGrid>
+				<div style="height: 40px"></div>
+	    		<!-- <rich:panel header="Login" style="width:300px !important;"> -->
+	    		<h:panelGrid style="border-radius: 4px; border: 1px solid;" columns="2">
+		    		<h:graphicImage name="user.png" library="images" style="border:none;border-color:white;" height="24" width="24"/>	
+		    	   	<h:inputText style="width: 250px; height: 18px;" value="#{loginController.usuariosDTO.nombreUsuario}" id="nombreUsuario" />
+		    	</h:panelGrid>
+		    	<div style="height: 5px"></div>
+		    	<h:panelGrid style="border-radius: 4px; border: 1px solid;" columns="2">
+		    	   	<h:graphicImage name="candado.png" library="images" style="border:none;border-color:white;" height="24" width="24"/>	
+		    	   	<h:inputSecret style="width: 250px; height: 18px;" value="#{loginController.usuariosDTO.passwordUsuario}" id="passwordUsuario"/>
 	    	    </h:panelGrid>
-	   			<a4j:commandButton id="button" value="Login" render="pnlMensajes" action="#{loginController.doLogin}"/>
-    	  	</rich:panel>
+	    	    <div style="height: 20px"></div>
+	    	    
+	   			<a4j:commandButton style="width: 100px; height: 25px;" id="button" value="Login" render="pnlMensajes" action="#{loginController.doLogin}"/>
+	    	  	<!-- </rich:panel>-->
+    	  	</h:panelGrid>
 	    	<script>
 				/*<![CDATA[*/
 				$(document).ready(function(){				
@@ -31,6 +42,11 @@
 									
 				/*]]>*/			
 			</script>
+			<h:outputStylesheet>
+				.columnaCenter {
+					text-align: center !important;
+				}
+			</h:outputStylesheet>
 	   	   	<a4j:commandLink id="linkopensystem" styleClass="linkopensystem" execute="@this" actionListener="#{loginController.refrescarPantalla}">
 			</a4j:commandLink>	
     	</h:form>

@@ -142,47 +142,50 @@
 					<h:graphicImage library="images" name="close.png" style="border:0px" id="closePopUpBodega" />
 				</h:outputLink>
 			</f:facet>
-			<h:panelGrid id="pnlListaTransportistas" cellpadding="3" cellspacing="3">				
-		        <rich:dataTable style="width:100%" value="#{vehiculoController.transportistaDTOCols}" var="transport" iterationStatusVar="it" id="tabletransporte" rows="15">
-		        	<rich:column style="padding:0px;padding-left:2px" >
-						<h:selectOneRadio onclick="radioButton(this);" id="myRadio" value="#{vehiculoController.codigoTransportistaSeleccionado}" valueChangeListener="#{vehiculoController.seleccionTransportista}">  
-							<f:selectItem itemValue="#{transport.id.codigoTransportista}"/> 
-							<a4j:ajax event="click" execute="@this" render="myRadio"/>								
-						</h:selectOneRadio>
-					</rich:column>
-		            <rich:column>
-		                <f:facet name="header">Nro.</f:facet>
-		                #{it.index+1}
-		            </rich:column>
-		            <rich:column>
-		                <f:facet name="header"><h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.header.tabla.tipo.transportista']}"/></f:facet>
-		                <h:outputText value="#{transport.tipoTransportistaCatalogoValorDTO.nombreCatalogoValor}" />
-		            </rich:column>
-		            <rich:column>
-		                <f:facet name="header"><h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.label.lista.cabecera.documento.transportista']}"/></f:facet>
-		                <h:outputText value="#{transport.personaDTO.numeroDocumento == null ? transport.empresaDTO.numeroRuc : transport.personaDTO.numeroDocumento}" />
-		            </rich:column>
-		            <rich:column>
-		                <f:facet name="header"><h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.label.lista.cabecera.nombre.transportista']}"/></f:facet>
-		                <h:outputText value="#{transport.personaDTO.nombreCompleto == null ? transport.empresaDTO.razonSocial : transport.personaDTO.nombreCompleto}" />
-		            </rich:column>
-		            <rich:column>
-		                <f:facet name="header"><h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.header.tabla.direccion.cliente']}"/></f:facet>
-		                <h:outputText value="#{transport.personaDTO == null ? transport.empresaDTO.contactoEmpresaDTO.direccionPrincipal : transport.personaDTO.contactoPersonaDTO.direccionPrincipal}" />
-		            </rich:column>
-		            <rich:column>
-		                <f:facet name="header"><h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.header.tabla.ciudad.cliente']}"/></f:facet>
-		                <h:outputText value="#{transport.personaDTO == null ? transport.empresaDTO.contactoEmpresaDTO.ciudad : transport.personaDTO.contactoPersonaDTO.ciudad}" />
-		            </rich:column>
-		             <rich:column>
-		                <f:facet name="header"><h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.header.tabla.telefono.cliente']}"/></f:facet>
-		                <h:outputText value="#{transport.personaDTO == null ? transport.empresaDTO.contactoEmpresaDTO.telefonoPrincipal : transport.personaDTO.contactoPersonaDTO.telefonoPrincipal}" />
-		            </rich:column>
-		        </rich:dataTable>
-		        <rich:panel style="text-align:center; border-left: none; border-right:none; border-bottom:none" rendered="#{not empty vehiculoController.vehiculoChoferDTOCols}">
-					<rich:dataScroller for="tabletransporte" maxPages="5" rendered="#{not empty vehiculoController.vehiculoChoferDTOCols}" renderIfSinglePage="false"/>
+				<rich:panel id="pnlListaTransportistas" header="Seleccionar transportista" style="height: 415px">	
+					<h:panelGrid id="tablaVaciaTransp" columns="1" rendered="#{empty vehiculoController.transportistaDTOCols}" style="width:100%; text-align: center; padding-top: 220px">
+						<h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.mensaje.lista.vacio']}"/>
+					</h:panelGrid>
+					<rich:panel style="text-align:center; border-left: none; border-right:none; border-bottom:none" rendered="#{not empty vehiculoController.transportistaDTOCols}">
+						<rich:dataScroller page="#{choferController.page}" fastStep="3" for="tabletransporte" maxPages="5" rendered="#{not empty vehiculoController.transportistaDTOCols}" renderIfSinglePage="false"/>
+					</rich:panel>			
+			        <rich:dataTable style="width:100%" value="#{vehiculoController.transportistaDTOCols}" var="transport" iterationStatusVar="it" id="tabletransporte" rows="10">
+			        	<rich:column style="padding:0px;padding-left:2px" >
+							<h:selectOneRadio onclick="radioButton(this);" id="myRadio" value="#{vehiculoController.codigoTransportistaSeleccionado}" valueChangeListener="#{vehiculoController.seleccionTransportista}">  
+								<f:selectItem itemValue="#{transport.id.codigoTransportista}"/> 
+								<a4j:ajax event="click" execute="@this" render="myRadio"/>								
+							</h:selectOneRadio>
+						</rich:column>
+			            <rich:column>
+			                <f:facet name="header">Nro.</f:facet>
+			                #{it.index+1}
+			            </rich:column>
+			            <rich:column>
+			                <f:facet name="header"><h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.header.tabla.tipo.transportista']}"/></f:facet>
+			                <h:outputText value="#{transport.tipoTransportistaCatalogoValorDTO.nombreCatalogoValor}" />
+			            </rich:column>
+			            <rich:column>
+			                <f:facet name="header"><h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.label.lista.cabecera.documento.transportista']}"/></f:facet>
+			                <h:outputText value="#{transport.personaDTO.numeroDocumento == null ? transport.empresaDTO.numeroRuc : transport.personaDTO.numeroDocumento}" />
+			            </rich:column>
+			            <rich:column>
+			                <f:facet name="header"><h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.label.lista.cabecera.nombre.transportista']}"/></f:facet>
+			                <h:outputText value="#{transport.personaDTO.nombreCompleto == null ? transport.empresaDTO.razonSocial : transport.personaDTO.nombreCompleto}" />
+			            </rich:column>
+			            <rich:column>
+			                <f:facet name="header"><h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.header.tabla.direccion.cliente']}"/></f:facet>
+			                <h:outputText value="#{transport.personaDTO == null ? transport.empresaDTO.contactoEmpresaDTO.direccionPrincipal : transport.personaDTO.contactoPersonaDTO.direccionPrincipal}" />
+			            </rich:column>
+			            <rich:column>
+			                <f:facet name="header"><h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.header.tabla.ciudad.cliente']}"/></f:facet>
+			                <h:outputText value="#{transport.personaDTO == null ? transport.empresaDTO.contactoEmpresaDTO.ciudad : transport.personaDTO.contactoPersonaDTO.ciudad}" />
+			            </rich:column>
+			             <rich:column>
+			                <f:facet name="header"><h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.header.tabla.telefono.cliente']}"/></f:facet>
+			                <h:outputText value="#{transport.personaDTO == null ? transport.empresaDTO.contactoEmpresaDTO.telefonoPrincipal : transport.personaDTO.contactoPersonaDTO.telefonoPrincipal}" />
+			            </rich:column>
+			        </rich:dataTable>
 				</rich:panel>
-			</h:panelGrid>
 			
 			<!-- Botones de PopUp -->
 			<h:panelGrid style="margin:auto;" columns="2" cellpadding="0" cellspacing="0">
