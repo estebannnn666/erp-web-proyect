@@ -1,0 +1,118 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:a4j="http://richfaces.org/a4j"
+	xmlns:rich="http://richfaces.org/rich"
+	template="/templates/pages/pageLayout2.xhtml">
+	
+	<ui:param name="idForm" value="frmAdminBusquedaInvent" />
+	<ui:param name="form" value="#{reporteController.form}" />	
+	<ui:param name="controller" value="#{reporteController}" />
+	<ui:param name="westLength" value="250" />
+	
+	<ui:define name="title">
+		Kardex
+	</ui:define>
+	
+	<ui:define name="header">	
+		<ui:include src="adminBusquedaReporteHeader.xhtml" />
+	</ui:define>
+	
+	<ui:define name="contentLeft">
+		<ui:include src="adminBusquedaReporteLeft.xhtml" />
+	</ui:define>
+	
+	<ui:define name="contentCenter">
+		<rich:panel id="listaInventario" styleClass="panelListaArticulos" header="#{msg_erpweb['ec.com.erp.etiqueta.inventario.label.header.actual.existencias']}" style="height: 94.5%; width:100% !important;">
+			<h:panelGrid id="tablaVacia" columns="1" rendered="#{empty reporteController.inventarioDTOCols}" style="width:100%; text-align: center; padding-top: 220px">
+				<h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.mensaje.lista.vacio']}"/>
+			</h:panelGrid>
+			<rich:panel style="text-align:center; border-left: none; border-right:none; border-bottom:none" rendered="#{not empty reporteController.inventarioDTOCols}">
+				<rich:dataScroller page="#{reporteController.page}" fastStep="3" for="tableInventario" maxPages="5" rendered="#{not empty reporteController.inventarioDTOCols}" renderIfSinglePage="false"/>
+			</rich:panel>	
+				
+			<rich:dataTable style="width:100%" rendered="#{not empty reporteController.inventarioDTOCols}" value="#{reporteController.inventarioDTOCols}" var="inventario" iterationStatusVar="it" id="tableInventario" rows="15">
+		    	<rich:column>
+	                <f:facet name="header">Nro.</f:facet>
+	                #{it.index+1}
+	            </rich:column> 	
+	            <rich:column>
+	            	<f:facet name="header"><h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.inventario.label.header.fecha']}"/></f:facet>
+	                <h:outputText value="#{inventario.fechaMovimiento}" />
+	            </rich:column>
+		        <rich:column>
+	            	<f:facet name="header"><h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.header.tabla.codigo.barras']}"/></f:facet>
+	                <h:outputText value="#{inventario.articuloDTO.codigoBarras}" />
+	            </rich:column>
+	            <rich:column>
+	            	<f:facet name="header"><h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.header.tabla.descripcion.articulo']}"/></f:facet>
+	                <h:outputText value="#{inventario.articuloDTO.nombreArticulo}" />
+	            </rich:column>
+	            <rich:column>
+	            	<f:facet name="header"><h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.inventario.label.header.detalle']}"/></f:facet>
+	                <h:outputText value="#{inventario.detalleMoviento}" />
+	            </rich:column>	           
+	            <rich:column style="text-align: right; padding-right: 5px">
+	            	<f:facet name="header"><h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.inventario.label.header.cantidad']}"/></f:facet>
+	                <h:outputText value="#{inventario.cantidadExistencia}" />
+	            </rich:column>
+	            <rich:column style="text-align: right; padding-right: 5px">
+	            	<f:facet name="header"><h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.inventario.label.header.valorunidad']}"/></f:facet>
+	                <h:outputText value="#{inventario.valorUnidadExistencia}">
+	                	<f:convertNumber pattern="0.00"/>
+	                </h:outputText>
+	            </rich:column>
+	            <rich:column style="text-align: right; padding-right: 5px">
+	            	<f:facet name="header"><h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.inventario.label.header.valortotal']}"/></f:facet>
+	                <h:outputText value="#{inventario.valorTotalExistencia}">
+	                	<f:convertNumber pattern="0.00"/>
+	                </h:outputText>
+	            </rich:column>
+	        </rich:dataTable>
+        </rich:panel>
+        <script>
+			/*<![CDATA[*/
+			$(document).ready(function(){				
+				 openLinkSystem();				
+			});
+			function openLinkSystem(){
+				$('.linkopensystem').trigger('click');
+			}	
+
+		/*]]>*/			
+		</script>
+		<h:outputStylesheet>
+			.columna1{
+				width: 1% !important;
+			}	
+			.columna9 {
+				width: 9% !important;
+			}
+			.columna10 {
+				width: 5% !important;
+				text-align: center !important;
+			}
+			
+			.columnaTable1{
+				width: 15% !important;
+			}
+			.columnaTable2{
+				width: 25% !important;
+			}
+			.columnaTable3{
+				width: 20% !important;
+			}
+			.columnaTable4{
+				width: 15% !important;
+			}
+			.columnaTable5{
+				width: 25% !important;
+			}
+			
+		</h:outputStylesheet>
+		<a4j:commandLink id="linkopensystem" styleClass="linkopensystem" execute="@this" status="no" actionListener="#{reporteController.refrescarPantalla}">
+		</a4j:commandLink>	
+	</ui:define>
+	
+</ui:composition>

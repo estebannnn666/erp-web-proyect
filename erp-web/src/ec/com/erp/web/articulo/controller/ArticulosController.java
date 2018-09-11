@@ -64,6 +64,7 @@ public class ArticulosController extends CommonsController implements Serializab
 			this.setArticuloDTO(articulosDataManager.getArticuloDTOEditar());
 			this.modoEdicion = Boolean.TRUE;
 		}
+		this.articuloDTOCols = ERPFactory.articulos.getArticuloServicio().findObtenerListaArticulos(Integer.parseInt(ERPConstantes.ESTADO_ACTIVO_NUMERICO), codigoBarrasBusqueda,nombreArticuloBusqueda);
 	}
 		
 	@Override

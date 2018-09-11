@@ -11,17 +11,30 @@
 	<ui:param name="controller" value="#{loginController}" />
 	<ui:define name="contentCenter">
 		<rich:panel class="styleRichPanelMenu">
-			<div style="padding-left: 80px">
-	    		<rich:dataGrid styleClass="estiloMenuDinamico" style="width:100% ; background-color: transparent; border: none;" value="#{loginController.usuariosDTO.perfilDTO.moduloPerfilDTOCols}" var="modulo" columns="6" elements="12">
-					<!-- <h:panelGroup layout="block" styleClass="stylePrincipal #{modulo.moduloDTO.estilo}">
-						<a4j:commandLink styleClass="guardarA" action="#{modulo.moduloDTO.url.toString()}"/>
-					</h:panelGroup> -->
-					
-					<h:panelGroup layout="block">
-						<a4j:commandLink styleClass="guardarA" action="#{modulo.moduloDTO.url.toString()}" value="#{modulo.moduloDTO.nombreModulo.toString()}"/>
-					</h:panelGroup>
-	    	   	</rich:dataGrid>
-    	   	</div>
+			<rich:tabPanel>
+		        <rich:tab header="Gestion" rendered="#{not empty loginController.modulosGestionCols}">
+		        	<rich:dataGrid styleClass="estiloMenuDinamico" style="width:100% ; background-color: transparent; border: none;" value="#{loginController.modulosGestionCols}" var="modulo" columns="6" elements="18">
+						<!-- <h:panelGroup layout="block" styleClass="stylePrincipal #{modulo.estilo}">
+							<a4j:commandLink styleClass="guardarA" action="#{modulo.url.toString()}"/>
+						</h:panelGroup> -->
+						
+						<h:panelGroup layout="block">
+							<a4j:commandLink styleClass="guardarA" action="#{modulo.url.toString()}" value="#{modulo.nombreModulo.toString()}"/>
+						</h:panelGroup>
+    	   			</rich:dataGrid>
+		        </rich:tab>
+		        <rich:tab header="Administracion" rendered="#{not empty loginController.modulosAdministracionCols}">
+		        	<rich:dataGrid styleClass="estiloMenuDinamico" style="width:100% ; background-color: transparent; border: none;" value="#{loginController.modulosAdministracionCols}" var="modulo" columns="6" elements="18">
+						<!-- <h:panelGroup layout="block" styleClass="stylePrincipal #{modulo.estilo}">
+							<a4j:commandLink styleClass="guardarA" action="#{modulo.url.toString()}"/>
+						</h:panelGroup> -->
+						
+						<h:panelGroup layout="block" >
+							<a4j:commandLink styleClass="guardarA" action="#{modulo.url.toString()}" value="#{modulo.nombreModulo.toString()}"/>
+						</h:panelGroup>
+    	   			</rich:dataGrid>
+		        </rich:tab>
+		    </rich:tabPanel>
    	   	</rich:panel>
    	   	<script>
 			/*<![CDATA[*/
@@ -34,7 +47,7 @@
 								
 			/*]]>*/			
 		</script>
-   	   	<a4j:commandLink id="linkopensystem" styleClass="linkopensystem" execute="@this" actionListener="#{loginController.refrescarPantalla}">
+   	   	<a4j:commandLink id="linkopensystem" styleClass="linkopensystem" execute="@this" status="no" actionListener="#{loginController.refrescarPantalla}">
 		</a4j:commandLink>	
 	</ui:define>
 </ui:composition>
