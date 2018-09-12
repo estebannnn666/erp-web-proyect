@@ -33,7 +33,7 @@ body {
 	margin: 0px;
 	height: 11vh !important;
 	font-family: Arial, Helvetica, sans-serif, Geneva;
-	border-bottom: 1px solid darkred;
+	border-bottom: 1px solid #466ea7;
 }
 
 #topBusqueda{
@@ -64,7 +64,7 @@ body {
 	font-family: Arial, Helvetica, sans-serif;
 	color: #a6a6a6;
 	text-align: center;
-	border-top: 1px solid darkred;
+	border-top: 1px solid #466ea7;
 }
 
 .style-copy-rigth{
