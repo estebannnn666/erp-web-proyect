@@ -2,6 +2,8 @@ package ec.com.erp.web.commons.login.controller;
 
 import java.io.IOException;
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Collection;
 
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
@@ -18,6 +20,8 @@ import org.apache.commons.logging.impl.Log4JLogger;
 
 import ec.com.erp.cliente.common.exception.ERPException;
 import ec.com.erp.cliente.common.factory.ERPFactory;
+import ec.com.erp.cliente.mdl.dto.ModuloDTO;
+import ec.com.erp.cliente.mdl.dto.ModuloPerfilDTO;
 import ec.com.erp.cliente.mdl.dto.UsuariosDTO;
 import ec.com.erp.web.commons.controller.CommonsController;
 import ec.com.erp.web.commons.datamanager.CommonDataManager;
@@ -45,6 +49,8 @@ public class LoginController extends CommonsController implements Serializable{
 	private HtmlForm form;
 	
 	// Simple user database :)
+	private Collection<ModuloDTO> modulosGestionCols;
+	private Collection<ModuloDTO> modulosAdministracionCols;
 	private UsuariosDTO usuariosDTO;
 	private Log4JLogger log;
 	
@@ -146,6 +152,18 @@ public class LoginController extends CommonsController implements Serializable{
 			usuariosDTO = ERPFactory.usuarios.getUsuariosServicio().findLoginUser(usuariosDTO.getNombreUsuario(), usuariosDTO.getPasswordUsuario());
 			if(usuariosDTO.getLogeado()){
 				loggedIn = true;
+				this.modulosGestionCols = new ArrayList<ModuloDTO>();
+				this.modulosAdministracionCols = new ArrayList<ModuloDTO>();
+				
+				for(ModuloPerfilDTO  moduloPerfilDTO : usuariosDTO.getPerfilDTO().getModuloPerfilDTOCols()) {
+					if(moduloPerfilDTO.getModuloDTO().getValorTipo().equals("GES")) {
+						this.modulosGestionCols.add(moduloPerfilDTO.getModuloDTO());
+					}
+					if(moduloPerfilDTO.getModuloDTO().getValorTipo().equals("ADM")) {
+						this.modulosAdministracionCols.add(moduloPerfilDTO.getModuloDTO());
+					}
+				}
+				
 				this.sessionDataManagerBase.setUserDto(usuariosDTO);
 				
 				FacesContext.getCurrentInstance().getExternalContext().getSessionMap().put(ID_SESDATMAN, this.sessionDataManagerBase);
@@ -295,5 +313,21 @@ public class LoginController extends CommonsController implements Serializable{
 
 	public void setLog(Log4JLogger log) {
 		this.log = log;
+	}
+
+	public Collection<ModuloDTO> getModulosGestionCols() {
+		return modulosGestionCols;
+	}
+
+	public void setModulosGestionCols(Collection<ModuloDTO> modulosGestionCols) {
+		this.modulosGestionCols = modulosGestionCols;
+	}
+
+	public Collection<ModuloDTO> getModulosAdministracionCols() {
+		return modulosAdministracionCols;
+	}
+
+	public void setModulosAdministracionCols(Collection<ModuloDTO> modulosAdministracionCols) {
+		this.modulosAdministracionCols = modulosAdministracionCols;
 	}
 }

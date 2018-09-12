@@ -49,8 +49,12 @@
 						<f:selectItem itemLabel="INACTIVO" itemValue="0"/>
 					</h:selectOneMenu>
 			 		<h:outputText value=""/>
-			 		<h:outputText value=""/>
-			 		<h:outputText value=""/>
+			 		<h:outputText class="styleNegritas" value="#{msg_erpweb['ec.com.erp.etiqueta.pantalla.modulos.tipo.modulo']}: *" />
+			 		<h:selectOneMenu value="#{modulosController.moduloDTO.valorTipo}" style="background-color:#f9f9d5; background-image: none; width: 165px">
+						<f:selectItem itemLabel="SELECCIONE"/>
+						<f:selectItem itemLabel="GESTION" itemValue="GES"/>
+						<f:selectItem itemLabel="ADMINISTRACION" itemValue="ADM"/>
+					</h:selectOneMenu>
 			 	</h:panelGrid>
 			  </fieldset>
 		</rich:panel>

@@ -58,7 +58,7 @@
 				</h:panelGrid>
 			</fieldset>
 	 		<fieldset>
-	 			<a4j:commandLink id="linkopensystem" render="pnlGridDetalleFactura" styleClass="linkopensystem" execute="@this" actionListener="#{cuentasController.reloadPagina}">
+	 			<a4j:commandLink id="linkopensystem" render="pnlGridDetalleFactura" styleClass="linkopensystem" execute="@this" status="no" actionListener="#{cuentasController.reloadPagina}">
 				</a4j:commandLink>
 				<legend class="styleLegend">#{msg_erpweb['ec.com.erp.etiqueta.label.nuevo.pedidos.etiqueta.detallepedido']}</legend>
 			 	<h:panelGrid id="pnlGridDetalleFactura" style="width:100%">
