@@ -8,6 +8,7 @@ import javax.annotation.PostConstruct;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.ViewScoped;
+import javax.faces.context.FacesContext;
 import javax.faces.event.ActionEvent;
 import javax.faces.event.AjaxBehaviorEvent;
 
@@ -63,6 +64,9 @@ public class UsuariosController extends CommonsController implements Serializabl
 		if(usuariosDataManager.getUsuariosDTOEditar() != null && usuariosDataManager.getUsuariosDTOEditar().getId().getUserId() != null)
 		{
 			this.setUsuarioDTO(usuariosDataManager.getUsuariosDTOEditar());
+		}
+		if(FacesContext.getCurrentInstance().getViewRoot().getViewId().equals("/modules/usuarios/adminBusquedaUsuarios.xhtml")) {
+			this.usuariosDTOCols = ERPFactory.usuarios.getUsuariosServicio().findObtenerListaUsuarios(nombreUsuario);
 		}
 	}
 		

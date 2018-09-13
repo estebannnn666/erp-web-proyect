@@ -12,6 +12,7 @@ import javax.annotation.PostConstruct;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.ViewScoped;
+import javax.faces.context.FacesContext;
 import javax.faces.event.ActionEvent;
 
 import org.apache.commons.collections.CollectionUtils;
@@ -61,6 +62,9 @@ public class ReporteController extends CommonsController implements Serializable
 		fechaInicioBusqueda = new Date();
 		fechaFinBusqueda = new Date();
 		this.page = 0;
+		if(FacesContext.getCurrentInstance().getViewRoot().getViewId().equals("/modules/reportes/adminBusquedaReporte.xhtml")) {
+			this.inventarioDTOCols = ERPFactory.inventario.getInventarioServicio().findObtenerListaExistenciasByArticuloFechas(Integer.parseInt(ERPConstantes.ESTADO_ACTIVO_NUMERICO), codigoBarras, null, null);
+		}
 	}
 		
 	@Override

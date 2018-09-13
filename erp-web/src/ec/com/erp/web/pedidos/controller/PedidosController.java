@@ -117,6 +117,9 @@ public class PedidosController extends CommonsController implements Serializable
 			this.documentoCliente = this.clienteDTO.getPersonaDTO() == null ? this.clienteDTO.getEmpresaDTO().getNumeroRuc() : this.clienteDTO.getPersonaDTO().getNumeroDocumento();
 			this.setDetallePedidoDTOCols((List<DetallePedidoDTO>)pedidosDataManager.getPedidoDTOEditar().getDetallePedidoDTOCols());
 		}
+		if(FacesContext.getCurrentInstance().getViewRoot().getViewId().equals("/modules/pedidos/adminBusquedaPedidos.xhtml")) {
+			this.pedidosDTOCols = ERPFactory.pedidos.getPedidoServicio().findObtenerPedidosRegistrados(Integer.parseInt(ERPConstantes.ESTADO_ACTIVO_NUMERICO), null);
+		}
 	}
 		
 	@Override

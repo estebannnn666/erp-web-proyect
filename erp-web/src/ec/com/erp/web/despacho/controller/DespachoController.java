@@ -13,6 +13,7 @@ import javax.annotation.PostConstruct;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.ViewScoped;
+import javax.faces.context.FacesContext;
 import javax.faces.event.ActionEvent;
 import javax.faces.event.AjaxBehaviorEvent;
 import javax.faces.event.ValueChangeEvent;
@@ -113,6 +114,9 @@ public class DespachoController extends CommonsController implements Serializabl
 			this.setGuiaDespachoDTO(despachoDataManager.getGuiaDespachoDTOEditar());
 			this.setGuiaDespachoExtrasDTOCols(ERPFactory.despacho.getGuiaDespachoServicio().findObtenerListaGuiaDespachoExtrasByNumeroGuia(Integer.parseInt(ERPConstantes.ESTADO_ACTIVO_NUMERICO), despachoDataManager.getGuiaDespachoDTOEditar().getNumeroGuiaDespacho()));
 			this.setGuiaDespachoPedidoDTOCols(ERPFactory.despacho.getGuiaDespachoServicio().findObtenerListaGuiaDespachoPedidosByNumeroGuiaDespacho(Integer.parseInt(ERPConstantes.ESTADO_ACTIVO_NUMERICO), despachoDataManager.getGuiaDespachoDTOEditar().getNumeroGuiaDespacho()));
+		}
+		if(FacesContext.getCurrentInstance().getViewRoot().getViewId().equals("/modules/despachos/adminBusquedaDespacho.xhtml")) {
+			this.guiaDespachoDTOCols = ERPFactory.despacho.getGuiaDespachoServicio().findObtenerListaDespachosByFiltrosBusqueda(Integer.parseInt(ERPConstantes.ESTADO_ACTIVO_NUMERICO), numeroGuiaDespachoBusqueda, null, null, placaBusqueda, numeroDocumentoChoferBusqueda, nombreChoferBusqueda);
 		}
 	}
 		

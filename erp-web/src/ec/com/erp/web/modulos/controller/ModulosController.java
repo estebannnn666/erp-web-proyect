@@ -8,6 +8,7 @@ import javax.annotation.PostConstruct;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.ViewScoped;
+import javax.faces.context.FacesContext;
 import javax.faces.event.ActionEvent;
 
 import org.apache.commons.collections.CollectionUtils;
@@ -61,6 +62,9 @@ public class ModulosController extends CommonsController implements Serializable
 		if(modulosDataManager.getModuloDTOEditar() != null && modulosDataManager.getModuloDTOEditar().getId().getCodigoModulo() != null)
 		{
 			this.setModuloDTO(modulosDataManager.getModuloDTOEditar());
+		}
+		if(FacesContext.getCurrentInstance().getViewRoot().getViewId().equals("/modules/modulos/adminBusquedaModulos.xhtml")) {
+			this.moduloDTOCols = ERPFactory.modulos.getModuloServicio().findObtenerListaModulos(nombreModulo);
 		}
 	}
 		

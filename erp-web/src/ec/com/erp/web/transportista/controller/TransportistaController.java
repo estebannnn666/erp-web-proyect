@@ -87,6 +87,9 @@ public class TransportistaController extends CommonsController implements Serial
 				this.personaDTO.setNumeroDocumento(transportistaDataManager.getTransportistaDTOEditar().getEmpresaDTO().getNumeroRuc());
 			}
 		}
+		if(FacesContext.getCurrentInstance().getViewRoot().getViewId().equals("/modules/transportistas/adminBusquedaTransportista.xhtml")) {
+			this.transportistaDTOCols = ERPFactory.transportista.getTransportistasServicio().findObtenerListaTransportistas(Integer.parseInt(ERPConstantes.ESTADO_ACTIVO_NUMERICO), numeroDocumentoBusqueda, nombreTransportistaBusqueda);
+		}
 	}
 		
 	@Override

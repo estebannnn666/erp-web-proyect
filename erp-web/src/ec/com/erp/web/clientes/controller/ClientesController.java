@@ -87,6 +87,9 @@ public class ClientesController extends CommonsController implements Serializabl
 //			this.setUsuarioDTO(clientesDataManager.getClienteDTOEditar().getUsuariosDTO());
 			this.setContactoDTO(clientesDataManager.getClienteDTOEditar().getPersonaDTO() == null ? clientesDataManager.getClienteDTOEditar().getEmpresaDTO().getContactoEmpresaDTO() : clientesDataManager.getClienteDTOEditar().getPersonaDTO().getContactoPersonaDTO());
 		}
+		if(FacesContext.getCurrentInstance().getViewRoot().getViewId().equals("/modules/clientes/adminBusquedaClientes.xhtml")) {
+			this.clienteDTOCols = ERPFactory.clientes.getClientesServicio().findObtenerListaClientes(Integer.parseInt(ERPConstantes.ESTADO_ACTIVO_NUMERICO), numeroDocumentoBusqueda, nombreClienteBusqueda);
+		}
 		
 	}
 		

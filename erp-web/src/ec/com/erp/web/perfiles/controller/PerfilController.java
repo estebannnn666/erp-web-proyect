@@ -9,6 +9,7 @@ import javax.annotation.PostConstruct;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.ViewScoped;
+import javax.faces.context.FacesContext;
 import javax.faces.event.ActionEvent;
 
 import org.apache.commons.collections.CollectionUtils;
@@ -75,6 +76,9 @@ public class PerfilController extends CommonsController implements Serializable 
 			}
 		}
 		this.tipoPerfilCatalogoValorDTOCols = ERPFactory.catalogos.getCatalogoServicio().findObtenerCatalogoByTipo(ERPConstantes.CODIGO_CATALOGO_TIPOS_PERFILES);
+		if(FacesContext.getCurrentInstance().getViewRoot().getViewId().equals("/modules/perfiles/adminBusquedaPerfil.xhtml")) {
+			this.perfilDTOCols = ERPFactory.perfiles.getPerfilesServicio().findObtenerListaPerfiles(nombrePerfil);
+		}
 	}
 		
 	@Override
