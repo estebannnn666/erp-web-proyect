@@ -62,6 +62,7 @@ public class ModulosController extends CommonsController implements Serializable
 		{
 			this.setModuloDTO(modulosDataManager.getModuloDTOEditar());
 		}
+		this.moduloDTOCols = ERPFactory.modulos.getModuloServicio().findObtenerListaModulos(nombreModulo);
 	}
 		
 	@Override

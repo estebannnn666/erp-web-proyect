@@ -54,11 +54,15 @@
 	            </rich:column>
 	            <rich:column>
 	                <f:facet name="header"><h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.label.nuevo.pedidos.etiqueta.fechapedido']}"/></f:facet>
-	                <h:outputText value="#{pedido.fechaPedido}" />
+	                <h:outputText value="#{pedido.fechaPedido}">
+	                	<f:convertDateTime pattern="yyyy-MM-dd"/>
+	                </h:outputText>
 	            </rich:column>
 	            <rich:column>
 	                <f:facet name="header"><h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.label.nuevo.pedidos.etiqueta.fechaentrega']}"/></f:facet>
-	                <h:outputText value="#{pedido.fechaEntrega == null ? 'N/D' : pedido.fechaEntrega}" />
+	                <h:outputText value="#{pedido.fechaEntrega == null ? 'N/D' : pedido.fechaEntrega}">
+	                	<f:convertDateTime pattern="yyyy-MM-dd"/>
+	                </h:outputText>
 	            </rich:column>
 	            <rich:column>
 	                <f:facet name="header"><h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.label.nuevo.pedidos.etiqueta.estadoPedido']}"/></f:facet>

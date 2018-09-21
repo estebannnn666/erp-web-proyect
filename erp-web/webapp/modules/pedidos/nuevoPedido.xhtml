@@ -118,25 +118,32 @@
 				            </rich:column>
 				            <rich:column>
 				                <f:facet name="header"><h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.header.tabla.articulo.peso']}"/></f:facet>
-				                <h:inputText value="#{detalle.articuloDTO.peso}" disabled="true"/>
+				                <h:inputText style="text-align: right" value="#{detalle.articuloDTO.peso}" disabled="true">
+				                	<f:convertNumber pattern="0.00"/>
+				                </h:inputText>
 				            </rich:column>
 				            <rich:column>
 				                <f:facet name="header"><h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.header.tabla.articulo.stock']}"/></f:facet>
-				                <h:inputText value="#{detalle.articuloDTO.cantidadStock}" disabled="true" />
+				                <h:inputText style="text-align: right" value="#{detalle.articuloDTO.cantidadStock}" disabled="true" />
 				            </rich:column>
 				            <rich:column>
 				                <f:facet name="header"><h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.label.nuevo.pedidos.articulo.precio.unitario']}"/></f:facet>
-				                <h:inputText value="#{detalle.articuloDTO.precio}" disabled="true"/>
+				                <h:inputText style="text-align: right" value="#{detalle.articuloDTO.precio}" disabled="true">
+				                	<f:convertNumber pattern="0.00"/>
+				                </h:inputText>
 				            </rich:column>
 				            <rich:column style="text-align: right; paddin-right: 10px">
 				                <f:facet name="header"><h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.label.nuevo.pedidos.detalle.subtotal']}"/></f:facet>
-				                <h:outputText value="#{detalle.articuloDTO.precio * detalle.cantidad}" />
+				                <h:outputText value="#{detalle.articuloDTO.precio * detalle.cantidad}" >
+				                	<f:convertNumber pattern="0.00"/>
+				                </h:outputText>
 				            </rich:column>
 				            <f:facet name="footer">
 				                <rich:columnGroup>
 					                <rich:column colspan="8" style="text-align: right; paddin-right: 10px">Total:</rich:column>
 					                <rich:column style="text-align: right; paddin-right: 10px">
 					                    <h:outputText value="#{pedidosController.pedidoDTO.totalCompra}">
+					                    	<f:convertNumber pattern="0.00"/>
 					                    </h:outputText>
 					                </rich:column>
 					            </rich:columnGroup>

@@ -14,24 +14,24 @@
 			<rich:tabPanel>
 		        <rich:tab header="Gestion" rendered="#{not empty loginController.modulosGestionCols}">
 		        	<rich:dataGrid styleClass="estiloMenuDinamico" style="width:100% ; background-color: transparent; border: none;" value="#{loginController.modulosGestionCols}" var="modulo" columns="6" elements="18">
-						<!-- <h:panelGroup layout="block" styleClass="stylePrincipal #{modulo.estilo}">
+						<h:panelGroup layout="block" styleClass="stylePrincipal #{modulo.estilo}">
 							<a4j:commandLink styleClass="guardarA" action="#{modulo.url.toString()}"/>
-						</h:panelGroup> -->
-						
-						<h:panelGroup layout="block">
-							<a4j:commandLink styleClass="guardarA" action="#{modulo.url.toString()}" value="#{modulo.nombreModulo.toString()}"/>
 						</h:panelGroup>
+						
+						<!-- <h:panelGroup layout="block">
+							<a4j:commandLink styleClass="guardarA" action="#{modulo.url.toString()}" value="#{modulo.nombreModulo.toString()}"/>
+						</h:panelGroup> -->
     	   			</rich:dataGrid>
 		        </rich:tab>
 		        <rich:tab header="Administracion" rendered="#{not empty loginController.modulosAdministracionCols}">
 		        	<rich:dataGrid styleClass="estiloMenuDinamico" style="width:100% ; background-color: transparent; border: none;" value="#{loginController.modulosAdministracionCols}" var="modulo" columns="6" elements="18">
-						<!-- <h:panelGroup layout="block" styleClass="stylePrincipal #{modulo.estilo}">
+						<h:panelGroup layout="block" styleClass="stylePrincipal #{modulo.estilo}">
 							<a4j:commandLink styleClass="guardarA" action="#{modulo.url.toString()}"/>
-						</h:panelGroup> -->
-						
-						<h:panelGroup layout="block" >
-							<a4j:commandLink styleClass="guardarA" action="#{modulo.url.toString()}" value="#{modulo.nombreModulo.toString()}"/>
 						</h:panelGroup>
+						
+						<!-- <h:panelGroup layout="block" >
+							<a4j:commandLink styleClass="guardarA" action="#{modulo.url.toString()}" value="#{modulo.nombreModulo.toString()}"/>
+						</h:panelGroup> -->
     	   			</rich:dataGrid>
 		        </rich:tab>
 		    </rich:tabPanel>

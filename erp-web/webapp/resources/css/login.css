@@ -299,6 +299,7 @@ body {
     margin-left: 5em !important;
     margin-right: 5em !important;
     margin-bottom: 5em !important;
+    height: 85% !important;
 }
 
 .styleRichPanelMenu .rf-tab-hdr-tabs {
@@ -314,6 +315,14 @@ body {
 .styleRichPanelMenu .rf-tab-hdr-inact.rf-tab-hdr-top {
     vertical-align: middle !important;
 }
+
+.styleRichPanelMenu .rf-dg-c {
+    text-align: -webkit-center !important;
+}
+
+.styleRichPanelMenu .rf-tab-cnt {
+    background: #f2f7fe !important;
+}   
 
 .styleDivMenuLeft{
 	padding-right: 3px !important;
