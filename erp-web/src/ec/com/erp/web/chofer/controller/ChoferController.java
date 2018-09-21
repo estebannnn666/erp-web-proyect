@@ -10,6 +10,7 @@ import javax.annotation.PostConstruct;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.ViewScoped;
+import javax.faces.context.FacesContext;
 import javax.faces.event.ActionEvent;
 import javax.faces.event.AjaxBehaviorEvent;
 import javax.faces.event.ValueChangeEvent;
@@ -92,6 +93,9 @@ public class ChoferController extends CommonsController implements Serializable 
 			this.setContactoDTO(choferDataManager.getChoferDTOEditar().getPersonaDTO().getContactoPersonaDTO());
 			this.setTransportistaDTO(choferDataManager.getChoferDTOEditar().getTransportistaDTO());
 			this.documentoTransportista = this.transportistaDTO.getPersonaDTO() == null ? this.transportistaDTO.getEmpresaDTO().getNumeroRuc() : this.transportistaDTO.getPersonaDTO().getNumeroDocumento();
+		}
+		if(FacesContext.getCurrentInstance().getViewRoot().getViewId().equals("/modules/chofer/adminBusquedaChofer.xhtml")) {
+			this.choferDTOCols = ERPFactory.chofer.getChoferServicio().findObtenerListaChoferes(Integer.parseInt(ERPConstantes.ESTADO_ACTIVO_NUMERICO), numeroDocumentoBusqueda, nombreChoferBusqueda);
 		}
 	}
 		

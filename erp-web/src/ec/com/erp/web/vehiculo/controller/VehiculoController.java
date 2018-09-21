@@ -91,6 +91,9 @@ public class VehiculoController extends CommonsController implements Serializabl
 		this.transportistaDTOCols = new ArrayList<TransportistaDTO>();
 		this.page = 0;
 		this.tiposVehiculosCols = ERPFactory.catalogos.getCatalogoServicio().findObtenerCatalogoByTipo(ERPConstantes.CODIGO_CATALOGO_TIPOS_VEHICULOS);
+		if(FacesContext.getCurrentInstance().getViewRoot().getViewId().equals("/modules/vehiculo/adminBusquedaVehiculo.xhtml")) {
+			this.vehiculoDTOCols = ERPFactory.vehiculo.getVehiculoServicio().findObtenerListaVehiculos(Integer.parseInt(ERPConstantes.ESTADO_ACTIVO_NUMERICO), placaBusqueda, numeroDocumentoBusqueda, nombreTransportistaBusqueda);
+		}
 	}
 		
 	@Override

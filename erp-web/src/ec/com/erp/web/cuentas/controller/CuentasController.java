@@ -118,6 +118,10 @@ public class CuentasController extends CommonsController implements Serializable
 			this.setFacturaCabeceraDTO(cuentasDataManager.getFacturaCabeceraDTOEditar());
 			this.setFacturaDetalleDTOCols(cuentasDataManager.getFacturaCabeceraDTOEditar().getFacturaDetalleDTOCols());
 		}
+		
+		if(FacesContext.getCurrentInstance().getViewRoot().getViewId().equals("/modules/facturas/adminBusquedaCuentas.xhtml")) {
+			this.facturaCabeceraDTOCols = ERPFactory.facturas.getFacturaCabeceraServicio().findObtenerListaFacturas(Integer.parseInt(ERPConstantes.ESTADO_ACTIVO_NUMERICO), numeroFactura, null, null, docClienteProveedor, nombClienteProveedor, pagado, tipoDocumento);
+		}
 	}
 		
 	@Override
