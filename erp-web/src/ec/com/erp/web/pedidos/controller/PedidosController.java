@@ -86,6 +86,9 @@ public class PedidosController extends CommonsController implements Serializable
 	private String value;
 	private Integer contDetalle;
 	private Boolean pedidoGuardado;
+	private String mensaje;
+	private String valorAccion;
+	private Boolean mostrarIcono;
 
 	@PostConstruct
 	public void postConstruct() {
@@ -448,6 +451,40 @@ public class PedidosController extends CommonsController implements Serializable
 	}
 	
 	/**
+	 * Metodo para cargar datos del pedido a cancelar o entregar
+	 * @return
+	 */
+	public void cargarDatosPedido(ActionEvent e) {
+		String nombreComponente = e.getComponent().getClientId();
+		if(nombreComponente.contains("btnEntregar")){
+			this.mensaje = ERPWebResources.getString("ec.com.erp.etiqueta.mensaje.confirmacion.estado.entregado");
+			this.mostrarIcono = Boolean.TRUE;
+		}
+		else{
+			this.mensaje = ERPWebResources.getString("ec.com.erp.etiqueta.mensaje.confirmacion.estado.cancelar");
+			this.mostrarIcono = Boolean.FALSE;
+		}
+	}
+	
+	/**
+	 * Metodo para cargar datos detalle
+	 * @return
+	 */
+	public void actualizarEstadoPedido(ActionEvent e) {
+		try {
+			ERPFactory.estadopedido.getEstadoPedidoServicio().transActualizarEstadoPorEstadoyPedido(loginController.getUsuariosDTO().getCodigoCompania(), this.pedidoDTO.getId().getCodigoPedido(), this.valorAccion, loginController.getUsuariosDTO().getId().getUserId());
+			this.setShowMessagesBar(Boolean.TRUE);
+	        MensajesController.addInfo(null, ERPWebResources.getString("ec.com.erp.etiqueta.mensaje.informacion.estado.actualizado"));
+		} catch (ERPException e1) {
+			this.setShowMessagesBar(Boolean.TRUE);
+	        MensajesController.addError(null, e1.getMessage());
+		} catch (Exception e2) {
+			this.setShowMessagesBar(Boolean.TRUE);
+	        MensajesController.addError(null, e2.getMessage());
+		}
+	}
+	
+	/**
 	 * Metodo para cargar datos detalle
 	 * @return
 	 */
@@ -743,4 +780,29 @@ public class PedidosController extends CommonsController implements Serializable
 	public void setPedidoGuardado(Boolean pedidoGuardado) {
 		this.pedidoGuardado = pedidoGuardado;
 	}
+
+	public String getMensaje() {
+		return mensaje;
+	}
+
+	public void setMensaje(String mensaje) {
+		this.mensaje = mensaje;
+	}
+
+	public String getValorAccion() {
+		return valorAccion;
+	}
+
+	public void setValorAccion(String valorAccion) {
+		this.valorAccion = valorAccion;
+	}
+
+	public Boolean getMostrarIcono() {
+		return mostrarIcono;
+	}
+
+	public void setMostrarIcono(Boolean mostrarIcono) {
+		this.mostrarIcono = mostrarIcono;
+	}
+	
 }

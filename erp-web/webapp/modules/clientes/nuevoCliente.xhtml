@@ -54,22 +54,22 @@
 				 		
 				 		<h:outputText class="styleNegritas" value="#{msg_erpweb['ec.com.erp.etiqueta.label.nuevo.cliente.primer.apellido']}: *" />
 				 		<h:inputText class="styleUpperCase" style="background-color:#f9f9d5; background-image: none; width:260px" value="#{clientesController.personaDTO.primerApellido}" id="primerApellido">
-				 			<f:ajax render="nombreCompleto" event="keyup" execute="@this" listener="#{clientesController.concatenarNombrePersona}"></f:ajax>
+				 			<a4j:ajax render="nombreCompleto" event="keyup" execute="@this" status="no" listener="#{clientesController.concatenarNombrePersona}"  oncomplete="fijarFoco('primerApellido');"></a4j:ajax>
 				 		</h:inputText>
 				 		<div style="width:20px"></div>
 				 		<h:outputText class="styleNegritas" value="#{msg_erpweb['ec.com.erp.etiqueta.label.nuevo.cliente.segundo.apellido']}: " />
 				 		<h:inputText class="styleUpperCase" style="width:260px" value="#{clientesController.personaDTO.segundoApellido}" id="segundoApellido" required="false">
-				 			<f:ajax render="nombreCompleto" event="keyup" execute="@this" listener="#{clientesController.concatenarNombrePersona}"></f:ajax>
+				 			<a4j:ajax render="nombreCompleto" event="keyup" execute="@this" status="no" listener="#{clientesController.concatenarNombrePersona}"  oncomplete="fijarFoco('segundoApellido');"></a4j:ajax>
 				 		</h:inputText>
 				 		
 				 		<h:outputText class="styleNegritas" value="#{msg_erpweb['ec.com.erp.etiqueta.label.nuevo.cliente.primer.nombre']}: *" />
 				 		<h:inputText class="styleUpperCase" style="background-color:#f9f9d5; background-image: none; width:260px" value="#{clientesController.personaDTO.primerNombre}" id="primerNombre">
-				 			<f:ajax render="nombreCompleto" event="keyup" execute="@this" listener="#{clientesController.concatenarNombrePersona}"></f:ajax>
+				 			<a4j:ajax render="nombreCompleto" event="keyup" execute="@this" status="no" listener="#{clientesController.concatenarNombrePersona}"  oncomplete="fijarFoco('primerNombre');"></a4j:ajax>
 				 		</h:inputText>
 				 		<div style="width:20px"></div>
 				 		<h:outputText class="styleNegritas" value="#{msg_erpweb['ec.com.erp.etiqueta.label.nuevo.cliente.segundo.nombre']}: " />
 				 		<h:inputText class="styleUpperCase" style="width:260px" value="#{clientesController.personaDTO.segundoNombre}" id="segundoNombre" required="false">
-				 			<f:ajax render="nombreCompleto" event="keyup" execute="@this" listener="#{clientesController.concatenarNombrePersona}"></f:ajax>
+				 			<a4j:ajax render="nombreCompleto" event="keyup" execute="@this" status="no" listener="#{clientesController.concatenarNombrePersona}"  oncomplete="fijarFoco('segundoNombre');"></a4j:ajax>
 				 		</h:inputText>
 				 	</h:panelGrid>
 				 	
@@ -105,17 +105,17 @@
 			 		
 			 		<h:outputText class="styleNegritas" value="#{msg_erpweb['ec.com.erp.etiqueta.label.nuevo.cliente.contacto.calle.principal']}: *" />
 			 		<h:inputText class="styleUpperCase" style="background-color:#f9f9d5; background-image: none; width:260px" value="#{clientesController.contactoDTO.callePrincipal}" id="callePrincipal">
-			 			<f:ajax render="direccion" event="keyup" execute="@this" listener="#{clientesController.concatenarDireccion}"></f:ajax>
+			 			<a4j:ajax render="direccion" event="keyup" execute="@this" status="no" listener="#{clientesController.concatenarDireccion}"  oncomplete="fijarFoco('callePrincipal');"></a4j:ajax>
 			 		</h:inputText>
 			 		<div style="width:20px"></div>
 			 		<h:outputText class="styleNegritas" value="#{msg_erpweb['ec.com.erp.etiqueta.label.nuevo.cliente.contacto.numero.casa']}: *" />
 			 		<h:inputText class="styleUpperCase" style="background-color:#f9f9d5; background-image: none; width:260px" value="#{clientesController.contactoDTO.numeroCasa}" id="numeroCasa">
-			 			<f:ajax render="direccion" event="keyup" execute="@this" listener="#{clientesController.concatenarDireccion}"></f:ajax>
+			 			<a4j:ajax render="direccion" event="keyup" execute="@this" status="no" listener="#{clientesController.concatenarDireccion}"  oncomplete="fijarFoco('numeroCasa');"></a4j:ajax>
 			 		</h:inputText>
 			 		
 			 		<h:outputText class="styleNegritas" value="#{msg_erpweb['ec.com.erp.etiqueta.label.nuevo.cliente.contacto.calle.secundaria']}:" />
 			 		<h:inputText class="styleUpperCase" style="width:260px" value="#{clientesController.contactoDTO.calleSecundaria}" id="calleSecundaria">
-			 			<f:ajax render="direccion" event="keyup" execute="@this" listener="#{clientesController.concatenarDireccion}"></f:ajax>
+			 			<a4j:ajax render="direccion" event="keyup" execute="@this" status="no" listener="#{clientesController.concatenarDireccion}"  oncomplete="fijarFoco('calleSecundaria');"></a4j:ajax>
 			 		</h:inputText>
 			 		<div style="width:20px"></div>
 			 		<h:outputText class="styleNegritas" value="#{msg_erpweb['ec.com.erp.etiqueta.label.nuevo.cliente.contacto.referencia']}: " />
@@ -183,6 +183,19 @@
 				width: 135px !important;
 			}	
 		</h:outputStylesheet>
+		
+		<script type="text/javascript">
+			/*<![CDATA[*/								
+				function fijarFoco(classInput) {
+					try {
+						var idComponente = 'frmNuevoCliente:'+classInput;
+						element = document.getElementById(idComponente);
+						var lenghtInput = $(element).val();
+						setCursor(element,lenghtInput.length,lenghtInput.length);
+					}catch (e) {}
+				}
+			/*]]>*/
+		</script>
 	</ui:define>
 	
 </ui:composition>

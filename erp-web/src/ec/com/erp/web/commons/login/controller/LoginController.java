@@ -32,7 +32,7 @@ import ec.com.erp.web.commons.utils.ERPWebResources;
 /**
  * Simple login bean.
  * 
- * @author itcuties
+ * @author egudino
  */
 @ManagedBean
 @SessionScoped

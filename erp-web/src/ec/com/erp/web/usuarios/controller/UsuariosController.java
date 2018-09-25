@@ -128,6 +128,7 @@ public class UsuariosController extends CommonsController implements Serializabl
 		try {
 			this.setUsuarioCreado(Boolean.FALSE);
 			if(this.validarPantallaUsuarios()) { 
+				usuarioDTO.setCodigoCompania(loginController.getUsuariosDTO().getCodigoCompania());
 				ERPFactory.usuarios.getUsuariosServicio().transGuardarActualizarUsuarios(usuarioDTO);
 				this.setUsuarioCreado(Boolean.TRUE);
 		        this.setShowMessagesBar(Boolean.TRUE);
