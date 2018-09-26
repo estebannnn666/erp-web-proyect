@@ -4,6 +4,8 @@ package ec.com.erp.web.perfiles.controller;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 
 import javax.annotation.PostConstruct;
 import javax.faces.bean.ManagedBean;
@@ -242,8 +244,20 @@ public class PerfilController extends CommonsController implements Serializable 
 					moduloPerfilDTO.getId().setCodigoModulo(moduloDTO.getId().getCodigoModulo());
 					moduloPerfilDTO.setModuloDTO(moduloDTO);
 					this.modulosDTOAsignadosCols.add(moduloPerfilDTO);
+					this.desactivarSeleccionoModulosQuitados(moduloPerfilDTO.getId().getCodigoModulo());
 				}
 			}
+			ArrayList<ModuloPerfilDTO> moduloPerfilDTOCols = new ArrayList<ModuloPerfilDTO>();
+			moduloPerfilDTOCols.addAll(modulosDTOAsignadosCols);
+			Collections.sort(moduloPerfilDTOCols, new Comparator<ModuloPerfilDTO>() {
+				@Override
+				public int compare(ModuloPerfilDTO p1, ModuloPerfilDTO p2) {
+					return new Integer(p1.getModuloDTO().getOrden()).compareTo(new Integer(p2.getModuloDTO().getOrden()));
+				}
+			});
+			
+			modulosDTOAsignadosCols = new ArrayList<ModuloPerfilDTO>();
+			modulosDTOAsignadosCols.addAll(moduloPerfilDTOCols);
 		}
 		else {
 			this.setShowMessagesBar(Boolean.TRUE);
@@ -260,7 +274,7 @@ public class PerfilController extends CommonsController implements Serializable 
 			Collection<ModuloPerfilDTO> moduloPerfilDTOTem = new ArrayList<ModuloPerfilDTO>();
 			for(ModuloPerfilDTO moduloPerfilDTO: modulosDTOAsignadosCols) {
 				if(moduloPerfilDTO.getSeleccionado() != null && moduloPerfilDTO.getSeleccionado()) {
-					this.desactivarSeleccionoModulosQuitados(moduloPerfilDTO.getId().getCodigoModulo());
+					this.activarSeleccionoModulosQuitados(moduloPerfilDTO.getId().getCodigoModulo());
 				}else {
 					moduloPerfilDTOTem.add(moduloPerfilDTO);
 				}
@@ -280,7 +294,20 @@ public class PerfilController extends CommonsController implements Serializable 
 	public void desactivarSeleccionoModulosQuitados(Long codigoModulo) {
 		for(ModuloDTO moduloDTO: modulosDTOCols) {
 			if(moduloDTO.getId().getCodigoModulo().longValue() == codigoModulo.longValue()) {
-				moduloDTO.setSeleccionado(Boolean.FALSE);
+				moduloDTO.setMostrarPerfil(Boolean.FALSE);
+				break;
+			}
+		}
+	}
+	
+	/**
+	 * Metodo para desactivar seleccion
+	 * @param codigoModulo
+	 */
+	public void activarSeleccionoModulosQuitados(Long codigoModulo) {
+		for(ModuloDTO moduloDTO: modulosDTOCols) {
+			if(moduloDTO.getId().getCodigoModulo().longValue() == codigoModulo.longValue()) {
+				moduloDTO.setMostrarPerfil(Boolean.TRUE);
 				break;
 			}
 		}
@@ -294,7 +321,7 @@ public class PerfilController extends CommonsController implements Serializable 
 		Boolean resultado =  Boolean.FALSE;
 		if(CollectionUtils.isNotEmpty(modulosDTOCols)) {
 			for(ModuloDTO moduloDTO: modulosDTOCols) {
-				if(moduloDTO.getSeleccionado()) {
+				if(moduloDTO.getSeleccionado() != null && moduloDTO.getSeleccionado()) {
 					resultado = Boolean.TRUE;
 					break;
 				}
@@ -311,7 +338,7 @@ public class PerfilController extends CommonsController implements Serializable 
 		Boolean resultado =  Boolean.FALSE;
 		if(CollectionUtils.isNotEmpty(modulosDTOAsignadosCols)) {
 			for(ModuloPerfilDTO moduloPerfilDTO: modulosDTOAsignadosCols) {
-				if(moduloPerfilDTO.getSeleccionado()) {
+				if(moduloPerfilDTO.getSeleccionado() != null && moduloPerfilDTO.getSeleccionado()) {
 					resultado = Boolean.TRUE;
 					break;
 				}

@@ -58,7 +58,7 @@
 						<rich:dataTable style="width:100%" rendered="#{not empty perfilController.modulosDTOCols}" value="#{perfilController.modulosDTOCols}" var="module" iterationStatusVar="it" id="tableModulos" rows="5">
 				            <rich:column>
 				                <f:facet name="header">Sel.</f:facet>
-				                <h:selectBooleanCheckbox rendered="#{!module.seleccionado}" id="myCheck" value="#{module.seleccionado}">
+				                <h:selectBooleanCheckbox rendered="#{module.mostrarPerfil}" id="myCheck" value="#{module.seleccionado}">
 				                </h:selectBooleanCheckbox>
 				            </rich:column>
 				            <rich:column>
