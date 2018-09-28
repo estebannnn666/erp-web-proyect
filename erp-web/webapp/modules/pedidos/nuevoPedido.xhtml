@@ -100,21 +100,18 @@
 				                </h:inputText>
 				            </rich:column>			            
 				            <rich:column>
-				                <f:facet name="header"><h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.header.tabla.detalle.articulo']}"/></f:facet>
-				                <rich:autocomplete id="codBarras" style="width:200px" value="#{detalle.articuloDTO.codigoBarras}" mode="client" var="cap" 
-				                				   fetchValue="#{cap.codigoBarras}" layout="div" autocompleteList="#{pedidosController.articuloDTOCols}">	
+				                <f:facet name="header"><h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.header.tabla.descripcion.articulo']}"/></f:facet>
+				                <rich:autocomplete id="codBarras" style="width:200px" value="#{detalle.articuloDTO.nombreArticulo}" mode="client" var="cap" 
+				                				   fetchValue="#{cap.nombreArticulo}" layout="div" autocompleteList="#{pedidosController.articuloDTOCols}">	
 				                	<a4j:ajax event="change" execute="@this" render="pnlGridDetallePedido" listener="#{pedidosController.asignarValoresArticulo}"></a4j:ajax>
-						            <rich:column>
-						                <b>#{cap.codigoBarras}</b>
-						            </rich:column>
 						            <rich:column>
 						                <b>#{cap.nombreArticulo}</b> 
 						            </rich:column>
 						        </rich:autocomplete>
 				            </rich:column>
 				            <rich:column>
-				                <f:facet name="header"><h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.header.tabla.descripcion.articulo']}"/></f:facet>
-				                <h:inputText value="#{detalle.articuloDTO.nombreArticulo == null ? 'N/D' : detalle.articuloDTO.nombreArticulo}" disabled="true"/>
+				                <f:facet name="header"><h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.header.tabla.codigo.barras']}"/></f:facet>
+				                <h:inputText value="#{detalle.articuloDTO.codigoBarras == null ? 'N/D' : detalle.articuloDTO.codigoBarras}" disabled="true"/>
 				            </rich:column>
 				            <rich:column>
 				                <f:facet name="header"><h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.header.tabla.articulo.peso']}"/></f:facet>
@@ -297,12 +294,12 @@
 
 				function fijarFocoDetalleCantidad(classInput) {
 					try {
-						debugger;
 						element = document.getElementById(classInput);
 						var lenghtInput = $(element).val();
 						setCursor(element,lenghtInput.length,lenghtInput.length);
 					}catch (e) {}
 				}
+
 			/*]]>*/
 		</script>
 		

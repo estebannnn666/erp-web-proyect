@@ -219,7 +219,7 @@ public class PedidosController extends CommonsController implements Serializable
 				// Se busca el artculo con el codigo de barras seleccionado para asignar el resto de informacion del articulo
 				ArticuloDTO articuloDTOTemp = new ArticuloDTO();
 				for(ArticuloDTO articuloDTOSearch : this.articuloDTOCols) {
-					if(detallePedidoDTO.getArticuloDTO().getCodigoBarras().equals(articuloDTOSearch.getCodigoBarras())) {
+					if(detallePedidoDTO.getArticuloDTO().getNombreArticulo().equals(articuloDTOSearch.getNombreArticulo())) {
 						articuloDTOTemp.setCantidadStock(articuloDTOSearch.getCantidadStock());
 						articuloDTOTemp.setCodigoBarras(articuloDTOSearch.getCodigoBarras());
 						articuloDTOTemp.setNombreArticulo(articuloDTOSearch.getNombreArticulo());
