@@ -19,6 +19,13 @@ import javax.faces.context.FacesContext;
 import javax.faces.event.ActionEvent;
 import javax.faces.event.AjaxBehaviorEvent;
 import javax.faces.event.ValueChangeEvent;
+import javax.print.Doc;
+import javax.print.DocFlavor;
+import javax.print.DocPrintJob;
+import javax.print.PrintException;
+import javax.print.PrintService;
+import javax.print.PrintServiceLookup;
+import javax.print.SimpleDoc;
 
 import org.apache.commons.beanutils.BeanPredicate;
 import org.apache.commons.collections.CollectionUtils;
@@ -533,11 +540,22 @@ public class CuentasController extends CommonsController implements Serializable
 	public void imprimirListaFacturas() {
 		HtmlPdf htmltoPDF;
 		try {
+			PrintService printService = PrintServiceLookup.lookupDefaultPrintService();
+	 
+			DocFlavor flavor = DocFlavor.BYTE_ARRAY.AUTOSENSE;
+			DocPrintJob docPrintJob = printService.createPrintJob();
+			
 			// Plantilla rpincipal que permite la conversion de xsl a pdf
 			htmltoPDF = new HtmlPdf(ERPConstantes.PLANTILLA_XSL_FOPRINCIPAL);
 			HashMap<String , String> parametros = new HashMap<String, String>();
 			byte contenido[] = htmltoPDF.convertir(ERPFactory.facturas.getFacturaCabeceraServicio().finObtenerXMLReporteFacturas(facturaCabeceraDTOCols).replace("<?xml version=\"1.0\" encoding=\"UTF-8\"?>", ""), "", "",	parametros,	null);
-			UtilitarioWeb.mostrarPDF(contenido);				
+//			UtilitarioWeb.mostrarPDF(contenido);
+			
+			Doc doc = new SimpleDoc(contenido, flavor, null);
+			docPrintJob.print(doc, null);
+			
+		} catch (PrintException e) {
+			e.printStackTrace();
 		} catch (Exception e) {
 			this.setShowMessagesBar(Boolean.TRUE);
 			MensajesController.addError(null, "Error al imprimir");
@@ -551,6 +569,21 @@ public class CuentasController extends CommonsController implements Serializable
 //		HtmlPdf htmltoPDF;
 		try {
 			if(this.validarInformacionRequerida()) {
+				
+				String texto = "Esto es lo que va a la impresora";
+				 
+				PrintService printService = PrintServiceLookup.lookupDefaultPrintService();
+		 
+				DocFlavor flavor = DocFlavor.BYTE_ARRAY.AUTOSENSE;
+				DocPrintJob docPrintJob = printService.createPrintJob();
+				Doc doc = new SimpleDoc(texto.getBytes(), flavor, null);
+				try {
+					docPrintJob.print(doc, null);
+				} catch (PrintException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				
 				// Plantilla rpincipal que permite la conversion de xsl a pdf
 //				htmltoPDF = new HtmlPdf(ERPConstantes.PLANTILLA_XSL_FOPRINCIPAL);
 //				HashMap<String , String> parametros = new HashMap<String, String>();
