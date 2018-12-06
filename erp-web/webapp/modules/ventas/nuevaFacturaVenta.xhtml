@@ -33,7 +33,9 @@
 					
 					
 					<h:outputText class="styleNegritas" value="#{msg_erpweb['ec.com.erp.etiqueta.label.lista.cabecera.factura.ruc.documento']}: *" />
-					<h:inputText style="width:150px" value="#{cuentasController.facturaCabeceraDTO.rucDocumento}" id="docClienteProveedor" maxlength="13" onkeypress="return validarEnteros(event);"/>
+					<h:inputText style="width:150px" value="#{cuentasController.facturaCabeceraDTO.rucDocumento}" id="docClienteProveedor" maxlength="13" onkeypress="if (event.keyCode == 13) return false; return validarEnteros(event);">
+						<a4j:ajax event="keyup" execute="pnlGridVentas" listener="#{cuentasController.realizarConsultaClientes}" onbeforesubmit="return verifyKeyEnter(event);" render="pnlGridVentas, pnlMensajes"/>
+					</h:inputText>
 					<h:panelGroup layout="block" styleClass="botonB" style="margin-top:5px;">
 						<a4j:commandLink oncomplete="#{rich:component('mpClientes')}.show(); " styleClass="botonBuscar" actionListener="#{cuentasController.busquedaClientes}" render="pnlListaClientes tableClientes" execute="@this, pnlGridVentas" title="Click para buscar clientes">							
 						</a4j:commandLink>	

@@ -13,6 +13,7 @@ import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
 import javax.faces.event.ActionEvent;
+import javax.faces.event.AjaxBehaviorEvent;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -61,12 +62,16 @@ public class PerfilController extends CommonsController implements Serializable 
 
 	@PostConstruct
 	public void postConstruct() {
+		this.loginController.activarMenusSeleccionado();
 		this.perfilCreado = Boolean.FALSE;
 		this.perfilDTO = new PerfilDTO();
 		this.page = 0;
 		modulosDTOCols = new ArrayList<ModuloDTO>();
 		modulosDTOAsignadosCols = new ArrayList<ModuloPerfilDTO>();
 		this.modulosDTOCols = ERPFactory.modulos.getModuloServicio().findObtenerListaModulosActivos(null);
+		for(ModuloDTO moduloDTO: modulosDTOCols) {
+			moduloDTO.setMostrarPerfil(Boolean.TRUE);
+		}
 		if(perfilDataManager.getPerfilDTOEditar() != null && perfilDataManager.getPerfilDTOEditar().getId().getCodigoPerfil() != null)
 		{
 			this.setPerfilDTO(perfilDataManager.getPerfilDTOEditar());
@@ -103,6 +108,22 @@ public class PerfilController extends CommonsController implements Serializable 
 	 * @param e
 	 */
 	public void busquedaPerfiles(ActionEvent e){
+		this.buscarPerfiles();
+	}
+	
+	/**
+	 * Metodo para buscar modulos enter
+	 * @param e
+	 */
+	public void busquedaPerfilesEnter(AjaxBehaviorEvent e){
+		this.buscarPerfiles();
+	}
+	
+	/**
+	 * Metodo para buscar modulos
+	 * @param e
+	 */
+	public void buscarPerfiles(){
 		try {
 			this.perfilDTOCols = ERPFactory.perfiles.getPerfilesServicio().findObtenerListaPerfiles(nombrePerfil);
 			if(CollectionUtils.isEmpty(this.perfilDTOCols)){
@@ -228,6 +249,8 @@ public class PerfilController extends CommonsController implements Serializable 
 	 * @return
 	 */
 	public String regresarMenuPrincipal(){
+		this.loginController.desActivarMenusSeleccionado();
+		this.loginController.setActivarInicio(Boolean.TRUE);
 		return "/modules/principal/menu.xhtml?faces-redirect=true";
 	}
 	

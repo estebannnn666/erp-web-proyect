@@ -11,6 +11,7 @@ import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
 import javax.faces.event.ActionEvent;
+import javax.faces.event.AjaxBehaviorEvent;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -55,6 +56,7 @@ public class ArticulosController extends CommonsController implements Serializab
 
 	@PostConstruct
 	public void postConstruct() {
+		this.loginController.activarMenusSeleccionado();
 		this.articuloCreado = Boolean.FALSE;
 		this.modoEdicion = Boolean.FALSE;
 		this.articuloDTO = new ArticuloDTO();
@@ -89,6 +91,14 @@ public class ArticulosController extends CommonsController implements Serializab
 	 * @param e
 	 */
 	public void busquedaArticulos(ActionEvent e){
+		this.buscarArticulos();
+	}
+	
+	public void busquedaArticulosEnter(AjaxBehaviorEvent e){
+		this.buscarArticulos();
+	}
+	
+	public void buscarArticulos(){
 		try {
 			this.articuloDTOCols = ERPFactory.articulos.getArticuloServicio().findObtenerListaArticulos(Integer.parseInt(ERPConstantes.ESTADO_ACTIVO_NUMERICO), codigoBarrasBusqueda,nombreArticuloBusqueda);
 			if(CollectionUtils.isEmpty(this.articuloDTOCols)){
@@ -254,6 +264,8 @@ public class ArticulosController extends CommonsController implements Serializab
 	 * @return
 	 */
 	public String regresarMenuPrincipal(){
+		this.loginController.desActivarMenusSeleccionado();
+		this.loginController.setActivarInicio(Boolean.TRUE);
 		return "/modules/principal/menu.xhtml?faces-redirect=true";
 	}
 	

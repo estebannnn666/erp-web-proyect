@@ -1,0 +1,91 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:h="http://java.sun.com/jsf/html"
+    xmlns:f="http://java.sun.com/jsf/core"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:a4j="http://richfaces.org/a4j"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:rich="http://richfaces.org/rich"
+	xmlns:c="http://java.sun.com/jsp/jstl/core">
+
+	<div id="verticalMen">
+		<ul>
+			<!-- Datos generales -->
+			<h:panelGroup rendered="#{loginController.activarInicio}">
+				<li class="style-menu-select nivel1 menu-seleccionado" >
+					<a4j:commandLink styleClass="nivel1 guardarA">
+						<table>
+							<tr>
+								<td width="5" height="30" style="background-color: #27AE61"></td>
+								<td style="padding: 5px">
+									<h:graphicImage value="#{resource['images/home.png']}" height="24" width="24"/>
+								</td>
+								<td width="3" height="30" style="background-color: #F5F5F5"></td>
+								<td style="padding-left: 5px"><i class="size-image-menu-selected fa fa-home"></i></td>
+								<td style="padding-left: 10px; font-weight: bold; color: #ecf0f1;">INICIO</td>
+							</tr>
+						</table>
+					</a4j:commandLink>
+				</li>
+			</h:panelGroup>
+			<h:panelGroup rendered="#{!loginController.activarInicio}">
+				<li class="style-menu-select nivel1 menu-no-seleccionado">	
+					<a4j:commandLink styleClass="guardarA" action="#{loginController.redirectToWelcome}">
+						<table> 
+							<tr>
+								<td width="5" height="30" style="background-color: #27AE61"></td>
+								<td style="padding: 5px">
+									<h:graphicImage value="#{resource['images/home.png']}" height="24" width="24"/>
+								</td>
+								<td width="3" height="30" style="background-color: #E9E9E9"></td>
+								<td style="padding-left: 5px"><i class="size-image-menu fa fa-home"></i></td>
+								<td style="padding-left: 10px;">INICIO</td>
+							</tr>
+						</table>
+					</a4j:commandLink>
+				</li>
+			</h:panelGroup>
+			<ui:repeat var="modulo" value="#{loginController.modulosGestionCols}" varStatus="status">
+				<h:panelGroup rendered="#{!modulo.menuActivo}">
+					<li class="style-menu-select nivel1 menu-no-seleccionado">
+						<a4j:commandLink execute="@this" styleClass="guardarA" action="#{modulo.url.toString()}" actionListener="#{loginController.desActivarMenusSeleccionado}" render="verticalMen" status="si">
+							<table> 
+								<tr>
+									<td width="5" height="30" style="background-color: #27AE61"></td>
+									<td style="padding: 5px">
+										<h:panelGroup layout="block" styleClass="style-common #{modulo.estilo}">
+										</h:panelGroup>
+									</td>
+									<td width="3" height="30" style="background-color: #E9E9E9"></td>
+									<td style="padding-left: 5px"><i class="size-image-menu fa fa-home"></i></td>
+									<td style="padding-left: 10px;">#{modulo.nombreModulo.toString()}</td>
+								</tr>
+							</table>
+							<f:setPropertyActionListener value="true" target="#{modulo.menuActivo}"></f:setPropertyActionListener>
+							<f:setPropertyActionListener value="#{modulo.id.codigoModulo}" target="#{loginController.codigoModulo}"></f:setPropertyActionListener>
+						</a4j:commandLink>
+					</li>
+				</h:panelGroup>
+				<h:panelGroup rendered="#{modulo.menuActivo}">
+					<li class="style-menu-select nivel1 menu-seleccionado" >
+						<a4j:commandLink styleClass="nivel1 guardarA" render="verticalMen" status="si">
+							<table>
+								<tr>
+									<td width="5" height="30" style="background-color: #27AE61"></td>
+									<td style="padding: 5px">
+										<h:panelGroup layout="block" styleClass="style-common #{modulo.estilo}">
+										</h:panelGroup>
+									</td>
+									<td width="3" height="30" style="background-color: #F5F5F5"></td>
+									<td style="padding-left: 5px"><i class="size-image-menu-selected fa fa-home"></i></td>
+									<td style="padding-left: 10px; font-weight: bold; color: #ecf0f1;">#{modulo.nombreModulo.toString()}</td>
+								</tr>
+							</table>
+							<f:setPropertyActionListener value="true" target="#{modulo.menuActivo}"></f:setPropertyActionListener>
+							<f:setPropertyActionListener value="#{modulo.id.codigoModulo}" target="#{loginController.codigoModulo}"></f:setPropertyActionListener>
+						</a4j:commandLink>
+					</li>
+				</h:panelGroup>
+	   		</ui:repeat>
+		</ul>
+	</div>
+</ui:composition>

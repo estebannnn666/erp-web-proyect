@@ -1,0 +1,93 @@
+<!DOCTYPE html PUBLIC
+ "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" 
+	xmlns:h="http://java.sun.com/jsf/html" 
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets" 
+	xmlns:a4j="http://richfaces.org/a4j" 
+	xmlns:rich="http://richfaces.org/rich">
+<f:view contentType="text/html">
+	<h:head>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+		<meta http-equiv="Expires" content="0" />
+		<meta http-equiv="Pragma" content="no-cache" />
+		<meta http-equiv="cache-control" content="no-cache, no-store, must-revalidate" />
+		<meta http-equiv="Expires" content="Mon, 01 Jan 1990 00:00:01 GMT" />
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+		<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+		<meta http-equiv="Pragma" content="no-cache" />
+		<meta http-equiv="Expires" content="-1"/>
+		
+		<h:outputScript library="js" name="common.js"/>
+		<h:outputScript library="primefaces" name="jquery/jquery.js" target="head" />
+		<h:outputScript library="primefaces" name="jquery/jquery-plugins.js" target="head" />
+		
+		<script language="Javascript">
+			document.oncontextmenu = function(){return false}
+			window.history.forward(0);
+		</script>
+	</h:head>
+	<h:body>
+		<h:form id="#{idForm}">
+			<!-- Insertar el contenido de la cabecera -->
+			<h:panelGroup id="header" layout="block">
+				<div id="topBusqueda">
+					<div align="left" style="float: left; width:17.9%; border-right: 1px solid #a6a6a6; border-right-style: dashed;">
+						<h:panelGrid columns="2">
+							<h:panelGrid columns="1">
+								<h:graphicImage value="#{resource['images/erp.png']}" height="60" width="60"/>
+							</h:panelGrid>
+							<h:panelGrid columns="1">
+								<h:outputLabel style="font-size: 26px; color: #19426a; font-weight: bold; font-family: sans-serif;" value="SGPYMES" /> 
+								<!-- <h:outputLabel style="font-size: 17px; font-weight: bold; font-family: cursive; color: #4a4b4c;" value="#{loginController.usuariosDTO.companiaDTO.nombreCompania}" />-->
+							</h:panelGrid>
+						</h:panelGrid>			
+					</div>
+					<div align="right" style="float: right; width:82%" class="panelToolBar">
+						<rich:toolbar height="36" itemSeparator="line" itemStyle="width:2px">
+							<ui:insert name="header">
+							</ui:insert>
+					    	
+					    	<rich:toolbarGroup location="right">
+					    		<h:panelGroup layout="block" styleClass="botonLargeComun">
+									<a4j:commandLink value="#{loginController.usuariosDTO.nombreUsuario}" styleClass="botonUsuario"/>
+								</h:panelGroup>
+					    	</rich:toolbarGroup>
+					    	<rich:toolbarGroup location="right">
+								<h:panelGroup layout="block" styleClass="botonLargeComun">
+									<a4j:commandLink value="#{msg_erpweb['ec.com.erp.etiqueta.boton.cerrar.session']}" styleClass="botonCerrar" action="#{loginController.doLogout}"/>
+								</h:panelGroup>
+							</rich:toolbarGroup>
+						</rich:toolbar>
+					</div>
+				</div>
+			</h:panelGroup>
+			<!-- Insertar el contenido central -->
+			<div id="contenedorPrincipal">
+				<div id="contentLeft" class="styleDivMenuBusquedasLeft">
+					<ui:include src="/templates/main/menuleft.xhtml" />
+				</div>
+				<div id="contentRigth" class="styleDivMenuBusquedasRigth">
+					<ui:insert name="contentCenter">
+					</ui:insert>
+				</div>
+			</div>
+			<!-- Insertar el contenido del menu inferior -->
+			<h:panelGroup layout="block"  style="padding:0px;overflow:hidden;border:0px">
+				<div  id="bottom">
+					<ui:insert name="contentBottom">
+						<ui:include src="/templates/main/bottom.xhtml" />
+					</ui:insert>
+				</div>
+			</h:panelGroup>
+			<ui:debug hotkey="l" />
+		</h:form>
+		<!--  <ui:include src="/templates/main/messages.xhtml">
+			<ui:param name="controller" value="#{controller}"/>
+		</ui:include> -->
+	</h:body>
+	<h:outputStylesheet library="css" name="login.css" />
+	<h:outputStylesheet library="css" name="articulos.css" />
+	<h:outputStylesheet library="css" name="menuvertical.css" />
+</f:view>
+</html>

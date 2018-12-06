@@ -6,8 +6,13 @@
 	xmlns:a4j="http://richfaces.org/a4j">
 	<h:head></h:head>
 	<h:body onload="#{rich:component('stow')}.show();">
-	    <rich:popupPanel id="stow" width="375" height="130" resizeable="false" header="Session finalizada">
+	    <rich:popupPanel id="stow" width="375" height="155" resizeable="false" header="Session finalizada">
 			<table width="100%" border="0">
+				<tr>
+					<td align="center">
+						<h:graphicImage value="#{resource['images/close_session.png']}" height="48" width="48"/>
+					</td>
+				</tr>
 				<tr>
 					<td><h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.mensaje.sesion.caducada']}"/></td>
 				</tr>

@@ -20,11 +20,33 @@
 	</ui:define>
 	
 	<ui:define name="contentLeft">
-		<ui:include src="adminBusquedaUsuariosLeft.xhtml" />
+		<!-- <ui:include src="adminBusquedaUsuariosLeft.xhtml" /> -->
 	</ui:define>
 	
 	<ui:define name="contentCenter">
-		<rich:panel id="listaUsuarios" styleClass="panelListaArticulos" header="#{msg_erpweb['ec.com.erp.etiqueta.titulo.lista.usuarios']}" style="height: 94.5%; width:100% !important;">	
+		<rich:panel id="panel-content-left" styleClass="panel-content-left" style="width:100% !important;">
+			<f:facet name="header">			
+				<h:panelGrid columns="2" width="99.9%" columnClasses="align-left, align-right" cellpadding="0" cellspacing="0">
+					<h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.criterios.busqueda']}" style="white-space:nowrap" />
+				</h:panelGrid>
+			</f:facet>		
+			<h:panelGroup id="listaReporte" layout="block" styleClass="listaReporte">
+				<h:panelGrid columns="2" width="35%" cellpadding="0" cellspacing="2">
+					<h:panelGrid width="47%" columns="2" columnClasses="columnaIzquierda, columnaDerecha">
+			    	   	<rich:inplaceInput id="nombreUsuario" value="#{usuariosController.nombreUsuario}" styleClass="styleInputPlaceMunuscula" defaultLabel="#{msg_erpweb['ec.com.erp.etiqueta.buscar.nombre.usuario']}">
+			    	   		<a4j:ajax event="keyup" execute="listaReporte" listener="#{usuariosController.busquedaUsuariosEnter}" onbeforesubmit="if (event.keyCode != 13)  return false;" render="listaUsuarios tableUsuarios pnlMensajes"></a4j:ajax>
+			    	   	</rich:inplaceInput>
+			    	   	<h:panelGroup styleClass="styleClean">
+							<a4j:commandLink styleClass="guardarA" execute="@this" render="nombreUsuario" actionListener="#{usuariosController.borrarBusquedaUsuario}"/>
+						</h:panelGroup>
+					</h:panelGrid>
+			    	
+			    	 <a4j:commandButton id="btnBuscar" value="Buscar" styleClass="styleSearch" render="listaUsuarios tableUsuarios pnlMensajes" execute="listaReporte" actionListener="#{usuariosController.busquedaUsuarios}"/>
+				</h:panelGrid>						 
+			</h:panelGroup>	
+		</rich:panel>
+		
+		<rich:panel id="listaUsuarios" styleClass="panelListaArticulos" header="#{msg_erpweb['ec.com.erp.etiqueta.titulo.lista.usuarios']}" style="height: 84.3%; width:100% !important;">	
 			<h:panelGrid id="tablaVacia" columns="1" rendered="#{empty usuariosController.usuariosDTOCols}" style="width:100%; text-align: center; padding-top: 220px">
 				<h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.mensaje.lista.vacio']}"/>
 			</h:panelGrid>
@@ -32,7 +54,7 @@
 				<rich:dataScroller page="#{usuariosController.page}" fastStep="3" for="tableUsuarios" maxPages="5" rendered="#{not empty usuariosController.usuariosDTOCols}" renderIfSinglePage="false"/>
 			</rich:panel>	
 				
-			 <rich:dataTable style="width:100%" rendered="#{not empty usuariosController.usuariosDTOCols}" value="#{usuariosController.usuariosDTOCols}" var="usr" iterationStatusVar="it" id="tableUsuarios" rows="15">
+			 <rich:dataTable style="width:100%" rendered="#{not empty usuariosController.usuariosDTOCols}" value="#{usuariosController.usuariosDTOCols}" var="usr" iterationStatusVar="it" id="tableUsuarios" rows="14">
 	            <rich:column>
 	                <f:facet name="header">Nro.</f:facet>
 	                #{it.index+1}

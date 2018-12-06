@@ -48,14 +48,14 @@
 							</ui:insert>
 					    	
 					    	<rich:toolbarGroup location="right">
-					    		<h:panelGrid columns="2" cellpadding="0" cellspacing="0" id="pgr" style="padding-top: 1px !important;">
-						    		<h:panelGroup layout="block" styleClass="styleAyuda">
-										<a4j:commandLink styleClass="guardarA"/>
-									</h:panelGroup>
-									<h:panelGroup layout="block" styleClass="styleCerrar">
-										<a4j:commandLink styleClass="guardarA" action="#{loginController.doLogout}"/>
-									</h:panelGroup>
-								</h:panelGrid>
+					    		<h:panelGroup layout="block" styleClass="botonLargeComun">
+									<a4j:commandLink value="#{loginController.usuariosDTO.nombreUsuario}" styleClass="botonUsuario"/>
+								</h:panelGroup>
+					    	</rich:toolbarGroup>
+					    	<rich:toolbarGroup location="right">
+								<h:panelGroup layout="block" styleClass="botonLargeComun">
+									<a4j:commandLink value="#{msg_erpweb['ec.com.erp.etiqueta.boton.cerrar.session']}" styleClass="botonCerrar" action="#{loginController.doLogout}"/>
+								</h:panelGroup>
 							</rich:toolbarGroup>
 						</rich:toolbar>
 					</div>

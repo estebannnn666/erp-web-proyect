@@ -66,6 +66,7 @@ public class TransportistaController extends CommonsController implements Serial
 
 	@PostConstruct
 	public void postConstruct() {
+		this.loginController.activarMenusSeleccionado();
 		this.transportistaCreado = Boolean.FALSE;
 		this.transportistaDTO = new TransportistaDTO();
 		this.transportistaDTO.setCodigoValorTipoTransportista(ERPConstantes.CODIGO_CATALOGO_VALOR_TIPO_CLIENTE_PERSONA);
@@ -133,10 +134,26 @@ public class TransportistaController extends CommonsController implements Serial
 	}
 	
 	/**
-	 * Metodo para buscar articulos
+	 * Metodo para buscar proveedores 
 	 * @param e
 	 */
 	public void busquedaTransportista(ActionEvent e){
+		this.buscarTranportista();
+	}
+	
+	/**
+	 * Metodo para buscar proveedores al dar enter
+	 * @param e
+	 */
+	public void busquedaTransportistaEnter(AjaxBehaviorEvent e){
+		this.buscarTranportista();
+	}
+	
+	/**
+	 * Metodo para buscar proveedores 
+	 * @param e
+	 */
+	public void buscarTranportista(){
 		try {
 			this.transportistaDTOCols = ERPFactory.transportista.getTransportistasServicio().findObtenerListaTransportistas(Integer.parseInt(ERPConstantes.ESTADO_ACTIVO_NUMERICO), numeroDocumentoBusqueda, nombreTransportistaBusqueda);
 			if(CollectionUtils.isEmpty(this.transportistaDTOCols)){
@@ -320,6 +337,8 @@ public class TransportistaController extends CommonsController implements Serial
 	 * @return
 	 */
 	public String regresarMenuPrincipal(){
+		this.loginController.desActivarMenusSeleccionado();
+		this.loginController.setActivarInicio(Boolean.TRUE);
 		return "/modules/principal/menu.xhtml?faces-redirect=true";
 	}
 	

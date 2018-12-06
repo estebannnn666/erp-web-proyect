@@ -1,8 +1,13 @@
 
 package ec.com.erp.web.cuentas.controller;
 
+import java.io.IOException;
+import java.io.OutputStream;
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.net.HttpURLConnection;
+import java.net.Proxy;
+import java.net.URL;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -26,12 +31,16 @@ import javax.print.PrintException;
 import javax.print.PrintService;
 import javax.print.PrintServiceLookup;
 import javax.print.SimpleDoc;
+import javax.xml.xpath.XPath;
+import javax.xml.xpath.XPathExpressionException;
+import javax.xml.xpath.XPathFactory;
 
 import org.apache.commons.beanutils.BeanPredicate;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.Predicate;
 import org.apache.commons.collections.PredicateUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.w3c.dom.Document;
 
 import ec.com.erp.cliente.common.constantes.ERPConstantes;
 import ec.com.erp.cliente.common.exception.ERPException;
@@ -41,6 +50,7 @@ import ec.com.erp.cliente.mdl.dto.CatalogoValorDTO;
 import ec.com.erp.cliente.mdl.dto.ClienteDTO;
 import ec.com.erp.cliente.mdl.dto.FacturaCabeceraDTO;
 import ec.com.erp.cliente.mdl.dto.FacturaDetalleDTO;
+import ec.com.erp.cliente.mdl.dto.ProveedorDTO;
 import ec.com.erp.cliente.mdl.dto.SecuenciaDTO;
 import ec.com.erp.cliente.mdl.dto.id.FacturaCabeceraID;
 import ec.com.erp.utilitario.commons.util.HtmlPdf;
@@ -50,6 +60,7 @@ import ec.com.erp.web.commons.datamanager.CommonDataManager;
 import ec.com.erp.web.commons.login.controller.LoginController;
 import ec.com.erp.web.commons.utils.ERPWebResources;
 import ec.com.erp.web.commons.utils.UtilitarioWeb;
+import ec.com.erp.web.commons.utils.XML_Utilidades;
 import ec.com.erp.web.cuentas.datamanager.CuentasDataManager;
 
 /**
@@ -95,6 +106,7 @@ public class CuentasController extends CommonsController implements Serializable
 
 	@PostConstruct
 	public void postConstruct() {
+		this.loginController.activarMenusSeleccionado();
 		this.documentoCreado = Boolean.FALSE;
 		this.facturaCabeceraDTO = new FacturaCabeceraDTO();
 		this.facturaCabeceraDTO.setFechaDocumento(new Date());
@@ -114,19 +126,37 @@ public class CuentasController extends CommonsController implements Serializable
 		}
 		this.page = 0;
 		this.contDetalle = 1;
-		this.fechaFacturaInicio = new Date();
-		this.fechaFacturaFin = new Date();
+		// Inicializar fechas para filtros de busqueda
+		Calendar fechaInferior = Calendar.getInstance();
+		fechaInferior.set(Calendar.MONTH, 0);
+		fechaInferior.set(Calendar.DATE, 1);
+		UtilitarioWeb.cleanDate(fechaInferior);
+		Calendar fechaSuperior = Calendar.getInstance();
+		fechaFacturaInicio = fechaInferior.getTime();
+		fechaFacturaFin = fechaSuperior.getTime();
+		
 		this.tipoFacturaCatalogoValorDTOCols = ERPFactory.catalogos.getCatalogoServicio().findObtenerCatalogoByTipo(ERPConstantes.CODIGO_CATALOGO_TIPOS_DOCUMENTOS);
 		this.articuloDTOCols = ERPFactory.articulos.getArticuloServicio().findObtenerListaArticulos(1, null, null);
 		
 		// Cargar datos a editar
-		if(cuentasDataManager.getFacturaCabeceraDTOEditar() != null && cuentasDataManager.getFacturaCabeceraDTOEditar().getId().getCodigoFactura() != null)
-		{
+		if(cuentasDataManager.getFacturaCabeceraDTOEditar() != null && cuentasDataManager.getFacturaCabeceraDTOEditar().getId().getCodigoFactura() != null){
 			this.setFacturaCabeceraDTO(cuentasDataManager.getFacturaCabeceraDTOEditar());
 			this.setFacturaDetalleDTOCols(cuentasDataManager.getFacturaCabeceraDTOEditar().getFacturaDetalleDTOCols());
 		}
 		
-		if(FacesContext.getCurrentInstance().getViewRoot().getViewId().equals("/modules/facturas/adminBusquedaCuentas.xhtml")) {
+		if(FacesContext.getCurrentInstance().getViewRoot().getViewId().equals("/modules/ventas/adminBusquedaVentas.xhtml")) {
+			tipoDocumento = ERPConstantes.CODIGO_CATALOGO_VALOR_DOCUMENTO_VENTAS;
+			this.facturaCabeceraDTOCols = ERPFactory.facturas.getFacturaCabeceraServicio().findObtenerListaFacturas(Integer.parseInt(ERPConstantes.ESTADO_ACTIVO_NUMERICO), numeroFactura, null, null, docClienteProveedor, nombClienteProveedor, pagado, tipoDocumento);
+		}
+		
+		if(FacesContext.getCurrentInstance().getViewRoot().getViewId().equals("/modules/compras/adminBusquedaCompras.xhtml")) {
+			tipoDocumento = ERPConstantes.CODIGO_CATALOGO_VALOR_DOCUMENTO_COMPRAS;
+			this.facturaCabeceraDTOCols = ERPFactory.facturas.getFacturaCabeceraServicio().findObtenerListaFacturas(Integer.parseInt(ERPConstantes.ESTADO_ACTIVO_NUMERICO), numeroFactura, null, null, docClienteProveedor, nombClienteProveedor, pagado, tipoDocumento);
+		}
+		
+		if(FacesContext.getCurrentInstance().getViewRoot().getViewId().equals("/modules/cuentas/adminBusquedaCuentas.xhtml")) {
+			tipoDocumento = ERPConstantes.CODIGO_CATALOGO_VALOR_DOCUMENTO_VENTAS;
+			pagado = Boolean.FALSE;
 			this.facturaCabeceraDTOCols = ERPFactory.facturas.getFacturaCabeceraServicio().findObtenerListaFacturas(Integer.parseInt(ERPConstantes.ESTADO_ACTIVO_NUMERICO), numeroFactura, null, null, docClienteProveedor, nombClienteProveedor, pagado, tipoDocumento);
 		}
 	}
@@ -151,10 +181,66 @@ public class CuentasController extends CommonsController implements Serializable
 	}
 	
 	/**
+	 * Metodo para buscar facturas en venta
+	 * @param e
+	 */
+	public void busquedaFacturasCuentasCobrar(ActionEvent e){
+		String tipoFactura = ERPConstantes.CODIGO_CATALOGO_VALOR_DOCUMENTO_VENTAS;
+		this.pagado = Boolean.FALSE;
+		this.buscarFacturas(tipoFactura);
+	}
+	
+	/**
+	 * Metodo para buscar facturas en venta por filtros de busqueda al dar enter
+	 * @param e
+	 */
+	public void busquedaFacturasCuentasCobrarEnter(AjaxBehaviorEvent e){
+		String tipoFactura = ERPConstantes.CODIGO_CATALOGO_VALOR_DOCUMENTO_VENTAS;
+		this.pagado = Boolean.FALSE;
+		this.buscarFacturas(tipoFactura);
+	}
+	
+	/**
+	 * Metodo para buscar facturas en venta
+	 * @param e
+	 */
+	public void busquedaFacturasVentas(ActionEvent e){
+		String tipoFactura = ERPConstantes.CODIGO_CATALOGO_VALOR_DOCUMENTO_VENTAS;
+		this.buscarFacturas(tipoFactura);
+	}
+	
+	/**
+	 * Metodo para buscar facturas en venta por filtros de busqueda al dar enter
+	 * @param e
+	 */
+	public void busquedaFacturasVentasEnter(AjaxBehaviorEvent e){
+		String tipoFactura = ERPConstantes.CODIGO_CATALOGO_VALOR_DOCUMENTO_VENTAS;
+		this.buscarFacturas(tipoFactura);
+	}
+	
+	/**
+	 * Metodo para buscar facturas en venta
+	 * @param e
+	 */
+	public void busquedaFacturasCompras(ActionEvent e){
+		String tipoFactura = ERPConstantes.CODIGO_CATALOGO_VALOR_DOCUMENTO_COMPRAS;
+		this.buscarFacturas(tipoFactura);
+	}
+	
+	/**
+	 * Metodo para buscar facturas en venta por filtros de busqueda al dar enter
+	 * @param e
+	 */
+	public void busquedaFacturasComprasEnter(AjaxBehaviorEvent e){
+		String tipoFactura = ERPConstantes.CODIGO_CATALOGO_VALOR_DOCUMENTO_COMPRAS;
+		this.buscarFacturas(tipoFactura);
+	}
+	
+	/**
 	 * Metodo para buscar cuentas o facturas por filtros de busqueda
 	 * @param e
 	 */
-	public void busquedaCuentasFacturas(ActionEvent e){
+	public void buscarFacturas(String tipoFactura){
 		try {
 			Calendar fechaInicio = Calendar.getInstance();
 			Calendar fechaFin = Calendar.getInstance();
@@ -225,13 +311,34 @@ public class CuentasController extends CommonsController implements Serializable
 	
 	
 	/**
-	 * Metodo para cancelar factura
+	 * Metodo para cancelar factura ventas
 	 * @param e
 	 */
-	public void cancelarFacturas(ActionEvent e){
+	public void cancelarFacturasVentas(ActionEvent e){
 		try {
 			ERPFactory.facturas.getFacturaCabeceraServicio().transCancelarFacturaInactivar(this.facturaCabeceraDTO);
-			this.busquedaCuentasFacturas(e);
+			String tipoFactura = ERPConstantes.CODIGO_CATALOGO_VALOR_DOCUMENTO_VENTAS;
+			this.buscarFacturas(tipoFactura);
+			this.setShowMessagesBar(Boolean.TRUE);
+	        MensajesController.addInfo(null, ERPWebResources.getString("ec.com.erp.etiqueta.mensaje.informacion.cancelacion"));
+		} catch (ERPException e1) {
+			this.setShowMessagesBar(Boolean.TRUE);
+			MensajesController.addError(null, e1.getMessage());
+		} catch (Exception e2) {
+			this.setShowMessagesBar(Boolean.TRUE);
+			MensajesController.addError(null, e2.getMessage());
+		}
+	}
+	
+	/**
+	 * Metodo para cancelar factura compras
+	 * @param e
+	 */
+	public void cancelarFacturasCompras(ActionEvent e){
+		try {
+			ERPFactory.facturas.getFacturaCabeceraServicio().transCancelarFacturaInactivar(this.facturaCabeceraDTO);
+			String tipoFactura = ERPConstantes.CODIGO_CATALOGO_VALOR_DOCUMENTO_COMPRAS;
+			this.buscarFacturas(tipoFactura);
 			this.setShowMessagesBar(Boolean.TRUE);
 	        MensajesController.addInfo(null, ERPWebResources.getString("ec.com.erp.etiqueta.mensaje.informacion.cancelacion"));
 		} catch (ERPException e1) {
@@ -413,6 +520,53 @@ public class CuentasController extends CommonsController implements Serializable
 	}
 	
 	/**
+	 * Metodo para consultar cliente por numero de documento 
+	 * @param e
+	 */
+	public void realizarConsultaClientes(AjaxBehaviorEvent e) {
+		if(StringUtils.isEmpty(this.facturaCabeceraDTO.getRucDocumento())) {
+			this.setShowMessagesBar(Boolean.TRUE);
+	        MensajesController.addError(null, "El campo no debe estar vacio, ingrese el documento del cliente que desea buscar.");
+		}else {
+			String numeroDocumento = this.facturaCabeceraDTO.getRucDocumento();
+			ClienteDTO clienteDTO = ERPFactory.clientes.getClientesServicio().findObtenerClienteByCodigo(Integer.parseInt(ERPConstantes.ESTADO_ACTIVO_NUMERICO), numeroDocumento, null);
+			if(clienteDTO != null) {
+				this.facturaCabeceraDTO.setRucDocumento(clienteDTO.getPersonaDTO() == null ? clienteDTO.getEmpresaDTO().getNumeroRuc() : clienteDTO.getPersonaDTO().getNumeroDocumento());
+				this.facturaCabeceraDTO.setNombreClienteProveedor(clienteDTO.getPersonaDTO() == null ? clienteDTO.getEmpresaDTO().getRazonSocial() : clienteDTO.getPersonaDTO().getNombreCompleto());
+				this.facturaCabeceraDTO.setDireccion(clienteDTO.getPersonaDTO() == null ? clienteDTO.getEmpresaDTO().getContactoEmpresaDTO().getDireccionPrincipal() : clienteDTO.getPersonaDTO().getContactoPersonaDTO().getDireccionPrincipal());
+				this.facturaCabeceraDTO.setTelefono(clienteDTO.getPersonaDTO() == null ? clienteDTO.getEmpresaDTO().getContactoEmpresaDTO().getTelefonoPrincipal() : clienteDTO.getPersonaDTO().getContactoPersonaDTO().getTelefonoPrincipal());
+			}else{
+				this.setShowMessagesBar(Boolean.TRUE);
+		        MensajesController.addWarn(null, "No se encontr\u00F3 el cliente con el documento ingresado.");
+			}
+		}
+	}
+	
+	/**
+	 * Metodo para consultar cliente por numero de documento 
+	 * @param e
+	 */
+	public void realizarConsultaProveedor(AjaxBehaviorEvent e) {
+		if(StringUtils.isEmpty(this.facturaCabeceraDTO.getRucDocumento())) {
+			this.setShowMessagesBar(Boolean.TRUE);
+	        MensajesController.addError(null, "El campo no debe estar vacio, ingrese el documento del proveedor que desea buscar.");
+		}else {
+			String numeroDocumento = this.facturaCabeceraDTO.getRucDocumento();
+			ProveedorDTO proveedorDTO = ERPFactory.proveedor.getProveedorServicio().findObtenerProveedor(Integer.parseInt(ERPConstantes.ESTADO_ACTIVO_NUMERICO), numeroDocumento, null);
+			if(proveedorDTO != null) {
+				this.facturaCabeceraDTO.setRucDocumento(proveedorDTO.getPersonaDTO() == null ? proveedorDTO.getEmpresaDTO().getNumeroRuc() : proveedorDTO.getPersonaDTO().getNumeroDocumento());
+				this.facturaCabeceraDTO.setNombreClienteProveedor(proveedorDTO.getPersonaDTO() == null ? proveedorDTO.getEmpresaDTO().getRazonSocial() : proveedorDTO.getPersonaDTO().getNombreCompleto());
+				this.facturaCabeceraDTO.setDireccion(proveedorDTO.getPersonaDTO() == null ? proveedorDTO.getEmpresaDTO().getContactoEmpresaDTO().getDireccionPrincipal() : proveedorDTO.getPersonaDTO().getContactoPersonaDTO().getDireccionPrincipal());
+				this.facturaCabeceraDTO.setTelefono(proveedorDTO.getPersonaDTO() == null ? proveedorDTO.getEmpresaDTO().getContactoEmpresaDTO().getTelefonoPrincipal() : proveedorDTO.getPersonaDTO().getContactoPersonaDTO().getTelefonoPrincipal());
+			}else{
+				this.setShowMessagesBar(Boolean.TRUE);
+		        MensajesController.addWarn(null, "No se encontr\u00F3 el proveedor con el documento ingresado.");
+			}
+		}
+	}
+	
+	
+	/**
 	 * Agregar nueva fila factura
 	 * @param e
 	 */
@@ -464,14 +618,25 @@ public class CuentasController extends CommonsController implements Serializable
 	}
 	
 	/**
-	 * Metodo para regresar a la busqueda de facturas
+	 * Metodo para regresar a la busqueda de facturas de ventas
 	 * @param e
 	 */
-	public String regresarBusquedaCuentasFacturas(){
+	public String regresarBusquedaFacturasVentas(){
 		this.setDocumentoCreado(Boolean.FALSE);
 		this.cuentasDataManager.setFacturaCabeceraDTOEditar(new FacturaCabeceraDTO());
-		return "/modules/facturas/adminBusquedaCuentas.xhtml?faces-redirect=true";
+		return "/modules/ventas/adminBusquedaVentas.xhtml?faces-redirect=true";
 	}
+	
+	/**
+	 * Metodo para regresar a la busqueda de facturas de compras
+	 * @param e
+	 */
+	public String regresarBusquedaFacturasCompras(){
+		this.setDocumentoCreado(Boolean.FALSE);
+		this.cuentasDataManager.setFacturaCabeceraDTOEditar(new FacturaCabeceraDTO());
+		return "/modules/compras/adminBusquedaCompras.xhtml?faces-redirect=true";
+	}
+	
 	
 	/**
 	 * Metodo para ir a la pantalla de nuevo factura compra
@@ -482,7 +647,7 @@ public class CuentasController extends CommonsController implements Serializable
 		facturaCabeceraDTO.setCodigoValorTipoDocumento(ERPConstantes.CODIGO_CATALOGO_VALOR_DOCUMENTO_COMPRAS);
 		this.cuentasDataManager.setTipoFactura(ERPConstantes.CODIGO_CATALOGO_VALOR_DOCUMENTO_COMPRAS);
 		this.cuentasDataManager.setFacturaCabeceraDTOEditar(new FacturaCabeceraDTO());
-		return "/modules/facturas/nuevaFacturaCompra.xhtml?faces-redirect=true";
+		return "/modules/compras/nuevaFacturaCompra.xhtml?faces-redirect=true";
 	}
 	
 	/**
@@ -494,7 +659,7 @@ public class CuentasController extends CommonsController implements Serializable
 		facturaCabeceraDTO.setCodigoValorTipoDocumento(ERPConstantes.CODIGO_CATALOGO_VALOR_DOCUMENTO_VENTAS);
 		this.cuentasDataManager.setTipoFactura(ERPConstantes.CODIGO_CATALOGO_VALOR_DOCUMENTO_VENTAS);
 		this.cuentasDataManager.setFacturaCabeceraDTOEditar(new FacturaCabeceraDTO());
-		return "/modules/facturas/nuevaFacturaVenta.xhtml?faces-redirect=true";
+		return "/modules/ventas/nuevaFacturaVenta.xhtml?faces-redirect=true";
 	}
 	
 	/**
@@ -502,6 +667,8 @@ public class CuentasController extends CommonsController implements Serializable
 	 * @return
 	 */
 	public String regresarMenuPrincipal(){
+		this.loginController.desActivarMenusSeleccionado();
+		this.loginController.setActivarInicio(Boolean.TRUE);
 		return "/modules/principal/menu.xhtml?faces-redirect=true";
 	}
 	
@@ -537,29 +704,30 @@ public class CuentasController extends CommonsController implements Serializable
 	/**
 	 * Metodo para imprimir lista de facturas
 	 */
-	public void imprimirListaFacturas() {
+	public String imprimirListaFacturas() {
 		HtmlPdf htmltoPDF;
 		try {
-			PrintService printService = PrintServiceLookup.lookupDefaultPrintService();
-	 
-			DocFlavor flavor = DocFlavor.BYTE_ARRAY.AUTOSENSE;
-			DocPrintJob docPrintJob = printService.createPrintJob();
+//			PrintService printService = PrintServiceLookup.lookupDefaultPrintService();
+//	 
+//			DocFlavor flavor = DocFlavor.BYTE_ARRAY.AUTOSENSE;
+//			DocPrintJob docPrintJob = printService.createPrintJob();
 			
 			// Plantilla rpincipal que permite la conversion de xsl a pdf
 			htmltoPDF = new HtmlPdf(ERPConstantes.PLANTILLA_XSL_FOPRINCIPAL);
 			HashMap<String , String> parametros = new HashMap<String, String>();
 			byte contenido[] = htmltoPDF.convertir(ERPFactory.facturas.getFacturaCabeceraServicio().finObtenerXMLReporteFacturas(facturaCabeceraDTOCols).replace("<?xml version=\"1.0\" encoding=\"UTF-8\"?>", ""), "", "",	parametros,	null);
-//			UtilitarioWeb.mostrarPDF(contenido);
+			UtilitarioWeb.mostrarPDF(contenido);
 			
-			Doc doc = new SimpleDoc(contenido, flavor, null);
-			docPrintJob.print(doc, null);
+//			Doc doc = new SimpleDoc(contenido, flavor, null);
+//			docPrintJob.print(doc, null);
 			
-		} catch (PrintException e) {
-			e.printStackTrace();
+//		} catch (PrintException e) {
+//			e.printStackTrace();
 		} catch (Exception e) {
 			this.setShowMessagesBar(Boolean.TRUE);
 			MensajesController.addError(null, "Error al imprimir");
 		}
+		return null;
 	}
 	
 	/**
@@ -617,6 +785,132 @@ public class CuentasController extends CommonsController implements Serializable
 			}
 			return null;
 		}
+	}
+	
+	public String formatSendPost(String codAcceso){
+		String xml = "<soapenv:Envelope xmlns:soapenv='http://schemas.xmlsoap.org/soap/envelope/' xmlns:ec='http://ec.gob.sr"+
+			"<soapenv:Header/>"+
+				"<soapenv:Body>"+
+					"<ec:autorizacionComprobante>"+
+						"<claveAccesoComprobante>"+codAcceso+"</claveAccesoComprobante>"+
+					"</ec:autorizacionComprobante>"+
+				"</soapenv:Body>"+
+			"</soapenv:Envelope>";
+		return xml;
+	}
+	
+	public String formatSendPostValidar(String bytesEncodeBase64){
+		String xml = "<soapenv:Envelope	xmlns:soapenv='http://schemas.xmlsoap.org/soap/envelope/' xmlns:ec='http://ec.gob.sri.ws.recepcion'>"+
+				"<soapenv:Header/>"+
+					"<soapenv:Body>"+
+						"<ec:validarComprobante>"+
+							"<xml>"+bytesEncodeBase64+"</xml>"+
+						"</ec:validarComprobante>"+
+					"</soapenv:Body>"+
+				"</soapenv:Envelope>";
+		return xml;
+	}
+	
+	public void getAutorizacion(Document doc) throws XPathExpressionException{
+		String pathLevelAutorizacon = "//RespuestaAutorizacionComprobante/autorizaciones/autorizacion[last()]/";
+		String pathLevelMensajes = "//RespuestaAutorizacionComprobante/autorizaciones/autorizacion/mensajes[last()]/mensaje/";
+		String estado = getLastNode(pathLevelAutorizacon, "estado", doc);         
+		if(estado.equals("AUTORIZADO")){
+			System.out.println("Estado: " + getLastNode(pathLevelAutorizacon,"estado", doc)+"\n"+"N° Auto: " + 
+					getLastNode(pathLevelAutorizacon,"numeroAutorizacion", doc)+"\n"+"Fecha Auto: " + 
+					getLastNode(pathLevelAutorizacon,"fechaAutorizacion", doc)+"\n"+"Ambiente: " + 
+					getLastNode(pathLevelAutorizacon,"ambiente", doc));
+		}else if(estado.equals("NO AUTORIZADO")){
+			System.out.println("Estado: " + getLastNode(pathLevelAutorizacon,"estado", doc)+"\n"+"Fecha Auto: " + 
+					getLastNode(pathLevelAutorizacon,"fechaAutorizacion", doc)+"\n"+"Ambiente: " + 
+					getLastNode(pathLevelAutorizacon,"ambiente", doc)+"\n"+"Identificador: " + 
+					getLastNode(pathLevelMensajes,"identificador", doc)+"\n"+"Mensaje: " + 
+					getLastNode(pathLevelMensajes,"mensaje", doc)+"\n"+"Tipo: " + 
+					getLastNode(pathLevelMensajes,"tipo", doc));
+		}
+	}
+	
+	 
+	public boolean getRequestSoap(String urlWebServices, String method, String host, String getEncodeXML, Proxy proxy) throws IOException{
+		try {
+			URL URL = new URL(urlWebServices);
+			HttpURLConnection con = (HttpURLConnection) URL.openConnection(proxy);
+			con.setDoOutput(true);
+			con.setRequestMethod(method);
+			con.setRequestProperty("Content‐type", "text/xml; charset=utf‐8");
+			con.setRequestProperty("SOAPAction", "");
+			con.setRequestProperty("Host", host);       
+			OutputStream reqStreamOut = con.getOutputStream();
+			reqStreamOut.write(getEncodeXML.getBytes());                                      
+			System.out.println(con.getErrorStream());
+			java.io.BufferedReader rd = new java.io.BufferedReader(new java.io.InputStreamReader(con.getInputStream(), "UTF8"));
+			String line = "";
+			StringBuilder sb = new StringBuilder();
+			while ((line = rd.readLine()) != null){
+				sb.append(line);
+			}
+			//System.out.println(sb.toString());
+			Document doc = (Document) XML_Utilidades.convertStringToDocument(sb.toString());
+			getAutorizacion(doc);
+			con.disconnect();
+			return true;
+		}catch (Exception ex) {
+			System.out.println(ex.getMessage());
+		}
+		return false;
+	}
+	
+	public String getLastNode(String pathLevelXML, String nodo, Document doc) throws XPathExpressionException{
+		//Ejemplo:
+		//RespuestaAutorizacionComprobante/autorizaciones/autorizacion[last()]/estado
+		String pathFull = pathLevelXML + nodo;
+		XPath xpath = XPathFactory.newInstance().newXPath();
+		return xpath.evaluate(pathFull, doc);
+	}
+	
+	public boolean sendPostSoap(String urlWebServices, String method, String host, String getEncodeXML, Proxy proxy){
+		try {
+			URL oURL = new URL(urlWebServices);
+			HttpURLConnection con = (HttpURLConnection) oURL.openConnection(proxy);
+			con.setDoOutput(true);
+			con.setRequestMethod(method);
+			con.setRequestProperty("Content-type", "text/xml; charset=utf-8");
+			con.setRequestProperty("SOAPAction", "");
+			con.setRequestProperty("Host", host);
+			OutputStream reqStreamOut = con.getOutputStream();
+			reqStreamOut.write(getEncodeXML.getBytes());
+			java.io.BufferedReader rd = new java.io.BufferedReader(new
+			java.io.InputStreamReader(con.getInputStream(), "UTF8"));
+			String line = "";
+			StringBuilder sb = new StringBuilder();
+			while ((line = rd.readLine()) != null){
+				sb.append(line);
+			}
+			getEstadoPostSoap(XML_Utilidades.convertStringToDocument(sb.toString()), "RespuestaRecepcionComprobante", "estado");//está extrae la data de los nodos en un archivo XML
+			con.disconnect();
+			return true;
+			
+		}catch (Exception ex) {
+			System.out.println(ex.getMessage());
+		}
+		return false;
+	}
+	
+	public boolean getEstadoPostSoap(Document doc, String nodoRaiz, String nodoElemento){
+		String estado = XML_Utilidades.getNodes(nodoRaiz, nodoElemento, doc);
+		boolean respuesta = Boolean.FALSE;
+		if(estado.equals("DEVUELTA")){
+			System.out.println("Clave de Accceso: " + XML_Utilidades.getNodes("comprobante","claveAcceso", doc));
+			System.out.println("Identificador Error: " + XML_Utilidades.getNodes("mensaje","identificador", doc));
+			System.out.println("Descripción Error: " + XML_Utilidades.getNodes("mensaje","mensaje",	doc));
+			System.out.println("Descripción Adicional Error: " + XML_Utilidades.getNodes("mensaje","informacionAdicional", doc));
+			System.out.println("Tipo mensaje: " + XML_Utilidades.getNodes("mensaje","tipo", doc));
+			respuesta = Boolean.FALSE;
+		}else if(estado.equals("RECIBIDA")){
+			System.out.println("RECIBIDA");
+			respuesta = Boolean.TRUE;
+		}
+		return respuesta;
 	}
 	
 	public void setCuentasDataManager(CuentasDataManager cuentasDataManager) {

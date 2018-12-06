@@ -66,6 +66,7 @@ public class ClientesController extends CommonsController implements Serializabl
 
 	@PostConstruct
 	public void postConstruct() {
+		this.loginController.activarMenusSeleccionado();
 		this.clienteCreado = Boolean.FALSE;
 		this.clienteDTO = new ClienteDTO();
 		this.clienteDTO.setPersonaDTO(new PersonaDTO());
@@ -113,6 +114,14 @@ public class ClientesController extends CommonsController implements Serializabl
 	 * @param e
 	 */
 	public void busquedaClientes(ActionEvent e){
+		this.buscarClientes();
+	}
+	
+	public void busquedaClienteEnter(AjaxBehaviorEvent e){
+		this.buscarClientes();
+	}
+	
+	public void buscarClientes(){
 		try {
 			this.clienteDTOCols = ERPFactory.clientes.getClientesServicio().findObtenerListaClientes(Integer.parseInt(ERPConstantes.ESTADO_ACTIVO_NUMERICO), numeroDocumentoBusqueda, nombreClienteBusqueda);
 			if(CollectionUtils.isEmpty(this.clienteDTOCols)){
@@ -347,6 +356,8 @@ public class ClientesController extends CommonsController implements Serializabl
 	 * @return
 	 */
 	public String regresarMenuPrincipal(){
+		this.loginController.desActivarMenusSeleccionado();
+		this.loginController.setActivarInicio(Boolean.TRUE);
 		return "/modules/principal/menu.xhtml?faces-redirect=true";
 	}
 	

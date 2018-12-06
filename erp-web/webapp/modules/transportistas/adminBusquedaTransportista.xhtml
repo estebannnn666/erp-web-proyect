@@ -20,18 +20,49 @@
 	</ui:define>
 	
 	<ui:define name="contentLeft">
-		<ui:include src="adminBusquedaTransportistaLeft.xhtml" />
+		<!-- <ui:include src="adminBusquedaTransportistaLeft.xhtml" /> -->
 	</ui:define>
 	
 	<ui:define name="contentCenter">
-		<rich:panel id="listaTransport" styleClass="panelListaArticulos" header="Lista de transportistas" style="height: 94.5%; width:100% !important;">	
+		<rich:panel id="panel-content-left" styleClass="panel-content-left" style="width:100% !important;">
+			<f:facet name="header">			
+				<h:panelGrid columns="2" width="99.9%" columnClasses="align-left, align-right" cellpadding="0" cellspacing="0">
+					<h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.criterios.busqueda']}" style="white-space:nowrap" />
+				</h:panelGrid>
+			</f:facet>		
+		
+			<h:panelGroup id="filtrosTransportista" layout="block" styleClass="listaReporte">
+				<h:panelGrid columns="3" width="70%" cellpadding="0" cellspacing="2">
+					<h:panelGrid width="47%" columns="2" columnClasses="columnaIzquierda, columnaDerecha">
+			    	   	<rich:inplaceInput id="numeroDocumento" value="#{transportistaController.numeroDocumentoBusqueda}" styleClass="styleInputPlace" defaultLabel="#{msg_erpweb['ec.com.erp.etiqueta.buscar.documento.cliente']}" onkeypress="return validarEnteros(event);">
+			    	   		<a4j:ajax event="keyup" execute="filtrosTransportista" listener="#{transportistaController.busquedaTransportistaEnter}" onbeforesubmit="if (event.keyCode != 13)  return false;" render="listaTransport tabletransporte pnlMensajes"></a4j:ajax>
+			    	   	</rich:inplaceInput>
+			    	   	<h:panelGroup styleClass="styleClean">
+							<a4j:commandLink styleClass="guardarA" execute="@this" render="numeroDocumento" actionListener="#{transportistaController.borrarBusquedaNumeroDocumento}"/>
+						</h:panelGroup>
+					</h:panelGrid>
+			    	
+			    	<h:panelGrid width="47%" columns="2" columnClasses="columnaIzquierda, columnaDerecha">
+						<rich:inplaceInput id="nombreTransportista" value="#{transportistaController.nombreTransportistaBusqueda}" styleClass="styleInputPlace" defaultLabel="#{msg_erpweb['ec.com.erp.etiqueta.buscar.nombre.transportista']}">
+							<a4j:ajax event="keyup" execute="filtrosTransportista" listener="#{transportistaController.busquedaTransportistaEnter}" onbeforesubmit="if (event.keyCode != 13)  return false;" render="listaTransport tabletransporte pnlMensajes"></a4j:ajax>
+						</rich:inplaceInput>
+			    	   	<h:panelGroup styleClass="styleClean">
+							<a4j:commandLink styleClass="guardarA" execute="@this" render="nombreTransportista" actionListener="#{transportistaController.borrarBusquedaNombreTransportista}"/>
+						</h:panelGroup>
+					</h:panelGrid>
+			    	 <a4j:commandButton id="btnBuscarTransportistas" value="Buscar" styleClass="styleSearch" render="listaTransport tabletransporte pnlMensajes" execute="filtrosTransportista" actionListener="#{transportistaController.busquedaTransportista}"/>
+				</h:panelGrid>						 
+			</h:panelGroup>	
+		</rich:panel>
+		
+		<rich:panel id="listaTransport" styleClass="panelListaArticulos" header="Lista de transportistas" style="height: 84.3%; width:100% !important;">	
 			<h:panelGrid id="tablaVacia" columns="1" rendered="#{empty transportistaController.transportistaDTOCols}" style="width:100%; text-align: center; padding-top: 220px">
 				<h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.mensaje.lista.vacio']}"/>
 			</h:panelGrid>
 			<rich:panel style="text-align:center; border-left: none; border-right:none; border-bottom:none" rendered="#{not empty transportistaController.transportistaDTOCols}">
 				<rich:dataScroller page="#{transportistaController.page}" fastStep="3" for="tabletransporte" maxPages="5" rendered="#{not empty transportistaController.transportistaDTOCols}" renderIfSinglePage="false"/>
 			</rich:panel>			
-			 <rich:dataTable style="width:100%" rendered="#{not empty transportistaController.transportistaDTOCols}" value="#{transportistaController.transportistaDTOCols}" var="transport" iterationStatusVar="it" id="tabletransporte" rows="15">
+			 <rich:dataTable style="width:100%" rendered="#{not empty transportistaController.transportistaDTOCols}" value="#{transportistaController.transportistaDTOCols}" var="transport" iterationStatusVar="it" id="tabletransporte" rows="14">
 	            <rich:column>
 	                <f:facet name="header">Nro.</f:facet>
 	                #{it.index+1}

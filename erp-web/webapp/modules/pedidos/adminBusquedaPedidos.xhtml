@@ -20,18 +20,50 @@
 	</ui:define>
 	
 	<ui:define name="contentLeft">
-		<ui:include src="adminBusquedaPedidosLeft.xhtml" />
+		<!-- <ui:include src="adminBusquedaPedidosLeft.xhtml" /> -->
 	</ui:define>
 	
-	<ui:define name="contentCenter">	
-		<rich:panel id="panelPedidosTabla" header="Lista de pedidos" styleClass="panelPedidos" style="width:100%; height: 94.5%">	
+	<ui:define name="contentCenter">
+		<rich:panel id="panel-content-left" styleClass="panel-content-left" style="width:100% !important;">
+			<f:facet name="header">			
+				<h:panelGrid columns="2" width="99.9%" columnClasses="align-left, align-right" cellpadding="0" cellspacing="0">
+					<h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.criterios.busqueda']}" style="white-space:nowrap" />
+				</h:panelGrid>
+			</f:facet>		
+		
+			<h:panelGroup id="filtrosPedido" layout="block" styleClass="listaReporte">
+				<h:panelGrid columns="5" width="85%" cellpadding="0" cellspacing="2">
+					<h:panelGrid width="47%" columns="2" columnClasses="columnaIzquierda, columnaDerecha">
+			    	   	<rich:inplaceInput id="numeroDocumentoBusqueda" value="#{pedidosController.numeroDocumentoBusqueda}" styleClass="styleInputPlace" defaultLabel="#{msg_erpweb['ec.com.erp.etiqueta.label.busqueda.pedidos.etiqueta.documento.cliente']}">
+			    	   		<a4j:ajax event="keyup" execute="filtrosPedido" listener="#{pedidosController.busquedaPedididosEnter}" onbeforesubmit="if (event.keyCode != 13)  return false;" render="panelPedidosTabla, tablaVaciaPedidos, tablePedidos, pnlMensajes"></a4j:ajax>
+			    	   	</rich:inplaceInput>
+			    	   	<h:panelGroup styleClass="styleClean">
+							<a4j:commandLink styleClass="guardarA" execute="@this" render="numeroDocumentoBusqueda" actionListener="#{pedidosController.borrarBusquedaNumeroDocumento}"/>
+						</h:panelGroup>
+					</h:panelGrid>
+			    	<h:panelGrid width="47%" columns="2" columnClasses="columnaIzquierda, columnaDerecha">
+						<rich:inplaceInput id="nombreClienteBusqueda" value="#{pedidosController.nombreClienteBusqueda}" styleClass="styleInputPlace" defaultLabel="#{msg_erpweb['ec.com.erp.etiqueta.label.busqueda.pedidos.etiqueta.nombre.cliente']}">
+							<a4j:ajax event="keyup" execute="filtrosPedido" listener="#{pedidosController.busquedaPedididosEnter}" onbeforesubmit="if (event.keyCode != 13)  return false;" render="panelPedidosTabla, tablaVaciaPedidos, tablePedidos, pnlMensajes"></a4j:ajax>
+						</rich:inplaceInput>
+			    	   	<h:panelGroup styleClass="styleClean">
+							<a4j:commandLink styleClass="guardarA" execute="@this" render="nombreClienteBusqueda" actionListener="#{pedidosController.borrarBusquedaNombreCliente}"/>
+						</h:panelGroup>
+					</h:panelGrid>
+			    	<rich:calendar inputStyle="width: 80px; height: 20px;" value="#{pedidosController.fechaPedidoInicioBusqueda}" datePattern="yyyy-MM-dd"></rich:calendar>
+			    	<rich:calendar inputStyle="width: 80px; height: 20px;" value="#{pedidosController.fechaPedidoFinBusqueda}" datePattern="yyyy-MM-dd"></rich:calendar>
+					<a4j:commandButton id="btnBuscarCliente" value="Buscar" styleClass="styleSearch" render="panelPedidosTabla, tablaVaciaPedidos, tablePedidos, pnlMensajes" execute="filtrosPedido" actionListener="#{pedidosController.busquedaPedididos}"/>
+				</h:panelGrid>						 
+			</h:panelGroup>	
+		</rich:panel>
+			
+		<rich:panel id="panelPedidosTabla" header="Lista de pedidos" styleClass="panelPedidos" style="width:100%; height: 84.3%">	
 			<h:panelGrid id="tablaVaciaPedidos" columns="1" rendered="#{empty pedidosController.pedidosDTOCols}" style="width:100%; text-align: center; padding-top: 230px">
 				<h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.mensaje.lista.vacio']}"/>
 			</h:panelGrid>	
 			<rich:panel style="text-align:center; border-left: none; border-right:none;" rendered="#{not empty pedidosController.pedidosDTOCols}">
 				<rich:dataScroller page="#{pedidosController.page}" fastStep="3" for="tablePedidos" maxPages="5" rendered="#{not empty pedidosController.pedidosDTOCols}" renderIfSinglePage="false"/>
 			</rich:panel>	
-			<rich:dataTable style="width:100%" value="#{pedidosController.pedidosDTOCols}" rendered="#{not empty pedidosController.pedidosDTOCols}" var="pedido" iterationStatusVar="it" id="tablePedidos" rows="20">
+			<rich:dataTable style="width:100%" value="#{pedidosController.pedidosDTOCols}" rendered="#{not empty pedidosController.pedidosDTOCols}" var="pedido" iterationStatusVar="it" id="tablePedidos" rows="14">
 	            <rich:column styleClass="columna5">
 	                <f:facet name="header">Acc.</f:facet>
 	                <a4j:commandLink id="btnEntregar" title="Marcar pedido como entregado" rendered="#{pedido.estadoPedidoDTO.codigoValorEstadoPedido == 'REG'}" render="mpConfirmacion pnlConfirma" actionListener="#{pedidosController.cargarDatosPedido}" execute="@this" oncomplete="#{rich:component('mpConfirmacion')}.show();">

@@ -1,0 +1,88 @@
+#verticalMen {
+	font-size: 11px;
+	font-family: sans-serif;
+}
+
+#verticalMen ul {
+	list-style-type: none;
+	margin-left: -42px !important;
+}
+
+#verticalMen ul li.primera {
+	border-top: solid 1px #FFF;
+}
+
+#verticalMen ul li a {
+	display: block;
+	text-decoration: none;
+	color: #000000;
+	border: solid 1px #fff;
+	border-top: none;
+	position: relative;
+}
+
+.menu-seleccionado{
+	/*background-color: #DCDCDC !important;*/
+	background-color: #95A5A6 !important;
+}
+
+.menu-no-seleccionado{
+	background-color: #F5F5F5;
+}
+
+
+#verticalMen ul li:hover {
+	position: relative;
+	background-color: #6CC;
+	color: #FFFFFF;
+}
+
+#verticalMen ul li a:hover, #verticalMen ul li:hover a.nivel1 {
+	background-color: #95A5A6;
+	color: #FFFFFF !important;
+	font-weight: bold !important;
+	position: relative;
+}
+
+#verticalMen ul li a.nivel1 {
+	display: block!important;
+	display: none;
+	position: relative;
+}
+
+#verticalMen ul li ul {display: none;
+}
+
+#verticalMen ul li a:hover ul, #verticalMen ul li:hover ul {
+	display: block;
+	position: absolute;
+	left: 161px;
+	top:-1px!important;
+	top: -31px;
+}
+
+#verticalMen ul li ul li a {
+	width: 160px;
+	background-color: #DCDCDC;
+	color: #FFFFFF;
+}
+
+#verticalMen ul li ul li a:hover {
+	position: relative;
+	background-color: #DCDCDC;
+	color: #FFF;
+}
+
+#verticalMen a:focus, a:hover{
+	color: black !important;
+}
+
+.size-image-menu{
+	font-size: 17px !important;
+	color: #777777;
+}
+
+.size-image-menu-selected {
+	font-size: 17px !important;
+	color: #ecf0f1 !important;
+}

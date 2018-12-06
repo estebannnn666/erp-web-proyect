@@ -10,6 +10,7 @@ import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
 import javax.faces.event.ActionEvent;
+import javax.faces.event.AjaxBehaviorEvent;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -53,6 +54,7 @@ public class ModulosController extends CommonsController implements Serializable
 
 	@PostConstruct
 	public void postConstruct() {
+		this.loginController.activarMenusSeleccionado();
 		this.moduloCreado = Boolean.FALSE;
 		this.moduloDTO = new ModuloDTO();
 		SecuenciaDTO secuenciaDespacho = ERPFactory.secuencias.getSecuenciaServicio().findObtenerSecuenciaByNombre(ModuloID.NOMBRE_SECUENCIA);
@@ -89,6 +91,22 @@ public class ModulosController extends CommonsController implements Serializable
 	 * @param e
 	 */
 	public void busquedaModulos(ActionEvent e){
+		this.buscarModulos();
+	}
+	
+	/**
+	 * Metodo para buscar modulos al dar enter
+	 * @param e
+	 */
+	public void busquedaModulosEnter(AjaxBehaviorEvent e){
+		this.buscarModulos();
+	}
+	
+	/**
+	 * Metodo para buscar modulos
+	 * @param e
+	 */
+	public void buscarModulos(){
 		try {
 			this.moduloDTOCols = ERPFactory.modulos.getModuloServicio().findObtenerListaModulos(nombreModulo);
 			if(CollectionUtils.isEmpty(this.moduloDTOCols)){
@@ -218,6 +236,8 @@ public class ModulosController extends CommonsController implements Serializable
 	 * @return
 	 */
 	public String regresarMenuPrincipal(){
+		this.loginController.desActivarMenusSeleccionado();
+		this.loginController.setActivarInicio(Boolean.TRUE);
 		return "/modules/principal/menu.xhtml?faces-redirect=true";
 	}
 	

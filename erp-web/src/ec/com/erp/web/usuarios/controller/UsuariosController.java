@@ -55,6 +55,7 @@ public class UsuariosController extends CommonsController implements Serializabl
 
 	@PostConstruct
 	public void postConstruct() {
+		this.loginController.activarMenusSeleccionado();
 		this.usuarioCreado = Boolean.FALSE;
 		this.usuarioDTO = new UsuariosDTO();
 		this.page = 0;
@@ -227,6 +228,8 @@ public class UsuariosController extends CommonsController implements Serializabl
 	 * @return
 	 */
 	public String regresarMenuPrincipal(){
+		this.loginController.desActivarMenusSeleccionado();
+		this.loginController.setActivarInicio(Boolean.TRUE);
 		return "/modules/principal/menu.xhtml?faces-redirect=true";
 	}
 	

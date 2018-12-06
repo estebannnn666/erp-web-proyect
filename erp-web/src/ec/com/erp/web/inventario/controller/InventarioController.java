@@ -73,8 +73,16 @@ public class InventarioController extends CommonsController implements Serializa
 
 	@PostConstruct
 	public void postConstruct() {
-		fechaInicioBusqueda = new Date();
-		fechaFinBusqueda = new Date();
+		this.loginController.activarMenusSeleccionado();
+		// Inicializar fechas para filtros de busqueda
+		Calendar fechaInferior = Calendar.getInstance();
+		fechaInferior.set(Calendar.MONTH, 0);
+		fechaInferior.set(Calendar.DATE, 1);
+		UtilitarioWeb.cleanDate(fechaInferior);
+		Calendar fechaSuperior = Calendar.getInstance();
+		fechaInicioBusqueda = fechaInferior.getTime();
+		fechaFinBusqueda = fechaSuperior.getTime();
+				
 		this.inventarioCreado = Boolean.FALSE;
 		this.inventarioDTO = new InventarioDTO();
 		this.articuloDTO = new ArticuloDTO();
@@ -108,6 +116,21 @@ public class InventarioController extends CommonsController implements Serializa
 	 * @param e
 	 */
 	public void busquedaInventario(ActionEvent e){
+		this.buscarInventario();
+	}
+	/**
+	 * Metodo para buscar inventario
+	 * @param e
+	 */
+	public void busquedaInventarioEnter(AjaxBehaviorEvent e){
+		this.buscarInventario();
+	}
+	
+	/**
+	 * Metodo para buscar inventario
+	 * @param e
+	 */
+	public void buscarInventario(){
 		try {
 			if(StringUtils.isNotEmpty(codigoBarras)) {
 				Calendar fechaInicio = Calendar.getInstance();
@@ -325,6 +348,8 @@ public class InventarioController extends CommonsController implements Serializa
 	 * @return
 	 */
 	public String regresarMenuPrincipal(){
+		this.loginController.desActivarMenusSeleccionado();
+		this.loginController.setActivarInicio(Boolean.TRUE);
 		return "/modules/principal/menu.xhtml?faces-redirect=true";
 	}
 	

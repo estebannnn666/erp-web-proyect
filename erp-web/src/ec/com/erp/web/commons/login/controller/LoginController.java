@@ -53,6 +53,8 @@ public class LoginController extends CommonsController implements Serializable{
 	private Collection<ModuloDTO> modulosAdministracionCols;
 	private UsuariosDTO usuariosDTO;
 	private Log4JLogger log;
+	private Long codigoModulo;
+	private Boolean activarInicio;
 	
 	private boolean loggedIn;
 	
@@ -62,6 +64,7 @@ public class LoginController extends CommonsController implements Serializable{
 	}
 	
 	public void inicializar() {
+		activarInicio = Boolean.TRUE;
 		// TODO Auto-generated method stub
 		log =  new Log4JLogger();
 		banderaToken=Boolean.FALSE;
@@ -149,6 +152,7 @@ public class LoginController extends CommonsController implements Serializable{
 	 */
 	public void doLogin() {
 		try {
+			activarInicio = Boolean.TRUE;
 			usuariosDTO = ERPFactory.usuarios.getUsuariosServicio().findLoginUser(usuariosDTO.getNombreUsuario(), usuariosDTO.getPasswordUsuario());
 			if(usuariosDTO.getLogeado()){
 				loggedIn = true;
@@ -156,12 +160,14 @@ public class LoginController extends CommonsController implements Serializable{
 				this.modulosAdministracionCols = new ArrayList<ModuloDTO>();
 				
 				for(ModuloPerfilDTO  moduloPerfilDTO : usuariosDTO.getPerfilDTO().getModuloPerfilDTOCols()) {
-					if(moduloPerfilDTO.getModuloDTO().getValorTipo().equals("GES")) {
-						this.modulosGestionCols.add(moduloPerfilDTO.getModuloDTO());
-					}
-					if(moduloPerfilDTO.getModuloDTO().getValorTipo().equals("ADM")) {
-						this.modulosAdministracionCols.add(moduloPerfilDTO.getModuloDTO());
-					}
+					moduloPerfilDTO.getModuloDTO().setMenuActivo(Boolean.FALSE);
+					this.modulosGestionCols.add(moduloPerfilDTO.getModuloDTO());
+//					if(moduloPerfilDTO.getModuloDTO().getValorTipo().equals("GES")) {
+//						this.modulosGestionCols.add(moduloPerfilDTO.getModuloDTO());
+//					}
+//					if(moduloPerfilDTO.getModuloDTO().getValorTipo().equals("ADM")) {
+//						this.modulosAdministracionCols.add(moduloPerfilDTO.getModuloDTO());
+//					}
 				}
 				
 				this.sessionDataManagerBase.setUserDto(usuariosDTO);
@@ -177,10 +183,34 @@ public class LoginController extends CommonsController implements Serializable{
 				FacesMessage msg = new FacesMessage("Usuario o contrase\u00F1a incorrecta, intente nuevamente.", "ERROR MSG");
 		        msg.setSeverity(FacesMessage.SEVERITY_ERROR);
 		        FacesContext.getCurrentInstance().addMessage(null, msg);
-	//			return "/login.xhtml";
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
+		}
+	}
+	
+	/**
+	 * Menu para desactivar panel seleccionado
+	 * @param e
+	 */
+	public void desActivarMenusSeleccionado(){
+		activarInicio = Boolean.FALSE;
+		for(ModuloDTO  moduloTO : this.modulosGestionCols) {
+			moduloTO.setMenuActivo(Boolean.FALSE);
+		}
+	}
+	
+	/**
+	 * Menu para activar panel seleccionado
+	 * @param e
+	 */
+	public void activarMenusSeleccionado(){
+		for(ModuloDTO  moduloTO : this.modulosGestionCols) {
+			if(codigoModulo.longValue() == moduloTO.getId().getCodigoModulo().longValue()){
+				moduloTO.setMenuActivo(Boolean.TRUE);
+				activarInicio = Boolean.FALSE;
+				break;
+			}
 		}
 	}
 	
@@ -189,6 +219,12 @@ public class LoginController extends CommonsController implements Serializable{
 	}
 	
 	public String redirectToWelcome(){
+		activarInicio = Boolean.TRUE;
+		this.modulosGestionCols = new ArrayList<ModuloDTO>();
+		for(ModuloPerfilDTO  moduloPerfilDTO : usuariosDTO.getPerfilDTO().getModuloPerfilDTOCols()) {
+			moduloPerfilDTO.getModuloDTO().setMenuActivo(Boolean.FALSE);
+			this.modulosGestionCols.add(moduloPerfilDTO.getModuloDTO());
+		}
 		return "/modules/principal/menu.xhtml?faces-redirect=true";
 	}
 	
@@ -329,5 +365,21 @@ public class LoginController extends CommonsController implements Serializable{
 
 	public void setModulosAdministracionCols(Collection<ModuloDTO> modulosAdministracionCols) {
 		this.modulosAdministracionCols = modulosAdministracionCols;
+	}
+
+	public Long getCodigoModulo() {
+		return codigoModulo;
+	}
+
+	public void setCodigoModulo(Long codigoModulo) {
+		this.codigoModulo = codigoModulo;
+	}
+
+	public Boolean getActivarInicio() {
+		return activarInicio;
+	}
+
+	public void setActivarInicio(Boolean activarInicio) {
+		this.activarInicio = activarInicio;
 	}
 }

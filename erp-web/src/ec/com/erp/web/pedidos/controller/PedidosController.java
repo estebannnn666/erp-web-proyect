@@ -3,7 +3,9 @@ package ec.com.erp.web.pedidos.controller;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
@@ -39,6 +41,7 @@ import ec.com.erp.web.commons.controller.MensajesController;
 import ec.com.erp.web.commons.datamanager.CommonDataManager;
 import ec.com.erp.web.commons.login.controller.LoginController;
 import ec.com.erp.web.commons.utils.ERPWebResources;
+import ec.com.erp.web.commons.utils.UtilitarioWeb;
 import ec.com.erp.web.pedidos.datamanager.PedidosDataManager;
 
 /**
@@ -76,7 +79,8 @@ public class PedidosController extends CommonsController implements Serializable
 	private String razonSocialBusqueda;
 	private String codigoBarrasBusqueda;
 	private String nombreArticuloBusqueda;
-	private Date fechaPedidoBusqueda;
+	private Date fechaPedidoInicioBusqueda;
+	private Date fechaPedidoFinBusqueda;
 	private String estadoPedidoBusqueda;
 	private String documentoCliente;
 	private Collection<CatalogoValorDTO> estadoPedidosCatalogoValorDTOCols;
@@ -92,6 +96,14 @@ public class PedidosController extends CommonsController implements Serializable
 
 	@PostConstruct
 	public void postConstruct() {
+		Calendar fechaInferior = Calendar.getInstance();
+		fechaInferior.set(Calendar.DATE, 1);
+		UtilitarioWeb.cleanDate(fechaInferior);
+		Calendar fechaSuperior = Calendar.getInstance();
+		fechaPedidoInicioBusqueda = fechaInferior.getTime();
+		fechaPedidoFinBusqueda = fechaSuperior.getTime();
+		
+		this.loginController.activarMenusSeleccionado();
 		this.pedidoGuardado = Boolean.FALSE;
 		this.pedidoDTO = new PedidoDTO();
 		this.pedidoDTO.setFechaPedido(new Date());
@@ -121,7 +133,7 @@ public class PedidosController extends CommonsController implements Serializable
 			this.setDetallePedidoDTOCols((List<DetallePedidoDTO>)pedidosDataManager.getPedidoDTOEditar().getDetallePedidoDTOCols());
 		}
 		if(FacesContext.getCurrentInstance().getViewRoot().getViewId().equals("/modules/pedidos/adminBusquedaPedidos.xhtml")) {
-			this.pedidosDTOCols = ERPFactory.pedidos.getPedidoServicio().findObtenerPedidosRegistrados(Integer.parseInt(ERPConstantes.ESTADO_ACTIVO_NUMERICO), null);
+			this.pedidosDTOCols = ERPFactory.pedidos.getPedidoServicio().findObtenerPedidosRegistrados(Integer.parseInt(ERPConstantes.ESTADO_ACTIVO_NUMERICO), null, null, null ,null, null);
 		}
 	}
 		
@@ -170,6 +182,8 @@ public class PedidosController extends CommonsController implements Serializable
 	 * @return
 	 */
 	public String regresarMenuPrincipal(){
+		this.loginController.desActivarMenusSeleccionado();
+		this.loginController.setActivarInicio(Boolean.TRUE);
 		return "/modules/principal/menu.xhtml?faces-redirect=true";
 	}
 	
@@ -247,8 +261,16 @@ public class PedidosController extends CommonsController implements Serializable
 	 * @param e
 	 */
 	public void busquedaPedididos(ActionEvent e){
+		this.buscarPedidos();
+	}
+	
+	public void busquedaPedididosEnter(AjaxBehaviorEvent e){
+		this.buscarPedidos();
+	}
+	
+	public void buscarPedidos(){
 		try {
-			this.pedidosDTOCols = ERPFactory.pedidos.getPedidoServicio().findObtenerPedidosRegistrados(Integer.parseInt(ERPConstantes.ESTADO_ACTIVO_NUMERICO), null);
+			this.pedidosDTOCols = ERPFactory.pedidos.getPedidoServicio().findObtenerPedidosRegistrados(Integer.parseInt(ERPConstantes.ESTADO_ACTIVO_NUMERICO), numeroDocumentoBusqueda, nombreClienteBusqueda, new Timestamp(fechaPedidoInicioBusqueda.getTime()), new Timestamp(fechaPedidoFinBusqueda.getTime()), null);
 			if(CollectionUtils.isEmpty(this.pedidosDTOCols)){
 				this.setShowMessagesBar(Boolean.TRUE);
 				FacesMessage msg = new FacesMessage("No se encontraron resultados para la b\u00FAsqueda realizada.", "ERROR MSG");
@@ -677,12 +699,20 @@ public class PedidosController extends CommonsController implements Serializable
 		this.estadoPedidoBusqueda = estadoPedidoBusqueda;
 	}
 
-	public Date getFechaPedidoBusqueda() {
-		return fechaPedidoBusqueda;
+	public Date getFechaPedidoInicioBusqueda() {
+		return fechaPedidoInicioBusqueda;
 	}
 
-	public void setFechaPedidoBusqueda(Date fechaPedidoBusqueda) {
-		this.fechaPedidoBusqueda = fechaPedidoBusqueda;
+	public void setFechaPedidoInicioBusqueda(Date fechaPedidoInicioBusqueda) {
+		this.fechaPedidoInicioBusqueda = fechaPedidoInicioBusqueda;
+	}
+
+	public Date getFechaPedidoFinBusqueda() {
+		return fechaPedidoFinBusqueda;
+	}
+
+	public void setFechaPedidoFinBusqueda(Date fechaPedidoFinBusqueda) {
+		this.fechaPedidoFinBusqueda = fechaPedidoFinBusqueda;
 	}
 
 	public Collection<CatalogoValorDTO> getEstadoPedidosCatalogoValorDTOCols() {

@@ -32,8 +32,10 @@
 					<h:inputText style="width:150px" value="#{cuentasController.facturaCabeceraDTO.numeroDocumento}" id="nroDocumentoFac" />
 					
 					
-					<h:outputText class="styleNegritas" value="#{msg_erpweb['ec.com.erp.etiqueta.label.lista.cabecera.factura.ruc.documento']}: *" />
-					<h:inputText style="width:150px" value="#{cuentasController.facturaCabeceraDTO.rucDocumento}" id="docClienteProveedor" maxlength="13" onkeypress="return validarEnteros(event);"/>
+					<h:outputText class="styleNegritas" value="#{msg_erpweb['ec.com.erp.etiqueta.label.nuevo.factura.compra.ruc.proveedor']}: *" />
+					<h:inputText style="width:150px" value="#{cuentasController.facturaCabeceraDTO.rucDocumento}" id="docClienteProveedor" maxlength="13" onkeypress="if (event.keyCode == 13) return false; return validarEnteros(event);">
+						<a4j:ajax event="keyup" execute="pnlGridVentas" listener="#{cuentasController.realizarConsultaProveedor}" onbeforesubmit="return verifyKeyEnter(event);" render="pnlGridVentas, pnlMensajes"/>
+					</h:inputText>
 					<h:outputText value="" />
 					<div style="width: 30px"></div>
 					<h:outputText class="styleNegritas" value="#{msg_erpweb['ec.com.erp.etiqueta.label.lista.cabecera.factura.telefono']}: *" />

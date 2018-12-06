@@ -20,10 +20,54 @@
 	</ui:define>
 	
 	<ui:define name="contentLeft">
-		<ui:include src="adminBusquedaDespachoLeft.xhtml" />
+		<!-- <ui:include src="adminBusquedaDespachoLeft.xhtml" /> -->
 	</ui:define>
 	
 	<ui:define name="contentCenter">	
+		
+		<rich:panel id="panel-content-left" styleClass="panel-content-left" style="width:100% !important;">
+			<f:facet name="header">			
+				<h:panelGrid columns="2" width="99.9%" columnClasses="align-left, align-right" cellpadding="0" cellspacing="0">
+					<h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.criterios.busqueda']}" style="white-space:nowrap" />
+				</h:panelGrid>
+			</f:facet>		
+		
+			<h:panelGroup id="filtrosDespacho" layout="block" styleClass="listaReporte">
+				<h:panelGrid columns="6" width="90%" cellpadding="0" cellspacing="2">
+					<h:panelGrid width="30%" columns="2" columnClasses="columnaIzquierda, columnaDerecha">
+			    	   	<rich:inplaceInput id="nroGuiaBusqueda" value="#{despachoController.numeroGuiaDespachoBusqueda}" styleClass="styleInputPlaceMediano" defaultLabel="#{msg_erpweb['ec.com.erp.etiqueta.busqueda.despacho.numero.guia']}">
+			    	   		<a4j:ajax event="keyup" execute="filtrosDespacho" listener="#{despachoController.busquedaGuiasDespachosEnter}" onbeforesubmit="if (event.keyCode != 13)  return false;" render="panelTablasDespachos tablaVacia tableDespacho pnlMensajes"></a4j:ajax>
+			    	   	</rich:inplaceInput>
+			    	   	<h:panelGroup styleClass="styleClean">
+							<a4j:commandLink styleClass="guardarA" execute="@this" render="nroGuiaBusqueda" actionListener="#{despachoController.borrarBusquedaGuiaDespacho}"/>
+						</h:panelGroup>
+					</h:panelGrid>
+			    	
+			    	<h:panelGrid width="30%" columns="2" columnClasses="columnaIzquierda, columnaDerecha">
+						<rich:inplaceInput id="placaBusqueda" value="#{despachoController.placaBusqueda}" styleClass="styleInputPlaceMediano" defaultLabel="#{msg_erpweb['ec.com.erp.etiqueta.buscar.numero.placa']}">
+							<a4j:ajax event="keyup" execute="filtrosDespacho" listener="#{despachoController.busquedaGuiasDespachosEnter}" onbeforesubmit="if (event.keyCode != 13)  return false;" render="panelTablasDespachos tablaVacia tableDespacho pnlMensajes"></a4j:ajax>
+						</rich:inplaceInput>
+			    	   	<h:panelGroup styleClass="styleClean">
+							<a4j:commandLink styleClass="guardarA" execute="@this" render="placaBusqueda" actionListener="#{despachoController.borrarBusquedaPlaca}"/>
+						</h:panelGroup>
+					</h:panelGrid>
+					
+					<h:panelGrid width="30%" columns="2" columnClasses="columnaIzquierda, columnaDerecha">
+						<rich:inplaceInput id="nombreChofer" value="#{despachoController.nombreChoferBusqueda}" styleClass="styleInputPlaceMediano" defaultLabel="#{msg_erpweb['ec.com.erp.etiqueta.buscar.nombre.chofer']}">
+							<a4j:ajax event="keyup" execute="filtrosDespacho" listener="#{despachoController.busquedaGuiasDespachosEnter}" onbeforesubmit="if (event.keyCode != 13)  return false;" render="panelTablasDespachos tablaVacia tableDespacho pnlMensajes"></a4j:ajax>
+						</rich:inplaceInput>
+			    	   	<h:panelGroup styleClass="styleClean">
+							<a4j:commandLink styleClass="guardarA" execute="@this" render="nombreChofer" actionListener="#{despachoController.borrarBusquedaNombreChofer}"/>
+						</h:panelGroup>
+					</h:panelGrid>
+					<rich:calendar inputStyle="width: 80px; height: 20px;" value="#{despachoController.fechaDespachoBusqueda}" datePattern="yyyy-MM-dd"></rich:calendar>
+			    	<rich:calendar inputStyle="width: 80px; height: 20px;" value="#{despachoController.fechaDespachoBusquedaFin}" datePattern="yyyy-MM-dd"></rich:calendar>
+			    	
+			    	 <a4j:commandButton id="btnBuscarDespacho" value="Buscar" styleClass="styleSearch" render="panelTablasDespachos tablaVacia tableDespacho pnlMensajes" execute="filtrosDespacho" actionListener="#{despachoController.busquedaGuiasDespachos}"/>
+				</h:panelGrid>						 
+			</h:panelGroup>	
+		</rich:panel>
+	
 		<rich:panel header="Lista de despachos" style="height: 94.5%; width:100% !important;">	
 			<h:panelGrid id="panelTablasDespachos" columns="1" style="width:100%;">
 				<h:panelGrid id="tablaVacia" columns="1" rendered="#{empty despachoController.guiaDespachoDTOCols}" style="width:100%; text-align: center; padding-top: 220px">

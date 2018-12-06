@@ -5,21 +5,15 @@
 	xmlns:a4j="http://richfaces.org/a4j"
 	xmlns:rich="http://richfaces.org/rich"
 	xmlns:c="http://java.sun.com/jstl/core">
-        <rich:toolbarGroup>
+        <rich:toolbarGroup itemStyle="width: 100px !important;">
 			<!-- BOTON: NUEVO-->
-			<h:panelGroup layout="block" styleClass="botonComun">
-				<a4j:commandLink value="Ventas" styleClass="botonVentas" action="#{cuentasController.crearNuevaCuentaFacturaVenta}"/>
+			<h:panelGroup layout="block" styleClass="botonLargeComun">
+				<a4j:commandLink value="Nueva compra" styleClass="botonCompras" action="#{cuentasController.crearNuevaCuentaFacturaCompra}"/>
 			</h:panelGroup>
 		</rich:toolbarGroup> 
-		<rich:toolbarGroup>
-			<!-- BOTON: NUEVO-->
-			<h:panelGroup layout="block" styleClass="botonComun">
-				<a4j:commandLink value="Compras" styleClass="botonCompras" action="#{cuentasController.crearNuevaCuentaFacturaCompra}"/>
-			</h:panelGroup>
-		</rich:toolbarGroup>
 		<rich:toolbarGroup>	
 			<h:panelGroup layout="block" styleClass="botonComun">
-				<h:commandLink value="Imprimir" styleClass="botonImprimir" action="#{cuentasController.imprimirListaFacturas}" target="_BLANK"/>
+				<h:commandLink value="Imprimir" styleClass="botonImprimirPdf" action="#{cuentasController.imprimirListaFacturas}" target="_blank"/>
 			</h:panelGroup>
 		</rich:toolbarGroup>
 		<rich:toolbarGroup>	

@@ -14,6 +14,7 @@ import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
 import javax.faces.event.ActionEvent;
+import javax.faces.event.AjaxBehaviorEvent;
 
 import org.apache.commons.collections.CollectionUtils;
 
@@ -59,8 +60,16 @@ public class ReporteController extends CommonsController implements Serializable
 
 	@PostConstruct
 	public void postConstruct() {
-		fechaInicioBusqueda = new Date();
-		fechaFinBusqueda = new Date();
+		this.loginController.activarMenusSeleccionado();
+		
+		Calendar fechaInferior = Calendar.getInstance();
+		fechaInferior.set(Calendar.MONTH, 0);
+		fechaInferior.set(Calendar.DATE, 1);
+		UtilitarioWeb.cleanDate(fechaInferior);
+		Calendar fechaSuperior = Calendar.getInstance();
+		fechaInicioBusqueda = fechaInferior.getTime();
+		fechaFinBusqueda = fechaSuperior.getTime();
+		
 		this.page = 0;
 		if(FacesContext.getCurrentInstance().getViewRoot().getViewId().equals("/modules/reportes/adminBusquedaReporte.xhtml")) {
 			this.inventarioDTOCols = ERPFactory.inventario.getInventarioServicio().findObtenerListaExistenciasByArticuloFechas(Integer.parseInt(ERPConstantes.ESTADO_ACTIVO_NUMERICO), codigoBarras, null, null);
@@ -87,20 +96,36 @@ public class ReporteController extends CommonsController implements Serializable
 	 * @param e
 	 */
 	public void busquedaInventario(ActionEvent e){
+		this.buscarInventario();
+	}
+	
+	/**
+	 * Metodo para buscar inventario
+	 * @param e
+	 */
+	public void busquedaInventarioEnter(AjaxBehaviorEvent e){
+		this.buscarInventario();
+	}
+	
+	/**
+	 * Metodo para buscar inventario
+	 * @param e
+	 */
+	public void buscarInventario(){
 		try {
-				Calendar fechaInicio = Calendar.getInstance();
-				Calendar fechaFin = Calendar.getInstance();
-				fechaInicio.setTime(fechaInicioBusqueda);
-				fechaFin.setTime(fechaFinBusqueda);
-				UtilitarioWeb.cleanDate(fechaInicio);
-				UtilitarioWeb.cleanDate(fechaFin);
-				fechaFin.add(Calendar.DATE, 1);
-				
-				this.inventarioDTOCols = ERPFactory.inventario.getInventarioServicio().findObtenerListaExistenciasByArticuloFechas(Integer.parseInt(ERPConstantes.ESTADO_ACTIVO_NUMERICO), codigoBarras, new Timestamp(fechaInicio.getTime().getTime()), new Timestamp(fechaFin.getTime().getTime()));
-				if(CollectionUtils.isEmpty(this.inventarioDTOCols)){
-					this.setShowMessagesBar(Boolean.TRUE);
-					MensajesController.addInfo(null, ERPWebResources.getString("ec.com.erp.etiqueta.mensaje.lista.resultado"));
-				}
+			Calendar fechaInicio = Calendar.getInstance();
+			Calendar fechaFin = Calendar.getInstance();
+			fechaInicio.setTime(fechaInicioBusqueda);
+			fechaFin.setTime(fechaFinBusqueda);
+			UtilitarioWeb.cleanDate(fechaInicio);
+			UtilitarioWeb.cleanDate(fechaFin);
+			fechaFin.add(Calendar.DATE, 1);
+			
+			this.inventarioDTOCols = ERPFactory.inventario.getInventarioServicio().findObtenerListaExistenciasByArticuloFechas(Integer.parseInt(ERPConstantes.ESTADO_ACTIVO_NUMERICO), codigoBarras, new Timestamp(fechaInicio.getTime().getTime()), new Timestamp(fechaFin.getTime().getTime()));
+			if(CollectionUtils.isEmpty(this.inventarioDTOCols)){
+				this.setShowMessagesBar(Boolean.TRUE);
+				MensajesController.addInfo(null, ERPWebResources.getString("ec.com.erp.etiqueta.mensaje.lista.resultado"));
+			}
 		} catch (ERPException e1) {
 			this.setShowMessagesBar(Boolean.TRUE);
 			MensajesController.addError(null, e1.getMessage());
@@ -131,6 +156,8 @@ public class ReporteController extends CommonsController implements Serializable
 	 * @return
 	 */
 	public String regresarMenuPrincipal(){
+		this.loginController.desActivarMenusSeleccionado();
+		this.loginController.setActivarInicio(Boolean.TRUE);
 		return "/modules/principal/menu.xhtml?faces-redirect=true";
 	}
 	

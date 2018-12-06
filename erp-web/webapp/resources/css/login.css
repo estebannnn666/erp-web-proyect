@@ -93,6 +93,21 @@ body {
 	background-image: rgba(0, 0, 0, 0.3);
 }
 /** Inicio estilos menus **/
+.styleMenuVert{
+	height: 70px;
+    width: 67px;
+    font-family: Arial, Verdana, sans-serif;
+    font-size: 10px;
+    font-weight: normal;
+    text-align: center;
+    text-decoration: none;
+    padding: 28px 0 0 0px;
+    border: 1px solid transparent;
+    background-repeat: no-repeat;
+    background-position: center 2px;
+    display: block;
+}
+
 .stylePrincipal a{
 	height: 70px;
     width: 67px;
@@ -108,6 +123,80 @@ body {
     display: block;
 }
 
+.style-common{
+	width: 24px;
+	height: 24px;
+}
+
+.style-home{
+	background-image: url("#{resource['images/home.png']}");
+}
+
+.styleArticle{
+	background-image: url("#{resource['images/article.png']}");
+}
+
+.styleClient{
+	background-image: url("#{resource['images/client.png']}");
+}
+
+.stylePedidos{
+	background-image: url("#{resource['images/orders.png']}");
+}
+
+.styleTransportista{
+	background-image: url("#{resource['images/transport.png']}");
+}
+
+.styleChofer{
+	background-image: url("#{resource['images/driver.png']}");
+}
+
+.styleVehiculo{
+    background-image: url("#{resource['images/car.png']}");
+}
+
+.styleDespacho{
+	background-image: url("#{resource['images/dispatch.png']}");
+}
+
+.styleFactura{
+    background-image: url("#{resource['images/bill.png']}");
+}
+
+.styleInvetario{
+    background-image: url("#{resource['images/inventory.png']}");
+}
+
+.styleReporte{
+	background-image: url("#{resource['images/report.png']}");
+}
+
+.styleProveedor{
+	background-image: url("#{resource['images/provider.png']}");
+}
+
+.styleCompras{
+	background-image: url("#{resource['images/compra.png']}");
+}
+
+.styleCuentas{
+	background-image: url("#{resource['images/cuentas.png']}");
+}
+
+.styleUsuario{
+    background-image: url("#{resource['images/users.png']}");
+}
+
+.styleModulo{
+	background-image: url("#{resource['images/module.png']}");
+}
+
+.stylePerfil{
+	background-image: url("#{resource['images/profile.png']}");
+}
+
+/*Estilos menu centro*/
 .styleArticle a:hover {
 	background-image: url("#{resource['images/articulos_over.png']}");
 }
@@ -280,11 +369,38 @@ body {
 	width: 17.5%;
 	border-right: 7px solid #a6a6a6 !important; 
 	height: 300px;
+	overflow-y: auto;
 }
 
 #contentRigth{
 	float: right;
 	width: 81.5%
+}
+
+#contenedorMenuPrincipal{
+	overflow: hidden;
+    width: 99.4%;
+    padding-top: 2px;
+    padding-left: 2px;
+    padding-right: 14px;
+    background-color: #FFF;
+    height: 83vh;
+}
+
+#contentLeftMenu{
+	float: left;
+	width: 30%;
+	height: 450px;
+	overflow-y: auto;
+}
+
+#contentRigthMenu{
+	float: right;
+	width: 65%
+}
+
+::-webkit-scrollbar {
+    width: 0px !important;
 }
 
 .styleDivMenuSecundario{
@@ -293,13 +409,10 @@ body {
 }
 
 .styleRichPanelMenu{
-	background-color: #d5e2ef;
-	border: 1px solid #545445;
-	margin-top: 2em !important;
-    margin-left: 5em !important;
-    margin-right: 5em !important;
-    margin-bottom: 5em !important;
-    height: 85% !important;
+    margin-top: 0.2em !important;
+    margin-left: 0.2em !important;
+    margin-right: -0.2em !important;
+    height: 98% !important;
 }
 
 .styleRichPanelMenu .rf-tab-hdr-tabs {
@@ -340,7 +453,7 @@ body {
     padding-top: 2px !important;
     padding-right: 3px !important;
 	padding-left: 1px !important;
-	background-image: url("#{resource['images/menu.png']}");
+	background-color: #F5F5F5;
 	background-size: cover;
 	height: 80vh !important;
 	background-image: rgba(0, 0, 0, 0.3);
@@ -348,7 +461,7 @@ body {
 
 .styleDivMenuBusquedasRigth{
 	padding-left: 2px !important;
-	background-image: url("#{resource['images/menu.png']}");
+	background-color: #F5F5F5;
 	background-size: cover;
 	height: 80.3vh !important;
 	background-image: rgba(0, 0, 0, 0.3);
@@ -389,6 +502,11 @@ body {
     width: 45px;
 }
 
+.botonComun a.botonImprimirPdf {
+    background-image: url("#{resource['images/botonpdf.png']}");
+    width: 45px;
+}
+
 .botonComun a {
     height: 12px;
     width: 60px;
@@ -405,6 +523,47 @@ body {
 }
 
 .botonComun a:hover {
+	border: 1px solid #e5973e !important;
+	backgroud-color: #fae6b0 !important;
+	background-repeat: no-repeat !important;
+}
+
+.botonLargeComun a.botonUsuario {
+    background-image: url("#{resource['images/usuario.png']}");
+    width: 45px;
+}
+
+.botonLargeComun a.botonCerrar {
+    background-image: url("#{resource['images/cerrar_ses.png']}");
+    width: 45px;
+}
+
+.botonLargeComun a.botonVentas {
+    background-image: url("#{resource['images/btnVentas.png']}");
+    width: 45px;
+}
+
+.botonLargeComun a.botonCompras {
+    background-image: url("#{resource['images/btnCompras.png']}");
+    width: 45px;
+}
+
+.botonLargeComun a {
+    height: 12px;
+    width: 60px !important;
+    font-family: Arial, Verdana, sans-serif;
+    font-size: 10px;
+    font-weight: normal;
+    text-align: center;
+    text-decoration: none;
+    padding: 28px 0 0 0px;
+    border: 1px solid transparent;
+    background-repeat: no-repeat;
+    background-position: center 2px;
+    display: block;
+}
+
+.botonLargeComun a:hover {
 	border: 1px solid #e5973e !important;
 	backgroud-color: #fae6b0 !important;
 	background-repeat: no-repeat !important;
@@ -561,7 +720,15 @@ body {
 }
 
 .panelToolBar .rf-tb-itm{
-	padding: 14px 3px !important;
+	padding-top: 13px !important;
+    padding-right: 3px !important;
+    padding-bottom: 13px !important;
+    padding-left: 3px !important;
+}
+
+.panelToolBar .rf-tb {
+    margin-top: -0.4em !important;
+    padding-top: 0px !important;
 }
 
 .panelToolBar .rf-tb-sep {
@@ -585,4 +752,131 @@ body {
     border-right-width: 0px !important;
     border-right-style: solid;
     border-right-color: #C0C0C0;
+}
+
+.styleInfoMenuPrincipal{
+	overflow: hidden;
+    width: 99.4%;
+    padding-top: 2px;
+    padding-left: 2px;
+    padding-right: 14px;
+    background-color: #FFF;
+}
+
+.styleInfoMenuLeft{
+	float: left;
+	width: 25.9%;
+	height: 60px;
+	overflow-y: auto;
+	text-align: center;
+	padding-top: 10px;
+}
+
+.styleInfoMenuRight{
+	float: right;
+	width: 74%;
+	height: 70px;
+}
+
+.styleInputPlaceMunuscula{
+	border: 1px solid #bed6f8;
+    height: 20px;
+    width: 250px;
+    padding-top: 3px;
+    font-size: 14px;
+    background-color: #f1f6fe;
+}
+
+.styleInputPlaceMunuscula .rf-ii-chng{
+	height: 20px !important;
+	border: 1px solid #bed6f8;
+    height: 20px;
+    width: 250px;
+    padding-top: 3px;
+    font-size: 14px;
+    background-color: #f1f6fe;
+}
+
+.styleInputPlaceMunuscula .rf-ii-fld{
+	height: 23px !important;
+	background-color: #f1f6fe;
+}
+
+.styleInputPlace{
+	border: 1px solid #bed6f8;
+    height: 20px;
+    width: 250px;
+    padding-top: 3px;
+    font-size: 14px;
+    background-color: #f1f6fe;
+}
+
+.styleInputPlace .rf-ii-chng{
+	height: 20px !important;
+	border: 1px solid #bed6f8;
+    height: 20px;
+    width: 250px;
+    padding-top: 3px;
+    font-size: 14px;
+    background-color: #f1f6fe;
+    text-transform: uppercase !important;
+}
+
+.styleInputPlace .rf-ii-fld{
+	height: 23px !important;
+	background-color: #f1f6fe;
+	text-transform: uppercase !important;
+}
+
+
+.styleInputPlaceMediano{
+	border: 1px solid #bed6f8;
+    height: 20px;
+    width: 175px;
+    padding-top: 3px;
+    font-size: 14px;
+    background-color: #f1f6fe;
+}
+
+.styleInputPlaceMediano .rf-ii-chng{
+	height: 20px !important;
+	border: 1px solid #bed6f8;
+    height: 20px;
+    width: 175px;
+    padding-top: 3px;
+    font-size: 14px;
+    background-color: #f1f6fe;
+    text-transform: uppercase !important;
+}
+
+
+.styleInputPlaceMediano .rf-ii-fld{
+	height: 23px !important;
+	background-color: #f1f6fe;
+	text-transform: uppercase !important;
+}
+
+
+.styleClean a:hover {
+	background-image: url("#{resource['images/limpiar.png']}");
+}
+
+.styleClean a {
+	height: 21px;
+    width: 16px;
+    font-family: Arial, Verdana, sans-serif;
+    font-size: 10px;
+    font-weight: normal;
+    text-align: center;
+    text-decoration: none;
+    border: 1px solid transparent;
+    background-repeat: no-repeat;
+    background-position: center 2px;
+    display: inline-block;
+    background-image: url("#{resource['images/limpiar.png']}");    
+}
+
+.styleSearch{
+	height: 24px;
+	width: 70px;
 }

@@ -8,24 +8,18 @@
         <rich:toolbarGroup>
         	<!-- BOTON: NUEVO-->
 			<h:panelGroup layout="block" styleClass="botonComun">
-				<a4j:commandLink value="Nuevo" execute="@this" render="pnlMensajes, pnlGridVentas, pnlGridDetalleFactura"
-					styleClass="botonNuevo" actionListener="#{cuentasController.clearNuevaCuentaFacturaVentas}"/>
-			</h:panelGroup>
-		</rich:toolbarGroup>
-		
-		<rich:toolbarGroup>
-			<!-- BOTON: GUARDAR-->
-			<h:panelGroup layout="block" styleClass="botonComun">
-				<a4j:commandLink oncomplete="if(#{cuentasController.documentoCreado})#{rich:component('mpConfirmacion')}.show();"  
-					value="#{msg_erpweb['ec.com.erp.etiqueta.boton.guardar']}"
-					styleClass="botonGuardar" actionListener="#{cuentasController.guadarActualizarCuentasFacturas}"
-					execute="pnlGridVentas pnlGridDetalleFactura" render="pnlMensajes"/>
+				<a4j:commandLink value="Nuevo" execute="@this" render="pnlGridProveedor pnlDatosBasicosProveedor pnlGridContacto pnlMensajes"
+					styleClass="botonNuevo" actionListener="#{proveedorController.clearNuevoProveedor}"/>
 			</h:panelGroup>
 		</rich:toolbarGroup>
 		
 		<rich:toolbarGroup>	
+			<!-- BOTON: GUARDAR-->
 			<h:panelGroup layout="block" styleClass="botonComun">
-				<h:commandLink value="Imprimir" styleClass="botonImprimir" action="#{cuentasController.imprimirFactura}" target="_BLANK"/>
+				<a4j:commandLink oncomplete="if(#{proveedorController.proveedorCreado})#{rich:component('mpConfirmacion')}.show();"
+					value="#{msg_erpweb['ec.com.erp.etiqueta.boton.guardar']}"
+					styleClass="botonGuardar" actionListener="#{proveedorController.guadarActualizarProveedor}"
+					execute="pnlGridProveedor, pnlDatosBasicosProveedor, pnlGridContacto" render="pnlMensajes"/>
 			</h:panelGroup>
 		</rich:toolbarGroup>
 		
@@ -33,7 +27,7 @@
 			<!-- BOTON: BUSQUEDA-->
 			<h:panelGroup layout="block" styleClass="botonComun">
 				<a4j:commandLink value="#{msg_erpweb['ec.com.erp.etiqueta.boton.busqueda']}"
-					styleClass="botonBuscar" action="#{cuentasController.regresarBusquedaCuentasFacturas}"
+					styleClass="botonBuscar" action="#{proveedorController.regresarBusquedaProveedor}"
 					immediate="true" execute="@this" />
 			</h:panelGroup>
 		</rich:toolbarGroup>

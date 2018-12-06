@@ -9,23 +9,17 @@
         	<!-- BOTON: NUEVO-->
 			<h:panelGroup layout="block" styleClass="botonComun">
 				<a4j:commandLink value="Nuevo" execute="@this" render="pnlMensajes, pnlGridVentas, pnlGridDetalleFactura"
-					styleClass="botonNuevo" actionListener="#{cuentasController.clearNuevaCuentaFacturaVentas}"/>
+					styleClass="botonNuevo" actionListener="#{cuentasController.clearNuevaCuentaFacturaCompra}"/>
 			</h:panelGroup>
 		</rich:toolbarGroup>
 		
 		<rich:toolbarGroup>
 			<!-- BOTON: GUARDAR-->
 			<h:panelGroup layout="block" styleClass="botonComun">
-				<a4j:commandLink oncomplete="if(#{cuentasController.documentoCreado})#{rich:component('mpConfirmacion')}.show();" 
+				<a4j:commandLink oncomplete="if(#{cuentasController.documentoCreado})#{rich:component('mpConfirmacion')}.show();"  
 					value="#{msg_erpweb['ec.com.erp.etiqueta.boton.guardar']}"
 					styleClass="botonGuardar" actionListener="#{cuentasController.guadarActualizarCuentasFacturas}"
 					execute="pnlGridVentas pnlGridDetalleFactura" render="pnlMensajes"/>
-			</h:panelGroup>
-		</rich:toolbarGroup>
-		
-		<rich:toolbarGroup>	
-			<h:panelGroup layout="block" styleClass="botonComun">
-				<h:commandLink value="Imprimir" styleClass="botonImprimir" action="#{cuentasController.imprimirFactura}" target="_BLANK"/>
 			</h:panelGroup>
 		</rich:toolbarGroup>
 		
@@ -33,7 +27,7 @@
 			<!-- BOTON: BUSQUEDA-->
 			<h:panelGroup layout="block" styleClass="botonComun">
 				<a4j:commandLink value="#{msg_erpweb['ec.com.erp.etiqueta.boton.busqueda']}"
-					styleClass="botonBuscar" action="#{cuentasController.regresarBusquedaCuentasFacturas}"
+					styleClass="botonBuscar" action="#{cuentasController.regresarBusquedaFacturasCompras}"
 					immediate="true" execute="@this" />
 			</h:panelGroup>
 		</rich:toolbarGroup>

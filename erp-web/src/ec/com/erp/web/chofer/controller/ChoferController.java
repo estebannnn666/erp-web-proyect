@@ -75,6 +75,7 @@ public class ChoferController extends CommonsController implements Serializable 
 
 	@PostConstruct
 	public void postConstruct() {
+		this.loginController.activarMenusSeleccionado();
 		this.choferCreado = Boolean.FALSE;
 		this.choferDTO = new ChoferDTO();
 		this.choferDTO.setFechaCaducidadLicencia(new Date());
@@ -371,6 +372,8 @@ public class ChoferController extends CommonsController implements Serializable 
 	 * @return
 	 */
 	public String regresarMenuPrincipal(){
+		this.loginController.desActivarMenusSeleccionado();
+		this.loginController.setActivarInicio(Boolean.TRUE);
 		return "/modules/principal/menu.xhtml?faces-redirect=true";
 	}
 	

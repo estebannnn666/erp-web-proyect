@@ -31,31 +31,30 @@
 			<!-- Insertar el contenido de la cabecera -->
 			<h:panelGroup id="header" layout="block">
 				<div id="topBusqueda">
-					<div align="left" style="float: left; width:21.8%; border-right: 1px solid #a6a6a6; border-right-style: dashed;">
+					<div align="left" style="float: left; width:17.9%; border-right: 1px solid #a6a6a6; border-right-style: dashed;">
 						<h:panelGrid columns="2">
 							<h:panelGrid columns="1">
 								<h:graphicImage value="#{resource['images/erp.png']}" height="60" width="60"/>
 							</h:panelGrid>
 							<h:panelGrid columns="1">
 								<h:outputLabel style="font-size: 26px; color: #19426a; font-weight: bold; font-family: sans-serif;" value="SGPYMES" /> 
-								<h:outputLabel style="font-size: 17px; font-weight: bold; font-family: cursive; color: #4a4b4c;" value="#{loginController.usuariosDTO.companiaDTO.nombreCompania}" />
+								<!-- <h:outputLabel style="font-size: 17px; font-weight: bold; font-family: cursive; color: #4a4b4c;" value="#{loginController.usuariosDTO.companiaDTO.nombreCompania}" />-->
 							</h:panelGrid>
 						</h:panelGrid>			
 					</div>
-					<div align="right" style="float: right; width:78.1%" class="panelToolBar">
+					<div align="right" style="float: right; width:82%" class="panelToolBar">
 						<rich:toolbar height="36" itemSeparator="line" itemStyle="width:2px">
 							<ui:insert name="header">
 							</ui:insert>
-					    	
 					    	<rich:toolbarGroup location="right">
-					    		<h:panelGrid columns="2" cellpadding="0" cellspacing="0" id="pgr" style="padding-top: 1px !important;">
-						    		<h:panelGroup layout="block" styleClass="styleAyuda">
-										<a4j:commandLink styleClass="guardarA"/>
-									</h:panelGroup>
-									<h:panelGroup layout="block" styleClass="styleCerrar">
-										<a4j:commandLink styleClass="guardarA" action="#{loginController.doLogout}"/>
-									</h:panelGroup>
-								</h:panelGrid>
+					    		<h:panelGroup layout="block" styleClass="botonLargeComun">
+									<a4j:commandLink value="#{loginController.usuariosDTO.nombreUsuario}" styleClass="botonUsuario"/>
+								</h:panelGroup>
+					    	</rich:toolbarGroup>
+					    	<rich:toolbarGroup location="right">
+								<h:panelGroup layout="block" styleClass="botonLargeComun">
+									<a4j:commandLink value="#{msg_erpweb['ec.com.erp.etiqueta.boton.cerrar.session']}" styleClass="botonCerrar" action="#{loginController.doLogout}"/>
+								</h:panelGroup>
 							</rich:toolbarGroup>
 						</rich:toolbar>
 					</div>
@@ -64,8 +63,9 @@
 			<!-- Insertar el contenido central -->
 			<div id="contenedorPrincipal">
 				<div id="contentLeft" class="styleDivMenuBusquedasLeft">
-					<ui:insert name="contentLeft">
-					</ui:insert>
+					<ui:include src="/templates/main/menuleft.xhtml" />
+					<!-- <ui:insert name="contentLeft">
+					</ui:insert> -->
 				</div>
 				<div id="contentRigth" class="styleDivMenuBusquedasRigth">
 					<ui:insert name="contentCenter">
@@ -88,5 +88,6 @@
 	</h:body>
 	<h:outputStylesheet library="css" name="login.css" />
 	<h:outputStylesheet library="css" name="articulos.css" />
+	<h:outputStylesheet library="css" name="menuvertical.css" />
 </f:view>
 </html>

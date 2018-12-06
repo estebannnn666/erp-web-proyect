@@ -87,6 +87,16 @@ public class DespachoController extends CommonsController implements Serializabl
 
 	@PostConstruct
 	public void postConstruct() {
+		
+		Calendar fechaInicio = Calendar.getInstance();
+		Calendar fechaFin = Calendar.getInstance();
+		fechaInicio.set(Calendar.MONTH, 0);
+		fechaInicio.set(Calendar.DATE, 1);
+		UtilitarioWeb.cleanDate(fechaInicio);
+		fechaDespachoBusqueda = fechaInicio.getTime();
+		fechaDespachoBusquedaFin = fechaFin.getTime();
+		
+		this.loginController.activarMenusSeleccionado();
 		this.guiaDespachoDTO = new GuiaDespachoDTO();
 		this.guiaDespachoDTO.setFechaDespacho(new Date());
 		SecuenciaDTO secuenciaDespacho = ERPFactory.secuencias.getSecuenciaServicio().findObtenerSecuenciaByNombre(GuiaDespachoID.NOMBRE_SECUENCIA);
@@ -100,8 +110,6 @@ public class DespachoController extends CommonsController implements Serializabl
 		this.page = 0;
 		this.orden = 1;
 		this.despachoCreado = Boolean.FALSE;
-		this.fechaDespachoBusqueda = new Date();
-		this.fechaDespachoBusquedaFin = new Date();
 		
 		GuiaDespachoExtrasDTO guiaDespachoExtrasDTOTemp = null;
 		for(int i = 0; i < 5 ; i++){
@@ -116,7 +124,7 @@ public class DespachoController extends CommonsController implements Serializabl
 			this.setGuiaDespachoPedidoDTOCols(ERPFactory.despacho.getGuiaDespachoServicio().findObtenerListaGuiaDespachoPedidosByNumeroGuiaDespacho(Integer.parseInt(ERPConstantes.ESTADO_ACTIVO_NUMERICO), despachoDataManager.getGuiaDespachoDTOEditar().getNumeroGuiaDespacho()));
 		}
 		if(FacesContext.getCurrentInstance().getViewRoot().getViewId().equals("/modules/despachos/adminBusquedaDespacho.xhtml")) {
-			this.guiaDespachoDTOCols = ERPFactory.despacho.getGuiaDespachoServicio().findObtenerListaDespachosByFiltrosBusqueda(Integer.parseInt(ERPConstantes.ESTADO_ACTIVO_NUMERICO), numeroGuiaDespachoBusqueda, null, null, placaBusqueda, numeroDocumentoChoferBusqueda, nombreChoferBusqueda);
+			this.guiaDespachoDTOCols = ERPFactory.despacho.getGuiaDespachoServicio().findObtenerListaDespachosByFiltrosBusqueda(Integer.parseInt(ERPConstantes.ESTADO_ACTIVO_NUMERICO), numeroGuiaDespachoBusqueda, null, null, placaBusqueda, null, nombreChoferBusqueda);
 		}
 	}
 		
@@ -171,7 +179,7 @@ public class DespachoController extends CommonsController implements Serializabl
 	 */
 	public void abrirPopUpPedidos(ActionEvent e){
 		controlPopUp = Boolean.FALSE;
-		this.pedidosDTOCols = ERPFactory.pedidos.getPedidoServicio().findObtenerPedidosRegistrados(Integer.parseInt(ERPConstantes.ESTADO_ACTIVO_NUMERICO), ERPConstantes.CODIGO_CATALOGO_VALOR_ESTADO_PEDIDO_REGISTRADO);
+		this.pedidosDTOCols = ERPFactory.pedidos.getPedidoServicio().findObtenerPedidosRegistrados(Integer.parseInt(ERPConstantes.ESTADO_ACTIVO_NUMERICO), null, null, null, null, ERPConstantes.CODIGO_CATALOGO_VALOR_ESTADO_PEDIDO_REGISTRADO);
 		Collection<PedidoDTO> pedidoDTOAuxCols = new ArrayList<PedidoDTO>();
 		Boolean ban;
 		if(CollectionUtils.isNotEmpty(this.guiaDespachoPedidoDTOCols) && CollectionUtils.isNotEmpty(this.pedidosDTOCols)) {
@@ -268,10 +276,26 @@ public class DespachoController extends CommonsController implements Serializabl
 	}
 	
 	/**
-	 * Metodo para buscar guias por filtros o todos
+	 * Metodo para buscar guias
 	 * @param e
 	 */
 	public void busquedaGuiasDespachos(ActionEvent e){
+		this.buscarGuiasDespachos();
+	}
+	
+	/**
+	 * Metodo para buscar guias al dar enter
+	 * @param e
+	 */
+	public void busquedaGuiasDespachosEnter(AjaxBehaviorEvent e){
+		this.buscarGuiasDespachos();
+	}
+	
+	/**
+	 * Metodo para buscar guias por filtros o todos
+	 * @param e
+	 */
+	public void buscarGuiasDespachos(){
 		try {
 			this.setShowMessagesBar(Boolean.FALSE);
 			
@@ -280,11 +304,9 @@ public class DespachoController extends CommonsController implements Serializabl
 			fechaInicio.setTime(fechaDespachoBusqueda);
 			fechaFin.setTime(fechaDespachoBusquedaFin);
 			UtilitarioWeb.cleanDate(fechaInicio);
-			UtilitarioWeb.cleanDate(fechaFin);
-			fechaFin.add(Calendar.DATE, 1);
 			
 			// Busqueda por (Integer codigoCompania, String numeroGuia, Timestamp fechaDespacho, String placa, String documentoChofer, String nombreChofer)
-			this.guiaDespachoDTOCols = ERPFactory.despacho.getGuiaDespachoServicio().findObtenerListaDespachosByFiltrosBusqueda(Integer.parseInt(ERPConstantes.ESTADO_ACTIVO_NUMERICO), numeroGuiaDespachoBusqueda, new Timestamp(fechaInicio.getTime().getTime()), new Timestamp(fechaFin.getTime().getTime()), placaBusqueda, numeroDocumentoChoferBusqueda, nombreChoferBusqueda);
+			this.guiaDespachoDTOCols = ERPFactory.despacho.getGuiaDespachoServicio().findObtenerListaDespachosByFiltrosBusqueda(Integer.parseInt(ERPConstantes.ESTADO_ACTIVO_NUMERICO), numeroGuiaDespachoBusqueda, new Timestamp(fechaInicio.getTime().getTime()), new Timestamp(fechaFin.getTime().getTime()), placaBusqueda, null, nombreChoferBusqueda);
 			if(CollectionUtils.isEmpty(this.guiaDespachoDTOCols)){
 				this.setShowMessagesBar(Boolean.TRUE);
 		        MensajesController.addInfo(null, ERPWebResources.getString("ec.com.erp.etiqueta.mensaje.lista.resultado"));
@@ -303,6 +325,8 @@ public class DespachoController extends CommonsController implements Serializabl
 	 * @return
 	 */
 	public String regresarMenuPrincipal(){
+		this.loginController.desActivarMenusSeleccionado();
+		this.loginController.setActivarInicio(Boolean.TRUE);
 		return "/modules/principal/menu.xhtml?faces-redirect=true";
 	}
 	

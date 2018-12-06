@@ -81,6 +81,7 @@ public class VehiculoController extends CommonsController implements Serializabl
 
 	@PostConstruct
 	public void postConstruct() {
+		this.loginController.activarMenusSeleccionado();
 		this.vehiculoCreado = Boolean.FALSE;
 		this.controlPopUp = Boolean.FALSE;
 		this.choferDTO = new ChoferDTO();
@@ -177,6 +178,8 @@ public class VehiculoController extends CommonsController implements Serializabl
 	 * @return
 	 */
 	public String regresarMenuPrincipal(){
+		this.loginController.desActivarMenusSeleccionado();
+		this.loginController.setActivarInicio(Boolean.TRUE);
 		return "/modules/principal/menu.xhtml?faces-redirect=true";
 	}
 	
@@ -323,10 +326,26 @@ public class VehiculoController extends CommonsController implements Serializabl
 	}
 	
 	/**
-	 * Metodo para buscar vehiculos por filtros o todos
+	 * Metodo para buscar vehiculos
 	 * @param e
 	 */
 	public void busquedaVehiculos(ActionEvent e){
+		this.buscarVehiculos();
+	}
+	
+	/**
+	 * Metodo para buscar vehiculos enter
+	 * @param e
+	 */
+	public void busquedaVehiculosEnter(AjaxBehaviorEvent e){
+		this.buscarVehiculos();
+	}
+	
+	/**
+	 * Metodo para buscar vehiculos por filtros o todos
+	 * @param e
+	 */
+	public void buscarVehiculos(){
 		try {
 			this.placaBusqueda = placaBusqueda.toUpperCase();
 			this.numeroDocumentoBusqueda = numeroDocumentoBusqueda.toUpperCase();

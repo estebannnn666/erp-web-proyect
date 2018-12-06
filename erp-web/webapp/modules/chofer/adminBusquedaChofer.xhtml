@@ -24,14 +24,41 @@
 	</ui:define>
 	
 	<ui:define name="contentCenter">
-		<rich:panel id="listaChofer" styleClass="panelListaArticulos" header="Lista de choferes" style="height: 94.5%; width:100% !important;">	
+		<rich:panel id="panel-content-left" styleClass="panel-content-left" style="width:100% !important;">
+			<f:facet name="header">			
+				<h:panelGrid columns="2" width="99.9%" columnClasses="align-left, align-right" cellpadding="0" cellspacing="0">
+					<h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.criterios.busqueda']}" style="white-space:nowrap" />
+				</h:panelGrid>
+			</f:facet>		
+		
+			<h:panelGroup id="filtrosChofer" layout="block" styleClass="listaReporte">
+				<h:panelGrid columns="3" width="70%" cellpadding="0" cellspacing="2">
+					<h:panelGrid width="47%" columns="2" columnClasses="columnaIzquierda, columnaDerecha">
+			    	   	<rich:inplaceInput id="codigoBarras" value="#{choferController.numeroDocumentoBusqueda}" styleClass="styleInputPlace" defaultLabel="#{msg_erpweb['ec.com.erp.etiqueta.label.busqueda.numero.documento']}" />
+			    	   	<h:panelGroup styleClass="styleClean">
+							<a4j:commandLink styleClass="guardarA" execute="@this" render="filtrosChofer" actionListener="#{choferController.borrarBusquedaNumeroDocumento}"/>
+						</h:panelGroup>
+					</h:panelGrid>
+			    	
+			    	<h:panelGrid width="47%" columns="2" columnClasses="columnaIzquierda, columnaDerecha">
+						<rich:inplaceInput id="nombreArticulo" value="#{choferController.nombreChoferBusqueda}" styleClass="styleInputPlace" defaultLabel="#{msg_erpweb['ec.com.erp.etiqueta.label.busqueda.nombre.chofer']}" />
+			    	   	<h:panelGroup styleClass="styleClean">
+							<a4j:commandLink styleClass="guardarA" execute="@this" render="filtrosChofer" actionListener="#{choferController.borrarBusquedaNombreChofer}"/>
+						</h:panelGroup>
+					</h:panelGrid>
+			    	 <a4j:commandButton id="btnBuscarCliente" value="Buscar" styleClass="styleSearch" render="listaChofer tableChofer, pnlMensajes" execute="filtrosCliente" actionListener="#{choferController.busquedaChofer}"/>
+				</h:panelGrid>						 
+			</h:panelGroup>	
+		</rich:panel>
+		
+		<rich:panel id="listaChofer" styleClass="panelListaArticulos" header="Lista de choferes" style="height: 84.3%; width:100% !important;">	
 			<h:panelGrid id="tablaVacia" columns="1" rendered="#{empty choferController.choferDTOCols}" style="width:100%; text-align: center; padding-top: 220px">
 				<h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.mensaje.lista.vacio']}"/>
 			</h:panelGrid>
 			<rich:panel style="text-align:center; border-left: none; border-right:none; border-bottom:none" rendered="#{not empty choferController.choferDTOCols}">
 				<rich:dataScroller page="#{choferController.page}" fastStep="3" for="tableChofer" maxPages="5" rendered="#{not empty choferController.choferDTOCols}" renderIfSinglePage="false"/>
 			</rich:panel>		
-			<rich:dataTable style="width:100%" rendered="#{not empty choferController.choferDTOCols}" value="#{choferController.choferDTOCols}" var="chofer" iterationStatusVar="it" id="tableChofer" rows="15">
+			<rich:dataTable style="width:100%" rendered="#{not empty choferController.choferDTOCols}" value="#{choferController.choferDTOCols}" var="chofer" iterationStatusVar="it" id="tableChofer" rows="14">
 	        	<rich:column>
 	                <f:facet name="header">Nro.</f:facet>
 	                #{it.index+1}
