@@ -91,7 +91,9 @@ public class ChartBean implements Serializable {
 		// Fecha superior
 		Calendar fechaSuperior = Calendar.getInstance();
 		BigDecimal cuentasCobrar = ERPFactory.facturas.getFacturaCabeceraServicio().findObtenerComprasVentas(Integer.parseInt(ERPConstantes.ESTADO_ACTIVO_NUMERICO), new Timestamp(fechaInferior.getTime().getTime()), new Timestamp(fechaSuperior.getTime().getTime()), ERPConstantes.CODIGO_CATALOGO_VALOR_DOCUMENTO_VENTAS, Boolean.FALSE);
-		valorPendienteCobro = cuentasCobrar.doubleValue();
+		if(cuentasCobrar != null){
+			valorPendienteCobro = cuentasCobrar.doubleValue();
+		}
 		fechaSuperior.set(Calendar.DATE, 1);
 		UtilitarioWeb.cleanDate(fechaSuperior);
 		

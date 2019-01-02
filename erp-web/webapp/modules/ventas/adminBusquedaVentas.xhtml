@@ -144,6 +144,13 @@
 					</a4j:commandLink>
 	            </rich:column>
 	            <rich:column styleClass="columna5">
+	                <f:facet name="header">Imprimir</f:facet>
+	                <h:commandLink id="botonImprimir" title="Ver factura en pdf para imprimir" action="#{cuentasController.imprimirFactura}" target="_BLANK" actionListener="#{cuentasController.cargarFacturaDetalle}">
+						<h:graphicImage name="print_pdf.png" library="images" style="border:none;border-color:white;" height="24" width="24"/>
+						<f:setPropertyActionListener value="#{cuenta}" target="#{cuentasController.facturaCabeceraDTO}" />											
+					</h:commandLink>
+	            </rich:column>
+	            <rich:column styleClass="columna5">
 	                <f:facet name="header">Cancelar</f:facet>
 	                <a4j:commandLink id="botonEditar" title="Cancelar factura" render="pnlGridVentas, pnlGridDetalleFactura" actionListener="#{cuentasController.cargarFacturaDetalle}"	execute="@this" oncomplete="#{rich:component('popUpConfirmar')}.show();"> 
 						<h:graphicImage name="btnCancelar.png" library="images" style="border:none;border-color:white;" height="16" width="16"/>

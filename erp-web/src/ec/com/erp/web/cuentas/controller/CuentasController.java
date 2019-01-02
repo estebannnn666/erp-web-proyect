@@ -24,13 +24,13 @@ import javax.faces.context.FacesContext;
 import javax.faces.event.ActionEvent;
 import javax.faces.event.AjaxBehaviorEvent;
 import javax.faces.event.ValueChangeEvent;
-import javax.print.Doc;
-import javax.print.DocFlavor;
-import javax.print.DocPrintJob;
-import javax.print.PrintException;
-import javax.print.PrintService;
-import javax.print.PrintServiceLookup;
-import javax.print.SimpleDoc;
+//import javax.print.Doc;
+//import javax.print.DocFlavor;
+//import javax.print.DocPrintJob;
+//import javax.print.PrintException;
+//import javax.print.PrintService;
+//import javax.print.PrintServiceLookup;
+//import javax.print.SimpleDoc;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
@@ -364,6 +364,10 @@ public class CuentasController extends CommonsController implements Serializable
 		if(StringUtils.isEmpty(this.facturaCabeceraDTO.getNombreClienteProveedor())) {
 			MensajesController.addError(null, ERPWebResources.getString("ec.com.erp.etiqueta.mensaje.campo.requerido.nombrecliente.factura"));
 		}
+		if(CollectionUtils.isEmpty(this.facturaDetalleDTOCols)) {
+			this.setFacturaDetalleDTOCols(this.facturaCabeceraDTO.getFacturaDetalleDTOCols());
+		}
+		
 		if(CollectionUtils.isEmpty(this.facturaDetalleDTOCols)) {
 			valido = Boolean.FALSE;
 			MensajesController.addError(null, ERPWebResources.getString("ec.com.erp.etiqueta.label.nuevo.pedidos.mensaje.requerido.factura"));
@@ -734,31 +738,29 @@ public class CuentasController extends CommonsController implements Serializable
 	 * Metodo para imprimir lista de facturas
 	 */
 	public void imprimirFactura() {
-//		HtmlPdf htmltoPDF;
+		HtmlPdf htmltoPDF;
 		try {
 			if(this.validarInformacionRequerida()) {
 				
-				String texto = "Esto es lo que va a la impresora";
-				 
-				PrintService printService = PrintServiceLookup.lookupDefaultPrintService();
-		 
-				DocFlavor flavor = DocFlavor.BYTE_ARRAY.AUTOSENSE;
-				DocPrintJob docPrintJob = printService.createPrintJob();
-				Doc doc = new SimpleDoc(texto.getBytes(), flavor, null);
-				try {
-					docPrintJob.print(doc, null);
-				} catch (PrintException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
+//				String texto = "Esto es lo que va a la impresora";
+//				PrintService printService = PrintServiceLookup.lookupDefaultPrintService();
+//				DocFlavor flavor = DocFlavor.BYTE_ARRAY.AUTOSENSE;
+//				DocPrintJob docPrintJob = printService.createPrintJob();
+//				Doc doc = new SimpleDoc(texto.getBytes(), flavor, null);
+//				try {
+//					docPrintJob.print(doc, null);
+//				} catch (PrintException e) {
+//					// TODO Auto-generated catch block
+//					e.printStackTrace();
+//				}
 				
 				// Plantilla rpincipal que permite la conversion de xsl a pdf
-//				htmltoPDF = new HtmlPdf(ERPConstantes.PLANTILLA_XSL_FOPRINCIPAL);
-//				HashMap<String , String> parametros = new HashMap<String, String>();
-//				byte contenido[] = htmltoPDF.convertir(ERPFactory.despacho.getGuiaDespachoServicio().finObtenerXMLImprimirGuiaDespacho(guiaDespachoDTO).replace("<?xml version=\"1.0\" encoding=\"UTF-8\"?>", ""), "", "",	parametros,	null);
-				this.setShowMessagesBar(Boolean.TRUE);
-		        MensajesController.addInfo(null, ERPWebResources.getString("ec.com.erp.etiqueta.pantall.despacho.mensaje.impresion.correcta"));
-//				UtilitarioWeb.mostrarPDF(contenido);	
+				htmltoPDF = new HtmlPdf(ERPConstantes.PLANTILLA_XSL_FOPRINCIPAL);
+				HashMap<String , String> parametros = new HashMap<String, String>();
+				byte contenido[] = htmltoPDF.convertir(ERPFactory.facturas.getFacturaCabeceraServicio().finObtenerXMLImprimirFacturaVenta(facturaCabeceraDTO).replace("<?xml version=\"1.0\" encoding=\"UTF-8\"?>", ""), "", "",	parametros,	null);
+//				this.setShowMessagesBar(Boolean.TRUE);
+//		        MensajesController.addInfo(null, ERPWebResources.getString("ec.com.erp.etiqueta.pantall.despacho.mensaje.impresion.correcta"));
+				UtilitarioWeb.mostrarPDF(contenido);	
 			}else {
 				this.setShowMessagesBar(Boolean.TRUE);
 			}
