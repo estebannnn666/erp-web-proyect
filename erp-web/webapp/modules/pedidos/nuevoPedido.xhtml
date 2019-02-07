@@ -4,6 +4,7 @@
 	xmlns:h="http://java.sun.com/jsf/html"
 	xmlns:a4j="http://richfaces.org/a4j"
 	xmlns:rich="http://richfaces.org/rich"
+	xmlns:p="http://primefaces.org/ui"
 	template="/templates/pages/pageLayout3.xhtml">
 	
 	<ui:param name="idForm" value="frmNuevoPedido" />
@@ -99,15 +100,20 @@
 				                	</a4j:ajax>
 				                </h:inputText>
 				            </rich:column>			            
-				            <rich:column>
+				            <rich:column styleClass="autoStyle">
 				                <f:facet name="header"><h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.header.tabla.descripcion.articulo']}"/></f:facet>
-				                <rich:autocomplete id="codBarras" style="width:200px" value="#{detalle.articuloDTO.nombreArticulo}" mode="client" var="cap" 
-				                				   fetchValue="#{cap.nombreArticulo}" layout="div" autocompleteList="#{pedidosController.articuloDTOCols}">	
-				                	<a4j:ajax event="change" execute="@this" render="pnlGridDetallePedido" listener="#{pedidosController.asignarValoresArticulo}"></a4j:ajax>
-						            <rich:column>
-						                <b>#{cap.nombreArticulo}</b> 
-						            </rich:column>
-						        </rich:autocomplete>
+						        <p:autoComplete id="themeCustom" value="#{detalle.articuloDTO}" completeMethod="#{pedidosController.completeTheme}"
+					                        var="art" itemLabel="#{art.nombreArticulo}" itemValue="#{art}" converter="articuloConverter">
+					                <a4j:ajax event="change" execute="@this" render="pnlGridDetallePedido" listener="#{pedidosController.asignarValoresArticuloPrime}"></a4j:ajax>
+					                <a4j:ajax event="keyup" execute="@this" render="pnlGridDetallePedido" listener="#{pedidosController.asignarValoresArticuloPrime}" onbeforesubmit="return verifyKeyEnter(event);"></a4j:ajax>
+						            <p:column>
+						                <h:outputText value="#{art.codigoBarras} - " />
+						            </p:column>
+						             
+						            <p:column>
+						                <h:outputText value="#{art.nombreArticulo}" />
+						            </p:column>
+						        </p:autoComplete>
 				            </rich:column>
 				            <rich:column>
 				                <f:facet name="header"><h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.header.tabla.codigo.barras']}"/></f:facet>
@@ -310,6 +316,10 @@
 			
 			.styleColumPedido{
 				width: 120px !important;
+			}
+			
+			.autoStyle .ui-inputfield{
+			    -webkit-box-shadow: inset 0 0px 0px #8f8f8f !important;
 			}
 		</h:outputStylesheet>
 	</ui:define>

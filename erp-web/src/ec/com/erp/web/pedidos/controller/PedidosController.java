@@ -49,7 +49,7 @@ import ec.com.erp.web.pedidos.datamanager.PedidosDataManager;
  * @author hgudino
  *
  */
-@ManagedBean
+@ManagedBean(name="pedidosController", eager = true)
 @ViewScoped
 public class PedidosController extends CommonsController implements Serializable {
 
@@ -72,7 +72,7 @@ public class PedidosController extends CommonsController implements Serializable
 	
 	// Variables
 	private Collection<PedidoDTO> pedidosDTOCols;
-	private Collection<ArticuloDTO> articuloDTOCols;
+//	private List<ArticuloDTO> articuloDTOCols;
 	private ArticuloDTO articuloDTO;
 	private String numeroDocumentoBusqueda;
 	private String nombreClienteBusqueda;
@@ -93,6 +93,10 @@ public class PedidosController extends CommonsController implements Serializable
 	private String mensaje;
 	private String valorAccion;
 	private Boolean mostrarIcono;
+	
+	@ManagedProperty("#{articuloService}")
+	private ArticuloService service;
+	 
 
 	@PostConstruct
 	public void postConstruct() {
@@ -123,7 +127,11 @@ public class PedidosController extends CommonsController implements Serializable
 			contDetalle++;
 		}
 		this.page = 0;
-		this.articuloDTOCols = ERPFactory.articulos.getArticuloServicio().findObtenerListaArticulos(1, null, null);
+//		this.articuloDTOCols = new ArrayList<ArticuloDTO>();
+//		Collection<ArticuloDTO> articuloCols = ERPFactory.articulos.getArticuloServicio().findObtenerListaArticulos(1, null, null);
+//		for (ArticuloDTO skin : articuloCols) {
+//            this.articuloDTOCols.add(skin);
+//        }
 		
 		if(pedidosDataManager.getPedidoDTOEditar() != null && pedidosDataManager.getPedidoDTOEditar().getId().getCodigoPedido() != null)
 		{
@@ -135,6 +143,8 @@ public class PedidosController extends CommonsController implements Serializable
 		if(FacesContext.getCurrentInstance().getViewRoot().getViewId().equals("/modules/pedidos/adminBusquedaPedidos.xhtml")) {
 			this.pedidosDTOCols = ERPFactory.pedidos.getPedidoServicio().findObtenerPedidosRegistrados(Integer.parseInt(ERPConstantes.ESTADO_ACTIVO_NUMERICO), null, null, null ,null, null);
 		}
+		
+//		FacesContext.getCurrentInstance().getExternalContext().getSessionMap().put("articuloDTOCols", this.articuloDTOCols);
 	}
 		
 	@Override
@@ -155,6 +165,20 @@ public class PedidosController extends CommonsController implements Serializable
 	public void reloadPagina(ActionEvent e) {
 		System.out.println("Reload");
 	}
+	
+	public List<ArticuloDTO> completeTheme(String query) {
+        Collection<ArticuloDTO> allThemes = this.service.getArticuloDTOCols();
+        
+        List<ArticuloDTO> filteredThemes = new ArrayList<ArticuloDTO>();
+         
+        for (ArticuloDTO skin : allThemes) {
+            if(skin.getNombreArticulo().toLowerCase().contains(query)) {
+                filteredThemes.add(skin);
+            }
+        }
+         
+        return filteredThemes;
+    }
 	
 	/**
 	 * Calcular el total y subtotal
@@ -224,36 +248,62 @@ public class PedidosController extends CommonsController implements Serializable
 	 * @param e
 	 */
 	public void asignarValoresArticulo(AjaxBehaviorEvent e) {
-		String idComponete = e.getComponent().getClientId();
-		String[] idCompuesto =  idComponete.split(":");
-		Integer numeroDetalle = Integer.parseInt(idCompuesto[2])+1;
+//		String idComponete = e.getComponent().getClientId();
+//		String[] idCompuesto =  idComponete.split(":");
+//		Integer numeroDetalle = Integer.parseInt(idCompuesto[2])+1;
 		
-		for(DetallePedidoDTO detallePedidoDTO : detallePedidoDTOCols) {
-			if(detallePedidoDTO.getId().getCodigoCompania().intValue() == numeroDetalle.intValue()) {
-				// Se busca el artculo con el codigo de barras seleccionado para asignar el resto de informacion del articulo
-				ArticuloDTO articuloDTOTemp = new ArticuloDTO();
-				for(ArticuloDTO articuloDTOSearch : this.articuloDTOCols) {
-					if(detallePedidoDTO.getArticuloDTO().getNombreArticulo().equals(articuloDTOSearch.getNombreArticulo())) {
-						articuloDTOTemp.setCantidadStock(articuloDTOSearch.getCantidadStock());
-						articuloDTOTemp.setCodigoBarras(articuloDTOSearch.getCodigoBarras());
-						articuloDTOTemp.setNombreArticulo(articuloDTOSearch.getNombreArticulo());
-						articuloDTOTemp.setPeso(articuloDTOSearch.getPeso());
-						articuloDTOTemp.setPrecio(articuloDTOSearch.getPrecio());
-						articuloDTOTemp.getId().setCodigoArticulo(articuloDTOSearch.getId().getCodigoArticulo());
-						break;
-					}
-				}				
-				// Se agrega el articulo al detalle del pedido y se realiza las respectivas operaciones
-				detallePedidoDTO.setArticuloDTO(articuloDTOTemp);
-				if(detallePedidoDTO.getCantidad() != null && detallePedidoDTO.getArticuloDTO().getPrecio() != null) {
-					BigDecimal subTotal = BigDecimal.valueOf(Double.valueOf(""+detallePedidoDTO.getCantidad())).multiply(detallePedidoDTO.getArticuloDTO().getPrecio());
-					detallePedidoDTO.setSubTotal(subTotal);
-					detallePedidoDTO.setCodigoArticulo(articuloDTOTemp.getId().getCodigoArticulo());
-					this.calcularTotal();
-				}
-				break;
+//		for(DetallePedidoDTO detallePedidoDTO : detallePedidoDTOCols) {
+//			if(detallePedidoDTO.getId().getCodigoCompania().intValue() == numeroDetalle.intValue()) {
+//				// Se busca el artculo con el codigo de barras seleccionado para asignar el resto de informacion del articulo
+//				ArticuloDTO articuloDTOTemp = new ArticuloDTO();
+//				for(ArticuloDTO articuloDTOSearch : this.articuloDTOCols) {
+//					if(detallePedidoDTO.getArticuloDTO().getNombreArticulo().equals(articuloDTOSearch.getNombreArticulo())) {
+//						articuloDTOTemp.setCantidadStock(articuloDTOSearch.getCantidadStock());
+//						articuloDTOTemp.setCodigoBarras(articuloDTOSearch.getCodigoBarras());
+//						articuloDTOTemp.setNombreArticulo(articuloDTOSearch.getNombreArticulo());
+//						articuloDTOTemp.setPeso(articuloDTOSearch.getPeso());
+//						articuloDTOTemp.setPrecio(articuloDTOSearch.getPrecio());
+//						articuloDTOTemp.getId().setCodigoArticulo(articuloDTOSearch.getId().getCodigoArticulo());
+//						break;
+//					}
+//				}				
+//				// Se agrega el articulo al detalle del pedido y se realiza las respectivas operaciones
+//				detallePedidoDTO.setArticuloDTO(articuloDTOTemp);
+//				if(detallePedidoDTO.getCantidad() != null && detallePedidoDTO.getArticuloDTO().getPrecio() != null) {
+//					BigDecimal subTotal = BigDecimal.valueOf(Double.valueOf(""+detallePedidoDTO.getCantidad())).multiply(detallePedidoDTO.getArticuloDTO().getPrecio());
+//					detallePedidoDTO.setSubTotal(subTotal);
+//					detallePedidoDTO.setCodigoArticulo(articuloDTOTemp.getId().getCodigoArticulo());
+//					this.calcularTotal();
+//				}
+//				break;
+//			}
+//		}
+	}
+	
+	/**
+	 * Metodo para asignar los valores del articulo seleccionado
+	 * @param e
+	 */
+	public void asignarValoresArticuloPrime(AjaxBehaviorEvent e) {
+		for(DetallePedidoDTO detallePedidoDTOTemp : detallePedidoDTOCols) {
+			if((detallePedidoDTOTemp.getCantidad() == null ||  detallePedidoDTOTemp.getCantidad().intValue() == 0) && detallePedidoDTOTemp.getArticuloDTO().getPrecio() != null){
+				detallePedidoDTOTemp.setCantidad(1);
+			}
+			if(detallePedidoDTOTemp.getCantidad() != null && detallePedidoDTOTemp.getArticuloDTO().getPrecio() != null) {
+				BigDecimal subTotal = BigDecimal.valueOf(Double.valueOf(""+detallePedidoDTOTemp.getCantidad())).multiply(detallePedidoDTOTemp.getArticuloDTO().getPrecio());
+				detallePedidoDTOTemp.setSubTotal(subTotal);
+				detallePedidoDTOTemp.setCodigoArticulo(detallePedidoDTOTemp.getArticuloDTO().getId().getCodigoArticulo());
+				this.calcularTotal();
 			}
 		}
+	}
+	
+	/**
+	 * Seleccion Local
+	 * @param e
+	 */
+	public void seleccionLocal(ValueChangeEvent e){
+		e.getNewValue();
 	}
 	
 	/**
@@ -763,13 +813,13 @@ public class PedidosController extends CommonsController implements Serializable
 		this.detallePedidoDTOCols = detallePedidoDTOCols;
 	}
 
-	public Collection<ArticuloDTO> getArticuloDTOCols() {
-		return articuloDTOCols;
-	}
-
-	public void setArticuloDTOCols(Collection<ArticuloDTO> articuloDTOCols) {
-		this.articuloDTOCols = articuloDTOCols;
-	}
+//	public List<ArticuloDTO> getArticuloDTOCols() {
+//		return articuloDTOCols;
+//	}
+//
+//	public void setArticuloDTOCols(List<ArticuloDTO> articuloDTOCols) {
+//		this.articuloDTOCols = articuloDTOCols;
+//	}
 
 	public ArticuloDTO getArticuloDTO() {
 		return articuloDTO;
@@ -834,5 +884,12 @@ public class PedidosController extends CommonsController implements Serializable
 	public void setMostrarIcono(Boolean mostrarIcono) {
 		this.mostrarIcono = mostrarIcono;
 	}
-	
+
+	public ArticuloService getService() {
+		return service;
+	}
+
+	public void setService(ArticuloService service) {
+		this.service = service;
+	}
 }
