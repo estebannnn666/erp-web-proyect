@@ -79,7 +79,7 @@
 				 		<rich:panel style="text-align:center; border-left: none; border-right:none;" rendered="#{not empty pedidosController.detallePedidoDTOCols}">
 							<rich:dataScroller fastStep="3" for="tableDetallePedido" maxPages="5" rendered="#{not empty pedidosController.detallePedidoDTOCols}" renderIfSinglePage="true"/>
 						</rich:panel>
-					 	<rich:dataTable style="width:100%" value="#{pedidosController.detallePedidoDTOCols}" var="detalle" rowKeyVar="rowIndex" iterationStatusVar="it" id="tableDetallePedido" rows="10">
+					 	<rich:dataTable styleClass="styleDetalle" style="width:100%" value="#{pedidosController.detallePedidoDTOCols}" var="detalle" rowKeyVar="rowIndex" iterationStatusVar="it" id="tableDetallePedido" rows="10">
 					 		<rich:column>
 				                <f:facet name="header"><h:outputText value="Eliminar"/></f:facet>
 				                <a4j:commandLink id="botonEditar" render="pnlGridDetallePedido" action="#{pedidosController.eliminarDetallePedido(detalle)}"	execute="@this" >
@@ -104,10 +104,10 @@
 				                <f:facet name="header"><h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.header.tabla.descripcion.articulo']}"/></f:facet>
 						        <p:autoComplete id="themeCustom" value="#{detalle.articuloDTO}" completeMethod="#{pedidosController.completeTheme}"
 					                        var="art" itemLabel="#{art.nombreArticulo}" itemValue="#{art}" converter="articuloConverter">
-					                <a4j:ajax event="change" execute="@this" render="pnlGridDetallePedido" listener="#{pedidosController.asignarValoresArticuloPrime}"></a4j:ajax>
-					                <a4j:ajax event="keyup" execute="@this" render="pnlGridDetallePedido" listener="#{pedidosController.asignarValoresArticuloPrime}" onbeforesubmit="return verifyKeyEnter(event);"></a4j:ajax>
+					                <a4j:ajax event="change" execute="@this" render="pnlGridDetallePedido" listener="#{pedidosController.asignarValoresArticuloPrime}" oncomplete="fijarFocoSiguienteDetalle(this.id);"></a4j:ajax>
+					                <a4j:ajax event="keyup" execute="@this" render="pnlGridDetallePedido" listener="#{pedidosController.asignarValoresArticuloPrime}" onbeforesubmit="return verifyKeyEnter(event);" oncomplete="fijarFocoSiguienteDetalle(this.id);"></a4j:ajax>
 						            <p:column>
-						                <h:outputText value="#{art.codigoBarras} - " />
+						                <h:outputText value="#{art.codigoBarras}" />
 						            </p:column>
 						             
 						            <p:column>
@@ -306,6 +306,21 @@
 					}catch (e) {}
 				}
 
+				$(document).ready(function(){				
+					focoInicio();				
+				});
+				
+				function focoInicio(){
+				 	document.getElementById('frmNuevoPedido:tableDetallePedido:0:themeCustom_input').focus();
+				}
+
+				function fijarFocoSiguienteDetalle(idImput){
+				 	var nombreComp = idImput.split(':');
+					var numeroFilaActual = Number(nombreComp[2]);
+					var numeroFilaSiguie = numeroFilaActual + 1;
+				 	document.getElementById('frmNuevoPedido:tableDetallePedido:'+numeroFilaSiguie+':themeCustom_input').focus();
+				}
+
 			/*]]>*/
 		</script>
 		
@@ -320,6 +335,12 @@
 			
 			.autoStyle .ui-inputfield{
 			    -webkit-box-shadow: inset 0 0px 0px #8f8f8f !important;
+			    height: 7px !important;
+			    width: 300px !important;
+			}
+			
+			.styleDetalle .rf-dt-c{
+				padding: 2px !important;
 			}
 		</h:outputStylesheet>
 	</ui:define>

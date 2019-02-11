@@ -247,43 +247,6 @@ public class PedidosController extends CommonsController implements Serializable
 	 * Metodo para asignar los valores del articulo seleccionado
 	 * @param e
 	 */
-	public void asignarValoresArticulo(AjaxBehaviorEvent e) {
-//		String idComponete = e.getComponent().getClientId();
-//		String[] idCompuesto =  idComponete.split(":");
-//		Integer numeroDetalle = Integer.parseInt(idCompuesto[2])+1;
-		
-//		for(DetallePedidoDTO detallePedidoDTO : detallePedidoDTOCols) {
-//			if(detallePedidoDTO.getId().getCodigoCompania().intValue() == numeroDetalle.intValue()) {
-//				// Se busca el artculo con el codigo de barras seleccionado para asignar el resto de informacion del articulo
-//				ArticuloDTO articuloDTOTemp = new ArticuloDTO();
-//				for(ArticuloDTO articuloDTOSearch : this.articuloDTOCols) {
-//					if(detallePedidoDTO.getArticuloDTO().getNombreArticulo().equals(articuloDTOSearch.getNombreArticulo())) {
-//						articuloDTOTemp.setCantidadStock(articuloDTOSearch.getCantidadStock());
-//						articuloDTOTemp.setCodigoBarras(articuloDTOSearch.getCodigoBarras());
-//						articuloDTOTemp.setNombreArticulo(articuloDTOSearch.getNombreArticulo());
-//						articuloDTOTemp.setPeso(articuloDTOSearch.getPeso());
-//						articuloDTOTemp.setPrecio(articuloDTOSearch.getPrecio());
-//						articuloDTOTemp.getId().setCodigoArticulo(articuloDTOSearch.getId().getCodigoArticulo());
-//						break;
-//					}
-//				}				
-//				// Se agrega el articulo al detalle del pedido y se realiza las respectivas operaciones
-//				detallePedidoDTO.setArticuloDTO(articuloDTOTemp);
-//				if(detallePedidoDTO.getCantidad() != null && detallePedidoDTO.getArticuloDTO().getPrecio() != null) {
-//					BigDecimal subTotal = BigDecimal.valueOf(Double.valueOf(""+detallePedidoDTO.getCantidad())).multiply(detallePedidoDTO.getArticuloDTO().getPrecio());
-//					detallePedidoDTO.setSubTotal(subTotal);
-//					detallePedidoDTO.setCodigoArticulo(articuloDTOTemp.getId().getCodigoArticulo());
-//					this.calcularTotal();
-//				}
-//				break;
-//			}
-//		}
-	}
-	
-	/**
-	 * Metodo para asignar los valores del articulo seleccionado
-	 * @param e
-	 */
 	public void asignarValoresArticuloPrime(AjaxBehaviorEvent e) {
 		for(DetallePedidoDTO detallePedidoDTOTemp : detallePedidoDTOCols) {
 			if((detallePedidoDTOTemp.getCantidad() == null ||  detallePedidoDTOTemp.getCantidad().intValue() == 0) && detallePedidoDTOTemp.getArticuloDTO().getPrecio() != null){

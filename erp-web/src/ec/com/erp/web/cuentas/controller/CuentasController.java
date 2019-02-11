@@ -14,6 +14,7 @@ import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
@@ -62,6 +63,7 @@ import ec.com.erp.web.commons.utils.ERPWebResources;
 import ec.com.erp.web.commons.utils.UtilitarioWeb;
 import ec.com.erp.web.commons.utils.XML_Utilidades;
 import ec.com.erp.web.cuentas.datamanager.CuentasDataManager;
+import ec.com.erp.web.pedidos.controller.ArticuloService;
 
 /**
  * Controlador para administracion de pedidos
@@ -88,6 +90,9 @@ public class CuentasController extends CommonsController implements Serializable
 	
 	@ManagedProperty(value="#{loginController}")
 	private LoginController loginController;
+	
+	@ManagedProperty("#{articuloService}")
+	private ArticuloService service;
 	
 	// Variables
 	private String numeroFactura;
@@ -126,6 +131,18 @@ public class CuentasController extends CommonsController implements Serializable
 		}
 		this.page = 0;
 		this.contDetalle = 1;
+		
+		FacturaDetalleDTO detalle = null;
+		
+		contDetalle = 1;
+		for(int i=0; i< 10; i++) {
+			detalle = new FacturaDetalleDTO();
+			detalle.setArticuloDTO(new ArticuloDTO());
+			detalle.getId().setCodigoCompania(contDetalle);
+			this.facturaDetalleDTOCols.add(detalle);
+			contDetalle++;
+		}
+		
 		// Inicializar fechas para filtros de busqueda
 		Calendar fechaInferior = Calendar.getInstance();
 		fechaInferior.set(Calendar.MONTH, 0);
@@ -587,6 +604,44 @@ public class CuentasController extends CommonsController implements Serializable
 		this.facturaDetalleDTOCols.add(detalle);
 		this.calcularTotalFactura();
 		contDetalle++;
+	}
+	
+	/**
+	 * Metodo para consultar articulos autocomplete
+	 * @param query
+	 * @return
+	 */
+	public List<ArticuloDTO> completeArticulos(String query) {
+        Collection<ArticuloDTO> allThemes = this.service.getArticuloDTOCols();
+        
+        List<ArticuloDTO> filteredThemes = new ArrayList<ArticuloDTO>();
+         
+        for (ArticuloDTO skin : allThemes) {
+            if(skin.getNombreArticulo().toLowerCase().contains(query)) {
+                filteredThemes.add(skin);
+            }
+        }
+        return filteredThemes;
+    }
+	
+	/**
+	 * Metodo para asignar los valores del articulo seleccionado
+	 * @param e
+	 */
+	public void asignarValoresArticuloFactura(AjaxBehaviorEvent e) {
+		for(FacturaDetalleDTO facturaDetalleDTOTemp : facturaDetalleDTOCols) {
+			if((facturaDetalleDTOTemp.getCantidad() == null ||  facturaDetalleDTOTemp.getCantidad().intValue() == 0) && facturaDetalleDTOTemp.getArticuloDTO().getPrecio() != null){
+				facturaDetalleDTOTemp.setCantidad(1);
+			}
+			if(facturaDetalleDTOTemp.getCantidad() != null && facturaDetalleDTOTemp.getArticuloDTO().getPrecio() != null) {
+				BigDecimal subTotal = BigDecimal.valueOf(Double.valueOf(""+facturaDetalleDTOTemp.getCantidad())).multiply(facturaDetalleDTOTemp.getArticuloDTO().getPrecio());
+				facturaDetalleDTOTemp.setSubTotal(subTotal);
+				facturaDetalleDTOTemp.setCodigoArticulo(facturaDetalleDTOTemp.getArticuloDTO().getId().getCodigoArticulo());
+				facturaDetalleDTOTemp.setDescripcion(facturaDetalleDTOTemp.getArticuloDTO().getCodigoBarras()+" - "+facturaDetalleDTOTemp.getArticuloDTO().getNombreArticulo());
+				facturaDetalleDTOTemp.setValorUnidad(facturaDetalleDTOTemp.getValorUnidad());
+				this.calcularTotalFactura();
+			}
+		}
 	}
 	
 	/**
@@ -1077,5 +1132,13 @@ public class CuentasController extends CommonsController implements Serializable
 
 	public void setDocumentoCreado(Boolean documentoCreado) {
 		this.documentoCreado = documentoCreado;
+	}
+
+	public ArticuloService getService() {
+		return service;
+	}
+
+	public void setService(ArticuloService service) {
+		this.service = service;
 	}
 }
