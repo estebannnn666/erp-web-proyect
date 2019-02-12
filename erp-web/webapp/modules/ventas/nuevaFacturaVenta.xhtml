@@ -24,14 +24,17 @@
 		<rich:panel header="Registro de facturas de productos vendidos" style="width: 100%; background-color: #F5FAFF;">
 			<fieldset>
 				<legend class="styleLegend">#{msg_erpweb['ec.com.erp.etiqueta.label.nuevo.pedidos.etiqueta.datoscliente']}</legend>
-				<h:panelGrid id="pnlGridVentas" columns="6" cellspacing="2" cellpadding="5">
+				<h:panelGrid id="pnlGridVentas" columns="10" cellspacing="0" cellpadding="2">
 					<h:outputText class="styleNegritas" value="#{msg_erpweb['ec.com.erp.etiqueta.label.lista.cabecera.factura.referencia.factura']}: *" />
 					<h:inputText style="width:150px" value="#{cuentasController.facturaCabeceraDTO.codigoReferenciaFactura}" id="refDocumentoFac" disabled="true"/>
 					<h:outputText value="" />
 					<div style="width: 30px"></div>
 					<h:outputText class="styleNegritas" value="#{msg_erpweb['ec.com.erp.etiqueta.label.lista.cabecera.factura.numero.factura']}: *" />
 					<h:inputText style="width:150px" value="#{cuentasController.facturaCabeceraDTO.numeroDocumento}" id="nroDocumentoFac"/>
-					
+					<h:outputText value="" />
+					<div style="width: 30px"></div>
+					<h:outputText class="styleNegritas" value="#{msg_erpweb['ec.com.erp.etiqueta.label.lista.cabecera.factura.fecha']}: *" />
+					<rich:calendar value="#{cuentasController.facturaCabeceraDTO.fechaDocumento}" datePattern="yyyy-MM-dd"></rich:calendar>
 					
 					<h:outputText class="styleNegritas" value="#{msg_erpweb['ec.com.erp.etiqueta.label.lista.cabecera.factura.ruc.documento']}: *" />
 					<h:inputText style="width:150px" value="#{cuentasController.facturaCabeceraDTO.rucDocumento}" id="docClienteProveedor" maxlength="13" onkeypress="if (event.keyCode == 13) return false; return validarEnteros(event);">
@@ -44,6 +47,10 @@
 					<div style="width: 30px"></div>
 					<h:outputText class="styleNegritas" value="#{msg_erpweb['ec.com.erp.etiqueta.label.lista.cabecera.factura.telefono']}: *" />
 					<h:inputText style="width:150px" value="#{cuentasController.facturaCabeceraDTO.telefono}" id="telefonoFacVen" maxlength="10" onkeypress="return validarEnteros(event);"/>
+					<h:outputText value="" />
+					<div style="width: 30px"></div>
+					<h:outputText class="styleNegritas" value="#{msg_erpweb['ec.com.erp.etiqueta.label.lista.cabecera.factura.cobrada']}:" />
+					<h:selectBooleanCheckbox value="#{cuentasController.facturaCabeceraDTO.pagado}"/>
 					
 					<h:outputText class="styleNegritas" value="#{msg_erpweb['ec.com.erp.etiqueta.label.lista.cabecera.factura.razonSocial']}:" />
 					<h:inputText styleClass="styleUpperCase" style="width:150px" value="#{cuentasController.facturaCabeceraDTO.nombreClienteProveedor}" id="razonSocialVen" maxlength="32"/>
@@ -51,13 +58,10 @@
 					<div style="width: 30px"></div>
 					<h:outputText class="styleNegritas" value="#{msg_erpweb['ec.com.erp.etiqueta.label.lista.cabecera.factura.direccion']}:" />
 					<h:inputText styleClass="styleUpperCase" style="width:150px" value="#{cuentasController.facturaCabeceraDTO.direccion}" id="direcionVen" maxlength="64"/>
-					
-					<h:outputText class="styleNegritas" value="#{msg_erpweb['ec.com.erp.etiqueta.label.lista.cabecera.factura.cobrada']}:" />
-					<h:selectBooleanCheckbox value="#{cuentasController.facturaCabeceraDTO.pagado}"/>
 					<h:outputText value="" />
 					<div style="width: 30px"></div>
-					<h:outputText class="styleNegritas" value="#{msg_erpweb['ec.com.erp.etiqueta.label.lista.cabecera.factura.fecha']}: *" />
-					<rich:calendar value="#{cuentasController.facturaCabeceraDTO.fechaDocumento}" datePattern="yyyy-MM-dd"></rich:calendar>
+					<h:outputText value="" />
+					<h:outputText value="" />
 				</h:panelGrid>
 			</fieldset>
 	 		<fieldset>

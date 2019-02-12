@@ -4,6 +4,7 @@
 	xmlns:h="http://java.sun.com/jsf/html"
 	xmlns:a4j="http://richfaces.org/a4j"
 	xmlns:rich="http://richfaces.org/rich"
+	xmlns:p="http://primefaces.org/ui"
 	template="/templates/pages/pageLayout3.xhtml">
 	
 	<ui:param name="idForm" value="frmNuevoCompra" />
@@ -23,14 +24,17 @@
 		<rich:panel header="Registro de facturas de productos comprados" style="width: 100%; background-color: #F5FAFF;">
 			<fieldset>
 				<legend class="styleLegend">#{msg_erpweb['ec.com.erp.etiqueta.label.nuevo.pedidos.etiqueta.datosproveedor']}</legend>
-				<h:panelGrid id="pnlGridVentas" columns="6" cellspacing="2" cellpadding="5">
+				<h:panelGrid id="pnlGridVentas" columns="10" cellspacing="0" cellpadding="2">
 					<h:outputText class="styleNegritas" value="#{msg_erpweb['ec.com.erp.etiqueta.label.lista.cabecera.factura.referencia.documento']}: *" />
 					<h:inputText style="width:150px" value="#{cuentasController.facturaCabeceraDTO.codigoReferenciaFactura}" id="refDocumentoFac" disabled="true"/>
 					<h:outputText value="" />
 					<div style="width: 30px"></div>
 					<h:outputText class="styleNegritas" value="#{msg_erpweb['ec.com.erp.etiqueta.label.lista.cabecera.factura.numero.documento']}: *" />
 					<h:inputText style="width:150px" value="#{cuentasController.facturaCabeceraDTO.numeroDocumento}" id="nroDocumentoFac" />
-					
+					<h:outputText value="" />
+					<div style="width: 30px"></div>
+					<h:outputText class="styleNegritas" value="#{msg_erpweb['ec.com.erp.etiqueta.label.lista.cabecera.factura.fecha']}: *" />
+					<rich:calendar value="#{cuentasController.facturaCabeceraDTO.fechaDocumento}" datePattern="yyyy-MM-dd"></rich:calendar>
 					
 					<h:outputText class="styleNegritas" value="#{msg_erpweb['ec.com.erp.etiqueta.label.nuevo.factura.compra.ruc.proveedor']}: *" />
 					<h:inputText style="width:150px" value="#{cuentasController.facturaCabeceraDTO.rucDocumento}" id="docClienteProveedor" maxlength="13" onkeypress="if (event.keyCode == 13) return false; return validarEnteros(event);">
@@ -40,6 +44,10 @@
 					<div style="width: 30px"></div>
 					<h:outputText class="styleNegritas" value="#{msg_erpweb['ec.com.erp.etiqueta.label.lista.cabecera.factura.telefono']}: *" />
 					<h:inputText style="width:150px" value="#{cuentasController.facturaCabeceraDTO.telefono}" id="telefonoFacVen" maxlength="10" onkeypress="return validarEnteros(event);"/>
+					<h:outputText value="" />
+					<div style="width: 30px"></div>
+					<h:outputText class="styleNegritas" value="#{msg_erpweb['ec.com.erp.etiqueta.label.lista.cabecera.factura.pagada']}:" />
+					<h:selectBooleanCheckbox value="#{cuentasController.facturaCabeceraDTO.pagado}"/>
 					
 					<h:outputText class="styleNegritas" value="#{msg_erpweb['ec.com.erp.etiqueta.label.lista.cabecera.factura.razonSocial']}:" />
 					<h:inputText styleClass="styleUpperCase" style="width:150px" value="#{cuentasController.facturaCabeceraDTO.nombreClienteProveedor}" id="razonSocialVen" maxlength="32"/>
@@ -47,13 +55,11 @@
 					<div style="width: 30px"></div>
 					<h:outputText class="styleNegritas" value="#{msg_erpweb['ec.com.erp.etiqueta.label.lista.cabecera.factura.direccion']}:" />
 					<h:inputText styleClass="styleUpperCase" style="width:150px" value="#{cuentasController.facturaCabeceraDTO.direccion}" id="direcionVen" maxlength="64"/>
-					
-					<h:outputText class="styleNegritas" value="#{msg_erpweb['ec.com.erp.etiqueta.label.lista.cabecera.factura.pagada']}:" />
-					<h:selectBooleanCheckbox value="#{cuentasController.facturaCabeceraDTO.pagado}"/>
 					<h:outputText value="" />
 					<div style="width: 30px"></div>
-					<h:outputText class="styleNegritas" value="#{msg_erpweb['ec.com.erp.etiqueta.label.lista.cabecera.factura.fecha']}: *" />
-					<rich:calendar value="#{cuentasController.facturaCabeceraDTO.fechaDocumento}" datePattern="yyyy-MM-dd"></rich:calendar>
+					<h:outputText value="" />
+					<h:outputText value="" />
+					
 				</h:panelGrid>
 			</fieldset>
 	 		<fieldset>
@@ -81,7 +87,7 @@
 				 		<rich:panel style="text-align:center; border-left: none; border-right:none;" rendered="#{not empty cuentasController.facturaDetalleDTOCols}">
 							<rich:dataScroller fastStep="3" for="tableDetallePedido" maxPages="5" rendered="#{not empty cuentasController.facturaDetalleDTOCols}" renderIfSinglePage="true"/>
 						</rich:panel>
-					 	<rich:dataTable style="width:100%" value="#{cuentasController.facturaDetalleDTOCols}" var="detalle" rowKeyVar="rowIndex" iterationStatusVar="it" id="tableDetallePedido" rows="10">
+					 	<rich:dataTable styleClass="styleDetalle" style="width:100%" value="#{cuentasController.facturaDetalleDTOCols}" var="detalle" rowKeyVar="rowIndex" iterationStatusVar="it" id="tableDetallePedido" rows="10">
 					 		<rich:column style="width:5%; text-align: center;">
 				                <f:facet name="header"><h:outputText value="Eliminar"/></f:facet>
 				                <a4j:commandLink id="botonEditar" render="pnlGridDetalleFactura" action="#{cuentasController.eliminarDetalleFactura(detalle)}"	execute="@this" >
@@ -101,10 +107,22 @@
 				                	</a4j:ajax>
 				                </h:inputText>
 				            </rich:column>			            
-				            <rich:column style="width:50%;;">
+				            <rich:column styleClass="autoStyle" style="width:50%;;">
 				                <f:facet name="header"><h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.label.lista.cabecera.guia.descripcion.producto']}"/></f:facet>
-				               	<h:inputText style="width:99%; text-align: left; padding-left: 5px;" id="descripcionDetalle" value="#{detalle.descripcion}" maxlength="32">
-				                </h:inputText>
+				               	<!-- <h:inputText style="width:99%; text-align: left; padding-left: 5px;" id="descripcionDetalle" value="#{detalle.descripcion}" maxlength="32">
+				                </h:inputText>-->
+				                <p:autoComplete id="themeCustom" value="#{detalle.articuloDTO}" completeMethod="#{cuentasController.completeArticulos}"
+					                        var="art" itemLabel="#{art.nombreArticulo}" itemValue="#{art}" converter="articuloConverter">
+					                <a4j:ajax event="change" execute="@this" render="pnlGridDetalleFactura" listener="#{cuentasController.asignarValoresArticuloFactura}" oncomplete="fijarFocoSiguienteDetalleFactura(this.id);"></a4j:ajax>
+					                <a4j:ajax event="keyup" execute="@this" render="pnlGridDetalleFactura" listener="#{cuentasController.asignarValoresArticuloFactura}" onbeforesubmit="return verifyKeyEnter(event);" oncomplete="fijarFocoSiguienteDetalleFactura(this.id);"></a4j:ajax>
+						            <p:column>
+						                <h:outputText value="#{art.codigoBarras}" />
+						            </p:column>
+						             
+						            <p:column>
+						                <h:outputText value="#{art.nombreArticulo}" />
+						            </p:column>
+						        </p:autoComplete>
 				            </rich:column>
 				            <rich:column style="width:10%">
 				                <f:facet name="header"><h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.label.nuevo.pedidos.articulo.precio.unitario']}"/></f:facet>
@@ -264,12 +282,45 @@
 				function openLinkSystem(){
 					$('.linkopensystem').trigger('click');
 				}	
+
+				$(document).ready(function(){				
+					focoInicioFactura();				
+				});
+				
+				function focoInicioFactura(){
+				 	document.getElementById('frmNuevoCompra:tableDetallePedido:0:themeCustom_input').focus();
+				}
+				
+				function fijarFocoSiguienteDetalleFactura(idImput){
+				 	var nombreComp = idImput.split(':');
+					var numeroFilaActual = Number(nombreComp[2]);
+					var numeroFilaSiguie = numeroFilaActual + 1;
+				 	document.getElementById('frmNuevoCompra:tableDetallePedido:'+numeroFilaSiguie+':themeCustom_input').focus();
+				}
 			/*]]>*/
 		</script>
 		
 		<h:outputStylesheet>
 			textarea[disabled], input[type="text"][disabled], input[type="password"][disabled], select[disabled] {
 			    color: #000000 !important; 
+			}
+			
+			.estiloColumnaDetalle{
+				width: 135px !important;
+			}
+			
+			.estiloAutoComplete input.rf-au-inp{
+				height: 15px !important;
+			}
+			
+			.autoStyle .ui-inputfield{
+			    -webkit-box-shadow: inset 0 0px 0px #8f8f8f !important;
+			    height: 7px !important;
+			    width: 300px !important;
+			}
+			
+			.styleDetalle .rf-dt-c{
+				padding: 2px !important;
 			}
 		</h:outputStylesheet>
 	</ui:define>
