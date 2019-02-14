@@ -489,6 +489,41 @@ public class CuentasController extends CommonsController implements Serializable
 		}
 	}
 	
+	public void obtenerCodigoBarrasEnter(AjaxBehaviorEvent e) {
+		
+		String idComponete = e.getComponent().getClientId();
+		String[] idCompuesto =  idComponete.split(":");
+		Integer numeroDetalle = Integer.parseInt(idCompuesto[2])+1;
+
+		for(FacturaDetalleDTO facturaDetalleDTO : facturaDetalleDTOCols) {
+			if(facturaDetalleDTO.getId().getCodigoCompania().intValue() == numeroDetalle.intValue()) {
+				
+				Collection<ArticuloDTO> articuloCols = ERPFactory.articulos.getArticuloServicio().findObtenerListaArticulos(1, facturaDetalleDTO.getCodigoBarras(), null);
+				if(articuloCols.isEmpty()){
+					this.setShowMessagesBar(Boolean.TRUE);
+			        MensajesController.addInfo(null, "No existe articulo con el codigo de barras ingresado.");
+				}else{
+					facturaDetalleDTO.setArticuloDTO(articuloCols.iterator().next());
+					facturaDetalleDTO.setValorUnidad(facturaDetalleDTO.getArticuloDTO().getPrecio());
+					if(facturaDetalleDTO.getCantidad() == null || facturaDetalleDTO.getCantidad().intValue() == 0){
+						facturaDetalleDTO.setCantidad(1);
+					}
+				}
+				
+				if(facturaDetalleDTO.getCantidad() != null && facturaDetalleDTO.getValorUnidad() != null) {
+					BigDecimal subTotal = BigDecimal.valueOf(Double.valueOf(""+facturaDetalleDTO.getCantidad())).multiply(facturaDetalleDTO.getValorUnidad());
+					facturaDetalleDTO.setSubTotal(subTotal);
+					this.calcularTotalFactura();
+				}
+				break;
+			}
+		}
+	}
+	
+	public void procesarDetalle(ActionEvent e) {
+		System.out.println("Prueba:"+facturaDetalleDTOCols.size());
+	}
+	
 	/**
 	 * Calcular el subtotal
 	 * @param e

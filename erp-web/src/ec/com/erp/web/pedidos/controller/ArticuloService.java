@@ -27,11 +27,16 @@ public class ArticuloService {
     }
     
     public ArticuloDTO obtenerArticuloPorNombre(String nombre){
-    	Collection<ArticuloDTO> articuloCols = ERPFactory.articulos.getArticuloServicio().findObtenerListaArticulos(1, null, nombre);
-    	if(articuloCols.isEmpty()){
+    	if(nombre != null && !nombre.equals("") && !nombre.equals("null") ){
+    		Collection<ArticuloDTO> articuloCols = ERPFactory.articulos.getArticuloServicio().findObtenerListaArticulos(1, null, nombre);
+	    	if(articuloCols.isEmpty()){
+	    		return new ArticuloDTO();
+	    	}else{
+	    		return articuloCols.iterator().next();
+	    	}
+    	}else
+    	{
     		return new ArticuloDTO();
-    	}else{
-    		return articuloCols.iterator().next();
     	}
     }
 

@@ -106,7 +106,15 @@
 				                			  execute="@this" render="pnlGridDetalleFactura" >
 				                	</a4j:ajax>
 				                </h:inputText>
-				            </rich:column>			            
+				            </rich:column>
+				            <rich:column style="width:10%"> 
+				                <f:facet name="header"><h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.header.tabla.codigo.barras']}"/></f:facet>
+				                <h:inputText style="text-align: right; width:95%; padding-right: 5px" id="codigoBarras" value="#{detalle.codigoBarras}" onkeypress="return validarEnteros(event);">
+				                	<a4j:ajax event="keyup" status="no" listener="#{cuentasController.obtenerCodigoBarrasEnter}"
+				                			  execute="@this" render="pnlGridDetalleFactura tableDetallePedido pnlMensajes" oncomplete="refrescarDetalle();" onbeforesubmit="return verifyKeyEnter(event);">
+				                	</a4j:ajax>
+				                </h:inputText>
+				            </rich:column>				            
 				            <rich:column styleClass="autoStyle" style="width:50%;;">
 				                <f:facet name="header"><h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.label.lista.cabecera.guia.descripcion.producto']}"/></f:facet>
 				               	<!-- <h:inputText style="width:99%; text-align: left; padding-left: 5px;" id="descripcionDetalle" value="#{detalle.descripcion}" maxlength="32">
@@ -244,7 +252,7 @@
 				</h:panelGroup>
 				
 				<h:panelGroup layout="block" styleClass="botonD" style="margin-top:5px;">
-					<a4j:commandLink action="#{cuentasController.regresarBusquedaCuentasFacturas}" styleClass="cancelarD" oncomplete="#{rich:component('mpConfirmacion')}.hide(); return false;" immediate="true">
+					<a4j:commandLink action="#{cuentasController.regresarBusquedaFacturasCompras}" styleClass="cancelarD" oncomplete="#{rich:component('mpConfirmacion')}.hide(); return false;" immediate="true">
 						<h:panelGrid columns="2" cellpadding="3" cellspacing="0">
 							<h:graphicImage name="btnCancel.png" library="images" style="border:none;border-color:white;" height="16" width="16"/>
 							<h:outputText value="Cancelar" />
@@ -253,6 +261,9 @@
 				</h:panelGroup>
 			</h:panelGrid>
 		</rich:popupPanel>
+		
+		<a4j:jsFunction name="refrescarDetalle" actionListener="#{cuentasController.procesarDetalle}" execute="pnlGridAgregarDetalle" render="pnlGridAgregarDetalle pnlMensajes" oncomplete="fijarFocoSiguienteCodigBarras(this.id);"></a4j:jsFunction>
+		
 		<script type="text/javascript">
 			/*<![CDATA[*/			
 				function radioButton(radio) {
@@ -288,14 +299,21 @@
 				});
 				
 				function focoInicioFactura(){
-				 	document.getElementById('frmNuevoCompra:tableDetallePedido:0:themeCustom_input').focus();
+				 	document.getElementById('frmNuevaVenta:tableDetallePedido:0:codigoBarras').focus();
 				}
 				
 				function fijarFocoSiguienteDetalleFactura(idImput){
 				 	var nombreComp = idImput.split(':');
 					var numeroFilaActual = Number(nombreComp[2]);
 					var numeroFilaSiguie = numeroFilaActual + 1;
-				 	document.getElementById('frmNuevoCompra:tableDetallePedido:'+numeroFilaSiguie+':themeCustom_input').focus();
+				 	document.getElementById('frmNuevaVenta:tableDetallePedido:'+numeroFilaSiguie+':themeCustom_input').focus();
+				}
+
+				function fijarFocoSiguienteCodigBarras(idImput){
+				 	var nombreComp = idImput.split(':');
+					var numeroFilaActual = Number(nombreComp[2]);
+					var numeroFilaSiguie = numeroFilaActual + 1;
+				 	document.getElementById('frmNuevaVenta:tableDetallePedido:'+numeroFilaSiguie+':codigoBarras').focus();
 				}
 			/*]]>*/
 		</script>

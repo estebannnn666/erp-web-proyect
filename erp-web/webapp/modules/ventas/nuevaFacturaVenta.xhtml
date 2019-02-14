@@ -108,13 +108,21 @@
 				                			  execute="@this" render="pnlGridDetalleFactura" >
 				                	</a4j:ajax>
 				                </h:inputText>
-				            </rich:column>			            
-				            <rich:column styleClass="autoStyle" style="width:50%;;">
+				            </rich:column>		
+				            <rich:column style="width:10%"> 
+				                <f:facet name="header"><h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.header.tabla.codigo.barras']}"/></f:facet>
+				                <h:inputText style="text-align: right; width:95%; padding-right: 5px" id="codigoBarras" value="#{detalle.codigoBarras}" onkeypress="return validarEnteros(event);">
+				                	<a4j:ajax event="keyup" status="no" listener="#{cuentasController.obtenerCodigoBarrasEnter}"
+				                			  execute="@this" render="pnlGridDetalleFactura tableDetallePedido" oncomplete="refrescarDetalle();" onbeforesubmit="return verifyKeyEnter(event);">
+				                	</a4j:ajax>
+				                </h:inputText>
+				            </rich:column>		            
+				            <rich:column styleClass="autoStyle" style="width:40%;;">
 				                <f:facet name="header"><h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.label.lista.cabecera.guia.descripcion.producto']}"/></f:facet>
 				               	<!-- <h:inputText style="width:99%; text-align: left; padding-left: 5px;" id="descripcionDetalle" value="#{detalle.descripcion}" maxlength="32">
 				                </h:inputText> -->
 				                <p:autoComplete id="themeCustom" value="#{detalle.articuloDTO}" completeMethod="#{cuentasController.completeArticulos}"
-					                        var="art" itemLabel="#{art.nombreArticulo}" itemValue="#{art}" converter="articuloConverter">
+					                        var="art" itemLabel="#{art.nombreArticulo}" itemValue="#{art}" converter="articuloConverter" minQueryLength="1">
 					                <a4j:ajax event="change" execute="@this" render="pnlGridDetalleFactura" listener="#{cuentasController.asignarValoresArticuloFactura}" oncomplete="fijarFocoSiguienteDetalleFactura(this.id);"></a4j:ajax>
 					                <a4j:ajax event="keyup" execute="@this" render="pnlGridDetalleFactura" listener="#{cuentasController.asignarValoresArticuloFactura}" onbeforesubmit="return verifyKeyEnter(event);" oncomplete="fijarFocoSiguienteDetalleFactura(this.id);"></a4j:ajax>
 						            <p:column>
@@ -287,7 +295,7 @@
 		</rich:popupPanel>
 		
 		<a4j:jsFunction name="refrescarPantallaPopUp" action="#{cuentasController.calcularValoresArticulo}" execute="pnlGridAgregarDetalle" render="pnlGridAgregarDetalle"></a4j:jsFunction>
-		
+		<a4j:jsFunction name="refrescarDetalle" actionListener="#{cuentasController.procesarDetalle}" execute="pnlGridAgregarDetalle" render="pnlGridAgregarDetalle pnlMensajes" oncomplete="fijarFocoSiguienteCodigBarras(this.id);"></a4j:jsFunction>
 		
 		<!-- Popup para confirmar que se guardo el documento -->
 		<rich:popupPanel id="mpConfirmacion" header="#{msg_erpweb['ec.com.erp.etiqueta.mensaje.informacion']}" width="345" height="160" modal="true" domElementAttachment="form">
@@ -329,7 +337,7 @@
 				</h:panelGroup>
 				
 				<h:panelGroup layout="block" styleClass="botonD" style="margin-top:5px;">
-					<a4j:commandLink action="#{cuentasController.regresarBusquedaCuentasFacturas}"  styleClass="cancelarD" oncomplete="#{rich:component('mpConfirmacion')}.hide(); return false;" immediate="true">
+					<a4j:commandLink action="#{cuentasController.regresarBusquedaFacturasVentas}"  styleClass="cancelarD" oncomplete="#{rich:component('mpConfirmacion')}.hide(); return false;" immediate="true">
 						<h:panelGrid columns="2" cellpadding="3" cellspacing="0">
 							<h:graphicImage name="btnCancel.png" library="images" style="border:none;border-color:white;" height="16" width="16"/>
 							<h:outputText value="Cancelar" />
@@ -382,7 +390,7 @@
 				});
 				
 				function focoInicioFactura(){
-				 	document.getElementById('frmNuevaVenta:tableDetallePedido:0:themeCustom_input').focus();
+				 	document.getElementById('frmNuevaVenta:tableDetallePedido:0:codigoBarras').focus();
 				}
 				
 				function fijarFocoSiguienteDetalleFactura(idImput){
@@ -390,6 +398,13 @@
 					var numeroFilaActual = Number(nombreComp[2]);
 					var numeroFilaSiguie = numeroFilaActual + 1;
 				 	document.getElementById('frmNuevaVenta:tableDetallePedido:'+numeroFilaSiguie+':themeCustom_input').focus();
+				}
+
+				function fijarFocoSiguienteCodigBarras(idImput){
+				 	var nombreComp = idImput.split(':');
+					var numeroFilaActual = Number(nombreComp[2]);
+					var numeroFilaSiguie = numeroFilaActual + 1;
+				 	document.getElementById('frmNuevaVenta:tableDetallePedido:'+numeroFilaSiguie+':codigoBarras').focus();
 				}
 				
 			/*]]>*/
