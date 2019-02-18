@@ -109,9 +109,9 @@
 				            </rich:column>
 				            <rich:column style="width:10%"> 
 				                <f:facet name="header"><h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.header.tabla.codigo.barras']}"/></f:facet>
-				                <h:inputText style="text-align: right; width:95%; padding-right: 5px" id="codigoBarras" value="#{detalle.codigoBarras}" onkeypress="return validarEnteros(event);">
-				                	<a4j:ajax event="keyup" status="no" listener="#{cuentasController.obtenerCodigoBarrasEnter}"
-				                			  execute="@this" render="pnlGridDetalleFactura tableDetallePedido pnlMensajes" oncomplete="refrescarDetalle();" onbeforesubmit="return verifyKeyEnter(event);">
+				                <h:inputText style="text-align: right; width:95%; padding-right: 5px" id="codigoBarras" value="#{detalle.codigoBarras}" onkeypress="if (event.keyCode == 13) return false; return validarEnteros(event);" >
+				                	<a4j:ajax event="keyup" listener="#{cuentasController.obtenerCodigoBarrasEnter}" oncomplete="fijarFocoSiguienteCodigBarras(this.id);"
+				                			  execute="@this" onbeforesubmit="return verifyKeyEnter(event);" render="pnlGridDetalleFactura tableDetallePedido pnlMensajes">
 				                	</a4j:ajax>
 				                </h:inputText>
 				            </rich:column>				            
@@ -262,7 +262,6 @@
 			</h:panelGrid>
 		</rich:popupPanel>
 		
-		<a4j:jsFunction name="refrescarDetalle" actionListener="#{cuentasController.procesarDetalle}" execute="pnlGridAgregarDetalle" render="pnlGridAgregarDetalle pnlMensajes" oncomplete="fijarFocoSiguienteCodigBarras(this.id);"></a4j:jsFunction>
 		
 		<script type="text/javascript">
 			/*<![CDATA[*/			
@@ -299,21 +298,21 @@
 				});
 				
 				function focoInicioFactura(){
-				 	document.getElementById('frmNuevaVenta:tableDetallePedido:0:codigoBarras').focus();
+				 	document.getElementById('frmNuevoCompra:tableDetallePedido:0:codigoBarras').focus();
 				}
 				
 				function fijarFocoSiguienteDetalleFactura(idImput){
 				 	var nombreComp = idImput.split(':');
 					var numeroFilaActual = Number(nombreComp[2]);
 					var numeroFilaSiguie = numeroFilaActual + 1;
-				 	document.getElementById('frmNuevaVenta:tableDetallePedido:'+numeroFilaSiguie+':themeCustom_input').focus();
+				 	document.getElementById('frmNuevoCompra:tableDetallePedido:'+numeroFilaSiguie+':themeCustom_input').focus();
 				}
 
 				function fijarFocoSiguienteCodigBarras(idImput){
 				 	var nombreComp = idImput.split(':');
 					var numeroFilaActual = Number(nombreComp[2]);
 					var numeroFilaSiguie = numeroFilaActual + 1;
-				 	document.getElementById('frmNuevaVenta:tableDetallePedido:'+numeroFilaSiguie+':codigoBarras').focus();
+				 	document.getElementById('frmNuevoCompra:tableDetallePedido:'+numeroFilaSiguie+':codigoBarras').focus();
 				}
 			/*]]>*/
 		</script>

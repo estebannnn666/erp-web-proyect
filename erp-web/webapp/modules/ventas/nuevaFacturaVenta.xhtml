@@ -111,9 +111,9 @@
 				            </rich:column>		
 				            <rich:column style="width:10%"> 
 				                <f:facet name="header"><h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.header.tabla.codigo.barras']}"/></f:facet>
-				                <h:inputText style="text-align: right; width:95%; padding-right: 5px" id="codigoBarras" value="#{detalle.codigoBarras}" onkeypress="return validarEnteros(event);">
-				                	<a4j:ajax event="keyup" status="no" listener="#{cuentasController.obtenerCodigoBarrasEnter}"
-				                			  execute="@this" render="pnlGridDetalleFactura tableDetallePedido" oncomplete="refrescarDetalle();" onbeforesubmit="return verifyKeyEnter(event);">
+				                <h:inputText style="text-align: right; width:95%; padding-right: 5px" id="codigoBarras" value="#{detalle.codigoBarras}" onkeypress="if (event.keyCode == 13) return false; return validarEnteros(event);" >
+				                	<a4j:ajax event="keyup" listener="#{cuentasController.obtenerCodigoBarrasEnter}" oncomplete="fijarFocoSiguienteCodigBarras(this.id);"
+				                			  execute="@this" onbeforesubmit="return verifyKeyEnter(event);" render="pnlGridDetalleFactura tableDetallePedido pnlMensajes">
 				                	</a4j:ajax>
 				                </h:inputText>
 				            </rich:column>		            
@@ -295,7 +295,6 @@
 		</rich:popupPanel>
 		
 		<a4j:jsFunction name="refrescarPantallaPopUp" action="#{cuentasController.calcularValoresArticulo}" execute="pnlGridAgregarDetalle" render="pnlGridAgregarDetalle"></a4j:jsFunction>
-		<a4j:jsFunction name="refrescarDetalle" actionListener="#{cuentasController.procesarDetalle}" execute="pnlGridAgregarDetalle" render="pnlGridAgregarDetalle pnlMensajes" oncomplete="fijarFocoSiguienteCodigBarras(this.id);"></a4j:jsFunction>
 		
 		<!-- Popup para confirmar que se guardo el documento -->
 		<rich:popupPanel id="mpConfirmacion" header="#{msg_erpweb['ec.com.erp.etiqueta.mensaje.informacion']}" width="345" height="160" modal="true" domElementAttachment="form">
@@ -401,6 +400,7 @@
 				}
 
 				function fijarFocoSiguienteCodigBarras(idImput){
+					debugger;
 				 	var nombreComp = idImput.split(':');
 					var numeroFilaActual = Number(nombreComp[2]);
 					var numeroFilaSiguie = numeroFilaActual + 1;

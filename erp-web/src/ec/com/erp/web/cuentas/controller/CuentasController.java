@@ -674,6 +674,7 @@ public class CuentasController extends CommonsController implements Serializable
 				facturaDetalleDTOTemp.setCodigoArticulo(facturaDetalleDTOTemp.getArticuloDTO().getId().getCodigoArticulo());
 				facturaDetalleDTOTemp.setDescripcion(facturaDetalleDTOTemp.getArticuloDTO().getCodigoBarras()+" - "+facturaDetalleDTOTemp.getArticuloDTO().getNombreArticulo());
 				facturaDetalleDTOTemp.setValorUnidad(facturaDetalleDTOTemp.getArticuloDTO().getPrecio());
+				facturaDetalleDTOTemp.setCodigoBarras(facturaDetalleDTOTemp.getArticuloDTO().getCodigoBarras());
 			}
 		}
 		this.calcularTotalFactura();
