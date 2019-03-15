@@ -25,6 +25,13 @@ import javax.faces.context.FacesContext;
 import javax.faces.event.ActionEvent;
 import javax.faces.event.AjaxBehaviorEvent;
 import javax.faces.event.ValueChangeEvent;
+import javax.print.Doc;
+import javax.print.DocFlavor;
+import javax.print.DocPrintJob;
+import javax.print.PrintException;
+import javax.print.PrintService;
+import javax.print.PrintServiceLookup;
+import javax.print.SimpleDoc;
 //import javax.print.Doc;
 //import javax.print.DocFlavor;
 //import javax.print.DocPrintJob;
@@ -47,6 +54,7 @@ import ec.com.erp.cliente.common.constantes.ERPConstantes;
 import ec.com.erp.cliente.common.exception.ERPException;
 import ec.com.erp.cliente.common.factory.ERPFactory;
 import ec.com.erp.cliente.mdl.dto.ArticuloDTO;
+import ec.com.erp.cliente.mdl.dto.ArticuloImpuestoDTO;
 import ec.com.erp.cliente.mdl.dto.CatalogoValorDTO;
 import ec.com.erp.cliente.mdl.dto.ClienteDTO;
 import ec.com.erp.cliente.mdl.dto.FacturaCabeceraDTO;
@@ -459,13 +467,23 @@ public class CuentasController extends CommonsController implements Serializable
 	 */
 	public void calcularTotalFactura() {
 		this.facturaCabeceraDTO.setTotalCuenta(BigDecimal.ZERO);
-		BigDecimal totalFactura = BigDecimal.ZERO;
+		BigDecimal totalSinImpuesto = BigDecimal.ZERO;
+		BigDecimal totalImpuesto = BigDecimal.ZERO;
+		BigDecimal totalConImpuesto = BigDecimal.ZERO;
 		for (FacturaDetalleDTO facturaDetalleDTO : facturaDetalleDTOCols) {
 			if(facturaDetalleDTO.getSubTotal() != null) {
-				totalFactura = totalFactura.add(facturaDetalleDTO.getSubTotal());
+				totalSinImpuesto = totalSinImpuesto.add(facturaDetalleDTO.getSubTotal());
+			}
+			if(facturaDetalleDTO.getArticuloDTO().getTieneImpuesto()){
+				for(ArticuloImpuestoDTO impuesto : facturaDetalleDTO.getArticuloDTO().getArticuloImpuestoDTOCols()){
+					totalImpuesto = totalImpuesto.add(BigDecimal.valueOf((totalSinImpuesto.doubleValue() * impuesto.getImpuestoDTO().getValorImpuesto().doubleValue())/ Double.valueOf(100)));
+				}
 			}
 		}
-		this.facturaCabeceraDTO.setTotalCuenta(totalFactura);
+		totalConImpuesto = totalSinImpuesto.add(totalImpuesto);
+		this.facturaCabeceraDTO.setTotalSinImpuestos(totalSinImpuesto);
+		this.facturaCabeceraDTO.setTotalImpuestos(totalImpuesto);
+		this.facturaCabeceraDTO.setTotalCuenta(totalConImpuesto);
 	}
 	
 	/**
@@ -505,6 +523,8 @@ public class CuentasController extends CommonsController implements Serializable
 				}else{
 					facturaDetalleDTO.setArticuloDTO(articuloCols.iterator().next());
 					facturaDetalleDTO.setValorUnidad(facturaDetalleDTO.getArticuloDTO().getPrecio());
+					facturaDetalleDTO.setDescripcion(facturaDetalleDTO.getArticuloDTO().getNombreArticulo());
+					facturaDetalleDTO.setCodigoArticulo(facturaDetalleDTO.getArticuloDTO().getId().getCodigoArticulo());
 					if(facturaDetalleDTO.getCantidad() == null || facturaDetalleDTO.getCantidad().intValue() == 0){
 						facturaDetalleDTO.setCantidad(1);
 					}
@@ -802,16 +822,30 @@ public class CuentasController extends CommonsController implements Serializable
 	public String imprimirListaFacturas() {
 		HtmlPdf htmltoPDF;
 		try {
+			
+
+			String texto = "Esto es lo que va a la impresora";
+			PrintService printService = PrintServiceLookup.lookupDefaultPrintService();
+			DocFlavor flavor = DocFlavor.BYTE_ARRAY.AUTOSENSE;
+			DocPrintJob docPrintJob = printService.createPrintJob();
+			Doc doc = new SimpleDoc(texto.getBytes(), flavor, null);
+			try {
+				docPrintJob.print(doc, null);
+			} catch (PrintException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			// prueba
 //			PrintService printService = PrintServiceLookup.lookupDefaultPrintService();
 //	 
 //			DocFlavor flavor = DocFlavor.BYTE_ARRAY.AUTOSENSE;
 //			DocPrintJob docPrintJob = printService.createPrintJob();
 			
 			// Plantilla rpincipal que permite la conversion de xsl a pdf
-			htmltoPDF = new HtmlPdf(ERPConstantes.PLANTILLA_XSL_FOPRINCIPAL);
-			HashMap<String , String> parametros = new HashMap<String, String>();
-			byte contenido[] = htmltoPDF.convertir(ERPFactory.facturas.getFacturaCabeceraServicio().finObtenerXMLReporteFacturas(facturaCabeceraDTOCols).replace("<?xml version=\"1.0\" encoding=\"UTF-8\"?>", ""), "", "",	parametros,	null);
-			UtilitarioWeb.mostrarPDF(contenido);
+//			htmltoPDF = new HtmlPdf(ERPConstantes.PLANTILLA_XSL_FOPRINCIPAL);
+//			HashMap<String , String> parametros = new HashMap<String, String>();
+//			byte contenido[] = htmltoPDF.convertir(ERPFactory.facturas.getFacturaCabeceraServicio().finObtenerXMLReporteFacturas(facturaCabeceraDTOCols).replace("<?xml version=\"1.0\" encoding=\"UTF-8\"?>", ""), "", "",	parametros,	null);
+//			UtilitarioWeb.mostrarPDF(contenido);
 			
 //			Doc doc = new SimpleDoc(contenido, flavor, null);
 //			docPrintJob.print(doc, null);

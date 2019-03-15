@@ -2,6 +2,7 @@
 package ec.com.erp.web.articulo.controller;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Collection;
 
 import javax.annotation.PostConstruct;
@@ -12,6 +13,7 @@ import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
 import javax.faces.event.ActionEvent;
 import javax.faces.event.AjaxBehaviorEvent;
+import javax.faces.event.ValueChangeEvent;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -20,6 +22,8 @@ import ec.com.erp.cliente.common.constantes.ERPConstantes;
 import ec.com.erp.cliente.common.exception.ERPException;
 import ec.com.erp.cliente.common.factory.ERPFactory;
 import ec.com.erp.cliente.mdl.dto.ArticuloDTO;
+import ec.com.erp.cliente.mdl.dto.ArticuloImpuestoDTO;
+import ec.com.erp.cliente.mdl.dto.ImpuestoDTO;
 import ec.com.erp.web.articulo.datamanager.ArticulosDataManager;
 import ec.com.erp.web.commons.controller.CommonsController;
 import ec.com.erp.web.commons.controller.MensajesController;
@@ -48,22 +52,34 @@ public class ArticulosController extends CommonsController implements Serializab
 	// Variables
 	private ArticuloDTO articuloDTO;
 	private Collection<ArticuloDTO> articuloDTOCols;
+	private Collection<ArticuloImpuestoDTO> articuloImpuestoDTOCols;
+	private Collection<ImpuestoDTO> impuestoDTOCols;
+	private ArticuloImpuestoDTO articuloImpuestoDTO;
 	private String codigoBarrasBusqueda;
 	private String nombreArticuloBusqueda;
+	private Long codigoImpuestoSeleccionado;
 	private Integer page;
 	private Boolean articuloCreado;
 	private Boolean modoEdicion;
+	private ImpuestoDTO impuestoDTO;
 
 	@PostConstruct
 	public void postConstruct() {
 		this.loginController.activarMenusSeleccionado();
+		this.articuloImpuestoDTOCols = new ArrayList<ArticuloImpuestoDTO>();
+		this.impuestoDTOCols = new ArrayList<ImpuestoDTO>();
+		articuloImpuestoDTO = new ArticuloImpuestoDTO();
+		this.impuestoDTO = new ImpuestoDTO();
 		this.articuloCreado = Boolean.FALSE;
 		this.modoEdicion = Boolean.FALSE;
 		this.articuloDTO = new ArticuloDTO();
 		this.page = 0;
-		if(articulosDataManager.getArticuloDTOEditar() != null && articulosDataManager.getArticuloDTOEditar().getId().getCodigoArticulo() != null)
-		{
+		
+		if(articulosDataManager.getArticuloDTOEditar() != null && articulosDataManager.getArticuloDTOEditar().getId().getCodigoArticulo() != null){
 			this.setArticuloDTO(articulosDataManager.getArticuloDTOEditar());
+			if(CollectionUtils.isNotEmpty(articulosDataManager.getArticuloDTOEditar().getArticuloImpuestoDTOCols())){
+				this.setArticuloImpuestoDTOCols(articulosDataManager.getArticuloDTOEditar().getArticuloImpuestoDTOCols());
+			}
 			this.modoEdicion = Boolean.TRUE;
 		}
 		if(FacesContext.getCurrentInstance().getViewRoot().getViewId().equals("/modules/articulos/adminBusquedaArticulos.xhtml")) {
@@ -133,7 +149,7 @@ public class ArticulosController extends CommonsController implements Serializab
 					articuloDTO.getId().setCodigoCompania(Integer.parseInt(ERPConstantes.ESTADO_ACTIVO_NUMERICO));
 					articuloDTO.setCodigoBarras(articuloDTO.getCodigoBarras().toUpperCase());
 					articuloDTO.setNombreArticulo(articuloDTO.getNombreArticulo().toUpperCase());
-					ERPFactory.articulos.getArticuloServicio().transGuardarActualizarArticulo(articuloDTO);
+					ERPFactory.articulos.getArticuloServicio().transGuardarActualizarArticulo(articuloDTO, articuloImpuestoDTOCols);
 					this.setShowMessagesBar(Boolean.TRUE);
 					this.setArticuloCreado(Boolean.TRUE);
 					FacesMessage msg = new FacesMessage("El art\u00EDculo se cre\u00F3 correctamente.", "ERROR MSG");
@@ -154,7 +170,7 @@ public class ArticulosController extends CommonsController implements Serializab
 						articuloDTO.getId().setCodigoCompania(Integer.parseInt(ERPConstantes.ESTADO_ACTIVO_NUMERICO));
 						articuloDTO.setCodigoBarras(articuloDTO.getCodigoBarras().toUpperCase());
 						articuloDTO.setNombreArticulo(articuloDTO.getNombreArticulo().toUpperCase());
-						ERPFactory.articulos.getArticuloServicio().transGuardarActualizarArticulo(articuloDTO);
+						ERPFactory.articulos.getArticuloServicio().transGuardarActualizarArticulo(articuloDTO, articuloImpuestoDTOCols);
 						this.setShowMessagesBar(Boolean.TRUE);
 						this.setArticuloCreado(Boolean.TRUE);
 						FacesMessage msg = new FacesMessage("El art\u00EDculo se cre\u00F3 correctamente.", "ERROR MSG");
@@ -283,6 +299,51 @@ public class ArticulosController extends CommonsController implements Serializab
 		this.nombreArticuloBusqueda = "";
 	}
 	
+	/**
+	 * Metodo para eliminar registro 
+	 * @param articuloImpuestoDTO
+	 */
+	public void eliminarImpuestoArticulo(ArticuloImpuestoDTO articuloImpuestoDTO) {
+		articuloImpuestoDTOCols.remove(articuloImpuestoDTO);
+	}
+	
+	/**
+	 * Abrir popup detalle articulos
+	 * @param e
+	 */
+	public void abrirPopUpImpuesto(ActionEvent e) {
+		this.articuloImpuestoDTO = new ArticuloImpuestoDTO();
+		this.setImpuestoDTOCols(ERPFactory.impuesto.getImpuestoServicio().findObtenerListaImpuestos(Integer.parseInt(ERPConstantes.ESTADO_ACTIVO_NUMERICO), null, null));
+	}
+	
+	/**
+	 * Seleccionar cliente del popUp
+	 * @param e
+	 */
+	public void seleccionImpuesto(ValueChangeEvent e)
+	{
+		this.codigoImpuestoSeleccionado = (Long)e.getNewValue();
+		// Verificar si existe en la coleccion el cliente
+		for(ImpuestoDTO impuesto: this.impuestoDTOCols){
+			if(impuesto.getId().getCodigoImpuesto().intValue() == this.codigoImpuestoSeleccionado.intValue()){
+				this.setImpuestoDTO(impuesto);
+			}
+		}
+		System.out.println(""+this.impuestoDTO);
+	}
+	
+	/**
+	 * Agregar nuevo impuesto
+	 * @param e
+	 */
+	public void agregarImpuesto(ActionEvent e) {
+		ArticuloImpuestoDTO detalle = new ArticuloImpuestoDTO();
+		detalle.getId().setCodigoCompania(Integer.parseInt(ERPConstantes.ESTADO_ACTIVO_NUMERICO));
+		detalle.setUsuarioRegistro(loginController.getUsuariosDTO().getId().getUserId());
+		detalle.setImpuestoDTO(this.impuestoDTO);
+		detalle.getId().setCodigoImpuesto(this.impuestoDTO.getId().getCodigoImpuesto());
+		this.articuloImpuestoDTOCols.add(detalle);
+	}
 	
 	public void setArticulosDataManager(ArticulosDataManager articulosDataManager) {
 		this.articulosDataManager = articulosDataManager;
@@ -350,5 +411,45 @@ public class ArticulosController extends CommonsController implements Serializab
 
 	public void setModoEdicion(Boolean modoEdicion) {
 		this.modoEdicion = modoEdicion;
+	}
+
+	public Collection<ArticuloImpuestoDTO> getArticuloImpuestoDTOCols() {
+		return articuloImpuestoDTOCols;
+	}
+
+	public void setArticuloImpuestoDTOCols(Collection<ArticuloImpuestoDTO> articuloImpuestoDTOCols) {
+		this.articuloImpuestoDTOCols = articuloImpuestoDTOCols;
+	}
+
+	public ArticuloImpuestoDTO getArticuloImpuestoDTO() {
+		return articuloImpuestoDTO;
+	}
+
+	public void setArticuloImpuestoDTO(ArticuloImpuestoDTO articuloImpuestoDTO) {
+		this.articuloImpuestoDTO = articuloImpuestoDTO;
+	}
+
+	public Collection<ImpuestoDTO> getImpuestoDTOCols() {
+		return impuestoDTOCols;
+	}
+
+	public void setImpuestoDTOCols(Collection<ImpuestoDTO> impuestoDTOCols) {
+		this.impuestoDTOCols = impuestoDTOCols;
+	}
+
+	public Long getCodigoImpuestoSeleccionado() {
+		return codigoImpuestoSeleccionado;
+	}
+
+	public void setCodigoImpuestoSeleccionado(Long codigoImpuestoSeleccionado) {
+		this.codigoImpuestoSeleccionado = codigoImpuestoSeleccionado;
+	}
+
+	public ImpuestoDTO getImpuestoDTO() {
+		return impuestoDTO;
+	}
+
+	public void setImpuestoDTO(ImpuestoDTO impuestoDTO) {
+		this.impuestoDTO = impuestoDTO;
 	}
 }

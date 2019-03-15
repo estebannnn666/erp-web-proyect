@@ -41,8 +41,123 @@
 			 		<h:outputText class="styleNegritas" value="#{msg_erpweb['ec.com.erp.etiqueta.header.tabla.articulo.stock']}: *" />
 			 		<h:inputText style="width:260px" value="#{articulosController.articuloDTO.cantidadStock}" id="cantidadStock" onkeypress="return validarEnteros(event);"/>
 			 	</h:panelGrid>
-			  </fieldset>
+			</fieldset>
+			
+			<fieldset>
+			 	<legend>Impuestos del articulo</legend>
+			 	
+			 	<rich:toolbar height="26" itemSeparator="grid">
+					<rich:toolbarGroup>
+						<h:graphicImage name="listaPedidos.png" library="images" style="border:none;border-color:white;" height="16" width="16"/>
+						<h:outputText value="Lista de impuestos"/>
+					</rich:toolbarGroup>
+					<rich:toolbarGroup location="right">	
+						<h:panelGroup layout="block" styleClass="botonD" style="padding-top: 3px; margin-top:0px;">
+							<a4j:commandLink styleClass="agregarD" actionListener="#{articulosController.abrirPopUpImpuesto}" oncomplete="#{rich:component('mpAddImpuesto')}.show();" render="mpAddImpuesto pnlListaImpuesto" execute="@this" title="Click para agregar fila">
+								<h:panelGrid columns="2" cellpadding="3" cellspacing="0">
+									<h:graphicImage name="btnNuevoPedido.png" library="images" style="border:none;border-color:white;" height="16" width="16"/>
+									<h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.boton.agregar']}"/>
+								</h:panelGrid>
+							</a4j:commandLink>	
+						</h:panelGroup>	
+					</rich:toolbarGroup>						
+				</rich:toolbar>	
+				
+			 	<h:panelGrid id="pnlGridImpuesto" style="width:100%">
+			 		<rich:dataTable styleClass="styleDetalle" style="width:100%" value="#{articulosController.articuloImpuestoDTOCols}" var="detalle" rowKeyVar="rowIndex" iterationStatusVar="it" id="tableArticuloImpuesto" rows="100">
+				 		<rich:column style="width:5%; text-align: center;">
+			                <f:facet name="header"><h:outputText value="Eliminar"/></f:facet>
+			                <a4j:commandLink id="botonEditar" render="pnlGridImpuesto" action="#{articulosController.eliminarImpuestoArticulo(detalle)}"	execute="@this" >
+								<h:outputText value="Eliminar" />
+								<f:setPropertyActionListener value="#{detalle}" target="#{articulosController.articuloImpuestoDTO}" />											
+							</a4j:commandLink>	
+			            </rich:column>
+			            <rich:column style="width:5%; text-align: center;">
+			                <f:facet name="header">Nro.</f:facet>
+			                #{rowIndex+1}
+			            </rich:column>
+			            <rich:column style="width:25%">
+			                <f:facet name="header"><h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.label.nuevo.impuesto.articulo.nombre']}"/></f:facet>
+			                <h:outputText style="text-align: right; width:95%; padding-right: 5px" value="#{detalle.impuestoDTO.nombreImpuesto}"></h:outputText>
+			            </rich:column>		
+			            <rich:column style="width:50%"> 
+			                <f:facet name="header"><h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.label.nuevo.impuesto.articulo.descripcion']}"/></f:facet>
+			                <h:outputText style="text-align: right; width:95%; padding-right: 5px" value="#{detalle.impuestoDTO.descripcion}"></h:outputText>
+			            </rich:column>		            
+			            <rich:column style="width:15%; text-align: right; paddin-right: 10px">
+			                <f:facet name="header"><h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.label.nuevo.impuesto.articulo.valor']}"/></f:facet>
+			                <h:outputText style="text-align: right; width:95%; padding-right: 5px" value="#{detalle.impuestoDTO.valorImpuesto}">
+			                	<f:convertNumber pattern="0.00" />
+			                </h:outputText>
+			                %
+			            </rich:column>
+			        </rich:dataTable>
+			 	</h:panelGrid>
+			</fieldset>
 		</rich:panel>
+		
+		<!-- Popup para agregar nuevo cliente -->
+		<rich:popupPanel id="mpAddImpuesto" styleClass="panelPedidos" header="Seleccionar impuestos" width="935" height="400" modal="true" domElementAttachment="form">
+			<f:facet name="controls">
+				<h:outputLink value="#"	onclick="#{rich:component('mpClientes')}.hide();">
+					<h:graphicImage library="images" name="close.png" style="border:0px" id="closePopUpBodega" />
+				</h:outputLink>
+			</f:facet>
+			<h:panelGrid id="pnlListaImpuesto" style="width: 100%;">	
+				<rich:panel style="width: 99.6%; height: 315px; " header="Lista de impuestos">
+					
+					<h:panelGrid id="tablaVaciaClient" columns="1" rendered="#{empty articulosController.impuestoDTOCols}" style="width:100%; text-align: center; padding-top: 150px">
+						<h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.mensaje.lista.vacio']}"/>
+					</h:panelGrid>	
+					<rich:panel style="text-align:center; border-left: none; border-right:none; margin-bottom: 2px" rendered="#{not empty articulosController.impuestoDTOCols}">
+						<rich:dataScroller fastStep="3" for="tableImpuestos" maxPages="5" rendered="#{not empty articulosController.impuestoDTOCols}" renderIfSinglePage="true"/>
+					</rich:panel>	
+					<rich:dataTable style="width:100%" value="#{articulosController.impuestoDTOCols}" rendered="#{not empty articulosController.impuestoDTOCols}" var="impuesto" iterationStatusVar="it" id="tableImpuestos" rows="7">
+			            <rich:column style="padding:0px;padding-left:2px" >
+							<h:selectOneRadio onclick="radioButton(this);" id="myRadio" value="#{articulosController.codigoImpuestoSeleccionado}" valueChangeListener="#{articulosController.seleccionImpuesto}">  
+								<f:selectItem itemValue="#{impuesto.id.codigoImpuesto}"/> 
+								<a4j:ajax event="click" execute="@this" render="myRadio"/>								
+							</h:selectOneRadio>
+						</rich:column>
+			            <rich:column>
+			                <f:facet name="header">Nro.</f:facet>
+			                #{it.index+1}
+			            </rich:column>
+			            <rich:column>
+			                <f:facet name="header"><h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.label.nuevo.impuesto.articulo.nombre']}"/></f:facet>
+			                <h:outputText value="#{impuesto.nombreImpuesto}" />
+			            </rich:column>
+			            <rich:column>
+			                <f:facet name="header"><h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.label.nuevo.impuesto.articulo.descripcion']}"/></f:facet>
+			                <h:outputText value="#{impuesto.descripcion}" />
+			            </rich:column>
+			            <rich:column>
+			                <f:facet name="header"><h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.label.nuevo.impuesto.articulo.valor']}"/></f:facet>
+			                <h:outputText value="#{impuesto.valorImpuesto}" />
+			            </rich:column>			           
+			        </rich:dataTable>
+		        </rich:panel>
+			</h:panelGrid>
+			<!-- Botones de PopUp -->
+			<h:panelGrid style="margin:auto;" columns="2" cellpadding="0" cellspacing="0">
+				<h:panelGroup layout="block" styleClass="botonD" style="margin-top:5px;margin-right:20px;">
+					<a4j:commandLink id="btnAceptarAgregarCliente" execute="@this" render="pnlGridImpuesto tableArticuloImpuesto" styleClass="aceptarD" actionListener="#{articulosController.agregarImpuesto}" oncomplete="#{rich:component('mpAddImpuesto')}.hide(); return false;">
+						<h:panelGrid columns="2" cellpadding="3" cellspacing="0">
+							<h:graphicImage name="btnAceptar.png" library="images" style="border:none;border-color:white;" height="16" width="16"/>
+							<h:outputText value="Aceptar" />
+						</h:panelGrid>
+					</a4j:commandLink>					
+				</h:panelGroup>
+				<h:panelGroup layout="block" styleClass="botonD" style="margin-top:5px;">
+					<a4j:commandLink id="btnCancelarAgregarCliente" styleClass="cancelarD" oncomplete="#{rich:component('mpAddImpuesto')}.hide(); return false;" immediate="true">
+						<h:panelGrid columns="2" cellpadding="3" cellspacing="0">
+							<h:graphicImage name="btnCancel.png" library="images" style="border:none;border-color:white;" height="16" width="16"/>
+							<h:outputText value="Cancelar" />
+						</h:panelGrid>
+					</a4j:commandLink>
+				</h:panelGroup>
+			</h:panelGrid>
+		</rich:popupPanel> 
 		 
 		<!-- Popup para confirmar que se guardo el articulo -->
 		<rich:popupPanel id="mpConfirmacion" header="#{msg_erpweb['ec.com.erp.etiqueta.mensaje.confirmacion']}" width="345" height="160" modal="true" domElementAttachment="form">
@@ -85,7 +200,18 @@
 			</h:panelGrid>
 		</rich:popupPanel>
 		<script type="text/javascript">
-			/*<![CDATA[*/								
+			/*<![CDATA[*/	
+				function radioButton(radio) {
+					var id = radio.name.substring(radio.name.lastIndexOf(':'));
+					var el = radio.form.elements;
+					for (var i = 0; i < el.length; i++) {
+						if (el[i].name.substring(el[i].name.lastIndexOf(':')) == id) {
+						el[i].checked = false;
+						}
+					}
+					radio.checked = true;
+				}
+											
 				function validarEnteros(e) {
 					tecla = (document.all) ? e.keyCode : e.which; 
 					if (tecla==8) return true; 
