@@ -109,7 +109,7 @@
 	                <f:facet name="header">Editar</f:facet>
 	                <a4j:commandLink id="botonEditar" render="pnlGridVehiculo panelTabla" action="#{vehiculoController.cargarVehiculoEditar}" execute="@this" >
 						<h:graphicImage name="btnEditar.png" library="images" style="border:none;border-color:white;" height="16" width="16"/>
-						<f:setPropertyActionListener value="#{vehic}" target="#{vehiculoController.transportistaDTO}" />											
+						<f:setPropertyActionListener value="#{vehic}" target="#{vehiculoController.vehiculoDTO}" />											
 					</a4j:commandLink>	
 	            </rich:column>        
 	        </rich:dataTable>

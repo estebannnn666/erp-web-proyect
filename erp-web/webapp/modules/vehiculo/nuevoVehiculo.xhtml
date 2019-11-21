@@ -120,12 +120,12 @@
 			                <f:facet name="header"><h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.label.lista.cabecera.observacion.chofer']}"/></f:facet>
 			                <h:outputText value="#{vehChofer.descripcion}" />
 			            </rich:column>					         
-			            <rich:column>
+			            <rich:column styleClass="columna5">
 			                <f:facet name="header"><h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.boton.eliminar']}"/></f:facet>
 			                <a4j:commandLink id="botonEliminar" execute="@this" oncomplete="#{rich:component('mpEliminarChofer')}.show();">
-								<h:graphicImage library="images/icons" name="deleteReg.png" title="Borrar"/>
+								<h:graphicImage style="border:none;border-color:white;" width="16" height="16" library="images" name="deleteReg.png" title="Borrar"/>
 								<f:setPropertyActionListener value="#{chofer}" target="#{vehiculoController.vehiculoChoferDTO}" />											
-							</a4j:commandLink>	
+							</a4j:commandLink>
 			            </rich:column>            
 			        </rich:dataTable>						
 					<rich:panel style="text-align:center; border-left: none; border-right:none; border-bottom:none" rendered="#{not empty vehiculoController.vehiculoChoferDTOCols}">

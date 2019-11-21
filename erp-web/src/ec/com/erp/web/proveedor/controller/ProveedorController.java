@@ -245,7 +245,7 @@ public class ProveedorController extends CommonsController implements Serializab
 			}
 		}else
 		{
-			if(StringUtils.isEmpty(this.empresaDTO.getNumeroRuc())){
+			if(StringUtils.isEmpty(this.personaDTO.getNumeroDocumento())){
 				MensajesController.addError(null, ERPWebResources.getString("ec.com.erp.etiqueta.mensaje.campo.requerido.numeroruc"));
 				validado = Boolean.FALSE;
 			}
