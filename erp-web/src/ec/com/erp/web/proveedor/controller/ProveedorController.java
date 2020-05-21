@@ -346,6 +346,7 @@ public class ProveedorController extends CommonsController implements Serializab
 	 */
 	public void borrarBusquedaNumeroDocumento(ActionEvent e){
 		this.numeroDocumentoBusqueda = "";
+		this.setShowMessagesBar(Boolean.FALSE);
 	}
 	
 	/**
@@ -353,6 +354,7 @@ public class ProveedorController extends CommonsController implements Serializab
 	 */
 	public void borrarBusquedaNombreProveedor(ActionEvent e){
 		this.nombreProveedorBusqueda = "";
+		this.setShowMessagesBar(Boolean.FALSE);
 	}
 	
 	/**

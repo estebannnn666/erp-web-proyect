@@ -38,7 +38,7 @@
 			    	   		<a4j:ajax event="keyup" execute="filtrosTransportista" listener="#{transportistaController.busquedaTransportistaEnter}" onbeforesubmit="if (event.keyCode != 13)  return false;" render="listaTransport tabletransporte pnlMensajes"></a4j:ajax>
 			    	   	</rich:inplaceInput>
 			    	   	<h:panelGroup styleClass="styleClean">
-							<a4j:commandLink styleClass="guardarA" execute="@this" render="numeroDocumento" actionListener="#{transportistaController.borrarBusquedaNumeroDocumento}"/>
+							<a4j:commandLink styleClass="guardarA" execute="@this" render="numeroDocumento pnlMensajes" actionListener="#{transportistaController.borrarBusquedaNumeroDocumento}"/>
 						</h:panelGroup>
 					</h:panelGrid>
 			    	
@@ -47,7 +47,7 @@
 							<a4j:ajax event="keyup" execute="filtrosTransportista" listener="#{transportistaController.busquedaTransportistaEnter}" onbeforesubmit="if (event.keyCode != 13)  return false;" render="listaTransport tabletransporte pnlMensajes"></a4j:ajax>
 						</rich:inplaceInput>
 			    	   	<h:panelGroup styleClass="styleClean">
-							<a4j:commandLink styleClass="guardarA" execute="@this" render="nombreTransportista" actionListener="#{transportistaController.borrarBusquedaNombreTransportista}"/>
+							<a4j:commandLink styleClass="guardarA" execute="@this" render="nombreTransportista pnlMensajes" actionListener="#{transportistaController.borrarBusquedaNombreTransportista}"/>
 						</h:panelGroup>
 					</h:panelGrid>
 			    	 <a4j:commandButton id="btnBuscarTransportistas" value="Buscar" styleClass="styleSearch" render="listaTransport tabletransporte pnlMensajes" execute="filtrosTransportista" actionListener="#{transportistaController.busquedaTransportista}"/>

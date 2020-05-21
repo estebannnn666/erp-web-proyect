@@ -38,7 +38,7 @@
 			    	   		<a4j:ajax event="keyup" execute="listaReporte" listener="#{perfilController.busquedaPerfilesEnter}" onbeforesubmit="if (event.keyCode != 13)  return false;" render="listaPerfiles tablePerfil pnlMensajes"></a4j:ajax>
 			    	   	</rich:inplaceInput>
 			    	   	<h:panelGroup styleClass="styleClean">
-							<a4j:commandLink styleClass="guardarA" execute="@this" render="nombrePerfil" actionListener="#{perfilController.borrarBusquedaNombrePerfil}"/>
+							<a4j:commandLink styleClass="guardarA" execute="@this" render="nombrePerfil pnlMensajes" actionListener="#{perfilController.borrarBusquedaNombrePerfil}"/>
 						</h:panelGroup>
 					</h:panelGrid>
 			    	 <a4j:commandButton id="btnBuscar" value="Buscar" styleClass="styleSearch" render="listaPerfiles tablePerfil pnlMensajes" execute="listaReporte" actionListener="#{perfilController.busquedaPerfiles}"/>

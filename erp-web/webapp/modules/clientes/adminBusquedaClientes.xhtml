@@ -38,7 +38,7 @@
 			    	   		<a4j:ajax event="keyup" execute="filtrosCliente" listener="#{clientesController.busquedaClienteEnter}" onbeforesubmit="if (event.keyCode != 13)  return false;" render="listaClientes tableCliente pnlMensajes"></a4j:ajax>
 			    	   	</rich:inplaceInput>
 			    	   	<h:panelGroup styleClass="styleClean">
-							<a4j:commandLink styleClass="guardarA" execute="@this" render="documentoCliente" actionListener="#{clientesController.borrarBusquedaNumeroDocumento}"/>
+							<a4j:commandLink styleClass="guardarA" execute="@this" render="documentoCliente pnlMensajes" actionListener="#{clientesController.borrarBusquedaNumeroDocumento}"/>
 						</h:panelGroup>
 					</h:panelGrid>
 			    	
@@ -47,7 +47,7 @@
 							<a4j:ajax event="keyup" execute="filtrosCliente" listener="#{clientesController.busquedaClienteEnter}" onbeforesubmit="if (event.keyCode != 13)  return false;" render="listaClientes tableCliente pnlMensajes"></a4j:ajax>
 						</rich:inplaceInput>
 			    	   	<h:panelGroup styleClass="styleClean">
-							<a4j:commandLink styleClass="guardarA" execute="@this" render="nombreCliente" actionListener="#{clientesController.borrarBusquedaNombreCliente}"/>
+							<a4j:commandLink styleClass="guardarA" execute="@this" render="nombreCliente pnlMensajes" actionListener="#{clientesController.borrarBusquedaNombreCliente}"/>
 						</h:panelGroup>
 					</h:panelGrid>
 			    	 <a4j:commandButton id="btnBuscarCliente" value="Buscar" styleClass="styleSearch" render="listaClientes tableCliente pnlMensajes" execute="filtrosCliente" actionListener="#{clientesController.busquedaClientes}"/>

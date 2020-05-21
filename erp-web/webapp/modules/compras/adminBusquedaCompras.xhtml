@@ -38,7 +38,7 @@
 			    	   		<a4j:ajax event="keyup" execute="filtrosCompras" listener="#{cuentasController.busquedaFacturasComprasEnter}" onbeforesubmit="if (event.keyCode != 13)  return false;" render="panelCuentasTabla, tableCuentas, pnlMensajes"></a4j:ajax>
 			    	   	</rich:inplaceInput>
 			    	   	<h:panelGroup styleClass="styleClean">
-							<a4j:commandLink styleClass="guardarA" execute="@this" render="numeroFacturaBusqueda" actionListener="#{cuentasController.borrarBusquedaNumeroFactura}"/>
+							<a4j:commandLink styleClass="guardarA" execute="@this" render="numeroFacturaBusqueda pnlMensajes" actionListener="#{cuentasController.borrarBusquedaNumeroFactura}"/>
 						</h:panelGroup>
 					</h:panelGrid>
 			    	
@@ -47,7 +47,7 @@
 			    	   		<a4j:ajax event="keyup" execute="filtrosCompras" listener="#{cuentasController.busquedaFacturasComprasEnter}" onbeforesubmit="if (event.keyCode != 13)  return false;" render="panelCuentasTabla, tableCuentas, pnlMensajes"></a4j:ajax>
 			    	   	</rich:inplaceInput>
 			    	   	<h:panelGroup styleClass="styleClean">
-							<a4j:commandLink styleClass="guardarA" execute="@this" render="numDocumento" actionListener="#{cuentasController.borrarBusquedaDocumento}"/>
+							<a4j:commandLink styleClass="guardarA" execute="@this" render="numDocumento pnlMensajes" actionListener="#{cuentasController.borrarBusquedaDocumento}"/>
 						</h:panelGroup>
 					</h:panelGrid>
 					
@@ -56,7 +56,7 @@
 			    	   		<a4j:ajax event="keyup" execute="filtrosCompras" listener="#{cuentasController.busquedaFacturasComprasEnter}" onbeforesubmit="if (event.keyCode != 13)  return false;" render="panelCuentasTabla, tableCuentas, pnlMensajes"></a4j:ajax>
 			    	   	</rich:inplaceInput>
 			    	   	<h:panelGroup styleClass="styleClean">
-							<a4j:commandLink styleClass="guardarA" execute="@this" render="razonSocialBusqueda" actionListener="#{cuentasController.borrarBusquedaClienteProveedor}"/>
+							<a4j:commandLink styleClass="guardarA" execute="@this" render="razonSocialBusqueda pnlMensajes" actionListener="#{cuentasController.borrarBusquedaClienteProveedor}"/>
 						</h:panelGroup>
 					</h:panelGrid>
 					<rich:calendar inputStyle="width: 80px; height: 20px;" value="#{cuentasController.fechaFacturaInicio}" datePattern="yyyy-MM-dd"></rich:calendar>

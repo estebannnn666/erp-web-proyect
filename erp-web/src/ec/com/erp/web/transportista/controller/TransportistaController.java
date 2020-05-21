@@ -347,6 +347,7 @@ public class TransportistaController extends CommonsController implements Serial
 	 */
 	public void borrarBusquedaNumeroDocumento(ActionEvent e){
 		this.numeroDocumentoBusqueda = "";
+		this.setShowMessagesBar(Boolean.FALSE);
 	}
 	
 	/**
@@ -354,6 +355,7 @@ public class TransportistaController extends CommonsController implements Serial
 	 */
 	public void borrarBusquedaNombreTransportista(ActionEvent e){
 		this.nombreTransportistaBusqueda = "";
+		this.setShowMessagesBar(Boolean.FALSE);
 	}
 	
 	/**

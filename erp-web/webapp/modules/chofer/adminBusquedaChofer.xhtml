@@ -34,16 +34,20 @@
 			<h:panelGroup id="filtrosChofer" layout="block" styleClass="listaReporte">
 				<h:panelGrid columns="3" width="70%" cellpadding="0" cellspacing="2">
 					<h:panelGrid width="47%" columns="2" columnClasses="columnaIzquierda, columnaDerecha">
-			    	   	<rich:inplaceInput id="codigoBarras" value="#{choferController.numeroDocumentoBusqueda}" styleClass="styleInputPlace" defaultLabel="#{msg_erpweb['ec.com.erp.etiqueta.label.busqueda.numero.documento']}" />
+			    	   	<rich:inplaceInput id="documentoChofer" value="#{choferController.numeroDocumentoBusqueda}" styleClass="styleInputPlace" defaultLabel="#{msg_erpweb['ec.com.erp.etiqueta.label.busqueda.numero.documento']}">
+			    	   		<a4j:ajax event="keyup" execute="filtrosChofer" listener="#{choferController.busquedaChoferEnter}" onbeforesubmit="if (event.keyCode != 13)  return false;" render="listaChofer tableChofer pnlMensajes"></a4j:ajax>
+			    	   	</rich:inplaceInput>
 			    	   	<h:panelGroup styleClass="styleClean">
-							<a4j:commandLink styleClass="guardarA" execute="@this" render="filtrosChofer" actionListener="#{choferController.borrarBusquedaNumeroDocumento}"/>
+							<a4j:commandLink styleClass="guardarA" execute="@this" render="documentoChofer pnlMensajes" actionListener="#{choferController.borrarBusquedaNumeroDocumento}"/>
 						</h:panelGroup>
 					</h:panelGrid>
 			    	
 			    	<h:panelGrid width="47%" columns="2" columnClasses="columnaIzquierda, columnaDerecha">
-						<rich:inplaceInput id="nombreArticulo" value="#{choferController.nombreChoferBusqueda}" styleClass="styleInputPlace" defaultLabel="#{msg_erpweb['ec.com.erp.etiqueta.label.busqueda.nombre.chofer']}" />
+						<rich:inplaceInput id="nombreChofer" value="#{choferController.nombreChoferBusqueda}" styleClass="styleInputPlace" defaultLabel="#{msg_erpweb['ec.com.erp.etiqueta.label.busqueda.nombre.chofer']}">
+							<a4j:ajax event="keyup" execute="filtrosChofer" listener="#{choferController.busquedaChoferEnter}" onbeforesubmit="if (event.keyCode != 13)  return false;" render="listaChofer tableChofer pnlMensajes"></a4j:ajax>
+			    	   	</rich:inplaceInput>
 			    	   	<h:panelGroup styleClass="styleClean">
-							<a4j:commandLink styleClass="guardarA" execute="@this" render="filtrosChofer" actionListener="#{choferController.borrarBusquedaNombreChofer}"/>
+							<a4j:commandLink styleClass="guardarA" execute="@this" render="nombreChofer pnlMensajes" actionListener="#{choferController.borrarBusquedaNombreChofer}"/>
 						</h:panelGroup>
 					</h:panelGrid>
 			    	 <a4j:commandButton id="btnBuscarCliente" value="Buscar" styleClass="styleSearch" render="listaChofer tableChofer, pnlMensajes" execute="filtrosCliente" actionListener="#{choferController.busquedaChofer}"/>

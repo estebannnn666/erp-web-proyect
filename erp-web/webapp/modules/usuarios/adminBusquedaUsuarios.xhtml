@@ -37,7 +37,7 @@
 			    	   		<a4j:ajax event="keyup" execute="listaReporte" listener="#{usuariosController.busquedaUsuariosEnter}" onbeforesubmit="if (event.keyCode != 13)  return false;" render="listaUsuarios tableUsuarios pnlMensajes"></a4j:ajax>
 			    	   	</rich:inplaceInput>
 			    	   	<h:panelGroup styleClass="styleClean">
-							<a4j:commandLink styleClass="guardarA" execute="@this" render="nombreUsuario" actionListener="#{usuariosController.borrarBusquedaUsuario}"/>
+							<a4j:commandLink styleClass="guardarA" execute="@this" render="nombreUsuario pnlMensajes" actionListener="#{usuariosController.borrarBusquedaUsuario}"/>
 						</h:panelGroup>
 					</h:panelGrid>
 			    	

@@ -38,7 +38,7 @@
 			    	   		<a4j:ajax event="keyup" execute="listaReporte" listener="#{inventarioController.busquedaInventarioEnter}" onbeforesubmit="if (event.keyCode != 13)  return false;" render="listaInventario tableInventario pnlMensajes"></a4j:ajax>
 			    	   	</rich:inplaceInput>
 			    	   	<h:panelGroup styleClass="styleClean">
-							<a4j:commandLink styleClass="guardarA" execute="@this" render="codigoBarras" actionListener="#{inventarioController.borrarBusquedaCodigoBarras}"/>
+							<a4j:commandLink styleClass="guardarA" execute="@this" render="codigoBarras pnlMensajes" actionListener="#{inventarioController.borrarBusquedaCodigoBarras}"/>
 						</h:panelGroup>
 					</h:panelGrid>
 			    	

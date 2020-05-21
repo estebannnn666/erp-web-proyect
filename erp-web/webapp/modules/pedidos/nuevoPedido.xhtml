@@ -102,18 +102,10 @@
 				            </rich:column>			            
 				            <rich:column styleClass="autoStyle">
 				                <f:facet name="header"><h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.header.tabla.descripcion.articulo']}"/></f:facet>
-						        <p:autoComplete id="themeCustom" value="#{detalle.articuloDTO}" completeMethod="#{pedidosController.completeTheme}"
-					                        var="art" itemLabel="#{art.nombreArticulo}" itemValue="#{art}" converter="articuloConverter">
-					                <a4j:ajax event="change" execute="@this" render="pnlGridDetallePedido" listener="#{pedidosController.asignarValoresArticuloPrime}" oncomplete="fijarFocoSiguienteDetalle(this.id);"></a4j:ajax>
-					                <a4j:ajax event="keyup" execute="@this" render="pnlGridDetallePedido" listener="#{pedidosController.asignarValoresArticuloPrime}" onbeforesubmit="return verifyKeyEnter(event);" oncomplete="fijarFocoSiguienteDetalle(this.id);"></a4j:ajax>
-						            <p:column>
-						                <h:outputText value="#{art.codigoBarras}" />
-						            </p:column>
-						             
-						            <p:column>
-						                <h:outputText value="#{art.nombreArticulo}" />
-						            </p:column>
-						        </p:autoComplete>
+				                <p:autoComplete id="themeCustom" value="#{detalle.nombreArticulo}" completeMethod="#{pedidosController.completeNombreArticulo}">
+            						<p:ajax event="itemSelect"  listener="#{pedidosController.onItemSelect}" update=":frmNuevoPedido:pnlGridDetallePedido"/>
+            						<a4j:ajax event="change" execute="@this" render="pnlGridDetallePedido" oncomplete="fijarFocoSiguienteDetalle(this.id);"></a4j:ajax>
+        						</p:autoComplete>
 				            </rich:column>
 				            <rich:column>
 				                <f:facet name="header"><h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.header.tabla.codigo.barras']}"/></f:facet>

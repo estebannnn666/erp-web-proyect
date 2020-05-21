@@ -19,7 +19,7 @@
 				<a4j:commandLink oncomplete="if(#{transportistaController.transportistaCreado})#{rich:component('mpConfirmacion')}.show();"
 					value="#{msg_erpweb['ec.com.erp.etiqueta.boton.guardar']}"
 					styleClass="botonGuardar" actionListener="#{transportistaController.guadarActualizarTransportista}"
-					execute="pnlGridTransportista, pnlDatosBasicosTransportista, pnlGridContacto" render="pnlMensajes"/>
+					execute="pnlGridTransportista, pnlDatosBasicosTransportista, pnlGridContacto" render="pnlMensajes pnlGridTransportista"/>
 			</h:panelGroup>
 		</rich:toolbarGroup>
 		

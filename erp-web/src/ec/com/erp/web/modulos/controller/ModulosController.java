@@ -246,6 +246,7 @@ public class ModulosController extends CommonsController implements Serializable
 	 */
 	public void borrarBusquedaNombreModulo(ActionEvent e){
 		this.nombreModulo = "";
+		this.setShowMessagesBar(Boolean.FALSE);
 	}
 	
 	public void setModulosDataManager(ModulosDataManager modulosDataManager) {

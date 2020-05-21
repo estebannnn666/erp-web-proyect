@@ -38,7 +38,7 @@
 			    	   		<a4j:ajax event="keyup" execute="listaReporte" listener="#{articulosController.busquedaArticulosEnter}" onbeforesubmit="if (event.keyCode != 13)  return false;" render="listaArticulos tableArticle pnlMensajes"></a4j:ajax>
 			    	   	</rich:inplaceInput>
 			    	   	<h:panelGroup styleClass="styleClean">
-							<a4j:commandLink styleClass="guardarA" execute="@this" render="codigoBarras" actionListener="#{articulosController.borrarBusquedaCondigoBarras}"/>
+							<a4j:commandLink styleClass="guardarA" execute="@this" render="codigoBarras pnlMensajes" actionListener="#{articulosController.borrarBusquedaCondigoBarras}"/>
 						</h:panelGroup>
 					</h:panelGrid>
 			    	
@@ -47,7 +47,7 @@
 							<a4j:ajax event="keyup" execute="listaReporte" listener="#{articulosController.busquedaArticulosEnter}" onbeforesubmit="if (event.keyCode != 13)  return false;" render="listaArticulos tableArticle pnlMensajes"></a4j:ajax>
 						</rich:inplaceInput>
 			    	   	<h:panelGroup styleClass="styleClean">
-							<a4j:commandLink styleClass="guardarA" execute="@this" render="nombreArticulo" actionListener="#{articulosController.borrarBusquedaNombreArticulo}"/>
+							<a4j:commandLink styleClass="guardarA" execute="@this" render="nombreArticulo pnlMensajes" actionListener="#{articulosController.borrarBusquedaNombreArticulo}"/>
 						</h:panelGroup>
 					</h:panelGrid>
 			    	 <a4j:commandButton id="btnBuscar" value="Buscar" styleClass="styleSearch" render="listaArticulos tableArticle pnlMensajes" execute="listaReporte" actionListener="#{articulosController.busquedaArticulos}"/>

@@ -476,6 +476,7 @@ public class DespachoController extends CommonsController implements Serializabl
 	 */
 	public void borrarBusquedaGuiaDespacho(ActionEvent e){
 		this.numeroGuiaDespachoBusqueda = "";
+		this.setShowMessagesBar(Boolean.FALSE);
 	}
 	
 	/**
@@ -483,6 +484,7 @@ public class DespachoController extends CommonsController implements Serializabl
 	 */
 	public void borrarBusquedaPlaca(ActionEvent e){
 		this.placaBusqueda = "";
+		this.setShowMessagesBar(Boolean.FALSE);
 	}
 	
 	/**
@@ -491,6 +493,7 @@ public class DespachoController extends CommonsController implements Serializabl
 	public void borrarBusquedaFechaDespacho(ActionEvent e){
 		this.fechaDespachoBusqueda = new Date();
 		this.fechaDespachoBusquedaFin = new Date();
+		this.setShowMessagesBar(Boolean.FALSE);
 	}
 	
 	/**
@@ -498,6 +501,7 @@ public class DespachoController extends CommonsController implements Serializabl
 	 */
 	public void borrarBusquedaDocumentoChofer(ActionEvent e){
 		this.numeroDocumentoChoferBusqueda = "";
+		this.setShowMessagesBar(Boolean.FALSE);
 	}
 	
 	/**
@@ -505,6 +509,7 @@ public class DespachoController extends CommonsController implements Serializabl
 	 */
 	public void borrarBusquedaNombreChofer(ActionEvent e){
 		this.nombreChoferBusqueda = "";
+		this.setShowMessagesBar(Boolean.FALSE);
 	}
 	
 	

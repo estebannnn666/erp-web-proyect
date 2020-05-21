@@ -490,6 +490,7 @@ public class VehiculoController extends CommonsController implements Serializabl
 	 */
 	public void borrarBusquedaPlaca(ActionEvent e){
 		this.placaBusqueda = "";
+		this.setShowMessagesBar(Boolean.FALSE);
 	}
 	
 	/**
@@ -497,6 +498,7 @@ public class VehiculoController extends CommonsController implements Serializabl
 	 */
 	public void borrarBusquedaNumeroDocumento(ActionEvent e){
 		this.numeroDocumentoBusqueda = "";
+		this.setShowMessagesBar(Boolean.FALSE);
 	}
 	
 	/**
@@ -504,6 +506,7 @@ public class VehiculoController extends CommonsController implements Serializabl
 	 */
 	public void borrarBusquedaNombreTransportista(ActionEvent e){
 		this.nombreTransportistaBusqueda = "";
+		this.setShowMessagesBar(Boolean.FALSE);
 	}
 	
 	public void setVehiculoDataManager(VehiculoDataManager vehiculoDataManager) {

@@ -366,6 +366,7 @@ public class ClientesController extends CommonsController implements Serializabl
 	 */
 	public void borrarBusquedaNumeroDocumento(ActionEvent e){
 		this.numeroDocumentoBusqueda = "";
+		this.setShowMessagesBar(Boolean.FALSE);
 	}
 	
 	/**
@@ -373,6 +374,7 @@ public class ClientesController extends CommonsController implements Serializabl
 	 */
 	public void borrarBusquedaNombreCliente(ActionEvent e){
 		this.nombreClienteBusqueda = "";
+		this.setShowMessagesBar(Boolean.FALSE);
 	}
 	
 	/**

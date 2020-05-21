@@ -290,6 +290,7 @@ public class ArticulosController extends CommonsController implements Serializab
 	 */
 	public void borrarBusquedaCondigoBarras(ActionEvent e){
 		this.codigoBarrasBusqueda = "";
+		this.setShowMessagesBar(Boolean.FALSE);
 	}
 	
 	/**
@@ -297,6 +298,7 @@ public class ArticulosController extends CommonsController implements Serializab
 	 */
 	public void borrarBusquedaNombreArticulo(ActionEvent e){
 		this.nombreArticuloBusqueda = "";
+		this.setShowMessagesBar(Boolean.FALSE);
 	}
 	
 	/**

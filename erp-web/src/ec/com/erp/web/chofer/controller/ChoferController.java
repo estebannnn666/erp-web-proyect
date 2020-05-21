@@ -189,10 +189,22 @@ public class ChoferController extends CommonsController implements Serializable 
 	}
 	
 	/**
-	 * Metodo para buscar choferes por filtros o todos
+	 * Metodo para buscar articulos
 	 * @param e
 	 */
 	public void busquedaChofer(ActionEvent e){
+		this.buscarChofer();
+	}
+	
+	public void busquedaChoferEnter(AjaxBehaviorEvent e){
+		this.buscarChofer();
+	}
+	
+	/**
+	 * Metodo para buscar choferes por filtros o todos
+	 * @param e
+	 */
+	public void buscarChofer(){
 		try {
 			this.choferDTOCols = ERPFactory.chofer.getChoferServicio().findObtenerListaChoferes(Integer.parseInt(ERPConstantes.ESTADO_ACTIVO_NUMERICO), numeroDocumentoBusqueda, nombreChoferBusqueda);
 			if(CollectionUtils.isEmpty(this.choferDTOCols)){
@@ -382,6 +394,7 @@ public class ChoferController extends CommonsController implements Serializable 
 	 */
 	public void borrarBusquedaNumeroDocumento(ActionEvent e){
 		this.numeroDocumentoBusqueda = "";
+		this.setShowMessagesBar(Boolean.FALSE);
 	}
 	
 	/**
@@ -389,6 +402,7 @@ public class ChoferController extends CommonsController implements Serializable 
 	 */
 	public void borrarBusquedaNombreChofer(ActionEvent e){
 		this.nombreChoferBusqueda = "";
+		this.setShowMessagesBar(Boolean.FALSE);
 	}
 	
 	/**

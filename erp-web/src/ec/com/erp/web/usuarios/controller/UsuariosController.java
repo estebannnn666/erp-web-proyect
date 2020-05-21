@@ -238,6 +238,7 @@ public class UsuariosController extends CommonsController implements Serializabl
 	 */
 	public void borrarBusquedaUsuario(ActionEvent e){
 		this.nombreUsuario = "";
+		this.setShowMessagesBar(Boolean.FALSE);
 	}
 	
 	public void setUsuariosDataManager(UsuariosDataManager usuariosDataManager) {

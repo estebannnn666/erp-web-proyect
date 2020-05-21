@@ -375,6 +375,7 @@ public class PerfilController extends CommonsController implements Serializable 
 	 */
 	public void borrarBusquedaNombrePerfil(ActionEvent e){
 		this.nombrePerfil = "";
+		this.setShowMessagesBar(Boolean.FALSE);
 	}
 	
 	public void setPerfilDataManager(PerfilDataManager perfilDataManager) {

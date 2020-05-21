@@ -38,7 +38,7 @@
 			    	   		<a4j:ajax event="keyup" execute="filtrosPedido" listener="#{pedidosController.busquedaPedididosEnter}" onbeforesubmit="if (event.keyCode != 13)  return false;" render="panelPedidosTabla, tablaVaciaPedidos, tablePedidos, pnlMensajes"></a4j:ajax>
 			    	   	</rich:inplaceInput>
 			    	   	<h:panelGroup styleClass="styleClean">
-							<a4j:commandLink styleClass="guardarA" execute="@this" render="numeroDocumentoBusqueda" actionListener="#{pedidosController.borrarBusquedaNumeroDocumento}"/>
+							<a4j:commandLink styleClass="guardarA" execute="@this" render="numeroDocumentoBusqueda pnlMensajes" actionListener="#{pedidosController.borrarBusquedaNumeroDocumento}"/>
 						</h:panelGroup>
 					</h:panelGrid>
 			    	<h:panelGrid width="47%" columns="2" columnClasses="columnaIzquierda, columnaDerecha">
@@ -46,7 +46,7 @@
 							<a4j:ajax event="keyup" execute="filtrosPedido" listener="#{pedidosController.busquedaPedididosEnter}" onbeforesubmit="if (event.keyCode != 13)  return false;" render="panelPedidosTabla, tablaVaciaPedidos, tablePedidos, pnlMensajes"></a4j:ajax>
 						</rich:inplaceInput>
 			    	   	<h:panelGroup styleClass="styleClean">
-							<a4j:commandLink styleClass="guardarA" execute="@this" render="nombreClienteBusqueda" actionListener="#{pedidosController.borrarBusquedaNombreCliente}"/>
+							<a4j:commandLink styleClass="guardarA" execute="@this" render="nombreClienteBusqueda pnlMensajes" actionListener="#{pedidosController.borrarBusquedaNombreCliente}"/>
 						</h:panelGroup>
 					</h:panelGrid>
 			    	<rich:calendar inputStyle="width: 80px; height: 20px;" value="#{pedidosController.fechaPedidoInicioBusqueda}" datePattern="yyyy-MM-dd"></rich:calendar>

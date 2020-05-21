@@ -39,7 +39,7 @@
 			    	   		<a4j:ajax event="keyup" execute="filtrosVehiculo" listener="#{vehiculoController.busquedaVehiculosEnter}" onbeforesubmit="if (event.keyCode != 13)  return false;" render="listaVehiculos, tableVehiculo, pnlMensajes"></a4j:ajax>
 			    	   	</rich:inplaceInput>
 			    	   	<h:panelGroup styleClass="styleClean">
-							<a4j:commandLink styleClass="guardarA" execute="@this" render="placaBusqueda" actionListener="#{vehiculoController.borrarBusquedaPlaca}"/>
+							<a4j:commandLink styleClass="guardarA" execute="@this" render="placaBusqueda pnlMensajes" actionListener="#{vehiculoController.borrarBusquedaPlaca}"/>
 						</h:panelGroup>
 					</h:panelGrid>
 			    	
@@ -48,7 +48,7 @@
 							<a4j:ajax event="keyup" execute="filtrosVehiculo" listener="#{vehiculoController.busquedaVehiculosEnter}" onbeforesubmit="if (event.keyCode != 13)  return false;" render="listaVehiculos, tableVehiculo, pnlMensajes"></a4j:ajax>
 						</rich:inplaceInput>
 			    	   	<h:panelGroup styleClass="styleClean">
-							<a4j:commandLink styleClass="guardarA" execute="@this" render="numeroDocumento" actionListener="#{vehiculoController.borrarBusquedaNumeroDocumento}"/>
+							<a4j:commandLink styleClass="guardarA" execute="@this" render="numeroDocumento pnlMensajes" actionListener="#{vehiculoController.borrarBusquedaNumeroDocumento}"/>
 						</h:panelGroup>
 					</h:panelGrid>
 					
@@ -57,7 +57,7 @@
 							<a4j:ajax event="keyup" execute="filtrosVehiculo" listener="#{vehiculoController.busquedaVehiculosEnter}" onbeforesubmit="if (event.keyCode != 13)  return false;" render="listaVehiculos, tableVehiculo, pnlMensajes"></a4j:ajax>
 						</rich:inplaceInput>
 			    	   	<h:panelGroup styleClass="styleClean">
-							<a4j:commandLink styleClass="guardarA" execute="@this" render="nombreTransportista" actionListener="#{vehiculoController.borrarBusquedaNombreTransportista}"/>
+							<a4j:commandLink styleClass="guardarA" execute="@this" render="nombreTransportista pnlMensajes" actionListener="#{vehiculoController.borrarBusquedaNombreTransportista}"/>
 						</h:panelGroup>
 					</h:panelGrid>
 			    	 <a4j:commandButton id="btnBuscarVehiculo" value="Buscar" styleClass="styleSearch" render="listaVehiculos, tableVehiculo, pnlMensajes" execute="filtrosVehiculo" actionListener="#{vehiculoController.busquedaVehiculos}"/>

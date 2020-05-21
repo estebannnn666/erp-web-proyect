@@ -792,6 +792,7 @@ public class CuentasController extends CommonsController implements Serializable
 	 */
 	public void borrarBusquedaNumeroFactura(ActionEvent e){
 		this.numeroFactura = "";
+		this.setShowMessagesBar(Boolean.FALSE);
 	}
 	
 	/**
@@ -800,6 +801,7 @@ public class CuentasController extends CommonsController implements Serializable
 	public void borrarBusquedaFechaFactura(ActionEvent e){
 		this.fechaFacturaInicio = new Date();
 		this.fechaFacturaFin = new Date();
+		this.setShowMessagesBar(Boolean.FALSE);
 	}
 	
 	/**
@@ -807,6 +809,7 @@ public class CuentasController extends CommonsController implements Serializable
 	 */
 	public void borrarBusquedaDocumento(ActionEvent e){
 		this.docClienteProveedor = "";
+		this.setShowMessagesBar(Boolean.FALSE);
 	}
 	
 	/**
@@ -814,6 +817,7 @@ public class CuentasController extends CommonsController implements Serializable
 	 */
 	public void borrarBusquedaClienteProveedor(ActionEvent e){
 		this.nombClienteProveedor = "";
+		this.setShowMessagesBar(Boolean.FALSE);
 	}
 	
 	/**
@@ -943,7 +947,7 @@ public class CuentasController extends CommonsController implements Serializable
 		String pathLevelMensajes = "//RespuestaAutorizacionComprobante/autorizaciones/autorizacion/mensajes[last()]/mensaje/";
 		String estado = getLastNode(pathLevelAutorizacon, "estado", doc);         
 		if(estado.equals("AUTORIZADO")){
-			System.out.println("Estado: " + getLastNode(pathLevelAutorizacon,"estado", doc)+"\n"+"N° Auto: " + 
+			System.out.println("Estado: " + getLastNode(pathLevelAutorizacon,"estado", doc)+"\n"+"NÂ° Auto: " + 
 					getLastNode(pathLevelAutorizacon,"numeroAutorizacion", doc)+"\n"+"Fecha Auto: " + 
 					getLastNode(pathLevelAutorizacon,"fechaAutorizacion", doc)+"\n"+"Ambiente: " + 
 					getLastNode(pathLevelAutorizacon,"ambiente", doc));
@@ -964,7 +968,7 @@ public class CuentasController extends CommonsController implements Serializable
 			HttpURLConnection con = (HttpURLConnection) URL.openConnection(proxy);
 			con.setDoOutput(true);
 			con.setRequestMethod(method);
-			con.setRequestProperty("Content‐type", "text/xml; charset=utf‐8");
+			con.setRequestProperty("Contentâ€�type", "text/xml; charset=utfâ€�8");
 			con.setRequestProperty("SOAPAction", "");
 			con.setRequestProperty("Host", host);       
 			OutputStream reqStreamOut = con.getOutputStream();
@@ -1013,7 +1017,7 @@ public class CuentasController extends CommonsController implements Serializable
 			while ((line = rd.readLine()) != null){
 				sb.append(line);
 			}
-			getEstadoPostSoap(XML_Utilidades.convertStringToDocument(sb.toString()), "RespuestaRecepcionComprobante", "estado");//está extrae la data de los nodos en un archivo XML
+			getEstadoPostSoap(XML_Utilidades.convertStringToDocument(sb.toString()), "RespuestaRecepcionComprobante", "estado");//estÃ¡ extrae la data de los nodos en un archivo XML
 			con.disconnect();
 			return true;
 			
@@ -1029,8 +1033,8 @@ public class CuentasController extends CommonsController implements Serializable
 		if(estado.equals("DEVUELTA")){
 			System.out.println("Clave de Accceso: " + XML_Utilidades.getNodes("comprobante","claveAcceso", doc));
 			System.out.println("Identificador Error: " + XML_Utilidades.getNodes("mensaje","identificador", doc));
-			System.out.println("Descripción Error: " + XML_Utilidades.getNodes("mensaje","mensaje",	doc));
-			System.out.println("Descripción Adicional Error: " + XML_Utilidades.getNodes("mensaje","informacionAdicional", doc));
+			System.out.println("DescripciÃ³n Error: " + XML_Utilidades.getNodes("mensaje","mensaje",	doc));
+			System.out.println("DescripciÃ³n Adicional Error: " + XML_Utilidades.getNodes("mensaje","informacionAdicional", doc));
 			System.out.println("Tipo mensaje: " + XML_Utilidades.getNodes("mensaje","tipo", doc));
 			respuesta = Boolean.FALSE;
 		}else if(estado.equals("RECIBIDA")){

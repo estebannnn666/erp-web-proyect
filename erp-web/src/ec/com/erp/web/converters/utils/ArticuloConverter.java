@@ -6,11 +6,13 @@ import javax.faces.context.FacesContext;
 import javax.faces.convert.Converter;
 import javax.faces.convert.ConverterException;
 import javax.faces.convert.FacesConverter;
+import javax.inject.Named;
 
 import ec.com.erp.cliente.mdl.dto.ArticuloDTO;
 import ec.com.erp.web.pedidos.controller.ArticuloService;
 
-@FacesConverter("articuloConverter")
+@Named
+@FacesConverter(value = "articuloConverter")
 public class ArticuloConverter implements Converter {
  
     @Override
@@ -37,7 +39,11 @@ public class ArticuloConverter implements Converter {
     public String getAsString(FacesContext context, UIComponent component, Object value) {
     	if(value != null) {
     		ArticuloDTO c = (ArticuloDTO) value;
-    		return String.valueOf( c.getId().getCodigoArticulo() );
+    		if(c.getId().getCodigoArticulo() != null) {
+    			return String.valueOf( c.getId().getCodigoArticulo() );
+    		}else {
+    			return null;
+    		}
         }
         else {
             return null;

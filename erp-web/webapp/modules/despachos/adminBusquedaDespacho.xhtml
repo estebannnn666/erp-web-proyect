@@ -39,7 +39,7 @@
 			    	   		<a4j:ajax event="keyup" execute="filtrosDespacho" listener="#{despachoController.busquedaGuiasDespachosEnter}" onbeforesubmit="if (event.keyCode != 13)  return false;" render="panelTablasDespachos tablaVacia tableDespacho pnlMensajes"></a4j:ajax>
 			    	   	</rich:inplaceInput>
 			    	   	<h:panelGroup styleClass="styleClean">
-							<a4j:commandLink styleClass="guardarA" execute="@this" render="nroGuiaBusqueda" actionListener="#{despachoController.borrarBusquedaGuiaDespacho}"/>
+							<a4j:commandLink styleClass="guardarA" execute="@this" render="nroGuiaBusqueda pnlMensajes" actionListener="#{despachoController.borrarBusquedaGuiaDespacho}"/>
 						</h:panelGroup>
 					</h:panelGrid>
 			    	
@@ -48,7 +48,7 @@
 							<a4j:ajax event="keyup" execute="filtrosDespacho" listener="#{despachoController.busquedaGuiasDespachosEnter}" onbeforesubmit="if (event.keyCode != 13)  return false;" render="panelTablasDespachos tablaVacia tableDespacho pnlMensajes"></a4j:ajax>
 						</rich:inplaceInput>
 			    	   	<h:panelGroup styleClass="styleClean">
-							<a4j:commandLink styleClass="guardarA" execute="@this" render="placaBusqueda" actionListener="#{despachoController.borrarBusquedaPlaca}"/>
+							<a4j:commandLink styleClass="guardarA" execute="@this" render="placaBusqueda pnlMensajes" actionListener="#{despachoController.borrarBusquedaPlaca}"/>
 						</h:panelGroup>
 					</h:panelGrid>
 					
@@ -57,7 +57,7 @@
 							<a4j:ajax event="keyup" execute="filtrosDespacho" listener="#{despachoController.busquedaGuiasDespachosEnter}" onbeforesubmit="if (event.keyCode != 13)  return false;" render="panelTablasDespachos tablaVacia tableDespacho pnlMensajes"></a4j:ajax>
 						</rich:inplaceInput>
 			    	   	<h:panelGroup styleClass="styleClean">
-							<a4j:commandLink styleClass="guardarA" execute="@this" render="nombreChofer" actionListener="#{despachoController.borrarBusquedaNombreChofer}"/>
+							<a4j:commandLink styleClass="guardarA" execute="@this" render="nombreChofer pnlMensajes" actionListener="#{despachoController.borrarBusquedaNombreChofer}"/>
 						</h:panelGroup>
 					</h:panelGrid>
 					<rich:calendar inputStyle="width: 80px; height: 20px;" value="#{despachoController.fechaDespachoBusqueda}" datePattern="yyyy-MM-dd"></rich:calendar>

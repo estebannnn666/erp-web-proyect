@@ -9,6 +9,7 @@ import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
@@ -24,6 +25,7 @@ import org.apache.commons.beanutils.BeanPredicate;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.Predicate;
 import org.apache.commons.collections.PredicateUtils;
+import org.primefaces.event.SelectEvent;
 
 import ec.com.erp.cliente.common.constantes.ERPConstantes;
 import ec.com.erp.cliente.common.exception.ERPException;
@@ -96,8 +98,7 @@ public class PedidosController extends CommonsController implements Serializable
 	
 	@ManagedProperty("#{articuloService}")
 	private ArticuloService service;
-	 
-
+	
 	@PostConstruct
 	public void postConstruct() {
 		Calendar fechaInferior = Calendar.getInstance();
@@ -127,11 +128,6 @@ public class PedidosController extends CommonsController implements Serializable
 			contDetalle++;
 		}
 		this.page = 0;
-//		this.articuloDTOCols = new ArrayList<ArticuloDTO>();
-//		Collection<ArticuloDTO> articuloCols = ERPFactory.articulos.getArticuloServicio().findObtenerListaArticulos(1, null, null);
-//		for (ArticuloDTO skin : articuloCols) {
-//            this.articuloDTOCols.add(skin);
-//        }
 		
 		if(pedidosDataManager.getPedidoDTOEditar() != null && pedidosDataManager.getPedidoDTOEditar().getId().getCodigoPedido() != null)
 		{
@@ -139,12 +135,13 @@ public class PedidosController extends CommonsController implements Serializable
 			this.setClienteDTO(pedidosDataManager.getPedidoDTOEditar().getClienteDTO());
 			this.documentoCliente = this.clienteDTO.getPersonaDTO() == null ? this.clienteDTO.getEmpresaDTO().getNumeroRuc() : this.clienteDTO.getPersonaDTO().getNumeroDocumento();
 			this.setDetallePedidoDTOCols((List<DetallePedidoDTO>)pedidosDataManager.getPedidoDTOEditar().getDetallePedidoDTOCols());
+			if(CollectionUtils.isNotEmpty(this.detallePedidoDTOCols)) {
+				detallePedidoDTOCols.stream().forEach(detalleitem -> detalleitem.setNombreArticulo(detalleitem.getArticuloDTO().getNombreArticulo()));
+			}
 		}
 		if(FacesContext.getCurrentInstance().getViewRoot().getViewId().equals("/modules/pedidos/adminBusquedaPedidos.xhtml")) {
 			this.pedidosDTOCols = ERPFactory.pedidos.getPedidoServicio().findObtenerPedidosRegistrados(Integer.parseInt(ERPConstantes.ESTADO_ACTIVO_NUMERICO), null, null, null ,null, null);
 		}
-		
-//		FacesContext.getCurrentInstance().getExternalContext().getSessionMap().put("articuloDTOCols", this.articuloDTOCols);
 	}
 		
 	@Override
@@ -167,17 +164,9 @@ public class PedidosController extends CommonsController implements Serializable
 	}
 	
 	public List<ArticuloDTO> completeTheme(String query) {
-        Collection<ArticuloDTO> allThemes = this.service.getArticuloDTOCols();
-        
-        List<ArticuloDTO> filteredThemes = new ArrayList<ArticuloDTO>();
-         
-        for (ArticuloDTO skin : allThemes) {
-            if(skin.getNombreArticulo().toLowerCase().contains(query)) {
-                filteredThemes.add(skin);
-            }
-        }
-         
-        return filteredThemes;
+        String queryLowerCase = query.toLowerCase();
+        List<ArticuloDTO> allThemes = service.getArticuloDTOCols();
+        return allThemes.stream().filter(t -> t.getNombreArticulo().toLowerCase().contains(queryLowerCase)).collect(Collectors.toList());
     }
 	
 	/**
@@ -200,6 +189,29 @@ public class PedidosController extends CommonsController implements Serializable
 			}
 		}
 	}
+	
+	public void onItemSelect(SelectEvent event) {
+        System.out.println(event.getObject());
+        for(DetallePedidoDTO detallePedidoDTOTemp : detallePedidoDTOCols) {
+        	if(detallePedidoDTOTemp.getNombreArticulo() != null) {
+        		String queryLowerCase = detallePedidoDTOTemp.getNombreArticulo().toLowerCase();
+        		ArticuloDTO articuloSeleccionado = service.getArticuloDTOCols().stream()
+                		.filter(articulo -> articulo.getNombreArticulo().toLowerCase().equals(queryLowerCase))
+                		.findFirst().orElse(null);
+        		detallePedidoDTOTemp.setArticuloDTO(articuloSeleccionado);
+        	}
+        	
+			if((detallePedidoDTOTemp.getCantidad() == null ||  detallePedidoDTOTemp.getCantidad().intValue() == 0) && detallePedidoDTOTemp.getArticuloDTO().getPrecio() != null){
+				detallePedidoDTOTemp.setCantidad(1);
+			}
+			if(detallePedidoDTOTemp.getCantidad() != null && detallePedidoDTOTemp.getArticuloDTO().getPrecio() != null) {
+				BigDecimal subTotal = BigDecimal.valueOf(Double.valueOf(""+detallePedidoDTOTemp.getCantidad())).multiply(detallePedidoDTOTemp.getArticuloDTO().getPrecio());
+				detallePedidoDTOTemp.setSubTotal(subTotal);
+				detallePedidoDTOTemp.setCodigoArticulo(detallePedidoDTOTemp.getArticuloDTO().getId().getCodigoArticulo());
+				this.calcularTotal();
+			}
+		}
+    }
 	
 	/**
 	 * Metodo para ir a la pantalla menu principal
@@ -260,6 +272,16 @@ public class PedidosController extends CommonsController implements Serializable
 			}
 		}
 	}
+	
+	public List<String> completeNombreArticulo(String query) {
+        String queryLowerCase = query.toLowerCase();
+        List<ArticuloDTO> allThemes = service.getArticuloDTOCols().stream()
+        		.filter(t -> t.getNombreArticulo().toLowerCase().contains(queryLowerCase))
+        		.collect(Collectors.toList());
+        List<String> results = new ArrayList<>();
+        allThemes.stream().forEach(articulo -> results.add(articulo.getNombreArticulo()));
+        return results;
+    }
 	
 	/**
 	 * Seleccion Local
@@ -575,6 +597,7 @@ public class PedidosController extends CommonsController implements Serializable
 	 */
 	public void borrarBusquedaNumeroDocumento(ActionEvent e){
 		this.numeroDocumentoBusqueda = "";
+		this.setShowMessagesBar(Boolean.FALSE);
 	}
 	
 	/**
@@ -582,6 +605,7 @@ public class PedidosController extends CommonsController implements Serializable
 	 */
 	public void borrarBusquedaNombreCliente(ActionEvent e){
 		this.nombreClienteBusqueda = "";
+		this.setShowMessagesBar(Boolean.FALSE);
 	}
 	
 	/**
@@ -589,6 +613,7 @@ public class PedidosController extends CommonsController implements Serializable
 	 */
 	public void borrarBusquedaRazonSocial(ActionEvent e){
 		this.razonSocialBusqueda = "";
+		this.setShowMessagesBar(Boolean.FALSE);
 	}
 	
 	/**
@@ -596,6 +621,7 @@ public class PedidosController extends CommonsController implements Serializable
 	 */
 	public void borrarBusquedaCodigoBarras(ActionEvent e){
 		this.codigoBarrasBusqueda = "";
+		this.setShowMessagesBar(Boolean.FALSE);
 	}
 	
 	/**
@@ -603,6 +629,7 @@ public class PedidosController extends CommonsController implements Serializable
 	 */
 	public void borrarBusquedaDescripcionArticulo(ActionEvent e){
 		this.nombreArticuloBusqueda = "";
+		this.setShowMessagesBar(Boolean.FALSE);
 	}
 	
 	/**
@@ -610,6 +637,7 @@ public class PedidosController extends CommonsController implements Serializable
 	 */
 	public void borrarBusquedaEstadoPedido(ActionEvent e){
 		this.estadoPedidoBusqueda = "";
+		this.setShowMessagesBar(Boolean.FALSE);
 	}
 	
 	public void setPedidosDataManager(PedidosDataManager pedidosDataManager) {

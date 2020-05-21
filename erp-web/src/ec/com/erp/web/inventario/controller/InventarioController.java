@@ -358,6 +358,7 @@ public class InventarioController extends CommonsController implements Serializa
 	 */
 	public void borrarBusquedaCodigoBarras(ActionEvent e){
 		this.codigoBarras = "";
+		this.setShowMessagesBar(Boolean.FALSE);
 	}
 	
 	/**
@@ -366,6 +367,7 @@ public class InventarioController extends CommonsController implements Serializa
 	public void borrarBusquedaFecha(ActionEvent e){
 		this.fechaInicioBusqueda = new Date();
 		this.fechaFinBusqueda = new Date();
+		this.setShowMessagesBar(Boolean.FALSE);
 	}
 	
 	/**

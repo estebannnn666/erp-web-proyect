@@ -166,6 +166,7 @@ public class ReporteController extends CommonsController implements Serializable
 	 */
 	public void borrarBusquedaCodigoBarras(ActionEvent e){
 		this.codigoBarras = "";
+		this.setShowMessagesBar(Boolean.FALSE);
 	}
 	
 	/**
@@ -174,6 +175,7 @@ public class ReporteController extends CommonsController implements Serializable
 	public void borrarBusquedaFecha(ActionEvent e){
 		this.fechaInicioBusqueda = new Date();
 		this.fechaFinBusqueda = new Date();
+		this.setShowMessagesBar(Boolean.FALSE);
 	}
 	
 	/**
