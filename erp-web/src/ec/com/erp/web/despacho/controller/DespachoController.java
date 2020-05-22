@@ -217,6 +217,14 @@ public class DespachoController extends CommonsController implements Serializabl
 	}
 	
 	/**
+	 * Metodo para cargar 
+	 * @return
+	 */
+	public void cargarGuiaImprimir(ActionEvent e) {
+		System.out.println("Ingreso a guia para imprimir");
+	}
+	
+	/**
 	 * Metodo para consultar vehiculos por placa 
 	 * @param e
 	 */
@@ -399,6 +407,10 @@ public class DespachoController extends CommonsController implements Serializabl
 	public void imprimirNotaDespacho() {
 		HtmlPdf htmltoPDF;
 		try {
+			if(this.guiaDespachoDTO.getId().getCodigoGuiaDespacho() != null) {
+				this.guiaDespachoDTO.setGuiaDespachoExtrasDTOCols(ERPFactory.despacho.getGuiaDespachoServicio().findObtenerListaGuiaDespachoExtrasByNumeroGuia(Integer.parseInt(ERPConstantes.ESTADO_ACTIVO_NUMERICO), this.guiaDespachoDTO.getNumeroGuiaDespacho()));
+				this.guiaDespachoDTO.setGuiaDespachoPedidoDTOCols(ERPFactory.despacho.getGuiaDespachoServicio().findObtenerListaGuiaDespachoPedidosByNumeroGuiaDespacho(Integer.parseInt(ERPConstantes.ESTADO_ACTIVO_NUMERICO), this.guiaDespachoDTO.getNumeroGuiaDespacho()));
+			}
 			if(this.validarPantallaCompleta()) {
 				// Plantilla rpincipal que permite la conversion de xsl a pdf
 				htmltoPDF = new HtmlPdf(ERPConstantes.PLANTILLA_XSL_FOPRINCIPAL);

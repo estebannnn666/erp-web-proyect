@@ -52,12 +52,14 @@ public class VehiculoController extends CommonsController implements Serializabl
 	private VehiculoDTO vehiculoDTO;
 	private TransportistaDTO transportistaDTO;
 	private Collection<TransportistaDTO> transportistaDTOCols;
+	private Collection<ChoferDTO> choferDTOCols;
 	private Collection<VehiculoDTO> vehiculoDTOCols;
 	private VehiculoChoferDTO vehiculoChoferDTO; 
 	private Collection<VehiculoChoferDTO> vehiculoChoferDTOCols;
 	private ChoferDTO choferDTO;
 	private String numeroDocumentoTransportista;
 	private Long codigoTransportistaSeleccionado;
+	private Long codigoChoferSeleccionado;
 	
 	// Data Managers
 	@ManagedProperty(value="#{vehiculoDataManager}")
@@ -90,6 +92,7 @@ public class VehiculoController extends CommonsController implements Serializabl
 		this.vehiculoDTOCols = new ArrayList<VehiculoDTO>();
 		this.vehiculoChoferDTOCols = new ArrayList<VehiculoChoferDTO>();
 		this.transportistaDTOCols = new ArrayList<TransportistaDTO>();
+		this.choferDTOCols = new ArrayList<>();
 		this.page = 0;
 		this.tiposVehiculosCols = ERPFactory.catalogos.getCatalogoServicio().findObtenerCatalogoByTipo(ERPConstantes.CODIGO_CATALOGO_TIPOS_VEHICULOS);
 		
@@ -267,6 +270,54 @@ public class VehiculoController extends CommonsController implements Serializabl
 	}
 	
 	/**
+	 * Metodo para buscar choferes
+	 * @param e
+	 */
+	public void busquedaChoferes(ActionEvent e){
+		try {
+			this.choferDTOCols = ERPFactory.chofer.getChoferServicio().findObtenerListaChoferes(Integer.parseInt(ERPConstantes.ESTADO_ACTIVO_NUMERICO), null, null);
+			if(CollectionUtils.isEmpty(this.choferDTOCols)){
+				this.setShowMessagesBar(Boolean.TRUE);
+				FacesMessage msg = new FacesMessage("No se encontraron resultados para la b\u00FAsqueda realizada.", "ERROR MSG");
+		        msg.setSeverity(FacesMessage.SEVERITY_INFO);
+		        FacesContext.getCurrentInstance().addMessage(null, msg);
+			}
+		} catch (ERPException e1) {
+			this.setShowMessagesBar(Boolean.TRUE);
+			FacesMessage msg = new FacesMessage(e1.getMessage(), "ERROR MSG");
+	        msg.setSeverity(FacesMessage.SEVERITY_ERROR);
+	        FacesContext.getCurrentInstance().addMessage(null, msg);
+		} catch (Exception e2) {
+			this.setShowMessagesBar(Boolean.TRUE);
+			FacesMessage msg = new FacesMessage(e2.getMessage(), "ERROR MSG");
+	        msg.setSeverity(FacesMessage.SEVERITY_ERROR);
+	        FacesContext.getCurrentInstance().addMessage(null, msg);
+		}
+	}
+	
+	/**
+	 * Seleccionar chofer del popUp
+	 * @param e
+	 */
+	public void seleccionChofer(ValueChangeEvent e)
+	{
+		this.codigoChoferSeleccionado = (Long)e.getNewValue();
+	}
+	
+	/**
+	 * Metodo para agragar el chofer a la vista
+	 */
+	public void agragarChoferPopUp(ActionEvent e) {
+		// Verificar si existe en la coleccion
+		Predicate testPredicate = new BeanPredicate("id.codigoChofer", PredicateUtils.equalPredicate(this.codigoChoferSeleccionado));
+		// Validacion de objeto existente
+		this.setChoferDTO((ChoferDTO) CollectionUtils.find(this.choferDTOCols, testPredicate));
+		this.documentoBusqueda = choferDTO.getPersonaDTO().getNumeroDocumento();
+		personaExistente = Boolean.TRUE;
+		vehiculoChoferDTO.setChoferDTO(choferDTO);
+	}
+	
+	/**
 	 * Agrega datos a la lista de choferes
 	 * @param e
 	 */
@@ -355,9 +406,6 @@ public class VehiculoController extends CommonsController implements Serializabl
 	 */
 	public void buscarVehiculos(){
 		try {
-			this.placaBusqueda = placaBusqueda.toUpperCase();
-			this.numeroDocumentoBusqueda = numeroDocumentoBusqueda.toUpperCase();
-			this.nombreTransportistaBusqueda = nombreTransportistaBusqueda.toUpperCase();
 			this.vehiculoDTOCols = ERPFactory.vehiculo.getVehiculoServicio().findObtenerListaVehiculos(Integer.parseInt(ERPConstantes.ESTADO_ACTIVO_NUMERICO), placaBusqueda, numeroDocumentoBusqueda, nombreTransportistaBusqueda);
 			if(CollectionUtils.isEmpty(this.vehiculoDTOCols)){
 				this.setShowMessagesBar(Boolean.TRUE);
@@ -445,12 +493,22 @@ public class VehiculoController extends CommonsController implements Serializabl
 	}
 	
 	/**
+	 * Metodo para borrar un chofer de la lista del vehiculo
+	 * @param e
+	 */
+	public void borrarChofer(ActionEvent e) {
+		this.vehiculoChoferDTOCols.remove(this.vehiculoChoferDTO);
+	}
+	
+	
+	/**
 	 * Metodo borrar pantalla y crear un vehiculo nuevo
 	 * @param e
 	 */
 	public void clearNuevoVehiculo(ActionEvent e){
 		this.setVehiculoCreado(Boolean.FALSE);
 		this.setShowMessagesBar(Boolean.FALSE);
+		this.vehiculoDataManager.setVehiculoDTOEditar(new VehiculoDTO());
 		this.choferDTO = new ChoferDTO();
 		this.vehiculoDTO = new VehiculoDTO();
 		this.vehiculoChoferDTO = new VehiculoChoferDTO(); 
@@ -474,6 +532,7 @@ public class VehiculoController extends CommonsController implements Serializabl
 	 * @param e
 	 */
 	public String regresarBusquedaVehiculos(){
+		this.vehiculoDataManager.setVehiculoDTOEditar(new VehiculoDTO());
 		return "/modules/vehiculo/adminBusquedaVehiculo.xhtml?faces-redirect=true";
 	}
 	
@@ -679,5 +738,21 @@ public class VehiculoController extends CommonsController implements Serializabl
 
 	public void setVehiculoCreado(Boolean vehiculoCreado) {
 		this.vehiculoCreado = vehiculoCreado;
+	}
+
+	public Collection<ChoferDTO> getChoferDTOCols() {
+		return choferDTOCols;
+	}
+
+	public void setChoferDTOCols(Collection<ChoferDTO> choferDTOCols) {
+		this.choferDTOCols = choferDTOCols;
+	}
+
+	public Long getCodigoChoferSeleccionado() {
+		return codigoChoferSeleccionado;
+	}
+
+	public void setCodigoChoferSeleccionado(Long codigoChoferSeleccionado) {
+		this.codigoChoferSeleccionado = codigoChoferSeleccionado;
 	}
 }

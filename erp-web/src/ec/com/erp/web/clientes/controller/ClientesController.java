@@ -74,7 +74,6 @@ public class ClientesController extends CommonsController implements Serializabl
 		this.clienteDTO.setUsuariosDTO(new UsuariosDTO());
 		this.clienteDTO.setCodigoValorTipoCliente(ERPConstantes.CODIGO_CATALOGO_VALOR_TIPO_CLIENTE_PERSONA);
 		this.clienteDTO.setCodigoTipoCliente(ERPConstantes.CODIGO_CATALOGO_TIPOS_CLIENTES);
-//		this.usuarioDTO = new UsuariosDTO();
 		this.personaDTO = new PersonaDTO();
 		this.empresaDTO = new EmpresaDTO();
 		this.contactoDTO = new ContactoDTO();
@@ -85,7 +84,6 @@ public class ClientesController extends CommonsController implements Serializabl
 			this.setClienteDTO(clientesDataManager.getClienteDTOEditar());
 			this.setPersonaDTO(clientesDataManager.getClienteDTOEditar().getPersonaDTO());
 			this.setEmpresaDTO(clientesDataManager.getClienteDTOEditar().getEmpresaDTO());
-//			this.setUsuarioDTO(clientesDataManager.getClienteDTOEditar().getUsuariosDTO());
 			this.setContactoDTO(clientesDataManager.getClienteDTOEditar().getPersonaDTO() == null ? clientesDataManager.getClienteDTOEditar().getEmpresaDTO().getContactoEmpresaDTO() : clientesDataManager.getClienteDTOEditar().getPersonaDTO().getContactoPersonaDTO());
 		}
 		if(FacesContext.getCurrentInstance().getViewRoot().getViewId().equals("/modules/clientes/adminBusquedaClientes.xhtml")) {
@@ -154,7 +152,6 @@ public class ClientesController extends CommonsController implements Serializabl
 				this.clienteDTO.setUserId(loginController.getUsuariosDTO().getId().getUserId());
 				this.clienteDTO.setPersonaDTO(this.personaDTO);
 				this.clienteDTO.setEmpresaDTO(this.empresaDTO);
-//				this.clienteDTO.setUsuariosDTO(this.usuarioDTO);
 				ERPFactory.clientes.getClientesServicio().transGuardarActualizarClientes(this.clienteDTO, this.contactoDTO);
 				this.setShowMessagesBar(Boolean.TRUE);
 				this.setClienteCreado(Boolean.TRUE);
@@ -232,22 +229,6 @@ public class ClientesController extends CommonsController implements Serializabl
 	 */
 	public Boolean validarPantallaClientes() {
 		Boolean validado = Boolean.TRUE;
-		/*if(StringUtils.isEmpty(usuarioDTO.getNombreUsuario())){
-			MensajesController.addError(null, ERPWebResources.getString("ec.com.erp.etiqueta.mensaje.campo.requerido.nombreusuario"));
-			validado = Boolean.FALSE;
-		}
-		if(StringUtils.isEmpty(usuarioDTO.getPasswordUsuario())){
-			MensajesController.addError(null, ERPWebResources.getString("ec.com.erp.etiqueta.mensaje.campo.requerido.contrasenia"));
-			validado = Boolean.FALSE;
-		}
-		if(StringUtils.isEmpty(repetirContrasenia)){
-			MensajesController.addError(null, ERPWebResources.getString("ec.com.erp.etiqueta.mensaje.campo.requerido.repetircontrasenia"));
-			validado = Boolean.FALSE;
-		}
-		if(StringUtils.isNotEmpty(repetirContrasenia) && StringUtils.isNotEmpty(usuarioDTO.getPasswordUsuario()) && !repetirContrasenia.equals(usuarioDTO.getPasswordUsuario())){
-			MensajesController.addError(null, ERPWebResources.getString("ec.com.erp.etiqueta.mensaje.campo.contrasenias.diferentes"));
-			validado = Boolean.FALSE;
-		}*/
 		// Validacion por tipo de cliente
 		if(clienteDTO.getCodigoValorTipoCliente().equals(ERPConstantes.CODIGO_CATALOGO_VALOR_TIPO_CLIENTE_PERSONA)){
 			if(StringUtils.isEmpty(this.personaDTO.getNumeroDocumento())){
@@ -310,7 +291,6 @@ public class ClientesController extends CommonsController implements Serializabl
 		this.personaDTO = new PersonaDTO();
 		this.empresaDTO = new EmpresaDTO();
 		this.contactoDTO = new ContactoDTO();
-//		this.usuarioDTO = new UsuariosDTO();
 	}
 	
 	/**

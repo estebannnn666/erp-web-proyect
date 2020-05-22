@@ -99,12 +99,6 @@
 		                </f:facet>
 		                <h:outputText styleClass="styleUpperCase" value="#{despacho.placa}" />
 		            </rich:column>
-		            <rich:column>
-		                <f:facet name="header">
-		                	<h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.pantall.vehiculos.marca']}"/>
-		                </f:facet>
-		                <h:outputText value="#{despacho.marca == null ? 'N/D' : despacho.marca}" />
-		            </rich:column>
 		             <rich:column>
 		                <f:facet name="header">
 		                	<h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.pantall.despacho.documento.chofer.principal']}"/>
@@ -119,7 +113,7 @@
 		            </rich:column>		            
 		            <rich:column>
 		                <f:facet name="header">
-		                	<h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.label.lista.cabecera.documento.transportista']}"/>
+		                	<h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.label.lista.cabecera.documento.abreviado.transportista']}"/>
 		                </f:facet>
 		                <h:outputText value="#{despacho.rucTransportista}" />
 		            </rich:column>
@@ -130,8 +124,15 @@
 		                <h:outputText value="#{despacho.nombreTransportista}" />
 		            </rich:column>
 		            <rich:column styleClass="columna5">
+	                	<f:facet name="header">Imprimir</f:facet>
+	                	<a4j:commandLink id="botonImprimir" title="Ver guia despacho en pdf para imprimir" oncomplete="imprimirGuiaDespacho()" execute="@this" actionListener="#{despachoController.cargarGuiaImprimir}">
+							<h:graphicImage name="print_pdf.png" library="images" style="border:none;border-color:white;" height="24" width="24"/>
+							<f:setPropertyActionListener value="#{despacho}" target="#{despachoController.guiaDespachoDTO}" />											
+						</a4j:commandLink>
+	            	</rich:column>
+		            <rich:column styleClass="columna5">
 		                <f:facet name="header">Editar</f:facet>
-		                <a4j:commandLink id="botonEditar" render="pnlGridDespacho panelTablaPedidos panelTablaAdicional" action="#{despachoController.cargarGuiaEditar}"	execute="@this" >
+		                <a4j:commandLink id="botonEditar" render="pnlGridDespacho panelTablaPedidos panelTablaAdicional" action="#{despachoController.cargarGuiaEditar}" execute="@this" >
 							<h:graphicImage name="btnEditar.png" library="images" style="border:none;border-color:white;" height="16" width="16"/>
 							<f:setPropertyActionListener value="#{despacho}" target="#{despachoController.guiaDespachoDTO}" />											
 						</a4j:commandLink>	
@@ -148,7 +149,10 @@
 			function openLinkSystem(){
 				$('.linkopensystem').trigger('click');
 			}	
-								
+			
+			function imprimirGuiaDespacho(){
+				$('.linkprintguide').trigger('click');
+			}
 			/*]]>*/			
 		</script>
 		<h:outputStylesheet>
@@ -162,7 +166,8 @@
 				width: 10% !important;
 			}
 		</h:outputStylesheet>
-			
+		<h:commandLink id="linkprintguide" styleClass="linkprintguide" action="#{despachoController.imprimirNotaDespacho}" target="_BLANK">
+		</h:commandLink>	
 		<a4j:commandLink id="linkopensystem" styleClass="linkopensystem" execute="@this" status="no" actionListener="#{despachoController.refrescarPantalla}">
 		</a4j:commandLink>	
 	</ui:define>

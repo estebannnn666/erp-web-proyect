@@ -35,7 +35,7 @@
 			<h:panelGroup id="filtrosVehiculo" layout="block" styleClass="listaReporte">
 				<h:panelGrid columns="4" width="80%" cellpadding="0" cellspacing="2">
 					<h:panelGrid width="47%" columns="2" columnClasses="columnaIzquierda, columnaDerecha">
-			    	   	<rich:inplaceInput id="placaBusqueda" value="#{vehiculoController.placaBusqueda}" styleClass="styleInputPlace" defaultLabel="#{msg_erpweb['ec.com.erp.etiqueta.buscar.numero.placa']}">
+			    	   	<rich:inplaceInput id="placaBusqueda" value="#{vehiculoController.placaBusqueda}" styleClass="styleInputPlace" defaultLabel="#{msg_erpweb['ec.com.erp.etiqueta.buscar.numero.placa']}" onkeypress="return validarEnteros(event);">
 			    	   		<a4j:ajax event="keyup" execute="filtrosVehiculo" listener="#{vehiculoController.busquedaVehiculosEnter}" onbeforesubmit="if (event.keyCode != 13)  return false;" render="listaVehiculos, tableVehiculo, pnlMensajes"></a4j:ajax>
 			    	   	</rich:inplaceInput>
 			    	   	<h:panelGroup styleClass="styleClean">

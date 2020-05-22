@@ -66,7 +66,7 @@
 			<rich:dataTable style="width:100%" value="#{pedidosController.pedidosDTOCols}" rendered="#{not empty pedidosController.pedidosDTOCols}" var="pedido" iterationStatusVar="it" id="tablePedidos" rows="14">
 	            <rich:column styleClass="columna5">
 	                <f:facet name="header">Acc.</f:facet>
-	                <a4j:commandLink id="btnEntregar" title="Marcar pedido como entregado" rendered="#{pedido.estadoPedidoDTO.codigoValorEstadoPedido == 'REG'}" render="mpConfirmacion pnlConfirma" actionListener="#{pedidosController.cargarDatosPedido}" execute="@this" oncomplete="#{rich:component('mpConfirmacion')}.show();">
+	                <a4j:commandLink id="btnEntregar" title="Marcar pedido como entregado" rendered="#{pedido.estadoPedidoDTO.codigoValorEstadoPedido == 'PEN'}" render="mpConfirmacion pnlConfirma" actionListener="#{pedidosController.cargarDatosPedido}" execute="@this" oncomplete="#{rich:component('mpConfirmacion')}.show();">
 						<h:graphicImage name="btnDeliveyOrder.png" library="images" style="border:none;border-color:white;" height="16" width="16"/>
 						<f:setPropertyActionListener value="#{pedido}" target="#{pedidosController.pedidoDTO}" />		
 						<f:setPropertyActionListener value="ENT" target="#{pedidosController.valorAccion}" />										
