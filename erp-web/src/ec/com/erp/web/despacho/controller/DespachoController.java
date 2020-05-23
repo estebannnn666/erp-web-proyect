@@ -84,6 +84,7 @@ public class DespachoController extends CommonsController implements Serializabl
 	private Integer orden;
 	private Boolean controlPopUp;
 	private Boolean despachoCreado;
+	private Boolean sePuedeEliminar;
 
 	@PostConstruct
 	public void postConstruct() {
@@ -110,6 +111,7 @@ public class DespachoController extends CommonsController implements Serializabl
 		this.page = 0;
 		this.orden = 1;
 		this.despachoCreado = Boolean.FALSE;
+		this.sePuedeEliminar = Boolean.FALSE;
 		
 		GuiaDespachoExtrasDTO guiaDespachoExtrasDTOTemp = null;
 		for(int i = 0; i < 5 ; i++){
@@ -200,6 +202,50 @@ public class DespachoController extends CommonsController implements Serializabl
 	}
 	
 	/**
+	 * Metodo para borrar un chofer de la lista del vehiculo
+	 * @param e
+	 */
+	public void borrarPedido(ActionEvent e) {
+		try {
+			ERPFactory.despacho.getGuiaDespachoServicio().transEliminarPedidoDespacho(this.guiaDespachoPedidoDTO);
+			this.guiaDespachoPedidoDTOCols.remove(this.guiaDespachoPedidoDTO);
+		} catch (Exception e2) {
+			this.setShowMessagesBar(Boolean.TRUE);
+			MensajesController.addError(null, ERPWebResources.getString("ec.com.erp.etiqueta.label.lista.guia.despacho.mensaje.error.eliminar"));
+		}
+	}
+	
+	/**
+	 * Metodo cancelar la accion borrar un chofer de la lista del vehiculo
+	 * @param e
+	 */
+	public void cancelarBorrarPedido(ActionEvent e) {
+		this.guiaDespachoPedidoDTO = new GuiaDespachoPedidoDTO();
+	}
+	
+	/**
+	 * Metodo para borrar un chofer de la lista del vehiculo
+	 * @param e
+	 */
+	public void borrarPedidoExtra(ActionEvent e) {
+		try {
+			ERPFactory.despacho.getGuiaDespachoServicio().transEliminarPedidosExtras(this.guiaDespachoExtrasDTO);
+			this.guiaDespachoExtrasDTOCols.remove(this.guiaDespachoExtrasDTO);
+		} catch (Exception e2) {
+			this.setShowMessagesBar(Boolean.TRUE);
+			MensajesController.addError(null, ERPWebResources.getString("ec.com.erp.etiqueta.label.lista.guia.despacho.mensaje.error.eliminar"));
+		}
+	}
+	
+	/**
+	 * Metodo cancelar la accion borrar un chofer de la lista del vehiculo
+	 * @param e
+	 */
+	public void cancelarBorrarPedidoExtra(ActionEvent e) {
+		this.guiaDespachoExtrasDTO = new GuiaDespachoExtrasDTO();
+	}
+	
+	/**
 	 * Agregar nueva fila extra
 	 * @param e
 	 */
@@ -212,8 +258,39 @@ public class DespachoController extends CommonsController implements Serializabl
 	 * Metodo para cargar 
 	 * @return
 	 */
-	public void cargarPedidoEliminar(ActionEvent e) {
+	public void cargarDatosEliminar(ActionEvent e) {
 		System.out.println("Ingreso a cargar detalle");
+	}
+	
+	/**
+	 * Metodo para validar si se se debe mostrar el popup de confirmacion 
+	 * @return
+	 */
+	public void validarEstadoPedido(ActionEvent e) {
+		this.sePuedeEliminar = Boolean.FALSE;
+		if(this.guiaDespachoPedidoDTO.getId().getCodigoGuiaDespachoPedido() == null) {
+			this.guiaDespachoPedidoDTOCols.remove(this.guiaDespachoPedidoDTO);
+		}else {
+			if(this.guiaDespachoPedidoDTO.getPedidoDTO().getEstadoPedidoDTO().getCodigoValorEstadoPedido().equals("ENT")) {
+				this.setShowMessagesBar(Boolean.TRUE);
+				MensajesController.addError(null, ERPWebResources.getString("ec.com.erp.etiqueta.label.lista.guia.despacho.mensaje.eliminar.entregado"));
+			}else {
+				this.sePuedeEliminar = Boolean.TRUE;
+			}
+		}
+	}
+	
+	/**
+	 * Metodo para validar si se se debe mostrar el popup de confirmacion 
+	 * @return
+	 */
+	public void validarExtras(ActionEvent e) {
+		this.sePuedeEliminar = Boolean.FALSE;
+		if(this.guiaDespachoExtrasDTO.getId().getCodigoGuiaDespachoExtra() == null) {
+			this.guiaDespachoExtrasDTOCols.remove(this.guiaDespachoExtrasDTO);
+		}else {
+			this.sePuedeEliminar = Boolean.TRUE;
+		}
 	}
 	
 	/**
@@ -222,6 +299,8 @@ public class DespachoController extends CommonsController implements Serializabl
 	 */
 	public void cargarGuiaImprimir(ActionEvent e) {
 		System.out.println("Ingreso a guia para imprimir");
+		this.setShowMessagesBar(Boolean.TRUE);
+        MensajesController.addInfo(null, ERPWebResources.getString("ec.com.erp.etiqueta.pantall.despacho.mensaje.impresion.correcta"));
 	}
 	
 	/**
@@ -416,8 +495,6 @@ public class DespachoController extends CommonsController implements Serializabl
 				htmltoPDF = new HtmlPdf(ERPConstantes.PLANTILLA_XSL_FOPRINCIPAL);
 				HashMap<String , String> parametros = new HashMap<String, String>();
 				byte contenido[] = htmltoPDF.convertir(ERPFactory.despacho.getGuiaDespachoServicio().finObtenerXMLImprimirGuiaDespacho(guiaDespachoDTO).replace("<?xml version=\"1.0\" encoding=\"UTF-8\"?>", ""), "", "",	parametros,	null);
-				this.setShowMessagesBar(Boolean.TRUE);
-		        MensajesController.addInfo(null, ERPWebResources.getString("ec.com.erp.etiqueta.pantall.despacho.mensaje.impresion.correcta"));
 				UtilitarioWeb.mostrarPDF(contenido);	
 			}else {
 				this.setShowMessagesBar(Boolean.TRUE);
@@ -687,5 +764,13 @@ public class DespachoController extends CommonsController implements Serializabl
 
 	public void setDespachoCreado(Boolean despachoCreado) {
 		this.despachoCreado = despachoCreado;
+	}
+
+	public Boolean getSePuedeEliminar() {
+		return sePuedeEliminar;
+	}
+
+	public void setSePuedeEliminar(Boolean sePuedeEliminar) {
+		this.sePuedeEliminar = sePuedeEliminar;
 	}
 }

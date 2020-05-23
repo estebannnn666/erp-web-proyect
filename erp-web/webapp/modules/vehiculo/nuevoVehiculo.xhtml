@@ -386,7 +386,7 @@
 		<!-- Popup para eliminar chofer asignado al vehiculo-->
 		<rich:popupPanel id="mpEliminarChofer" header="#{msg_erpweb['ec.com.erp.etiqueta.mensaje.confirmacion']}" width="345" height="160" modal="true" domElementAttachment="form">
 			<f:facet name="controls">
-				<h:outputLink value="#"	onclick="#{rich:component('mpConfirmacion')}.hide();">
+				<h:outputLink value="#"	onclick="#{rich:component('mpEliminarChofer')}.hide();">
 					<h:graphicImage library="images" name="close.png" style="border:0px"/>
 				</h:outputLink>
 			</f:facet>
@@ -414,7 +414,7 @@
 				</h:panelGroup>
 				
 				<h:panelGroup layout="block" styleClass="botonD" style="margin-top:5px;">
-					<a4j:commandLink action="#{vehiculoController.regresarBusquedaVehiculos}" styleClass="cancelarD" oncomplete="#{rich:component('mpEliminarChofer')}.hide(); return false;" immediate="true">
+					<a4j:commandLink actionListener="#{vehiculoController.cancelarBorrarChofer}" styleClass="cancelarD" oncomplete="#{rich:component('mpEliminarChofer')}.hide(); return false;" immediate="true">
 						<h:panelGrid columns="2" cellpadding="3" cellspacing="0">
 							<h:graphicImage name="btnCancel.png" library="images" style="border:none;border-color:white;" height="16" width="16"/>
 							<h:outputText value="Cancelar" />

@@ -125,7 +125,7 @@
 		            </rich:column>
 		            <rich:column styleClass="columna5">
 	                	<f:facet name="header">Imprimir</f:facet>
-	                	<a4j:commandLink id="botonImprimir" title="Ver guia despacho en pdf para imprimir" oncomplete="imprimirGuiaDespacho()" execute="@this" actionListener="#{despachoController.cargarGuiaImprimir}">
+	                	<a4j:commandLink id="botonImprimir" title="Ver guia despacho en pdf para imprimir" render="pnlMensajes" oncomplete="imprimirGuiaDespacho()" execute="@this" actionListener="#{despachoController.cargarGuiaImprimir}">
 							<h:graphicImage name="print_pdf.png" library="images" style="border:none;border-color:white;" height="24" width="24"/>
 							<f:setPropertyActionListener value="#{despacho}" target="#{despachoController.guiaDespachoDTO}" />											
 						</a4j:commandLink>

@@ -500,6 +500,14 @@ public class VehiculoController extends CommonsController implements Serializabl
 		this.vehiculoChoferDTOCols.remove(this.vehiculoChoferDTO);
 	}
 	
+	/**
+	 * Metodo cancelar la accion borrar un chofer de la lista del vehiculo
+	 * @param e
+	 */
+	public void cancelarBorrarChofer(ActionEvent e) {
+		this.vehiculoChoferDTO = new VehiculoChoferDTO();
+	}
+	
 	
 	/**
 	 * Metodo borrar pantalla y crear un vehiculo nuevo
