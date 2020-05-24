@@ -15,6 +15,7 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
@@ -25,13 +26,6 @@ import javax.faces.context.FacesContext;
 import javax.faces.event.ActionEvent;
 import javax.faces.event.AjaxBehaviorEvent;
 import javax.faces.event.ValueChangeEvent;
-import javax.print.Doc;
-import javax.print.DocFlavor;
-import javax.print.DocPrintJob;
-import javax.print.PrintException;
-import javax.print.PrintService;
-import javax.print.PrintServiceLookup;
-import javax.print.SimpleDoc;
 //import javax.print.Doc;
 //import javax.print.DocFlavor;
 //import javax.print.DocPrintJob;
@@ -48,6 +42,7 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.Predicate;
 import org.apache.commons.collections.PredicateUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.primefaces.event.SelectEvent;
 import org.w3c.dom.Document;
 
 import ec.com.erp.cliente.common.constantes.ERPConstantes;
@@ -204,6 +199,46 @@ public class CuentasController extends CommonsController implements Serializable
 	public void reloadPagina(ActionEvent e) {
 		System.out.println("Reload");
 	}
+	
+	/**
+	 * Metodo para buscar articulos
+	 * @param query
+	 * @return
+	 */
+	public List<String> completeNombreArticulo(String query) {
+        String queryLowerCase = query.toLowerCase();
+        List<ArticuloDTO> allThemes = service.getArticuloDTOCols().stream()
+        		.filter(t -> t.getNombreArticulo().toLowerCase().contains(queryLowerCase))
+        		.collect(Collectors.toList());
+        List<String> results = new ArrayList<>();
+        allThemes.stream().forEach(articulo -> results.add(articulo.getNombreArticulo()));
+        return results;
+    }
+	
+	public void onItemSelect(SelectEvent event) {
+        System.out.println(event.getObject());
+        for(FacturaDetalleDTO facturaDetalleDTOTemp : facturaDetalleDTOCols) {
+        	if(facturaDetalleDTOTemp.getDescripcion() != null) {
+        		String queryLowerCase = facturaDetalleDTOTemp.getDescripcion().toLowerCase();
+        		ArticuloDTO articuloSeleccionado = service.getArticuloDTOCols().stream()
+                		.filter(articulo -> articulo.getNombreArticulo().toLowerCase().equals(queryLowerCase))
+                		.findFirst().orElse(null);
+        		facturaDetalleDTOTemp.setArticuloDTO(articuloSeleccionado);
+        	}
+        	
+			if((facturaDetalleDTOTemp.getCantidad() == null ||  facturaDetalleDTOTemp.getCantidad().intValue() == 0) && facturaDetalleDTOTemp.getArticuloDTO().getPrecio() != null){
+				facturaDetalleDTOTemp.setCantidad(1);
+			}
+			if(facturaDetalleDTOTemp.getCantidad() != null && facturaDetalleDTOTemp.getArticuloDTO().getPrecio() != null) {
+				BigDecimal subTotal = BigDecimal.valueOf(Double.valueOf(""+facturaDetalleDTOTemp.getCantidad())).multiply(facturaDetalleDTOTemp.getArticuloDTO().getPrecio());
+				facturaDetalleDTOTemp.setSubTotal(subTotal);
+				facturaDetalleDTOTemp.setCodigoArticulo(facturaDetalleDTOTemp.getArticuloDTO().getId().getCodigoArticulo());
+				facturaDetalleDTOTemp.setValorUnidad(facturaDetalleDTOTemp.getArticuloDTO().getPrecio());
+				facturaDetalleDTOTemp.setCodigoBarras(facturaDetalleDTOTemp.getArticuloDTO().getCodigoBarras());
+			}
+		}
+		this.calcularTotalFactura();
+    }
 	
 	/**
 	 * Metodo para buscar facturas en venta
@@ -389,7 +424,7 @@ public class CuentasController extends CommonsController implements Serializable
 		if(StringUtils.isEmpty(this.facturaCabeceraDTO.getNombreClienteProveedor())) {
 			MensajesController.addError(null, ERPWebResources.getString("ec.com.erp.etiqueta.mensaje.campo.requerido.nombrecliente.factura"));
 		}
-		if(CollectionUtils.isEmpty(this.facturaDetalleDTOCols)) {
+		if(CollectionUtils.isNotEmpty(this.facturaCabeceraDTO.getFacturaDetalleDTOCols()) && this.facturaCabeceraDTO.getId().getCodigoFactura() != null) {
 			this.setFacturaDetalleDTOCols(this.facturaCabeceraDTO.getFacturaDetalleDTOCols());
 		}
 		
@@ -419,7 +454,9 @@ public class CuentasController extends CommonsController implements Serializable
 	 * @return
 	 */
 	public void cargarFacturaDetalle(ActionEvent e) {
-		System.out.println("Ingreso a cargar detalle");
+		System.out.println("Ingreso a imprimir factura");
+		this.setShowMessagesBar(Boolean.TRUE);
+        MensajesController.addInfo(null, ERPWebResources.getString("ec.com.erp.etiqueta.pantall.despacho.mensaje.impresion.correcta"));
 	}
 	
 	
@@ -826,36 +863,21 @@ public class CuentasController extends CommonsController implements Serializable
 	public String imprimirListaFacturas() {
 		HtmlPdf htmltoPDF;
 		try {
-			
-
-			String texto = "Esto es lo que va a la impresora";
-			PrintService printService = PrintServiceLookup.lookupDefaultPrintService();
-			DocFlavor flavor = DocFlavor.BYTE_ARRAY.AUTOSENSE;
-			DocPrintJob docPrintJob = printService.createPrintJob();
-			Doc doc = new SimpleDoc(texto.getBytes(), flavor, null);
-			try {
-				docPrintJob.print(doc, null);
-			} catch (PrintException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			// prueba
+//			String texto = "Esto es lo que va a la impresora";
 //			PrintService printService = PrintServiceLookup.lookupDefaultPrintService();
-//	 
 //			DocFlavor flavor = DocFlavor.BYTE_ARRAY.AUTOSENSE;
 //			DocPrintJob docPrintJob = printService.createPrintJob();
-			
+//			Doc doc = new SimpleDoc(texto.getBytes(), flavor, null);
+//			try {
+//				docPrintJob.print(doc, null);
+//			} catch (PrintException e) {
+//				e.printStackTrace();
+//			}
 			// Plantilla rpincipal que permite la conversion de xsl a pdf
-//			htmltoPDF = new HtmlPdf(ERPConstantes.PLANTILLA_XSL_FOPRINCIPAL);
-//			HashMap<String , String> parametros = new HashMap<String, String>();
-//			byte contenido[] = htmltoPDF.convertir(ERPFactory.facturas.getFacturaCabeceraServicio().finObtenerXMLReporteFacturas(facturaCabeceraDTOCols).replace("<?xml version=\"1.0\" encoding=\"UTF-8\"?>", ""), "", "",	parametros,	null);
-//			UtilitarioWeb.mostrarPDF(contenido);
-			
-//			Doc doc = new SimpleDoc(contenido, flavor, null);
-//			docPrintJob.print(doc, null);
-			
-//		} catch (PrintException e) {
-//			e.printStackTrace();
+			htmltoPDF = new HtmlPdf(ERPConstantes.PLANTILLA_XSL_FOPRINCIPAL);
+			HashMap<String , String> parametros = new HashMap<String, String>();
+			byte contenido[] = htmltoPDF.convertir(ERPFactory.facturas.getFacturaCabeceraServicio().finObtenerXMLReporteFacturas(facturaCabeceraDTOCols).replace("<?xml version=\"1.0\" encoding=\"UTF-8\"?>", ""), "", "",	parametros,	null);
+			UtilitarioWeb.mostrarPDF(contenido);
 		} catch (Exception e) {
 			this.setShowMessagesBar(Boolean.TRUE);
 			MensajesController.addError(null, "Error al imprimir");
@@ -870,19 +892,6 @@ public class CuentasController extends CommonsController implements Serializable
 		HtmlPdf htmltoPDF;
 		try {
 			if(this.validarInformacionRequerida()) {
-				
-//				String texto = "Esto es lo que va a la impresora";
-//				PrintService printService = PrintServiceLookup.lookupDefaultPrintService();
-//				DocFlavor flavor = DocFlavor.BYTE_ARRAY.AUTOSENSE;
-//				DocPrintJob docPrintJob = printService.createPrintJob();
-//				Doc doc = new SimpleDoc(texto.getBytes(), flavor, null);
-//				try {
-//					docPrintJob.print(doc, null);
-//				} catch (PrintException e) {
-//					// TODO Auto-generated catch block
-//					e.printStackTrace();
-//				}
-				
 				// Plantilla rpincipal que permite la conversion de xsl a pdf
 				htmltoPDF = new HtmlPdf(ERPConstantes.PLANTILLA_XSL_FOPRINCIPAL);
 				HashMap<String , String> parametros = new HashMap<String, String>();

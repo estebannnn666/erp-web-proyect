@@ -8,6 +8,8 @@ import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
 import javax.faces.bean.ManagedBean;
@@ -23,10 +25,12 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.Predicate;
 import org.apache.commons.collections.PredicateUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.primefaces.event.SelectEvent;
 
 import ec.com.erp.cliente.common.constantes.ERPConstantes;
 import ec.com.erp.cliente.common.exception.ERPException;
 import ec.com.erp.cliente.common.factory.ERPFactory;
+import ec.com.erp.cliente.mdl.dto.ArticuloDTO;
 import ec.com.erp.cliente.mdl.dto.GuiaDespachoDTO;
 import ec.com.erp.cliente.mdl.dto.GuiaDespachoExtrasDTO;
 import ec.com.erp.cliente.mdl.dto.GuiaDespachoPedidoDTO;
@@ -44,6 +48,7 @@ import ec.com.erp.web.commons.login.controller.LoginController;
 import ec.com.erp.web.commons.utils.ERPWebResources;
 import ec.com.erp.web.commons.utils.UtilitarioWeb;
 import ec.com.erp.web.despacho.datamanager.DespachoDataManager;
+import ec.com.erp.web.pedidos.controller.ArticuloService;
 
 /**
  * Controlador para administracion de guias de despacho
@@ -71,6 +76,9 @@ public class DespachoController extends CommonsController implements Serializabl
 	
 	@ManagedProperty(value="#{loginController}")
 	private LoginController loginController;
+	
+	@ManagedProperty("#{articuloService}")
+	private ArticuloService service;
 	
 	// Variables
 	private String placaBusqueda;
@@ -236,6 +244,34 @@ public class DespachoController extends CommonsController implements Serializabl
 			MensajesController.addError(null, ERPWebResources.getString("ec.com.erp.etiqueta.label.lista.guia.despacho.mensaje.error.eliminar"));
 		}
 	}
+	
+	/**
+	 * Auto completado de articulos extras
+	 * @param query
+	 * @return
+	 */
+	public List<String> completeNombreArticuloExtra(String query) {
+        String queryLowerCase = query.toLowerCase();
+        List<ArticuloDTO> allThemes = service.getArticuloDTOCols().stream()
+        		.filter(t -> t.getNombreArticulo().toLowerCase().contains(queryLowerCase))
+        		.collect(Collectors.toList());
+        List<String> results = new ArrayList<>();
+        allThemes.stream().forEach(articulo -> results.add(articulo.getNombreArticulo()));
+        return results;
+    }
+	
+	public void onItemSelectExtra(SelectEvent event) {
+        System.out.println(event.getObject());
+        for(GuiaDespachoExtrasDTO detallePedidoDTOTemp : this.guiaDespachoExtrasDTOCols) {
+        	if(detallePedidoDTOTemp.getDescripcionProducto() != null) {
+        		String queryLowerCase = detallePedidoDTOTemp.getDescripcionProducto().toLowerCase();
+        		ArticuloDTO articuloSeleccionado = service.getArticuloDTOCols().stream()
+                		.filter(articulo -> articulo.getNombreArticulo().toLowerCase().equals(queryLowerCase))
+                		.findFirst().orElse(null);
+        		detallePedidoDTOTemp.setCodigoArticulo(articuloSeleccionado.getId().getCodigoArticulo());
+        	}
+		}
+    }
 	
 	/**
 	 * Metodo cancelar la accion borrar un chofer de la lista del vehiculo
@@ -772,5 +808,13 @@ public class DespachoController extends CommonsController implements Serializabl
 
 	public void setSePuedeEliminar(Boolean sePuedeEliminar) {
 		this.sePuedeEliminar = sePuedeEliminar;
+	}
+	
+	public ArticuloService getService() {
+		return service;
+	}
+
+	public void setService(ArticuloService service) {
+		this.service = service;
 	}
 }

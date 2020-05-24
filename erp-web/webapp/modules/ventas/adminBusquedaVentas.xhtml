@@ -145,10 +145,10 @@
 	            </rich:column>
 	            <rich:column styleClass="columna5">
 	                <f:facet name="header">Imprimir</f:facet>
-	                <h:commandLink id="botonImprimir" title="Ver factura en pdf para imprimir" action="#{cuentasController.imprimirFactura}" target="_BLANK" actionListener="#{cuentasController.cargarFacturaDetalle}">
+					<a4j:commandLink id="botonImprimir" title="Ver factura en pdf para imprimir" render="pnlMensajes" oncomplete="imprimirFactura()" execute="@this" actionListener="#{cuentasController.cargarFacturaDetalle}">
 						<h:graphicImage name="print_pdf.png" library="images" style="border:none;border-color:white;" height="24" width="24"/>
 						<f:setPropertyActionListener value="#{cuenta}" target="#{cuentasController.facturaCabeceraDTO}" />											
-					</h:commandLink>
+					</a4j:commandLink>
 	            </rich:column>
 	            <rich:column styleClass="columna5">
 	                <f:facet name="header">Cancelar</f:facet>
@@ -218,6 +218,33 @@
 			                	<f:convertNumber pattern="0.00"/>
 			                </h:outputText>
 			            </rich:column>
+			            
+			            <f:facet name="footer">
+			                <rich:columnGroup>
+				                <rich:column colspan="7" style="text-align: right; paddin-right: 10px">Sub Total:</rich:column>
+				                <rich:column style="text-align: right; paddin-right: 10px">
+				                    <h:outputText value="#{cuentasController.facturaCabeceraDTO.totalSinImpuestos}">
+				                    	<f:convertNumber pattern="0.00"/>
+				                    </h:outputText>
+				                </rich:column>
+				            </rich:columnGroup>
+				            <rich:columnGroup>
+				                <rich:column colspan="7" style="text-align: right; paddin-right: 10px">Iva 12 %:</rich:column>
+				                <rich:column style="text-align: right; paddin-right: 10px">
+				                    <h:outputText value="#{cuentasController.facturaCabeceraDTO.totalImpuestos}">
+				                    	<f:convertNumber pattern="0.00"/>
+				                    </h:outputText>
+				                </rich:column>
+				            </rich:columnGroup>
+				            <rich:columnGroup>
+				                <rich:column colspan="7" style="text-align: right; paddin-right: 10px">Total:</rich:column>
+				                <rich:column style="text-align: right; paddin-right: 10px">
+				                    <h:outputText value="#{cuentasController.facturaCabeceraDTO.totalCuenta}">
+				                    	<f:convertNumber pattern="0.00"/>
+				                    </h:outputText>
+				                </rich:column>
+				            </rich:columnGroup>
+			            </f:facet>
 			        </rich:dataTable>
 		        </rich:panel>
 			</h:panelGrid>
@@ -282,6 +309,9 @@
 			function openLinkSystem(){
 				$('.linkopensystem').trigger('click');
 			}	
+			function imprimirFactura(){
+				$('.linkprintFacture').trigger('click');
+			}
 			function validarEnteros(e) {
 				tecla = (document.all) ? e.keyCode : e.which; 
 				if (tecla==8) return true; 
@@ -291,6 +321,8 @@
 			}
 		/*]]>*/			
 		</script>
+		<h:commandLink id="linkprintFacture" styleClass="linkprintFacture" action="#{cuentasController.imprimirFactura}" target="_BLANK">
+		</h:commandLink>
 		<a4j:commandLink id="linkopensystem" styleClass="linkopensystem" execute="@this" status="no" actionListener="#{cuentasController.refrescarPantalla}">
 		</a4j:commandLink>	
 	</ui:define>
