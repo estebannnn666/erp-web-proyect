@@ -85,6 +85,7 @@ public class CuentasController extends CommonsController implements Serializable
 	private Collection<FacturaDetalleDTO> facturaDetalleDTOCols;
 	private Collection<FacturaCabeceraDTO> facturaCabeceraDTOCols;
 	private Collection<ClienteDTO> clienteDTOCols;
+	private Collection<ProveedorDTO> proveedorDTOCols;
 	private Collection<ArticuloDTO> articuloDTOCols;
 	
 	// Data Managers
@@ -108,6 +109,7 @@ public class CuentasController extends CommonsController implements Serializable
 	private Collection<CatalogoValorDTO> tipoFacturaCatalogoValorDTOCols;
 	private Integer page;
 	private Long codigoClienteSeleccionado;
+	private Long codigoProveedorSeleccionado;
 	private Integer contDetalle;
 	private String codigoBarras;
 	private Boolean documentoCreado;
@@ -123,6 +125,7 @@ public class CuentasController extends CommonsController implements Serializable
 		this.facturaCabeceraDTOCols = new ArrayList<FacturaCabeceraDTO>();
 		this.facturaDetalleDTOCols = new ArrayList<FacturaDetalleDTO>();
 		this.clienteDTOCols =  new ArrayList<ClienteDTO>();
+		this.proveedorDTOCols = new ArrayList<>();
 		SecuenciaDTO secuenciaPedido = new SecuenciaDTO();
 		if(this.cuentasDataManager.getTipoFactura() != null && this.cuentasDataManager.getTipoFactura().equals(ERPConstantes.CODIGO_CATALOGO_VALOR_DOCUMENTO_VENTAS)) {
 			secuenciaPedido = ERPFactory.secuencias.getSecuenciaServicio().findObtenerSecuenciaByNombre(FacturaCabeceraID.NOMBRE_SECUENCIA_VENTA);
@@ -639,6 +642,32 @@ public class CuentasController extends CommonsController implements Serializable
 	{
 		this.codigoClienteSeleccionado = (Long)e.getNewValue();
 	}
+	
+	/**
+	 * Metodo para buscar clientes
+	 * @param e
+	 */
+	public void busquedaProveedores(ActionEvent e){
+		try {
+			this.proveedorDTOCols = ERPFactory.proveedor.getProveedorServicio().findObtenerListaProveedores(Integer.parseInt(ERPConstantes.ESTADO_ACTIVO_NUMERICO), null, null);
+		} catch (ERPException e1) {
+	        this.setShowMessagesBar(Boolean.TRUE);
+	        MensajesController.addError(null, e1.getMessage());
+	        
+		} catch (Exception e2) {
+	        this.setShowMessagesBar(Boolean.TRUE);
+	        MensajesController.addError(null, e2.getMessage());
+		}
+	}
+	
+	/**
+	 * Seleccionar proveedor del popUp
+	 * @param e
+	 */
+	public void seleccionProveedor(ValueChangeEvent e)
+	{
+		this.codigoProveedorSeleccionado = (Long)e.getNewValue();
+	}
 
 	/**
 	 * Metodo para agragar el cliente a la vista
@@ -652,6 +681,20 @@ public class CuentasController extends CommonsController implements Serializable
 		this.facturaCabeceraDTO.setNombreClienteProveedor(clienteDTO.getPersonaDTO() == null ? clienteDTO.getEmpresaDTO().getRazonSocial() : clienteDTO.getPersonaDTO().getNombreCompleto());
 		this.facturaCabeceraDTO.setDireccion(clienteDTO.getPersonaDTO() == null ? clienteDTO.getEmpresaDTO().getContactoEmpresaDTO().getDireccionPrincipal() : clienteDTO.getPersonaDTO().getContactoPersonaDTO().getDireccionPrincipal());
 		this.facturaCabeceraDTO.setTelefono(clienteDTO.getPersonaDTO() == null ? clienteDTO.getEmpresaDTO().getContactoEmpresaDTO().getTelefonoPrincipal() : clienteDTO.getPersonaDTO().getContactoPersonaDTO().getTelefonoPrincipal());
+	}
+	
+	/**
+	 * Metodo para agragar el proveedor a la vista
+	 */
+	public void agragarProveedor(ActionEvent e) {
+		// Verificar si existe en la coleccion el cliente
+		Predicate testPredicate = new BeanPredicate("id.codigoProveedor", PredicateUtils.equalPredicate(this.codigoProveedorSeleccionado));
+		// Validacion de objeto existente
+		ProveedorDTO proveedorDTO  = (ProveedorDTO) CollectionUtils.find(this.proveedorDTOCols, testPredicate);
+		this.facturaCabeceraDTO.setRucDocumento(proveedorDTO.getPersonaDTO() == null ? proveedorDTO.getEmpresaDTO().getNumeroRuc() : proveedorDTO.getPersonaDTO().getNumeroDocumento());
+		this.facturaCabeceraDTO.setNombreClienteProveedor(proveedorDTO.getPersonaDTO() == null ? proveedorDTO.getEmpresaDTO().getRazonSocial() : proveedorDTO.getPersonaDTO().getNombreCompleto());
+		this.facturaCabeceraDTO.setDireccion(proveedorDTO.getPersonaDTO() == null ? proveedorDTO.getEmpresaDTO().getContactoEmpresaDTO().getDireccionPrincipal() : proveedorDTO.getPersonaDTO().getContactoPersonaDTO().getDireccionPrincipal());
+		this.facturaCabeceraDTO.setTelefono(proveedorDTO.getPersonaDTO() == null ? proveedorDTO.getEmpresaDTO().getContactoEmpresaDTO().getTelefonoPrincipal() : proveedorDTO.getPersonaDTO().getContactoPersonaDTO().getTelefonoPrincipal());
 	}
 	
 	/**
@@ -1245,5 +1288,21 @@ public class CuentasController extends CommonsController implements Serializable
 
 	public void setService(ArticuloService service) {
 		this.service = service;
+	}
+
+	public Long getCodigoProveedorSeleccionado() {
+		return codigoProveedorSeleccionado;
+	}
+
+	public void setCodigoProveedorSeleccionado(Long codigoProveedorSeleccionado) {
+		this.codigoProveedorSeleccionado = codigoProveedorSeleccionado;
+	}
+
+	public Collection<ProveedorDTO> getProveedorDTOCols() {
+		return proveedorDTOCols;
+	}
+
+	public void setProveedorDTOCols(Collection<ProveedorDTO> proveedorDTOCols) {
+		this.proveedorDTOCols = proveedorDTOCols;
 	}
 }

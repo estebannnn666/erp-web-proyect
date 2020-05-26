@@ -40,7 +40,10 @@
 					<h:inputText style="width:150px" value="#{cuentasController.facturaCabeceraDTO.rucDocumento}" id="docClienteProveedor" maxlength="13" onkeypress="if (event.keyCode == 13) return false; return validarEnteros(event);">
 						<a4j:ajax event="keyup" execute="pnlGridVentas" listener="#{cuentasController.realizarConsultaProveedor}" onbeforesubmit="return verifyKeyEnter(event);" render="pnlGridVentas, pnlMensajes"/>
 					</h:inputText>
-					<h:outputText value="" />
+					<h:panelGroup layout="block" styleClass="botonB" style="margin-top:5px;">
+						<a4j:commandLink oncomplete="#{rich:component('mpProveedores')}.show(); " styleClass="botonBuscar" actionListener="#{cuentasController.busquedaProveedores}" render="pnlListaProveedor tableProveedores" execute="@this, pnlGridVentas" title="Click para buscar proveedores">							
+						</a4j:commandLink>	
+					</h:panelGroup>	
 					<div style="width: 30px"></div>
 					<h:outputText class="styleNegritas" value="#{msg_erpweb['ec.com.erp.etiqueta.label.lista.cabecera.factura.telefono']}: *" />
 					<h:inputText style="width:150px" value="#{cuentasController.facturaCabeceraDTO.telefono}" id="telefonoFacVen" maxlength="10" onkeypress="return validarEnteros(event);"/>
@@ -170,7 +173,7 @@
 		<!-- Popup para agregar articulos -->
 		<rich:popupPanel id="mpAddDetalle" styleClass="panelPedidos" header="#{msg_erpweb['ec.com.erp.etiqueta.label.lista.cabecera.factura.titulo.ingreso']}" width="535" height="200" modal="true" domElementAttachment="form">
 			<f:facet name="controls">
-				<h:outputLink value="#"	onclick="#{rich:component('mpClientes')}.hide();">
+				<h:outputLink value="#"	onclick="#{rich:component('mpProveedores')}.hide();">
 					<h:graphicImage library="images" name="close.png" style="border:0px" id="closePopUpDetalle" />
 				</h:outputLink>
 			</f:facet>
@@ -260,6 +263,81 @@
 				
 				<h:panelGroup layout="block" styleClass="botonD" style="margin-top:5px;">
 					<a4j:commandLink action="#{cuentasController.regresarBusquedaFacturasCompras}" styleClass="cancelarD" oncomplete="#{rich:component('mpConfirmacion')}.hide(); return false;" immediate="true">
+						<h:panelGrid columns="2" cellpadding="3" cellspacing="0">
+							<h:graphicImage name="btnCancel.png" library="images" style="border:none;border-color:white;" height="16" width="16"/>
+							<h:outputText value="Cancelar" />
+						</h:panelGrid>
+					</a4j:commandLink>
+				</h:panelGroup>
+			</h:panelGrid>
+		</rich:popupPanel>
+		
+		<!--  Pop Up para agregar datos de clientes -->
+		<rich:popupPanel id="mpProveedores" styleClass="panelPedidos" header="#{msg_erpweb['ec.com.erp.etiqueta.label.lista.cabecera.etiqueta.seleccionproveedor']}" width="935" height="400" modal="true" domElementAttachment="form">
+			<f:facet name="controls">
+				<h:outputLink value="#"	onclick="#{rich:component('mpProveedores')}.hide();">
+					<h:graphicImage library="images" name="close.png" style="border:0px" id="closePopUpCliente" />
+				</h:outputLink>
+			</f:facet> 
+			<h:panelGrid id="pnlListaProveedor" style="width: 100%;">	
+				<rich:panel style="width: 99.6%; height: 315px;" header="#{msg_erpweb['ec.com.erp.etiqueta.label.lista.cabecera.etiqueta.listaproveedores']}">
+					
+					<h:panelGrid id="tablaVaciaProveedor" columns="1" rendered="#{empty cuentasController.proveedorDTOCols}" style="width:100%; text-align: center; padding-top: 230px">
+						<h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.mensaje.lista.vacio']}"/>
+					</h:panelGrid>	
+					<rich:panel style="text-align:center; border-left: none; border-right:none; margin-bottom: 2px" rendered="#{not empty cuentasController.proveedorDTOCols}">
+						<rich:dataScroller fastStep="3" for="tableProveedores" maxPages="5" rendered="#{not empty cuentasController.proveedorDTOCols}" renderIfSinglePage="false"/>
+					</rich:panel>	
+					<rich:dataTable style="width:100%" value="#{cuentasController.proveedorDTOCols}" rendered="#{not empty cuentasController.proveedorDTOCols}" var="provider" iterationStatusVar="it" id="tableProveedores" rows="8">
+			            <rich:column style="padding:0px;padding-left:2px" >
+							<h:selectOneRadio onclick="radioButton(this);" id="myRadio" value="#{cuentasController.codigoProveedorSeleccionado}" valueChangeListener="#{cuentasController.seleccionProveedor}">  
+								<f:selectItem itemValue="#{provider.id.codigoProveedor}"/> 
+								<a4j:ajax event="click" execute="@this" render="myRadio"/>								
+							</h:selectOneRadio>
+						</rich:column>
+			            <rich:column>
+			                <f:facet name="header">Nro.</f:facet>
+			                #{it.index+1}
+			            </rich:column>
+			            <rich:column>
+			                <f:facet name="header"><h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.header.tabla.tipo.cliente']}"/></f:facet>
+			                <h:outputText value="#{provider.tipoProveedorCatalogoValorDTO.nombreCatalogoValor}" />
+			            </rich:column>
+			            <rich:column filter="#{provider.personaDTO.numeroDocumento}" filterType="">
+			                <f:facet name="header"><h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.header.tabla.documento.cliente']}"/></f:facet>
+			                <h:outputText value="#{provider.personaDTO.numeroDocumento == null ? provider.empresaDTO.numeroRuc : provider.personaDTO.numeroDocumento}" />
+			            </rich:column>
+			            <rich:column>
+			                <f:facet name="header"><h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.header.tabla.nombre.cliente']}"/></f:facet>
+			                <h:outputText value="#{provider.personaDTO.nombreCompleto == null ? provider.empresaDTO.razonSocial : provider.personaDTO.nombreCompleto}" />
+			            </rich:column>
+			            <rich:column>
+			                <f:facet name="header"><h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.header.tabla.direccion.cliente']}"/></f:facet>
+			                <h:outputText value="#{provider.personaDTO == null ? provider.empresaDTO.contactoEmpresaDTO.direccionPrincipal : provider.personaDTO.contactoPersonaDTO.direccionPrincipal}" />
+			            </rich:column>
+			            <rich:column>
+			                <f:facet name="header"><h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.header.tabla.ciudad.cliente']}"/></f:facet>
+			                <h:outputText value="#{provider.personaDTO == null ? provider.empresaDTO.contactoEmpresaDTO.ciudad : provider.personaDTO.contactoPersonaDTO.ciudad}" />
+			            </rich:column>
+			             <rich:column>
+			                <f:facet name="header"><h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.header.tabla.telefono.cliente']}"/></f:facet>
+			                <h:outputText value="#{provider.personaDTO == null ? provider.empresaDTO.contactoEmpresaDTO.telefonoPrincipal : provider.personaDTO.contactoPersonaDTO.telefonoPrincipal}" />
+			            </rich:column>
+			        </rich:dataTable>
+		        </rich:panel>
+			</h:panelGrid>
+			<!-- Botones de PopUp -->
+			<h:panelGrid style="margin:auto;" columns="2" cellpadding="0" cellspacing="0">
+				<h:panelGroup layout="block" styleClass="botonD" style="margin-top:5px;margin-right:20px;">
+					<a4j:commandLink id="btnAceptarAgregarProveedor" execute="@this" render="pnlGridVentas" styleClass="aceptarD" actionListener="#{cuentasController.agragarProveedor}" oncomplete="#{rich:component('mpProveedores')}.hide(); return false;">
+						<h:panelGrid columns="2" cellpadding="3" cellspacing="0">
+							<h:graphicImage name="btnAceptar.png" library="images" style="border:none;border-color:white;" height="16" width="16"/>
+							<h:outputText value="Aceptar" />
+						</h:panelGrid>
+					</a4j:commandLink>					
+				</h:panelGroup>
+				<h:panelGroup layout="block" styleClass="botonD" style="margin-top:5px;">
+					<a4j:commandLink id="btnCancelarAgregarProveedor" styleClass="cancelarD" oncomplete="#{rich:component('mpProveedores')}.hide(); return false;" immediate="true">
 						<h:panelGrid columns="2" cellpadding="3" cellspacing="0">
 							<h:graphicImage name="btnCancel.png" library="images" style="border:none;border-color:white;" height="16" width="16"/>
 							<h:outputText value="Cancelar" />
