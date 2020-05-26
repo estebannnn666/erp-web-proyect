@@ -416,23 +416,35 @@ public class CuentasController extends CommonsController implements Serializable
 	private Boolean validarInformacionRequerida() {
 		Boolean valido = Boolean.TRUE;
 		if(StringUtils.isEmpty(this.facturaCabeceraDTO.getNumeroDocumento())) {
+			valido = Boolean.FALSE;
 			MensajesController.addError(null, ERPWebResources.getString("ec.com.erp.etiqueta.mensaje.campo.requerido.numero.factura"));
 		}
 		if(StringUtils.isEmpty(this.facturaCabeceraDTO.getRucDocumento())) {
+			valido = Boolean.FALSE;
 			MensajesController.addError(null, ERPWebResources.getString("ec.com.erp.etiqueta.mensaje.campo.requerido.ruccliente.factura"));
 		}
 		if(StringUtils.isEmpty(this.facturaCabeceraDTO.getNombreClienteProveedor())) {
+			valido = Boolean.FALSE;
 			MensajesController.addError(null, ERPWebResources.getString("ec.com.erp.etiqueta.mensaje.campo.requerido.nombrecliente.factura"));
 		}
-		if(CollectionUtils.isNotEmpty(this.facturaCabeceraDTO.getFacturaDetalleDTOCols()) && this.facturaCabeceraDTO.getId().getCodigoFactura() != null) {
+		
+		Boolean existDetail = Boolean.TRUE;
+		for(FacturaDetalleDTO detalle : this.getFacturaDetalleDTOCols()){
+			if(detalle.getCantidad() != null && detalle.getValorUnidad() != null && detalle.getCodigoArticulo() != null) {
+				existDetail = Boolean.FALSE;
+				break;
+			}
+		}
+		
+		if(CollectionUtils.isNotEmpty(this.facturaCabeceraDTO.getFacturaDetalleDTOCols()) && this.facturaCabeceraDTO.getId().getCodigoFactura() != null && existDetail) {
+			valido = Boolean.FALSE;
 			this.setFacturaDetalleDTOCols(this.facturaCabeceraDTO.getFacturaDetalleDTOCols());
 		}
 		
 		if(CollectionUtils.isEmpty(this.facturaDetalleDTOCols)) {
 			valido = Boolean.FALSE;
 			MensajesController.addError(null, ERPWebResources.getString("ec.com.erp.etiqueta.label.nuevo.pedidos.mensaje.requerido.factura"));
-		}else
-		{
+		}else{
 			Boolean ban = Boolean.FALSE;
 			for(FacturaDetalleDTO facturaDetalleDTOAux : facturaDetalleDTOCols) {
 				if(facturaDetalleDTOAux.getCantidad() != null && facturaDetalleDTOAux.getDescripcion() != null && facturaDetalleDTOAux.getValorUnidad() != null) {
@@ -473,6 +485,16 @@ public class CuentasController extends CommonsController implements Serializable
 		this.facturaCabeceraDTO = new FacturaCabeceraDTO();
 		this.facturaDetalleDTO = new FacturaDetalleDTO();
 		this.facturaDetalleDTOCols = new ArrayList<FacturaDetalleDTO>();
+		
+		FacturaDetalleDTO detalle = null;
+		contDetalle = 1;
+		for(int i=0; i< 10; i++) {
+			detalle = new FacturaDetalleDTO();
+			detalle.setArticuloDTO(new ArticuloDTO());
+			detalle.getId().setCodigoCompania(contDetalle);
+			this.facturaDetalleDTOCols.add(detalle);
+			contDetalle++;
+		}
 	}
 	
 	/**

@@ -168,7 +168,7 @@
 						<h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.mensaje.lista.vacio']}"/>
 					</h:panelGrid>	
 					<rich:panel style="text-align:center; border-left: none; border-right:none; margin-bottom: 2px" rendered="#{not empty cuentasController.facturaCabeceraDTO.facturaDetalleDTOCols}">
-						<rich:dataScroller fastStep="3" for="tableDetalles" maxPages="5" rendered="#{not empty cuentasController.facturaCabeceraDTO.facturaDetalleDTOCols}" renderIfSinglePage="true"/>
+						<rich:dataScroller fastStep="3" for="tableDetalles" maxPages="5" rendered="#{not empty cuentasController.facturaCabeceraDTO.facturaDetalleDTOCols}" renderIfSinglePage="false"/>
 					</rich:panel>	
 					<rich:dataTable style="width:100%" value="#{cuentasController.facturaCabeceraDTO.facturaDetalleDTOCols}" rendered="#{not empty cuentasController.facturaCabeceraDTO.facturaDetalleDTOCols}" var="detalle" iterationStatusVar="it" id="tableDetalles" rows="7">
 			            <rich:column>
@@ -211,6 +211,32 @@
 			                	<f:convertNumber pattern="0.00"/>
 			                </h:outputText>
 			            </rich:column>
+			            <f:facet name="footer">
+			                <rich:columnGroup>
+				                <rich:column colspan="7" style="text-align: right; paddin-right: 10px">Sub Total:</rich:column>
+				                <rich:column style="text-align: right; paddin-right: 10px">
+				                    <h:outputText value="#{cuentasController.facturaCabeceraDTO.totalSinImpuestos}">
+				                    	<f:convertNumber pattern="0.00"/>
+				                    </h:outputText>
+				                </rich:column>
+				            </rich:columnGroup>
+				            <rich:columnGroup>
+				                <rich:column colspan="7" style="text-align: right; paddin-right: 10px">Iva 12 %:</rich:column>
+				                <rich:column style="text-align: right; paddin-right: 10px">
+				                    <h:outputText value="#{cuentasController.facturaCabeceraDTO.totalImpuestos}">
+				                    	<f:convertNumber pattern="0.00"/>
+				                    </h:outputText>
+				                </rich:column>
+				            </rich:columnGroup>
+				            <rich:columnGroup>
+				                <rich:column colspan="7" style="text-align: right; paddin-right: 10px">Total:</rich:column>
+				                <rich:column style="text-align: right; paddin-right: 10px">
+				                    <h:outputText value="#{cuentasController.facturaCabeceraDTO.totalCuenta}">
+				                    	<f:convertNumber pattern="0.00"/>
+				                    </h:outputText>
+				                </rich:column>
+				            </rich:columnGroup>
+			            </f:facet>
 			        </rich:dataTable>
 		        </rich:panel>
 			</h:panelGrid>

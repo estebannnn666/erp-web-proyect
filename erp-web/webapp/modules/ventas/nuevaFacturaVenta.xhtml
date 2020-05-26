@@ -324,12 +324,12 @@
 			<!-- Botones de PopUp -->
 			<h:panelGrid style="margin:auto; padding-top: 5px;" columns="3" cellpadding="0" cellspacing="0">
 				<h:panelGroup layout="block" styleClass="botonD" style="margin-top:5px;margin-right:20px;">
-					<h:commandLink styleClass="aceptarD" action="#{cuentasController.imprimirFactura}" target="_BLANK">
+					<a4j:commandLink styleClass="aceptarD" render="pnlMensajes" oncomplete="imprimirFacturaVenta();#{rich:component('mpConfirmacion')}.hide(); return false;" execute="@this" actionListener="#{cuentasController.cargarFacturaDetalle}">
 						<h:panelGrid columns="2" cellpadding="3" cellspacing="0">
 							<h:graphicImage name="btnImprimir.png" library="images" style="border:none;border-color:white;" height="16" width="16"/>
 							<h:outputText value="Imprimir" />
 						</h:panelGrid>
-					</h:commandLink>				
+					</a4j:commandLink>
 				</h:panelGroup>
 	
 				<h:panelGroup layout="block" styleClass="botonD" style="margin-top:5px; margin-right:20px;">
@@ -413,6 +413,10 @@
 				 	document.getElementById('frmNuevaVenta:tableDetallePedido:'+numeroFilaSiguie+':codigoBarras').focus();
 				}
 				
+				function imprimirFacturaVenta(){
+					$('.linkprintfactura').trigger('click');
+				}
+				
 			/*]]>*/
 		</script>
 		
@@ -439,6 +443,8 @@
 				padding: 2px !important;
 			}
 		</h:outputStylesheet>
+		<h:commandLink id="linkprintfactura" styleClass="linkprintfactura" action="#{cuentasController.imprimirFactura}" target="_BLANK">
+		</h:commandLink>
 	</ui:define>
 	
 </ui:composition>
