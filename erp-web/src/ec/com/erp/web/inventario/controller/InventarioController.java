@@ -69,6 +69,7 @@ public class InventarioController extends CommonsController implements Serializa
 	private String codigoBarrasNuevo;
 	private Collection<ArticuloDTO> articuloDTOCols;
 	private Integer codigoArticuloSeleccionado;
+	private Boolean existeInventario;
 	
 
 	@PostConstruct
@@ -82,6 +83,7 @@ public class InventarioController extends CommonsController implements Serializa
 		Calendar fechaSuperior = Calendar.getInstance();
 		fechaInicioBusqueda = fechaInferior.getTime();
 		fechaFinBusqueda = fechaSuperior.getTime();
+		existeInventario = Boolean.FALSE;
 				
 		this.inventarioCreado = Boolean.FALSE;
 		this.inventarioDTO = new InventarioDTO();
@@ -319,6 +321,21 @@ public class InventarioController extends CommonsController implements Serializa
 	}
 	
 	/**
+	 * Metodo para validar si existen datos que imprimir pantalla
+	 * @param e
+	 */
+	public void validarImpresion(ActionEvent e){
+		if(CollectionUtils.isEmpty(this.inventarioDTOCols)) {
+			existeInventario = Boolean.FALSE;
+			this.setShowMessagesBar(Boolean.TRUE);
+	        MensajesController.addError(null, ERPWebResources.getString("ec.com.erp.etiqueta.inventario.mensaje.reporte.inventario"));
+		}else {
+			existeInventario = Boolean.TRUE;
+		}
+	}
+	
+	
+	/**
 	 * Metodo para refrescar pantalla
 	 * @param e
 	 */
@@ -527,5 +544,13 @@ public class InventarioController extends CommonsController implements Serializa
 
 	public void setCodigoArticuloSeleccionado(Integer codigoArticuloSeleccionado) {
 		this.codigoArticuloSeleccionado = codigoArticuloSeleccionado;
+	}
+
+	public Boolean getExisteInventario() {
+		return existeInventario;
+	}
+
+	public void setExisteInventario(Boolean existeInventario) {
+		this.existeInventario = existeInventario;
 	}
 }

@@ -263,11 +263,16 @@ public class PerfilController extends CommonsController implements Serializable 
 			ModuloPerfilDTO moduloPerfilDTO;
 			for(ModuloDTO moduloDTO: modulosDTOCols) {
 				if(moduloDTO.getSeleccionado() != null && moduloDTO.getSeleccionado() ) {
-					moduloPerfilDTO = new ModuloPerfilDTO();
-					moduloPerfilDTO.getId().setCodigoModulo(moduloDTO.getId().getCodigoModulo());
-					moduloPerfilDTO.setModuloDTO(moduloDTO);
-					this.modulosDTOAsignadosCols.add(moduloPerfilDTO);
-					this.desactivarSeleccionoModulosQuitados(moduloPerfilDTO.getId().getCodigoModulo());
+					ModuloPerfilDTO moduloPerfilDTOExistente = this.modulosDTOAsignadosCols.stream()
+							.filter(asignado -> moduloDTO.getId().getCodigoModulo().intValue() == asignado.getId().getCodigoModulo().intValue())
+							.findFirst().orElse(null);
+					if(moduloPerfilDTOExistente == null) {
+						moduloPerfilDTO = new ModuloPerfilDTO();
+						moduloPerfilDTO.getId().setCodigoModulo(moduloDTO.getId().getCodigoModulo());
+						moduloPerfilDTO.setModuloDTO(moduloDTO);
+						this.modulosDTOAsignadosCols.add(moduloPerfilDTO);					
+						this.desactivarSeleccionoModulosQuitados(moduloPerfilDTO.getId().getCodigoModulo());
+					}
 				}
 			}
 			ArrayList<ModuloPerfilDTO> moduloPerfilDTOCols = new ArrayList<ModuloPerfilDTO>();

@@ -14,7 +14,10 @@
 		
 		<rich:toolbarGroup>	
 			<h:panelGroup layout="block" styleClass="botonComun">
-				<h:commandLink value="Imprimir" styleClass="botonImprimirPdf" action="#{inventarioController.imprimirKardex}" target="_BLANK"/>
+				<a4j:commandLink id="botonImprimir" styleClass="botonImprimirPdf" title="Imprimir kardex" value="Imprimir" 
+					render="pnlMensajes" oncomplete="if(#{inventarioController.existeInventario})imprimirInventario(); return false;"
+					execute="@this" actionListener="#{inventarioController.validarImpresion}">
+				</a4j:commandLink>
 			</h:panelGroup>
 		</rich:toolbarGroup>
 		

@@ -440,7 +440,6 @@ public class CuentasController extends CommonsController implements Serializable
 		}
 		
 		if(CollectionUtils.isNotEmpty(this.facturaCabeceraDTO.getFacturaDetalleDTOCols()) && this.facturaCabeceraDTO.getId().getCodigoFactura() != null && existDetail) {
-			valido = Boolean.FALSE;
 			this.setFacturaDetalleDTOCols(this.facturaCabeceraDTO.getFacturaDetalleDTOCols());
 		}
 		
@@ -961,11 +960,7 @@ public class CuentasController extends CommonsController implements Serializable
 				htmltoPDF = new HtmlPdf(ERPConstantes.PLANTILLA_XSL_FOPRINCIPAL);
 				HashMap<String , String> parametros = new HashMap<String, String>();
 				byte contenido[] = htmltoPDF.convertir(ERPFactory.facturas.getFacturaCabeceraServicio().finObtenerXMLImprimirFacturaVenta(facturaCabeceraDTO).replace("<?xml version=\"1.0\" encoding=\"UTF-8\"?>", ""), "", "",	parametros,	null);
-//				this.setShowMessagesBar(Boolean.TRUE);
-//		        MensajesController.addInfo(null, ERPWebResources.getString("ec.com.erp.etiqueta.pantall.despacho.mensaje.impresion.correcta"));
 				UtilitarioWeb.mostrarPDF(contenido);	
-			}else {
-				this.setShowMessagesBar(Boolean.TRUE);
 			}
 		} catch (Exception e) {
 			this.setShowMessagesBar(Boolean.TRUE);

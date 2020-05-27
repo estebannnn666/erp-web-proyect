@@ -104,7 +104,7 @@
 				            <rich:column style="width:10%">
 				                <f:facet name="header"><h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.label.nuevo.pedidos.detalle.cantidad.pedido']}"/></f:facet>
 				                <h:inputText style="text-align: right; width:95%; padding-right: 5px" id="cantidadPedida" value="#{detalle.cantidad}" onkeypress="return validarEnteros(event);">
-				                	<a4j:ajax event="keyup" status="no" listener="#{cuentasController.calcularTotalFacturaKeyUp}"
+				                	<a4j:ajax event="keyup" status="no" listener="#{cuentasController.calcularTotalFacturaKeyUp}" oncomplete="fijarFocoCantidadActual(this.id);"
 				                			  execute="@this" render="pnlGridDetalleFactura" >
 				                	</a4j:ajax>
 				                </h:inputText>
@@ -411,6 +411,18 @@
 					var numeroFilaActual = Number(nombreComp[2]);
 					var numeroFilaSiguie = numeroFilaActual + 1;
 				 	document.getElementById('frmNuevaVenta:tableDetallePedido:'+numeroFilaSiguie+':codigoBarras').focus();
+				}
+				
+				function fijarFocoCantidadActual(idImput){
+					var nombreComp = idImput.split(':');
+					var numeroFilaActual = Number(nombreComp[2]);
+					var obj = document.getElementById('frmNuevaVenta:tableDetallePedido:'+numeroFilaActual+':cantidadPedida');
+					var valor = new String(obj.value);
+					obj.focus();
+					if(obj.value!=""){
+						obj.value = "";
+						obj.value = valor;
+					}
 				}
 				
 				function imprimirFacturaVenta(){
