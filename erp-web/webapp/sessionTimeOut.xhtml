@@ -4,7 +4,11 @@
 	xmlns:h="http://java.sun.com/jsf/html"
 	xmlns:rich="http://richfaces.org/rich"
 	xmlns:a4j="http://richfaces.org/a4j">
-	<h:head></h:head>
+	<h:head>
+		<title>ERP - Sesión caducada</title>		
+		<link rel="shortcut icon" type="image/x-icon" href="./javax.faces.resource/favicon.ico.jsf?ln=images"/>
+		<link rel="icon" type="image/x-icon" href="./javax.faces.resource/animated_favicon1.gif.jsf?ln=images"/>
+	</h:head>
 	<h:body onload="#{rich:component('stow')}.show();">
 	    <rich:popupPanel id="stow" width="375" height="155" resizeable="false" header="Session finalizada">
 			<table width="100%" border="0">
