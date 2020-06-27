@@ -122,7 +122,8 @@
 	            </rich:column>
 	            <rich:column styleClass="columna5">
 	                <f:facet name="header">Editar</f:facet>
-	                <a4j:commandLink id="botonEditar" render="pnlGridDatosCliente panelDireccionCliente pnlGridDetallePedido" action="#{pedidosController.cargarPedidoEditar}"	execute="@this" >
+	                <h:graphicImage rendered="#{pedido.estadoPedidoDTO.codigoValorEstadoPedido != 'REG'}" name="btn_alert.png" library="images" style="border:none;border-color:white;" height="16" width="16" title="El pedido ya no se puede editar"/>
+	                <a4j:commandLink rendered="#{pedido.estadoPedidoDTO.codigoValorEstadoPedido == 'REG'}" id="botonEditar" render="pnlGridDatosCliente panelDireccionCliente pnlGridDetallePedido" action="#{pedidosController.cargarPedidoEditar}"	execute="@this" >
 						<h:graphicImage name="btnEditar.png" library="images" style="border:none;border-color:white;" height="16" width="16"/>
 						<f:setPropertyActionListener value="#{pedido}" target="#{pedidosController.pedidoDTO}" />											
 					</a4j:commandLink>	

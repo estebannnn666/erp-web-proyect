@@ -1,0 +1,191 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:a4j="http://richfaces.org/a4j"
+	xmlns:rich="http://richfaces.org/rich"
+	template="/templates/pages/pageLayout2.xhtml">
+	
+	<ui:param name="idForm" value="frmAdminBusquedaTransaccion" />
+	<ui:param name="form" value="#{transaccionController.form}" />	
+	<ui:param name="controller" value="#{transaccionController}" />
+	<ui:param name="westLength" value="250" />
+	
+	<ui:define name="title">
+		Articulos
+	</ui:define>
+	
+	<ui:define name="header">	
+		<ui:include src="adminBusquedaTransaccionHeader.xhtml" />
+	</ui:define>
+	
+	<ui:define name="contentCenter">
+		<rich:panel id="panel-content-left" styleClass="panel-content-left" style="width:100% !important;">
+			<f:facet name="header">			
+				<h:panelGrid columns="2" width="99.9%" columnClasses="align-left, align-right" cellpadding="0" cellspacing="0">
+					<h:outputText value="Ingresos y gastos de las fechas seleccionadas" style="white-space:nowrap" />
+				</h:panelGrid>
+			</f:facet>		
+		
+			<h:panelGroup id="listaReporte" layout="block" styleClass="listaReporte">
+				<h:panelGrid columns="3" width="100%" cellpadding="0" cellspacing="2" columnClasses="columna1, columna2, columna3">
+					<h:panelGrid columns="2" columnClasses="col1, col2">
+						<h:outputText value="Total ingresos:" style="white-space:nowrap; font-weight: bold; font-size: 14px;" />
+						<h:outputText value="#{transaccionController.totalIngresos}" style="white-space:nowrap; font-size: 14px;">
+							<f:convertNumber pattern="0.00"/>
+		                </h:outputText>
+						<h:outputText value="Total Gastos:" style="white-space:nowrap; font-weight: bold; font-size: 14px;" />
+						<h:outputText value="#{transaccionController.totalGastos}" style="white-space:nowrap; font-size: 14px;">
+							<f:convertNumber pattern="0.00"/>
+		                </h:outputText>
+					</h:panelGrid>
+					<h:outputText value="" />
+					<h:panelGrid columns="4">
+			    	   	<h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.busqueda.transacciones.por.fecha']}" style="white-space:nowrap" />
+			    	   	<rich:calendar inputStyle="width: 80px; height: 20px;" value="#{transaccionController.fechaInicioTransaccion}" datePattern="yyyy-MM-dd"></rich:calendar>
+						<rich:calendar inputStyle="width: 80px; height: 20px;" value="#{transaccionController.fechaFinTransaccion}" datePattern="yyyy-MM-dd"></rich:calendar>
+						<a4j:commandButton id="btnBuscar" value="Buscar" styleClass="styleSearch" render="listaIngresos listaReporte listaGastos tableIngresos tableGastos pnlMensajes" execute="listaReporte" actionListener="#{transaccionController.busquedaTransacciones}"/>
+					</h:panelGrid>
+				</h:panelGrid>						 
+			</h:panelGroup>	
+		</rich:panel>
+		<h:panelGrid id="pnlGridTransacciones" style="width: 100.4%; height: 83.3%; border: solid 1px #BED6F8; margin-top: 0.2em; background-color: #ffffff;" columns="3" cellspacing="2" cellpadding="5" columnClasses="columna1, columna2, columna3">
+			<rich:panel id="listaIngresos" styleClass="panelListaTransaccion" header="#{msg_erpweb['ec.com.erp.etiqueta.header.nueva.transacciones.title.lista.ingresos']}" style="height: 100%; width:100% !important;">	
+				<h:panelGrid id="tablaIngreso" columns="1" rendered="#{empty transaccionController.transaccionIngresosDTOCols}" style="width:100%; text-align: center; padding-top: 185px">
+					<h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.mensaje.lista.vacio']}"/>
+				</h:panelGrid>
+				<rich:panel id="paginaIngresos" style="text-align:center; border:none; height: 21px;">
+					<rich:dataScroller style="margin-top: -0.4em" page="#{transaccionController.page}" fastStep="3" for="tableIngresos" maxPages="5" rendered="#{not empty transaccionController.transaccionIngresosDTOCols}" renderIfSinglePage="false"/>
+				</rich:panel>	
+					
+				 <rich:dataTable style="width:100%" rendered="#{not empty transaccionController.transaccionIngresosDTOCols}" value="#{transaccionController.transaccionIngresosDTOCols}" var="tra" iterationStatusVar="it" id="tableIngresos" rows="10">
+		            <rich:column>
+		                <f:facet name="header">Nro.</f:facet>
+		                #{it.index+1}
+		            </rich:column>
+		            <rich:column>
+		                <f:facet name="header"><h:outputText title="#{msg_erpweb['ec.com.erp.etiqueta.header.nueva.transacciones.numero']}" value="#{msg_erpweb['ec.com.erp.etiqueta.header.nueva.transacciones.numero.abrev']}"/></f:facet>
+		                <h:outputText value="#{tra.numeroTransaccion}" />
+		            </rich:column>
+		            <rich:column style="text-align: center;">
+		                <f:facet name="header"><h:outputText title="#{msg_erpweb['ec.com.erp.etiqueta.header.nueva.transacciones.fecha']}" value="#{msg_erpweb['ec.com.erp.etiqueta.header.nueva.transacciones.fecha.abrev']}"/></f:facet>
+		                <h:outputText value="#{tra.fechaTransaccion}">
+		                	<f:convertDateTime pattern="yyyy-MM-dd"/>
+		                </h:outputText>
+		            </rich:column>
+		            <rich:column style="text-align: right; padding-right: 5px">
+		                <f:facet name="header"><h:outputText title="#{msg_erpweb['ec.com.erp.etiqueta.header.nueva.transacciones.valor']}" value="#{msg_erpweb['ec.com.erp.etiqueta.header.nueva.transacciones.valor.abrev']}"/></f:facet>
+		                <h:outputText value="#{tra.valorTransaccion}" >
+		                	<f:convertNumber pattern="0.00"/>
+		                </h:outputText>
+		            </rich:column>
+		            <rich:column style="text-align: left; padding-left: 5px">
+		                <f:facet name="header"><h:outputText title="#{msg_erpweb['ec.com.erp.etiqueta.header.nueva.transacciones.concepto']}" value="#{msg_erpweb['ec.com.erp.etiqueta.header.nueva.transacciones.concepto']}"/></f:facet>
+		                <rich:panel id="cliente#{it}" styleClass="tooltip-text" bodyClass="rich-laguna-panel-no-header" style="border: none !important">  
+			        		<h:outputText value="#{tra.concepto.length() > 20 ? tra.concepto.substring(0,20).concat('...') : tra.concepto}" /> 
+							<rich:tooltip id="ttc#{it}" showDelay="500" styleClass="tooltip" layout="block" rendered="#{tra.concepto.length() > 20}">                
+								<h:panelGrid>
+									<span style="white-space: nowrap">												
+										<h:outputText value="#{tra.concepto}" />												
+									</span>
+								</h:panelGrid>
+							</rich:tooltip>       
+						</rich:panel>
+		            </rich:column>
+		        </rich:dataTable>
+	        </rich:panel>
+	        <h:outputText value="" />
+	        <rich:panel id="listaGastos" styleClass="panelListaTransaccion" header="#{msg_erpweb['ec.com.erp.etiqueta.header.nueva.transacciones.title.lista.gastos']}" style="height: 100%; width:100% !important;">	
+				<h:panelGrid id="tablaGasto" columns="1" rendered="#{empty transaccionController.transaccionGastosDTOCols}" style="width:100%; text-align: center; padding-top: 185px">
+					<h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.mensaje.lista.vacio']}"/>
+				</h:panelGrid>
+				<rich:panel id="paginaGastos" style="text-align:center; border:none; height: 21px">
+					<rich:dataScroller style="margin-top: -0.4em" page="#{transaccionController.page}" fastStep="3" for="tableGastos" maxPages="5" rendered="#{not empty transaccionController.transaccionGastosDTOCols}" renderIfSinglePage="false"/>
+				</rich:panel>	
+					
+				 <rich:dataTable style="width:100%" rendered="#{not empty transaccionController.transaccionGastosDTOCols}" value="#{transaccionController.transaccionGastosDTOCols}" var="gas" iterationStatusVar="itg" id="tableGastos" rows="10">
+		            <rich:column>
+		                <f:facet name="header">Nro.</f:facet>
+		                #{itg.index+1}
+		            </rich:column>
+		            <rich:column>
+		                <f:facet name="header"><h:outputText title="#{msg_erpweb['ec.com.erp.etiqueta.header.nueva.transacciones.numero']}" value="#{msg_erpweb['ec.com.erp.etiqueta.header.nueva.transacciones.numero.abrev']}"/></f:facet>
+		                <h:outputText value="#{gas.numeroTransaccion}" />
+		            </rich:column>
+		            <rich:column style="text-align: center;">
+		                <f:facet name="header"><h:outputText title="#{msg_erpweb['ec.com.erp.etiqueta.header.nueva.transacciones.fecha']}" value="#{msg_erpweb['ec.com.erp.etiqueta.header.nueva.transacciones.fecha.abrev']}"/></f:facet>
+		                <h:outputText value="#{gas.fechaTransaccion}">
+		                	<f:convertDateTime pattern="yyyy-MM-dd"/>
+		                </h:outputText>
+		            </rich:column>
+		            <rich:column style="text-align: right; padding-right: 5px">
+		                <f:facet name="header"><h:outputText title="#{msg_erpweb['ec.com.erp.etiqueta.header.nueva.transacciones.valor']}" value="#{msg_erpweb['ec.com.erp.etiqueta.header.nueva.transacciones.valor.abrev']}"/></f:facet>
+		                <h:outputText value="#{gas.valorTransaccion}" >
+		                	<f:convertNumber pattern="0.00"/>
+		                </h:outputText>
+		            </rich:column>
+		            <rich:column style="text-align: left; padding-left: 5px">
+		                <f:facet name="header"><h:outputText title="#{msg_erpweb['ec.com.erp.etiqueta.header.nueva.transacciones.concepto']}" value="#{msg_erpweb['ec.com.erp.etiqueta.header.nueva.transacciones.concepto']}"/></f:facet>
+		                <rich:panel id="concept#{itg}" styleClass="tooltip-text" bodyClass="rich-laguna-panel-no-header" style="border: none !important; padding: 1px">  
+			        		<h:outputText value="#{gas.concepto.length() > 20 ? gas.concepto.substring(0,20).concat('...') : gas.concepto}" /> 
+							<rich:tooltip id="ttcg#{itg}" showDelay="500" styleClass="tooltip" layout="block" rendered="#{gas.concepto.length() > 20}">                
+								<h:panelGrid>
+									<span style="white-space: nowrap">												
+										<h:outputText value="#{gas.concepto}" />												
+									</span>
+								</h:panelGrid>
+							</rich:tooltip>       
+						</rich:panel>
+		            </rich:column>
+		        </rich:dataTable>
+	        </rich:panel>
+	    </h:panelGrid>
+        <script>
+			/*<![CDATA[*/
+			$(document).ready(function(){				
+				 openLinkSystem();				
+			});
+			function openLinkSystem(){
+				$('.linkopensystem').trigger('click');
+			}	
+								
+		/*]]>*/			
+		</script>
+		<h:outputStylesheet>
+			.panelListaTransaccion{
+				height: 99%;
+    			width: 100% !important;
+			}
+			.columna1{
+				width: 49% !important;
+			}	
+			.columna2 {
+				text-align:center;
+				width: 2% !important;
+			}
+			.columna3 {
+				width: 49% !important;
+			}
+			.tooltip-text {     
+			  	cursor: arrow;    
+			  	border-width: 2px;     
+			  	text-align: center;       
+			  	display: table-cell;       
+			  	vertical-align: middle;   
+				background-color: #FFFFFF !important;  	  
+		  	}	
+		  	.col1{
+				text-align:left;
+			}	
+			.col2 {
+				text-align:right;
+			}
+		  	.rf-p-b {
+		  		padding: 4px;
+		  	}
+		</h:outputStylesheet>
+		<a4j:commandLink id="linkopensystem" styleClass="linkopensystem" execute="@this" status="no" actionListener="#{transaccionController.refrescarPantalla}">
+		</a4j:commandLink>	
+	</ui:define>
+	
+</ui:composition>

@@ -20,10 +20,10 @@ public class ArticuloService {
     @PostConstruct
     public void init() {
     	articuloDTOCols = new ArrayList<ArticuloDTO>();
-        Collection<ArticuloDTO> articuloCols = ERPFactory.articulos.getArticuloServicio().findObtenerListaArticulos(1, null, null);
-		for (ArticuloDTO skin : articuloCols) {
-            this.articuloDTOCols.add(skin);
-        }
+//        Collection<ArticuloDTO> articuloCols = ERPFactory.articulos.getArticuloServicio().findObtenerListaArticulos(1, null, null);
+//		for (ArticuloDTO skin : articuloCols) {
+//            this.articuloDTOCols.add(skin);
+//        }
     }
     
     public ArticuloDTO obtenerArticuloPorNombre(String nombre){

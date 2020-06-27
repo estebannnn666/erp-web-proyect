@@ -196,6 +196,10 @@ body {
 	background-image: url("#{resource['images/profile.png']}");
 }
 
+.styleBancos{
+	background-image: url("#{resource['images/bancos.png']}");
+}
+
 /*Estilos menu centro*/
 .styleArticle a:hover {
 	background-image: url("#{resource['images/articulos_over.png']}");

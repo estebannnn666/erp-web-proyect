@@ -210,7 +210,7 @@ public class CuentasController extends CommonsController implements Serializable
 	 */
 	public List<String> completeNombreArticulo(String query) {
         String queryLowerCase = query.toLowerCase();
-        List<ArticuloDTO> allThemes = service.getArticuloDTOCols().stream()
+        List<ArticuloDTO> allThemes = this.articuloDTOCols.stream()
         		.filter(t -> t.getNombreArticulo().toLowerCase().contains(queryLowerCase))
         		.collect(Collectors.toList());
         List<String> results = new ArrayList<>();
@@ -223,7 +223,7 @@ public class CuentasController extends CommonsController implements Serializable
         for(FacturaDetalleDTO facturaDetalleDTOTemp : facturaDetalleDTOCols) {
         	if(facturaDetalleDTOTemp.getDescripcion() != null) {
         		String queryLowerCase = facturaDetalleDTOTemp.getDescripcion().toLowerCase();
-        		ArticuloDTO articuloSeleccionado = service.getArticuloDTOCols().stream()
+        		ArticuloDTO articuloSeleccionado = this.articuloDTOCols.stream()
                 		.filter(articulo -> articulo.getNombreArticulo().toLowerCase().equals(queryLowerCase))
                 		.findFirst().orElse(null);
         		facturaDetalleDTOTemp.setArticuloDTO(articuloSeleccionado);
@@ -364,9 +364,18 @@ public class CuentasController extends CommonsController implements Serializable
 				this.setShowMessagesBar(Boolean.TRUE);
 			}
 		} catch (ERPException e1) {
+			this.facturaCabeceraDTO.getId().setCodigoFactura(null);
+			this.facturaDetalleDTOCols.stream().forEach(detalle ->{
+				detalle.getId().setCodigoDetalleFactura(null);
+			});
+			
 			this.setShowMessagesBar(Boolean.TRUE);
 			MensajesController.addError(null, e1.getMessage());
 		} catch (Exception e2) {
+			this.facturaCabeceraDTO.getId().setCodigoFactura(null);
+			this.facturaDetalleDTOCols.stream().forEach(detalle ->{
+				detalle.getId().setCodigoDetalleFactura(null);
+			});
 			this.setShowMessagesBar(Boolean.TRUE);
 			MensajesController.addError(null, e2.getMessage());
 		}
@@ -479,15 +488,17 @@ public class CuentasController extends CommonsController implements Serializable
 	 * @param e
 	 */
 	public void clearNuevaCuentaFacturaVentas(ActionEvent e){
+		this.setShowMessagesBar(Boolean.FALSE);
 		this.setDocumentoCreado(Boolean.FALSE);
+		this.facturaCabeceraDTO = new FacturaCabeceraDTO();
+		this.facturaDetalleDTO = new FacturaDetalleDTO();
+		this.cuentasDataManager.setFacturaCabeceraDTOEditar(new FacturaCabeceraDTO());
+		this.facturaDetalleDTOCols = new ArrayList<FacturaDetalleDTO>();
 		this.cuentasDataManager.setTipoFactura(ERPConstantes.CODIGO_CATALOGO_VALOR_DOCUMENTO_VENTAS);
 		SecuenciaDTO secuenciaPedido = ERPFactory.secuencias.getSecuenciaServicio().findObtenerSecuenciaByNombre(FacturaCabeceraID.NOMBRE_SECUENCIA_VENTA);
 		this.facturaCabeceraDTO.setCodigoReferenciaFactura("FAC-"+secuenciaPedido.getValorSecuencia());
-		
-		this.facturaCabeceraDTO = new FacturaCabeceraDTO();
-		this.facturaDetalleDTO = new FacturaDetalleDTO();
-		this.facturaDetalleDTOCols = new ArrayList<FacturaDetalleDTO>();
-		
+		this.facturaCabeceraDTO.setFechaDocumento(new Date());
+		this.facturaCabeceraDTO.setPagado(Boolean.FALSE);
 		FacturaDetalleDTO detalle = null;
 		contDetalle = 1;
 		for(int i=0; i< 10; i++) {
@@ -504,14 +515,26 @@ public class CuentasController extends CommonsController implements Serializable
 	 * @param e
 	 */
 	public void clearNuevaCuentaFacturaCompra(ActionEvent e){
+		this.setShowMessagesBar(Boolean.FALSE);
 		this.setDocumentoCreado(Boolean.FALSE);
+		this.facturaCabeceraDTO = new FacturaCabeceraDTO();
+		this.facturaCabeceraDTO.setFechaDocumento(new Date());
+		this.facturaCabeceraDTO.setPagado(Boolean.FALSE);
+		this.facturaDetalleDTO = new FacturaDetalleDTO();
+		this.cuentasDataManager.setFacturaCabeceraDTOEditar(new FacturaCabeceraDTO());
+		this.facturaDetalleDTOCols = new ArrayList<FacturaDetalleDTO>();
 		this.cuentasDataManager.setTipoFactura(ERPConstantes.CODIGO_CATALOGO_VALOR_DOCUMENTO_COMPRAS);
 		SecuenciaDTO secuenciaPedido =  ERPFactory.secuencias.getSecuenciaServicio().findObtenerSecuenciaByNombre(FacturaCabeceraID.NOMBRE_SECUENCIA_COMPRA);
 		this.facturaCabeceraDTO.setCodigoReferenciaFactura("DOC-"+secuenciaPedido.getValorSecuencia());
-		
-		this.facturaCabeceraDTO = new FacturaCabeceraDTO();
-		this.facturaDetalleDTO = new FacturaDetalleDTO();
-		this.facturaDetalleDTOCols = new ArrayList<FacturaDetalleDTO>();
+		FacturaDetalleDTO detalle = null;
+		contDetalle = 1;
+		for(int i=0; i< 10; i++) {
+			detalle = new FacturaDetalleDTO();
+			detalle.setArticuloDTO(new ArticuloDTO());
+			detalle.getId().setCodigoCompania(contDetalle);
+			this.facturaDetalleDTOCols.add(detalle);
+			contDetalle++;
+		}
 	}
 	
 	/**

@@ -99,8 +99,8 @@
 	            <rich:column>
 	                <f:facet name="header"><h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.label.lista.cabecera.factura.razonSocial']}"/></f:facet>
 	                <rich:panel id="cliente#{it}" styleClass="tooltip-text" bodyClass="rich-laguna-panel-no-header" style="border: none !important">  
-		        		<h:outputText value="#{cuenta.nombreClienteProveedor.length() > 22 ? cuenta.nombreClienteProveedor.substring(0,22).concat('...') : cuenta.nombreClienteProveedor}" /> 
-						<rich:tooltip id="ttc#{it}" showDelay="500" styleClass="tooltip" layout="block" rendered="#{cuenta.nombreClienteProveedor.length() > 22}">                
+		        		<h:outputText value="#{cuenta.nombreClienteProveedor.length() > 18 ? cuenta.nombreClienteProveedor.substring(0,18).concat('...') : cuenta.nombreClienteProveedor}" /> 
+						<rich:tooltip id="ttc#{it}" showDelay="500" styleClass="tooltip" layout="block" rendered="#{cuenta.nombreClienteProveedor.length() > 18}">                
 							<h:panelGrid>
 								<span style="white-space: nowrap">												
 									<h:outputText value="#{cuenta.nombreClienteProveedor}" />												
@@ -112,8 +112,8 @@
 	            <rich:column>
 	                <f:facet name="header"><h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.label.lista.cabecera.factura.direccion']}"/></f:facet>
 	                <rich:panel id="direccion#{it}" styleClass="tooltip-text" bodyClass="rich-laguna-panel-no-header" style="border: none !important">  
-		        		<h:outputText value="#{cuenta.direccion.length() > 35 ? cuenta.direccion.substring(0,35).concat('...') : cuenta.direccion}" /> 
-						<rich:tooltip id="ttd#{it}" showDelay="500" styleClass="tooltip" layout="block" rendered="#{cuenta.direccion.length() > 35}">                
+		        		<h:outputText value="#{cuenta.direccion.length() > 30 ? cuenta.direccion.substring(0,30).concat('...') : cuenta.direccion}" /> 
+						<rich:tooltip id="ttd#{it}" showDelay="500" styleClass="tooltip" layout="block" rendered="#{cuenta.direccion.length() > 30}">                
 							<h:panelGrid>
 								<span style="white-space: nowrap">												
 									<h:outputText value="#{cuenta.direccion}" />												

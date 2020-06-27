@@ -93,6 +93,7 @@ public class DespachoController extends CommonsController implements Serializabl
 	private Boolean controlPopUp;
 	private Boolean despachoCreado;
 	private Boolean sePuedeEliminar;
+	private Collection<ArticuloDTO> articuloDTOCols;
 
 	@PostConstruct
 	public void postConstruct() {
@@ -120,7 +121,7 @@ public class DespachoController extends CommonsController implements Serializabl
 		this.orden = 1;
 		this.despachoCreado = Boolean.FALSE;
 		this.sePuedeEliminar = Boolean.FALSE;
-		
+		this.articuloDTOCols = ERPFactory.articulos.getArticuloServicio().findObtenerListaArticulos(1, null, null);
 		GuiaDespachoExtrasDTO guiaDespachoExtrasDTOTemp = null;
 		for(int i = 0; i < 5 ; i++){
 			guiaDespachoExtrasDTOTemp = new GuiaDespachoExtrasDTO();
@@ -252,7 +253,7 @@ public class DespachoController extends CommonsController implements Serializabl
 	 */
 	public List<String> completeNombreArticuloExtra(String query) {
         String queryLowerCase = query.toLowerCase();
-        List<ArticuloDTO> allThemes = service.getArticuloDTOCols().stream()
+        List<ArticuloDTO> allThemes = this.getArticuloDTOCols().stream()
         		.filter(t -> t.getNombreArticulo().toLowerCase().contains(queryLowerCase))
         		.collect(Collectors.toList());
         List<String> results = new ArrayList<>();
@@ -261,11 +262,10 @@ public class DespachoController extends CommonsController implements Serializabl
     }
 	
 	public void onItemSelectExtra(SelectEvent event) {
-        System.out.println(event.getObject());
         for(GuiaDespachoExtrasDTO detallePedidoDTOTemp : this.guiaDespachoExtrasDTOCols) {
         	if(detallePedidoDTOTemp.getDescripcionProducto() != null) {
         		String queryLowerCase = detallePedidoDTOTemp.getDescripcionProducto().toLowerCase();
-        		ArticuloDTO articuloSeleccionado = service.getArticuloDTOCols().stream()
+        		ArticuloDTO articuloSeleccionado = this.getArticuloDTOCols().stream()
                 		.filter(articulo -> articulo.getNombreArticulo().toLowerCase().equals(queryLowerCase))
                 		.findFirst().orElse(null);
         		detallePedidoDTOTemp.setCodigoArticulo(articuloSeleccionado.getId().getCodigoArticulo());
@@ -816,5 +816,13 @@ public class DespachoController extends CommonsController implements Serializabl
 
 	public void setService(ArticuloService service) {
 		this.service = service;
+	}
+	
+	public Collection<ArticuloDTO> getArticuloDTOCols() {
+		return articuloDTOCols;
+	}
+
+	public void setArticuloDTOCols(Collection<ArticuloDTO> articuloDTOCols) {
+		this.articuloDTOCols = articuloDTOCols;
 	}
 }

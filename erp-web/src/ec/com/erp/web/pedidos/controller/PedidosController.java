@@ -74,7 +74,7 @@ public class PedidosController extends CommonsController implements Serializable
 	
 	// Variables
 	private Collection<PedidoDTO> pedidosDTOCols;
-//	private List<ArticuloDTO> articuloDTOCols;
+	private Collection<ArticuloDTO> articuloDTOCols;
 	private ArticuloDTO articuloDTO;
 	private String numeroDocumentoBusqueda;
 	private String nombreClienteBusqueda;
@@ -107,7 +107,7 @@ public class PedidosController extends CommonsController implements Serializable
 		Calendar fechaSuperior = Calendar.getInstance();
 		fechaPedidoInicioBusqueda = fechaInferior.getTime();
 		fechaPedidoFinBusqueda = fechaSuperior.getTime();
-		
+		this.articuloDTOCols = ERPFactory.articulos.getArticuloServicio().findObtenerListaArticulos(1, null, null);
 		this.loginController.activarMenusSeleccionado();
 		this.pedidoGuardado = Boolean.FALSE;
 		this.pedidoDTO = new PedidoDTO();
@@ -195,7 +195,7 @@ public class PedidosController extends CommonsController implements Serializable
         for(DetallePedidoDTO detallePedidoDTOTemp : detallePedidoDTOCols) {
         	if(detallePedidoDTOTemp.getNombreArticulo() != null) {
         		String queryLowerCase = detallePedidoDTOTemp.getNombreArticulo().toLowerCase();
-        		ArticuloDTO articuloSeleccionado = service.getArticuloDTOCols().stream()
+        		ArticuloDTO articuloSeleccionado = this.getArticuloDTOCols().stream()
                 		.filter(articulo -> articulo.getNombreArticulo().toLowerCase().equals(queryLowerCase))
                 		.findFirst().orElse(null);
         		detallePedidoDTOTemp.setArticuloDTO(articuloSeleccionado);
@@ -275,7 +275,7 @@ public class PedidosController extends CommonsController implements Serializable
 	
 	public List<String> completeNombreArticulo(String query) {
         String queryLowerCase = query.toLowerCase();
-        List<ArticuloDTO> allThemes = service.getArticuloDTOCols().stream()
+        List<ArticuloDTO> allThemes = this.getArticuloDTOCols().stream()
         		.filter(t -> t.getNombreArticulo().toLowerCase().contains(queryLowerCase))
         		.collect(Collectors.toList());
         List<String> results = new ArrayList<>();
@@ -804,13 +804,13 @@ public class PedidosController extends CommonsController implements Serializable
 		this.detallePedidoDTOCols = detallePedidoDTOCols;
 	}
 
-//	public List<ArticuloDTO> getArticuloDTOCols() {
-//		return articuloDTOCols;
-//	}
-//
-//	public void setArticuloDTOCols(List<ArticuloDTO> articuloDTOCols) {
-//		this.articuloDTOCols = articuloDTOCols;
-//	}
+	public Collection<ArticuloDTO> getArticuloDTOCols() {
+		return articuloDTOCols;
+	}
+
+	public void setArticuloDTOCols(List<ArticuloDTO> articuloDTOCols) {
+		this.articuloDTOCols = articuloDTOCols;
+	}
 
 	public ArticuloDTO getArticuloDTO() {
 		return articuloDTO;
