@@ -38,4 +38,13 @@ public class UtilitarioWeb {
 		fecha.set(Calendar.SECOND, 0);
 		fecha.set(Calendar.MILLISECOND, 0);
 	}
+	
+	public static String numeroFactura(String numeroSecuencia) {
+		String cadena = "000000000";
+		int totalCadena = cadena.length();
+		int numeroCaracteres = numeroSecuencia.length();
+		int carRemplazar = totalCadena - numeroCaracteres;
+		String res = cadena.substring(0, carRemplazar);
+		return res+""+numeroSecuencia;
+	}
 }

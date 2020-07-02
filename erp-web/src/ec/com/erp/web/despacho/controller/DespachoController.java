@@ -550,6 +550,7 @@ public class DespachoController extends CommonsController implements Serializabl
 		this.setDespachoCreado(Boolean.FALSE);
 		this.setShowMessagesBar(Boolean.FALSE);
 		this.guiaDespachoDTO = new GuiaDespachoDTO();
+		this.guiaDespachoDTO.setFechaDespacho(new Date());
 		SecuenciaDTO secuenciaDespacho = ERPFactory.secuencias.getSecuenciaServicio().findObtenerSecuenciaByNombre(GuiaDespachoID.NOMBRE_SECUENCIA);
 		this.guiaDespachoDTO.setNumeroGuiaDespacho("GD-"+secuenciaDespacho.getValorSecuencia());
 		this.guiaDespachoExtrasDTOCols = new ArrayList<GuiaDespachoExtrasDTO>();

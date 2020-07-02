@@ -231,6 +231,10 @@ public class ArticulosController extends CommonsController implements Serializab
 	 * @param e
 	 */
 	public void clearNuevoArticulo(ActionEvent e){
+		this.articuloImpuestoDTOCols = new ArrayList<ArticuloImpuestoDTO>();
+		this.impuestoDTOCols = new ArrayList<ImpuestoDTO>();
+		this.articuloImpuestoDTO = new ArticuloImpuestoDTO();
+		this.impuestoDTO = new ImpuestoDTO();
 		this.setArticuloCreado(Boolean.FALSE);
 		this.setShowMessagesBar(Boolean.FALSE);
 		this.articuloDTO = new ArticuloDTO();

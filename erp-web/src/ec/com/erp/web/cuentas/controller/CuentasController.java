@@ -113,6 +113,7 @@ public class CuentasController extends CommonsController implements Serializable
 	private Integer contDetalle;
 	private String codigoBarras;
 	private Boolean documentoCreado;
+	private Boolean crearNuevaFila;
 
 	@PostConstruct
 	public void postConstruct() {
@@ -120,7 +121,7 @@ public class CuentasController extends CommonsController implements Serializable
 		this.documentoCreado = Boolean.FALSE;
 		this.facturaCabeceraDTO = new FacturaCabeceraDTO();
 		this.facturaCabeceraDTO.setFechaDocumento(new Date());
-		this.facturaCabeceraDTO.setPagado(Boolean.FALSE);
+		this.facturaCabeceraDTO.setPagado(Boolean.TRUE);
 		this.facturaDetalleDTO = new FacturaDetalleDTO();
 		this.facturaCabeceraDTOCols = new ArrayList<FacturaCabeceraDTO>();
 		this.facturaDetalleDTOCols = new ArrayList<FacturaDetalleDTO>();
@@ -130,6 +131,8 @@ public class CuentasController extends CommonsController implements Serializable
 		if(this.cuentasDataManager.getTipoFactura() != null && this.cuentasDataManager.getTipoFactura().equals(ERPConstantes.CODIGO_CATALOGO_VALOR_DOCUMENTO_VENTAS)) {
 			secuenciaPedido = ERPFactory.secuencias.getSecuenciaServicio().findObtenerSecuenciaByNombre(FacturaCabeceraID.NOMBRE_SECUENCIA_VENTA);
 			this.facturaCabeceraDTO.setCodigoReferenciaFactura("FAC-"+secuenciaPedido.getValorSecuencia());
+			SecuenciaDTO secuenciaFactura = ERPFactory.secuencias.getSecuenciaServicio().findObtenerSecuenciaByNombre(FacturaCabeceraID.NOMBRE_SECUENCIA_COMPROVANTE_VENTA);
+			this.facturaCabeceraDTO.setNumeroDocumento("001-001-"+UtilitarioWeb.numeroFactura(""+secuenciaFactura.getValorSecuencia()));
 		}
 		if(this.cuentasDataManager.getTipoFactura() != null && this.cuentasDataManager.getTipoFactura().equals(ERPConstantes.CODIGO_CATALOGO_VALOR_DOCUMENTO_COMPRAS)) {
 			secuenciaPedido = ERPFactory.secuencias.getSecuenciaServicio().findObtenerSecuenciaByNombre(FacturaCabeceraID.NOMBRE_SECUENCIA_COMPRA);
@@ -220,6 +223,7 @@ public class CuentasController extends CommonsController implements Serializable
 	
 	public void onItemSelect(SelectEvent event) {
         System.out.println(event.getObject());
+        this.crearNuevaFila = Boolean.TRUE;
         for(FacturaDetalleDTO facturaDetalleDTOTemp : facturaDetalleDTOCols) {
         	if(facturaDetalleDTOTemp.getDescripcion() != null) {
         		String queryLowerCase = facturaDetalleDTOTemp.getDescripcion().toLowerCase();
@@ -241,6 +245,20 @@ public class CuentasController extends CommonsController implements Serializable
 			}
 		}
 		this.calcularTotalFactura();
+		// Validar filas llenas
+		facturaDetalleDTOCols.forEach(detail ->{
+			if(detail.getCodigoArticulo() == null) {
+				this.crearNuevaFila = Boolean.FALSE;
+			}
+		});
+		
+		if(this.crearNuevaFila) {
+			FacturaDetalleDTO detalle = new FacturaDetalleDTO();
+			detalle.setArticuloDTO(new ArticuloDTO());
+			detalle.getId().setCodigoCompania(contDetalle);
+			this.facturaDetalleDTOCols.add(detalle);
+			contDetalle++;
+		}
     }
 	
 	/**
@@ -543,6 +561,20 @@ public class CuentasController extends CommonsController implements Serializable
 	 */
 	public void eliminarDetalleFactura(FacturaDetalleDTO facturaDetalleDTO) {
 		facturaDetalleDTOCols.remove(facturaDetalleDTO);
+		contDetalle = 1;
+		facturaDetalleDTOCols.stream().forEach(detail ->{
+			detail.getId().setCodigoCompania(contDetalle);
+			contDetalle++;
+		});
+		
+		FacturaDetalleDTO detalle = null;
+		while(contDetalle < 11) {
+			detalle = new FacturaDetalleDTO();
+			detalle.setArticuloDTO(new ArticuloDTO());
+			detalle.getId().setCodigoCompania(contDetalle);
+			this.facturaDetalleDTOCols.add(detalle);
+			contDetalle++;
+		}
 		this.calcularTotalFactura();
 	}
 	
@@ -596,6 +628,7 @@ public class CuentasController extends CommonsController implements Serializable
 		String idComponete = e.getComponent().getClientId();
 		String[] idCompuesto =  idComponete.split(":");
 		Integer numeroDetalle = Integer.parseInt(idCompuesto[2])+1;
+		this.crearNuevaFila = Boolean.TRUE;
 
 		for(FacturaDetalleDTO facturaDetalleDTO : facturaDetalleDTOCols) {
 			if(facturaDetalleDTO.getId().getCodigoCompania().intValue() == numeroDetalle.intValue()) {
@@ -621,6 +654,20 @@ public class CuentasController extends CommonsController implements Serializable
 				}
 				break;
 			}
+		}
+		// Validar filas llenas
+		facturaDetalleDTOCols.forEach(detail ->{
+			if(detail.getCodigoArticulo() == null) {
+				this.crearNuevaFila = Boolean.FALSE;
+			}
+		});
+		
+		if(this.crearNuevaFila) {
+			FacturaDetalleDTO detalle = new FacturaDetalleDTO();
+			detalle.setArticuloDTO(new ArticuloDTO());
+			detalle.getId().setCodigoCompania(contDetalle);
+			this.facturaDetalleDTOCols.add(detalle);
+			contDetalle++;
 		}
 	}
 	
@@ -1322,5 +1369,13 @@ public class CuentasController extends CommonsController implements Serializable
 
 	public void setProveedorDTOCols(Collection<ProveedorDTO> proveedorDTOCols) {
 		this.proveedorDTOCols = proveedorDTOCols;
+	}
+
+	public Boolean getCrearNuevaFila() {
+		return crearNuevaFila;
+	}
+
+	public void setCrearNuevaFila(Boolean crearNuevaFila) {
+		this.crearNuevaFila = crearNuevaFila;
 	}
 }

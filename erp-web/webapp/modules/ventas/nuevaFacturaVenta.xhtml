@@ -125,8 +125,14 @@
 				            </rich:column>
 				            <rich:column style="width:10%">
 				                <f:facet name="header"><h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.label.nuevo.pedidos.articulo.precio.unitario']}"/></f:facet>
-				                <h:inputText style="width:95%; text-align: right; padding-right: 5px" value="#{detalle.valorUnidad}" disabled="true">
+				                <!-- h:inputText style="width:95%; text-align: right; padding-right: 5px" value="#{detalle.valorUnidad}" disabled="true">
 				                	<f:convertNumber pattern="0.00"/>
+				                </h:inputText-->
+				                <h:inputText style="width:95%; text-align: right; padding-right: 5px" id="precioUnitario" value="#{detalle.valorUnidad}" onkeypress="return validarEnteros(event);">
+				                	<f:convertNumber pattern="0.00"/>
+				                	<a4j:ajax event="keyup" status="no" listener="#{cuentasController.calcularTotalFacturaKeyUp}" oncomplete="fijarFocoPrecioUnitario(this.id);"
+				                			  execute="@this" render="pnlGridDetalleFactura" >
+				                	</a4j:ajax>
 				                </h:inputText>
 				            </rich:column>
 				            <rich:column style="text-align: right; paddin-right: 10px; width:10%">
@@ -417,6 +423,18 @@
 					var nombreComp = idImput.split(':');
 					var numeroFilaActual = Number(nombreComp[2]);
 					var obj = document.getElementById('frmNuevaVenta:tableDetallePedido:'+numeroFilaActual+':cantidadPedida');
+					var valor = new String(obj.value);
+					obj.focus();
+					if(obj.value!=""){
+						obj.value = "";
+						obj.value = valor;
+					}
+				}
+				
+				function fijarFocoPrecioUnitario(idImput){
+					var nombreComp = idImput.split(':');
+					var numeroFilaActual = Number(nombreComp[2]);
+					var obj = document.getElementById('frmNuevaVenta:tableDetallePedido:'+numeroFilaActual+':precioUnitario');
 					var valor = new String(obj.value);
 					obj.focus();
 					if(obj.value!=""){
