@@ -215,6 +215,10 @@ public class ArticulosController extends CommonsController implements Serializab
 			MensajesController.addError(null, ERPWebResources.getString("ec.com.erp.etiqueta.articulos.mensaje.campo.requerido.peso.articulo"));
 			validado = Boolean.FALSE;
 		}
+		if(articuloDTO.getCosto() ==  null){
+			MensajesController.addError(null, ERPWebResources.getString("ec.com.erp.etiqueta.articulos.mensaje.campo.requerido.costo.articulo"));
+			validado = Boolean.FALSE;
+		}
 		if(articuloDTO.getPrecio() ==  null){
 			MensajesController.addError(null, ERPWebResources.getString("ec.com.erp.etiqueta.articulos.mensaje.campo.requerido.precio.articulo"));
 			validado = Boolean.FALSE;
@@ -231,6 +235,7 @@ public class ArticulosController extends CommonsController implements Serializab
 	 * @param e
 	 */
 	public void clearNuevoArticulo(ActionEvent e){
+		this.codigoImpuestoSeleccionado = null;
 		this.articuloImpuestoDTOCols = new ArrayList<ArticuloImpuestoDTO>();
 		this.impuestoDTOCols = new ArrayList<ImpuestoDTO>();
 		this.articuloImpuestoDTO = new ArticuloImpuestoDTO();

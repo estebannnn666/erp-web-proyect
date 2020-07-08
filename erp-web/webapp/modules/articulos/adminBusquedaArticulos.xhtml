@@ -63,7 +63,7 @@
 				<rich:dataScroller page="#{articulosController.page}" fastStep="3" for="tableArticle" maxPages="5" rendered="#{not empty articulosController.articuloDTOCols}" renderIfSinglePage="false"/>
 			</rich:panel>	
 				
-			 <rich:dataTable style="width:100%" rendered="#{not empty articulosController.articuloDTOCols}" value="#{articulosController.articuloDTOCols}" var="art" iterationStatusVar="it" id="tableArticle" rows="14">
+			 <rich:dataTable style="width:100%" rendered="#{not empty articulosController.articuloDTOCols}" value="#{articulosController.articuloDTOCols}" var="art" iterationStatusVar="it" id="tableArticle" rows="15">
 	            <rich:column>
 	                <f:facet name="header">Nro.</f:facet>
 	                #{it.index+1}
@@ -79,6 +79,12 @@
 	            <rich:column style="text-align: right; padding-right: 5px">
 	                <f:facet name="header">Peso</f:facet>
 	                <h:outputText value="#{art.peso}" >
+	                	<f:convertNumber pattern="0.00"/>
+	                </h:outputText>
+	            </rich:column>
+	            <rich:column style="text-align: right; padding-right: 5px">
+	                <f:facet name="header">Costo</f:facet>
+	                <h:outputText value="#{art.costo}">
 	                	<f:convertNumber pattern="0.00"/>
 	                </h:outputText>
 	            </rich:column>

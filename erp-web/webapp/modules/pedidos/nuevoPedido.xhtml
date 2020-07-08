@@ -102,9 +102,8 @@
 				            </rich:column>			            
 				            <rich:column styleClass="autoStyle">
 				                <f:facet name="header"><h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.header.tabla.descripcion.articulo']}"/></f:facet>
-				                <p:autoComplete id="themeCustom" value="#{detalle.nombreArticulo}" completeMethod="#{pedidosController.completeNombreArticulo}">
+        						<p:autoComplete id="themeCustom" value="#{detalle.nombreArticulo}" completeMethod="#{pedidosController.completeNombreArticulo}">
             						<p:ajax event="itemSelect"  listener="#{pedidosController.onItemSelect}" update=":frmNuevoPedido:pnlGridDetallePedido"/>
-            						<a4j:ajax event="change" execute="@this" render="pnlGridDetallePedido" oncomplete="fijarFocoSiguienteDetalle(this.id);"></a4j:ajax>
         						</p:autoComplete>
 				            </rich:column>
 				            <rich:column>

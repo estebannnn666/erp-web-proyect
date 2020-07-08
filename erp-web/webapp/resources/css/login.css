@@ -359,7 +359,8 @@ body {
 }
 
 #contenedorPrincipalNuevo{
-	overflow: hidden;
+	overflow-x: hidden;
+	overflow-y: auto;
     width: 99.4%;
     padding-top: 2px;
     padding-left: 2px;
@@ -378,7 +379,8 @@ body {
 
 #contentRigth{
 	float: right;
-	width: 81.5%
+	width: 81.5%;
+	overflow-y: auto;
 }
 
 #contenedorMenuPrincipal{

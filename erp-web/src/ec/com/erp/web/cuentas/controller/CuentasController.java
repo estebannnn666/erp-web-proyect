@@ -54,6 +54,7 @@ import ec.com.erp.cliente.mdl.dto.CatalogoValorDTO;
 import ec.com.erp.cliente.mdl.dto.ClienteDTO;
 import ec.com.erp.cliente.mdl.dto.FacturaCabeceraDTO;
 import ec.com.erp.cliente.mdl.dto.FacturaDetalleDTO;
+import ec.com.erp.cliente.mdl.dto.PagosFacturaDTO;
 import ec.com.erp.cliente.mdl.dto.ProveedorDTO;
 import ec.com.erp.cliente.mdl.dto.SecuenciaDTO;
 import ec.com.erp.cliente.mdl.dto.id.FacturaCabeceraID;
@@ -82,11 +83,14 @@ public class CuentasController extends CommonsController implements Serializable
 	// Variables
 	private FacturaCabeceraDTO facturaCabeceraDTO;
 	private FacturaDetalleDTO facturaDetalleDTO;
+	private PagosFacturaDTO pagosFacturaDTO;
 	private Collection<FacturaDetalleDTO> facturaDetalleDTOCols;
 	private Collection<FacturaCabeceraDTO> facturaCabeceraDTOCols;
 	private Collection<ClienteDTO> clienteDTOCols;
 	private Collection<ProveedorDTO> proveedorDTOCols;
 	private Collection<ArticuloDTO> articuloDTOCols;
+	private Collection<PagosFacturaDTO> pagosFacturaDTOCols;
+	private BigDecimal totalPagado;
 	
 	// Data Managers
 	@ManagedProperty(value="#{cuentasDataManager}")
@@ -117,9 +121,11 @@ public class CuentasController extends CommonsController implements Serializable
 
 	@PostConstruct
 	public void postConstruct() {
+		this.totalPagado = BigDecimal.ZERO;
 		this.loginController.activarMenusSeleccionado();
 		this.documentoCreado = Boolean.FALSE;
 		this.facturaCabeceraDTO = new FacturaCabeceraDTO();
+		this.pagosFacturaDTO = new PagosFacturaDTO(); 
 		this.facturaCabeceraDTO.setFechaDocumento(new Date());
 		this.facturaCabeceraDTO.setPagado(Boolean.TRUE);
 		this.facturaDetalleDTO = new FacturaDetalleDTO();
@@ -127,6 +133,8 @@ public class CuentasController extends CommonsController implements Serializable
 		this.facturaDetalleDTOCols = new ArrayList<FacturaDetalleDTO>();
 		this.clienteDTOCols =  new ArrayList<ClienteDTO>();
 		this.proveedorDTOCols = new ArrayList<>();
+		this.pagosFacturaDTOCols = new ArrayList<>();
+		
 		SecuenciaDTO secuenciaPedido = new SecuenciaDTO();
 		if(this.cuentasDataManager.getTipoFactura() != null && this.cuentasDataManager.getTipoFactura().equals(ERPConstantes.CODIGO_CATALOGO_VALOR_DOCUMENTO_VENTAS)) {
 			secuenciaPedido = ERPFactory.secuencias.getSecuenciaServicio().findObtenerSecuenciaByNombre(FacturaCabeceraID.NOMBRE_SECUENCIA_VENTA);
@@ -260,6 +268,113 @@ public class CuentasController extends CommonsController implements Serializable
 			contDetalle++;
 		}
     }
+	
+	public void onItemSelectCompra(SelectEvent event) {
+        System.out.println(event.getObject());
+        this.crearNuevaFila = Boolean.TRUE;
+        for(FacturaDetalleDTO facturaDetalleDTOTemp : facturaDetalleDTOCols) {
+        	if(facturaDetalleDTOTemp.getDescripcion() != null) {
+        		String queryLowerCase = facturaDetalleDTOTemp.getDescripcion().toLowerCase();
+        		ArticuloDTO articuloSeleccionado = this.articuloDTOCols.stream()
+                		.filter(articulo -> articulo.getNombreArticulo().toLowerCase().equals(queryLowerCase))
+                		.findFirst().orElse(null);
+        		facturaDetalleDTOTemp.setArticuloDTO(articuloSeleccionado);
+        	}
+        	
+			if((facturaDetalleDTOTemp.getCantidad() == null ||  facturaDetalleDTOTemp.getCantidad().intValue() == 0) && facturaDetalleDTOTemp.getArticuloDTO().getCosto() != null){
+				facturaDetalleDTOTemp.setCantidad(1);
+			}
+			if(facturaDetalleDTOTemp.getCantidad() != null && facturaDetalleDTOTemp.getArticuloDTO().getCosto() != null) {
+				BigDecimal subTotal = BigDecimal.valueOf(Double.valueOf(""+facturaDetalleDTOTemp.getCantidad())).multiply(facturaDetalleDTOTemp.getArticuloDTO().getCosto());
+				facturaDetalleDTOTemp.setSubTotal(subTotal);
+				facturaDetalleDTOTemp.setCodigoArticulo(facturaDetalleDTOTemp.getArticuloDTO().getId().getCodigoArticulo());
+				facturaDetalleDTOTemp.setValorUnidad(facturaDetalleDTOTemp.getArticuloDTO().getCosto());
+				facturaDetalleDTOTemp.setCodigoBarras(facturaDetalleDTOTemp.getArticuloDTO().getCodigoBarras());
+			}
+		}
+		this.calcularTotalFactura();
+		// Validar filas llenas
+		facturaDetalleDTOCols.forEach(detail ->{
+			if(detail.getCodigoArticulo() == null) {
+				this.crearNuevaFila = Boolean.FALSE;
+			}
+		});
+		
+		if(this.crearNuevaFila) {
+			FacturaDetalleDTO detalle = new FacturaDetalleDTO();
+			detalle.setArticuloDTO(new ArticuloDTO());
+			detalle.getId().setCodigoCompania(contDetalle);
+			this.facturaDetalleDTOCols.add(detalle);
+			contDetalle++;
+		}
+    }
+
+	public void guardarPagoCompra(ActionEvent e){
+		try {
+			if(this.validarInformacionRequeridaPago()) {
+				this.pagosFacturaDTO.setCodigoFactura(this.facturaCabeceraDTO.getId().getCodigoFactura());
+				this.pagosFacturaDTO.getId().setCodigoCompania(Integer.parseInt(ERPConstantes.ESTADO_ACTIVO_NUMERICO));
+				this.pagosFacturaDTO.setUsuarioRegistro(loginController.getUsuariosDTO().getId().getUserId());
+				ERPFactory.transaccion.getTransaccionServicio().transGuardarPago(ERPConstantes.CODIGO_CATALOGO_VALOR_TRANSACCION_GASTO, this.pagosFacturaDTO);
+				this.pagosFacturaDTOCols.add(this.pagosFacturaDTO);
+				this.setShowMessagesBar(Boolean.TRUE);
+				this.totalPagado = this.totalPagado.add(this.pagosFacturaDTO.getValorPago());
+		        MensajesController.addInfo(null, ERPWebResources.getString("ec.com.erp.etiqueta.label.lista.cabecera.factura.mensaje.guardado"));
+			}else{
+				this.setShowMessagesBar(Boolean.TRUE);
+			}
+		} catch (ERPException e1) {
+			this.pagosFacturaDTO.getId().setCodigoPago(null);
+			this.setShowMessagesBar(Boolean.TRUE);
+			MensajesController.addError(null, e1.getMessage());
+		} catch (Exception e2) {
+			this.pagosFacturaDTO.getId().setCodigoPago(null);
+			this.setShowMessagesBar(Boolean.TRUE);
+			MensajesController.addError(null, e2.getMessage());
+		}
+	}
+	
+	public void guardarPagoVenta(ActionEvent e){
+		try {
+			if(this.validarInformacionRequeridaPago()) {
+				this.pagosFacturaDTO.setCodigoFactura(this.facturaCabeceraDTO.getId().getCodigoFactura());
+				this.pagosFacturaDTO.getId().setCodigoCompania(Integer.parseInt(ERPConstantes.ESTADO_ACTIVO_NUMERICO));
+				this.pagosFacturaDTO.setUsuarioRegistro(loginController.getUsuariosDTO().getId().getUserId());
+				ERPFactory.transaccion.getTransaccionServicio().transGuardarPago(ERPConstantes.CODIGO_CATALOGO_VALOR_TRANSACCION_INGRESO, this.pagosFacturaDTO);
+				this.pagosFacturaDTOCols.add(this.pagosFacturaDTO);
+				this.setShowMessagesBar(Boolean.TRUE);
+				this.totalPagado = this.totalPagado.add(this.pagosFacturaDTO.getValorPago());
+		        MensajesController.addInfo(null, ERPWebResources.getString("ec.com.erp.etiqueta.label.lista.cabecera.factura.mensaje.guardado"));
+			}else{
+				this.setShowMessagesBar(Boolean.TRUE);
+			}
+		} catch (ERPException e1) {
+			this.pagosFacturaDTO.getId().setCodigoPago(null);
+			this.setShowMessagesBar(Boolean.TRUE);
+			MensajesController.addError(null, e1.getMessage());
+		} catch (Exception e2) {
+			this.pagosFacturaDTO.getId().setCodigoPago(null);
+			this.setShowMessagesBar(Boolean.TRUE);
+			MensajesController.addError(null, e2.getMessage());
+		}
+	}
+	
+	/**
+	 * Metodo para validar la informacion requerida de la pantalla
+	 */
+	private Boolean validarInformacionRequeridaPago() {
+		Boolean valido = Boolean.TRUE;
+		if(this.pagosFacturaDTO.getValorPago() == null) {
+			valido = Boolean.FALSE;
+			MensajesController.addError(null, ERPWebResources.getString("ec.com.erp.etiqueta.mensaje.campo.requerido.pago.valorpago"));
+		}
+		if(StringUtils.isEmpty(this.pagosFacturaDTO.getDescripcion())) {
+			valido = Boolean.FALSE;
+			MensajesController.addError(null, ERPWebResources.getString("ec.com.erp.etiqueta.mensaje.campo.requerido.pago.descripcion"));
+		}
+		return valido;
+	}
+	
 	
 	/**
 	 * Metodo para buscar facturas en venta
@@ -500,6 +615,30 @@ public class CuentasController extends CommonsController implements Serializable
         MensajesController.addInfo(null, ERPWebResources.getString("ec.com.erp.etiqueta.pantall.despacho.mensaje.impresion.correcta"));
 	}
 	
+	/**
+	 * Metodo para cargar datos detalle factura
+	 * @return
+	 */
+	public void simularEvento(ActionEvent e) {
+	}
+	
+	/**
+	 * Metodo para cargar datos detalle factura
+	 * @return
+	 */
+	public void cargarDatosPago(ActionEvent e) {
+		System.out.println("Cargar datos");
+		this.totalPagado = BigDecimal.ZERO;
+		this.pagosFacturaDTO = new PagosFacturaDTO();
+		this.pagosFacturaDTO.setFechaPago(new Date());
+		this.pagosFacturaDTOCols = ERPFactory.transaccion.getTransaccionServicio().findObtenerListaPagosFactura(1, facturaCabeceraDTO.getId().getCodigoFactura());
+		if(CollectionUtils.isNotEmpty(this.pagosFacturaDTOCols)) {
+			this.pagosFacturaDTOCols.stream().forEach(pago ->{
+				this.totalPagado = this.totalPagado.add(pago.getValorPago());
+			});
+		}
+	}
+	
 	
 	/**
 	 * Metodo borrar pantalla y crear una nueva factura en venta
@@ -640,6 +779,54 @@ public class CuentasController extends CommonsController implements Serializable
 				}else{
 					facturaDetalleDTO.setArticuloDTO(articuloCols.iterator().next());
 					facturaDetalleDTO.setValorUnidad(facturaDetalleDTO.getArticuloDTO().getPrecio());
+					facturaDetalleDTO.setDescripcion(facturaDetalleDTO.getArticuloDTO().getNombreArticulo());
+					facturaDetalleDTO.setCodigoArticulo(facturaDetalleDTO.getArticuloDTO().getId().getCodigoArticulo());
+					if(facturaDetalleDTO.getCantidad() == null || facturaDetalleDTO.getCantidad().intValue() == 0){
+						facturaDetalleDTO.setCantidad(1);
+					}
+				}
+				
+				if(facturaDetalleDTO.getCantidad() != null && facturaDetalleDTO.getValorUnidad() != null) {
+					BigDecimal subTotal = BigDecimal.valueOf(Double.valueOf(""+facturaDetalleDTO.getCantidad())).multiply(facturaDetalleDTO.getValorUnidad());
+					facturaDetalleDTO.setSubTotal(subTotal);
+					this.calcularTotalFactura();
+				}
+				break;
+			}
+		}
+		// Validar filas llenas
+		facturaDetalleDTOCols.forEach(detail ->{
+			if(detail.getCodigoArticulo() == null) {
+				this.crearNuevaFila = Boolean.FALSE;
+			}
+		});
+		
+		if(this.crearNuevaFila) {
+			FacturaDetalleDTO detalle = new FacturaDetalleDTO();
+			detalle.setArticuloDTO(new ArticuloDTO());
+			detalle.getId().setCodigoCompania(contDetalle);
+			this.facturaDetalleDTOCols.add(detalle);
+			contDetalle++;
+		}
+	}
+	
+public void obtenerCodigoBarrasCompraEnter(AjaxBehaviorEvent e) {
+		
+		String idComponete = e.getComponent().getClientId();
+		String[] idCompuesto =  idComponete.split(":");
+		Integer numeroDetalle = Integer.parseInt(idCompuesto[2])+1;
+		this.crearNuevaFila = Boolean.TRUE;
+
+		for(FacturaDetalleDTO facturaDetalleDTO : facturaDetalleDTOCols) {
+			if(facturaDetalleDTO.getId().getCodigoCompania().intValue() == numeroDetalle.intValue()) {
+				
+				Collection<ArticuloDTO> articuloCols = ERPFactory.articulos.getArticuloServicio().findObtenerListaArticulos(1, facturaDetalleDTO.getCodigoBarras(), null);
+				if(articuloCols.isEmpty()){
+					this.setShowMessagesBar(Boolean.TRUE);
+			        MensajesController.addInfo(null, "No existe articulo con el codigo de barras ingresado.");
+				}else{
+					facturaDetalleDTO.setArticuloDTO(articuloCols.iterator().next());
+					facturaDetalleDTO.setValorUnidad(facturaDetalleDTO.getArticuloDTO().getCosto());
 					facturaDetalleDTO.setDescripcion(facturaDetalleDTO.getArticuloDTO().getNombreArticulo());
 					facturaDetalleDTO.setCodigoArticulo(facturaDetalleDTO.getArticuloDTO().getId().getCodigoArticulo());
 					if(facturaDetalleDTO.getCantidad() == null || facturaDetalleDTO.getCantidad().intValue() == 0){
@@ -1377,5 +1564,29 @@ public class CuentasController extends CommonsController implements Serializable
 
 	public void setCrearNuevaFila(Boolean crearNuevaFila) {
 		this.crearNuevaFila = crearNuevaFila;
+	}
+
+	public PagosFacturaDTO getPagosFacturaDTO() {
+		return pagosFacturaDTO;
+	}
+
+	public void setPagosFacturaDTO(PagosFacturaDTO pagosFacturaDTO) {
+		this.pagosFacturaDTO = pagosFacturaDTO;
+	}
+
+	public Collection<PagosFacturaDTO> getPagosFacturaDTOCols() {
+		return pagosFacturaDTOCols;
+	}
+
+	public void setPagosFacturaDTOCols(Collection<PagosFacturaDTO> pagosFacturaDTOCols) {
+		this.pagosFacturaDTOCols = pagosFacturaDTOCols;
+	}
+
+	public BigDecimal getTotalPagado() {
+		return totalPagado;
+	}
+
+	public void setTotalPagado(BigDecimal totalPagado) {
+		this.totalPagado = totalPagado;
 	}
 }

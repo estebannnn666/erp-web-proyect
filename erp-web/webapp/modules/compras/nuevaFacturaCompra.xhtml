@@ -113,7 +113,7 @@
 				            <rich:column style="width:10%"> 
 				                <f:facet name="header"><h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.header.tabla.codigo.barras']}"/></f:facet>
 				                <h:inputText style="text-align: right; width:95%; padding-right: 5px" id="codigoBarras" value="#{detalle.codigoBarras}" onkeypress="if (event.keyCode == 13) return false; return validarEnteros(event);" >
-				                	<a4j:ajax event="keyup" listener="#{cuentasController.obtenerCodigoBarrasEnter}" oncomplete="fijarFocoSiguienteCodigBarras(this.id);"
+				                	<a4j:ajax event="keyup" listener="#{cuentasController.obtenerCodigoBarrasCompraEnter}" oncomplete="fijarFocoSiguienteCodigBarras(this.id);"
 				                			  execute="@this" onbeforesubmit="return verifyKeyEnter(event);" render="pnlGridDetalleFactura tableDetallePedido pnlMensajes">
 				                	</a4j:ajax>
 				                </h:inputText>
@@ -121,7 +121,7 @@
 				            <rich:column styleClass="autoStyle" style="width:50%;;">
 				                <f:facet name="header"><h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.label.lista.cabecera.guia.descripcion.producto']}"/></f:facet>
 				                <p:autoComplete id="themeCustom" value="#{detalle.descripcion}" completeMethod="#{cuentasController.completeNombreArticulo}">
-            						<p:ajax event="itemSelect"  listener="#{cuentasController.onItemSelect}" update=":frmNuevoCompra:panelDetallePedido"/>
+            						<p:ajax event="itemSelect"  listener="#{cuentasController.onItemSelectCompra}" update=":frmNuevoCompra:panelDetallePedido"/>
         						</p:autoComplete>
 				            </rich:column>
 				            <rich:column style="width:10%">

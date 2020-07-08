@@ -35,6 +35,9 @@
 			 			<f:convertNumber pattern="0.00"/>
 			 		</h:inputText>
 			 		
+			 		<h:outputText class="styleNegritas" value="#{msg_erpweb['ec.com.erp.etiqueta.header.tabla.articulo.costo']}: *" />
+			 		<h:inputText  style="width:260px" value="#{articulosController.articuloDTO.costo}" id="costo" onkeypress="return validarDecimal(event);"/>
+			 		
 			 		<h:outputText class="styleNegritas" value="#{msg_erpweb['ec.com.erp.etiqueta.header.tabla.articulo.precio']}: *" />
 			 		<h:inputText  style="width:260px" value="#{articulosController.articuloDTO.precio}" id="precio" onkeypress="return validarDecimal(event);"/>
 			 		
@@ -181,7 +184,7 @@
 			<!-- Botones de PopUp -->
 			<h:panelGrid style="margin:auto; padding-top: 5px;" columns="3" cellpadding="0" cellspacing="0">
 				<h:panelGroup layout="block" styleClass="botonD" style="margin-top:5px; margin-right:20px;">
-					<a4j:commandLink styleClass="cancelarD" execute="@this" render="pnlGridArticulos pnlMensajes" actionListener="#{articulosController.clearNuevoArticulo}" oncomplete="#{rich:component('mpConfirmacion')}.hide(); return false;">
+					<a4j:commandLink styleClass="cancelarD" execute="@this" render="pnlGridArticulos pnlGridImpuesto pnlMensajes" actionListener="#{articulosController.clearNuevoArticulo}" oncomplete="#{rich:component('mpConfirmacion')}.hide(); return false;">
 						<h:panelGrid columns="2" cellpadding="3" cellspacing="0">
 							<h:graphicImage name="btnNuevoA.png" library="images" style="border:none;border-color:white;" height="16" width="16"/>
 							<h:outputText value="Nueva" />

@@ -32,6 +32,7 @@ import ec.com.erp.cliente.common.exception.ERPException;
 import ec.com.erp.cliente.common.factory.ERPFactory;
 import ec.com.erp.cliente.mdl.dto.ArticuloDTO;
 import ec.com.erp.cliente.mdl.dto.GuiaDespachoDTO;
+import ec.com.erp.cliente.mdl.dto.GuiaDespachoDetalleDTO;
 import ec.com.erp.cliente.mdl.dto.GuiaDespachoExtrasDTO;
 import ec.com.erp.cliente.mdl.dto.GuiaDespachoPedidoDTO;
 import ec.com.erp.cliente.mdl.dto.PedidoDTO;
@@ -68,6 +69,8 @@ public class DespachoController extends CommonsController implements Serializabl
 	private GuiaDespachoPedidoDTO guiaDespachoPedidoDTO;
 	private Collection<GuiaDespachoExtrasDTO> guiaDespachoExtrasDTOCols;
 	private GuiaDespachoExtrasDTO guiaDespachoExtrasDTO;
+	private Collection<GuiaDespachoDetalleDTO> guiaDespachoDetalleDTOCols;
+	private GuiaDespachoDetalleDTO guiaDespachoDetalleDTO;
 	private Collection<PedidoDTO> pedidosDTOCols;
 	private PedidoDTO pedidoDTO;
 	// Data Managers
@@ -113,9 +116,11 @@ public class DespachoController extends CommonsController implements Serializabl
 		this.guiaDespachoDTO.setNumeroGuiaDespacho("GD-"+secuenciaDespacho.getValorSecuencia());
 		this.guiaDespachoPedidoDTO = new GuiaDespachoPedidoDTO();
 		this.guiaDespachoExtrasDTO = new GuiaDespachoExtrasDTO();
+		this.guiaDespachoDetalleDTO = new GuiaDespachoDetalleDTO();
 		this.guiaDespachoDTOCols = new ArrayList<GuiaDespachoDTO>();
 		this.guiaDespachoPedidoDTOCols = new ArrayList<GuiaDespachoPedidoDTO>();
 		this.guiaDespachoExtrasDTOCols = new ArrayList<GuiaDespachoExtrasDTO>();
+		this.guiaDespachoDetalleDTOCols = new ArrayList<>();
 		this.pedidosDTOCols = new ArrayList<PedidoDTO>();
 		this.page = 0;
 		this.orden = 1;
@@ -132,6 +137,7 @@ public class DespachoController extends CommonsController implements Serializabl
 		{
 			this.setGuiaDespachoDTO(despachoDataManager.getGuiaDespachoDTOEditar());
 			this.setGuiaDespachoExtrasDTOCols(ERPFactory.despacho.getGuiaDespachoServicio().findObtenerListaGuiaDespachoExtrasByNumeroGuia(Integer.parseInt(ERPConstantes.ESTADO_ACTIVO_NUMERICO), despachoDataManager.getGuiaDespachoDTOEditar().getNumeroGuiaDespacho()));
+			this.setGuiaDespachoDetalleDTOCols(ERPFactory.despacho.getGuiaDespachoServicio().findObtenerListaGuiaDespachoDetalleByNumeroGuia(Integer.parseInt(ERPConstantes.ESTADO_ACTIVO_NUMERICO), despachoDataManager.getGuiaDespachoDTOEditar().getNumeroGuiaDespacho()));
 			this.setGuiaDespachoPedidoDTOCols(ERPFactory.despacho.getGuiaDespachoServicio().findObtenerListaGuiaDespachoPedidosByNumeroGuiaDespacho(Integer.parseInt(ERPConstantes.ESTADO_ACTIVO_NUMERICO), despachoDataManager.getGuiaDespachoDTOEditar().getNumeroGuiaDespacho()));
 		}
 		if(FacesContext.getCurrentInstance().getViewRoot().getViewId().equals("/modules/despachos/adminBusquedaDespacho.xhtml")) {
@@ -178,10 +184,35 @@ public class DespachoController extends CommonsController implements Serializabl
 				this.guiaDespachoPedidoDTO.setPedidoDTO(this.pedidoDTO);
 				this.guiaDespachoPedidoDTO.setOrden(orden);
 				this.guiaDespachoPedidoDTOCols.add(guiaDespachoPedidoDTO);
+				agregarDetallePedido(pedidoDTO);
 				orden++;
 				controlPopUp = Boolean.TRUE;
 			}
 		}
+	}
+	
+	private void agregarDetallePedido(PedidoDTO pedidoDTO) {
+		pedidoDTO.getDetallePedidoDTOCols().stream().forEach(detalle ->{
+			GuiaDespachoDetalleDTO detalleGuia = this.guiaDespachoDetalleDTOCols.stream()
+	        		.filter(guiaDetalle -> guiaDetalle.getCodigoArticulo().intValue() == detalle.getCodigoArticulo().intValue())
+	        		.findFirst().orElse(null);
+			if(detalleGuia == null) {
+				this.guiaDespachoDetalleDTO = new GuiaDespachoDetalleDTO();
+				this.guiaDespachoDetalleDTO.getId().setCodigoCompania(Integer.parseInt(ERPConstantes.ESTADO_ACTIVO_NUMERICO));
+				this.guiaDespachoDetalleDTO.setCodigoArticulo(detalle.getCodigoArticulo());
+				this.guiaDespachoDetalleDTO.setDescripcionProducto(detalle.getArticuloDTO().getNombreArticulo());
+				this.guiaDespachoDetalleDTO.setCantidad(detalle.getCantidad());
+				this.guiaDespachoDetalleDTOCols.add(guiaDespachoDetalleDTO);
+			}else {
+				this.guiaDespachoDetalleDTOCols.stream().forEach(guiaDesp -> {
+					if(guiaDesp.getCodigoArticulo().intValue() == detalle.getCodigoArticulo().intValue()) {
+						guiaDesp.setCantidad(guiaDesp.getCantidad()+detalle.getCantidad());
+					}
+				});
+			}
+		});
+		
+		
 	}
 	
 	/**
@@ -216,8 +247,9 @@ public class DespachoController extends CommonsController implements Serializabl
 	 */
 	public void borrarPedido(ActionEvent e) {
 		try {
-			ERPFactory.despacho.getGuiaDespachoServicio().transEliminarPedidoDespacho(this.guiaDespachoPedidoDTO);
+			ERPFactory.despacho.getGuiaDespachoServicio().transEliminarPedidoDespacho(this.guiaDespachoDTO.getNumeroGuiaDespacho(), this.guiaDespachoPedidoDTO);
 			this.guiaDespachoPedidoDTOCols.remove(this.guiaDespachoPedidoDTO);
+			quitarArticulosPedido(this.guiaDespachoPedidoDTO);
 		} catch (Exception e2) {
 			this.setShowMessagesBar(Boolean.TRUE);
 			MensajesController.addError(null, ERPWebResources.getString("ec.com.erp.etiqueta.label.lista.guia.despacho.mensaje.error.eliminar"));
@@ -306,6 +338,7 @@ public class DespachoController extends CommonsController implements Serializabl
 		this.sePuedeEliminar = Boolean.FALSE;
 		if(this.guiaDespachoPedidoDTO.getId().getCodigoGuiaDespachoPedido() == null) {
 			this.guiaDespachoPedidoDTOCols.remove(this.guiaDespachoPedidoDTO);
+			quitarArticulosPedido(this.guiaDespachoPedidoDTO);
 		}else {
 			if(this.guiaDespachoPedidoDTO.getPedidoDTO().getEstadoPedidoDTO().getCodigoValorEstadoPedido().equals("ENT")) {
 				this.setShowMessagesBar(Boolean.TRUE);
@@ -314,6 +347,23 @@ public class DespachoController extends CommonsController implements Serializabl
 				this.sePuedeEliminar = Boolean.TRUE;
 			}
 		}
+	}
+	
+	public void quitarArticulosPedido(GuiaDespachoPedidoDTO guiaDespachoPedidoDTO) {
+		guiaDespachoPedidoDTO.getPedidoDTO().getDetallePedidoDTOCols().stream().forEach(detalle ->{
+			GuiaDespachoDetalleDTO detalleGuia = this.guiaDespachoDetalleDTOCols.stream()
+	        		.filter(guiaDetalle -> guiaDetalle.getCodigoArticulo().intValue() == detalle.getCodigoArticulo().intValue())
+	        		.findFirst().orElse(null);
+			if(detalleGuia != null) {
+				this.guiaDespachoDetalleDTOCols.stream().forEach(guiaDesp -> {
+					if(guiaDesp.getCodigoArticulo().intValue() == detalle.getCodigoArticulo().intValue()) {
+						guiaDesp.setCantidad(guiaDesp.getCantidad()-detalle.getCantidad());
+					}
+				});
+			}
+		});
+		this.guiaDespachoDetalleDTOCols = this.guiaDespachoDetalleDTOCols.stream().filter(detalle -> detalle.getCantidad().intValue() != 0)
+				.collect(Collectors.toList());
 	}
 	
 	/**
@@ -466,6 +516,7 @@ public class DespachoController extends CommonsController implements Serializabl
 				guiaDespachoDTO.setUsuarioRegistro(this.loginController.getUsuariosDTO().getId().getUserId());
 				guiaDespachoDTO.setGuiaDespachoPedidoDTOCols(guiaDespachoPedidoDTOCols);
 				guiaDespachoDTO.setGuiaDespachoExtrasDTOCols(guiaDespachoExtrasDTOCols);
+				guiaDespachoDTO.setGuiaDespachoDetalleDTOCols(guiaDespachoDetalleDTOCols);
 				
 				ERPFactory.despacho.getGuiaDespachoServicio().transCrearActualizarGuiaDespacho(guiaDespachoDTO);
 				this.setDespachoCreado(Boolean.TRUE);
@@ -525,6 +576,7 @@ public class DespachoController extends CommonsController implements Serializabl
 			if(this.guiaDespachoDTO.getId().getCodigoGuiaDespacho() != null) {
 				this.guiaDespachoDTO.setGuiaDespachoExtrasDTOCols(ERPFactory.despacho.getGuiaDespachoServicio().findObtenerListaGuiaDespachoExtrasByNumeroGuia(Integer.parseInt(ERPConstantes.ESTADO_ACTIVO_NUMERICO), this.guiaDespachoDTO.getNumeroGuiaDespacho()));
 				this.guiaDespachoDTO.setGuiaDespachoPedidoDTOCols(ERPFactory.despacho.getGuiaDespachoServicio().findObtenerListaGuiaDespachoPedidosByNumeroGuiaDespacho(Integer.parseInt(ERPConstantes.ESTADO_ACTIVO_NUMERICO), this.guiaDespachoDTO.getNumeroGuiaDespacho()));
+				this.guiaDespachoDTO.setGuiaDespachoDetalleDTOCols(ERPFactory.despacho.getGuiaDespachoServicio().findObtenerListaGuiaDespachoDetalleByNumeroGuia(Integer.parseInt(ERPConstantes.ESTADO_ACTIVO_NUMERICO), this.guiaDespachoDTO.getNumeroGuiaDespacho()));
 			}
 			if(this.validarPantallaCompleta()) {
 				// Plantilla rpincipal que permite la conversion de xsl a pdf
@@ -555,6 +607,7 @@ public class DespachoController extends CommonsController implements Serializabl
 		this.guiaDespachoDTO.setNumeroGuiaDespacho("GD-"+secuenciaDespacho.getValorSecuencia());
 		this.guiaDespachoExtrasDTOCols = new ArrayList<GuiaDespachoExtrasDTO>();
 		this.guiaDespachoPedidoDTOCols = new ArrayList<GuiaDespachoPedidoDTO>();
+		this.guiaDespachoDetalleDTOCols = new ArrayList<>();
 		this.despachoDataManager.setGuiaDespachoDTOEditar(new GuiaDespachoDTO());
 	}
 	
@@ -825,5 +878,21 @@ public class DespachoController extends CommonsController implements Serializabl
 
 	public void setArticuloDTOCols(Collection<ArticuloDTO> articuloDTOCols) {
 		this.articuloDTOCols = articuloDTOCols;
+	}
+
+	public Collection<GuiaDespachoDetalleDTO> getGuiaDespachoDetalleDTOCols() {
+		return guiaDespachoDetalleDTOCols;
+	}
+
+	public void setGuiaDespachoDetalleDTOCols(Collection<GuiaDespachoDetalleDTO> guiaDespachoDetalleDTOCols) {
+		this.guiaDespachoDetalleDTOCols = guiaDespachoDetalleDTOCols;
+	}
+
+	public GuiaDespachoDetalleDTO getGuiaDespachoDetalleDTO() {
+		return guiaDespachoDetalleDTO;
+	}
+
+	public void setGuiaDespachoDetalleDTO(GuiaDespachoDetalleDTO guiaDespachoDetalleDTO) {
+		this.guiaDespachoDetalleDTO = guiaDespachoDetalleDTO;
 	}
 }

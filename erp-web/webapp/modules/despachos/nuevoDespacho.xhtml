@@ -21,7 +21,7 @@
 	</ui:define>
 	
 	<ui:define name="contentCenter">
-		<rich:panel header="#{msg_erpweb['ec.com.erp.etiqueta.label.lista.guia.despacho.titulo']}" style="height: 94.5%; width: 100%; background-color: #F5FAFF;">
+		<rich:panel header="#{msg_erpweb['ec.com.erp.etiqueta.label.lista.guia.despacho.titulo']}" style="height: auto; width: 100%; background-color: #F5FAFF;">
 			<fieldset>
 				<legend class="styleLegend">#{msg_erpweb['ec.com.erp.etiqueta.mensaje.datos.generales']}</legend>
 				<h:panelGrid id="pnlGridDespacho" columns="6" cellspacing="2" cellpadding="5">
@@ -83,7 +83,7 @@
 			</fieldset>
 			  
 			<!-- LISTA DE PEDIDOS ASIGNADOS A LA GUIA -->		
-			<h:panelGrid id="divPrincipal" style="width: 100%" columns="2" styleClass="panelPedidos" columnClasses="estiloDivPedidos">
+			<h:panelGrid id="divPrincipal" style="width: 100%" columns="1" styleClass="panelPedidos">
 				<h:panelGroup id="flotanteizquierda2" style="width: 100%">
 					<rich:toolbar height="26" itemSeparator="grid">
 						<rich:toolbarGroup>
@@ -154,6 +154,46 @@
 						</h:panelGrid>
 					</rich:panel>
 				</h:panelGroup>
+			</h:panelGrid>	
+			<h:panelGrid id="divDetalles" style="width: 100%" columns="2" styleClass="panelPedidos" columnClasses="estiloDivPedidos">
+				<h:panelGroup style="width: 100%">
+					<rich:toolbar height="32" itemSeparator="grid">
+						<rich:toolbarGroup>
+							<h:graphicImage name="listachofer.png" library="images" style="border:none;border-color:white;" height="16" width="16"/>
+							<h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.label.lista.guia.despacho.titulo.articulos.detalle']}"/>
+						</rich:toolbarGroup>
+					</rich:toolbar>	
+					<rich:panel style="height: 206px;">
+						<h:panelGrid id="panelTablaDetalle" columns="1" style="width:100%;">
+							<h:panelGrid id="tablaVaciaDetalle" columns="1" rendered="#{empty despachoController.guiaDespachoDetalleDTOCols}" style="width:100%; text-align: center; padding-top: 100px">
+								<h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.mensaje.lista.vacio']}"/>
+							</h:panelGrid>	
+							<rich:panel style="text-align:center; border-left: none; border-right:none;" rendered="#{not empty despachoController.guiaDespachoDetalleDTOCols}">
+								<rich:dataScroller page="#{despachoController.page}" fastStep="3" for="tablePedidosDetalle" maxPages="5" rendered="#{not empty despachoController.guiaDespachoDetalleDTOCols}" renderIfSinglePage="false"/>
+							</rich:panel>					
+							<rich:dataTable style="width:100%; height:20%" value="#{despachoController.guiaDespachoDetalleDTOCols}" rendered="#{not empty despachoController.guiaDespachoDetalleDTOCols}" var="detalle" iterationStatusVar="itera" id="tablePedidosDetalle" rows="5">
+								<rich:column style="width:3% !important;">
+					                <f:facet name="header">Nro.</f:facet>
+					                #{itera.index+1}
+					            </rich:column>
+					            <rich:column styleClass="autoStyle" style="width:75% !important">
+					                <f:facet name="header"><h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.label.lista.cabecera.guia.descripcion.producto']}"/></f:facet>
+					                <h:outputText value="#{detalle.descripcionProducto}"></h:outputText>
+					            </rich:column>
+					            <rich:column style="width:10% !important; text-align:right !important;">
+					                <f:facet name="header"><h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.label.lista.cabecera.guia.cantidad']}"/></f:facet>
+					                <h:outputText value="#{detalle.cantidad}"></h:outputText>
+					            </rich:column>			           					         
+					            <rich:column style="width:10% !important; text-align:center !important;">
+					                <f:facet name="header"><h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.label.lista.cabecera.observacion.chofer']}"/></f:facet>
+					                <h:inputText maxlength="128" value="#{detalle.observacion}" style="width:120px !important; height: 14px !important;"/>
+					            </rich:column>            
+					        </rich:dataTable>						
+							
+						</h:panelGrid>
+					</rich:panel>
+				</h:panelGroup>
+				
 				<h:panelGroup style="width: 100%">
 					<rich:toolbar height="26" itemSeparator="grid">
 						<rich:toolbarGroup>
@@ -208,7 +248,7 @@
 				</h:panelGroup>
 			</h:panelGrid>
 		</rich:panel>
-		<a4j:jsFunction name="validarEstadoPedido" render="panelTablaPedidos pnlMensajes" actionListener="#{despachoController.validarEstadoPedido}" oncomplete="if(#{despachoController.sePuedeEliminar})#{rich:component('mpEliminarPedido')}.show(); return false;"></a4j:jsFunction>
+		<a4j:jsFunction name="validarEstadoPedido" render="panelTablaPedidos panelTablaDetalle pnlMensajes" actionListener="#{despachoController.validarEstadoPedido}" oncomplete="if(#{despachoController.sePuedeEliminar})#{rich:component('mpEliminarPedido')}.show(); return false;"></a4j:jsFunction>
 		<a4j:jsFunction name="validarExtras" render="panelTablaAdicional pnlMensajes" actionListener="#{despachoController.validarExtras}" oncomplete="if(#{despachoController.sePuedeEliminar})#{rich:component('mpEliminarExtras')}.show(); return false;"></a4j:jsFunction>
 		<!-- Popup para agregar nuevo chofer -->
 		<rich:popupPanel id="mpPedidos" header="#{msg_erpweb['ec.com.erp.etiqueta.label.nuevo.pedidos.titulo.lista.pedido']}" width="1000" height="450" modal="true" domElementAttachment="form">
@@ -268,7 +308,7 @@
 			<!-- Botones de PopUp -->
 			<h:panelGrid style="margin:auto;" columns="2" cellpadding="0" cellspacing="0">
 				<h:panelGroup layout="block" styleClass="botonD" style="margin-top:5px;margin-right:20px;">
-					<a4j:commandLink id="btnAceptarAgregarPedido" execute="tablePedidos" render="panelTablaPedidos" styleClass="aceptarD" actionListener="#{despachoController.agragarPedido}" oncomplete="if(#{despachoController.controlPopUp})#{rich:component('mpPedidos')}.hide(); return false;">
+					<a4j:commandLink id="btnAceptarAgregarPedido" execute="tablePedidos" render="panelTablaPedidos panelTablaDetalle" styleClass="aceptarD" actionListener="#{despachoController.agragarPedido}" oncomplete="if(#{despachoController.controlPopUp})#{rich:component('mpPedidos')}.hide(); return false;">
 						<h:panelGrid columns="2" cellpadding="3" cellspacing="0">
 							<h:graphicImage name="btnAceptar.png" library="images" style="border:none;border-color:white;" height="16" width="16"/>
 							<h:outputText value="Aceptar" />
@@ -319,7 +359,7 @@
 				</h:panelGroup>
 	
 				<h:panelGroup layout="block" styleClass="botonD" style="margin-top:5px; margin-right:20px;">
-					<a4j:commandLink styleClass="cancelarD" execute="@this" render="pnlGridDespacho, panelTablaPedidos, panelTablaAdicional, pnlMensajes" actionListener="#{despachoController.clearNuevoDespacho}" oncomplete="#{rich:component('mpConfirmacion')}.hide(); return false;">
+					<a4j:commandLink styleClass="cancelarD" execute="@this" render="pnlGridDespacho, panelTablaPedidos, panelTablaDetalle, panelTablaAdicional, pnlMensajes" actionListener="#{despachoController.clearNuevoDespacho}" oncomplete="#{rich:component('mpConfirmacion')}.hide(); return false;">
 						<h:panelGrid columns="2" cellpadding="3" cellspacing="0">
 							<h:graphicImage name="btnNuevoA.png" library="images" style="border:none;border-color:white;" height="16" width="16"/>
 							<h:outputText value="Nueva" />
@@ -360,7 +400,7 @@
 			<!-- Botones de PopUp -->
 			<h:panelGrid style="margin:auto; padding-top: 5px;" columns="3" cellpadding="0" cellspacing="0">
 				<h:panelGroup layout="block" styleClass="botonD" style="margin-top:5px; margin-right:20px;">
-					<a4j:commandLink styleClass="cancelarD" execute="@this" render="panelTablaPedidos pnlMensajes" actionListener="#{despachoController.borrarPedido}" oncomplete="#{rich:component('mpEliminarPedido')}.hide(); return false;">
+					<a4j:commandLink styleClass="cancelarD" execute="@this" render="panelTablaPedidos panelTablaDetalle pnlMensajes" actionListener="#{despachoController.borrarPedido}" oncomplete="#{rich:component('mpEliminarPedido')}.hide(); return false;">
 						<h:panelGrid columns="2" cellpadding="3" cellspacing="0">
 							<h:graphicImage name="deleteReg.png" library="images" style="border:none;border-color:white;" height="16" width="16"/>
 							<h:outputText value="Eliminar" />
@@ -448,7 +488,7 @@
 		
 		<h:outputStylesheet>
 			.estiloDivPedidos{
-				width: 60% !important;
+				width: 50% !important;
 			}	
 			
 			.tooltip-text {     
