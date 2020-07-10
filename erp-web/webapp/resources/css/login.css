@@ -200,6 +200,19 @@ body {
 	background-image: url("#{resource['images/bancos.png']}");
 }
 
+.styleCaja{
+	background-image: url("#{resource['images/caja.png']}");
+}
+
+.styleCuentasPagar{
+	background-image: url("#{resource['images/cuentaspagar.png']}");
+}
+
+.styleCuentasCobrar{
+	background-image: url("#{resource['images/cuentascobrar.png']}");
+}
+
+
 /*Estilos menu centro*/
 .styleArticle a:hover {
 	background-image: url("#{resource['images/articulos_over.png']}");

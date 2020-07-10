@@ -95,7 +95,7 @@
 				                <f:facet name="header"><h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.label.nuevo.pedidos.detalle.cantidad.pedido']}"/></f:facet>
 				                <h:inputText id="cantidadPedida" value="#{detalle.cantidad}" onkeypress="return validarEnteros(event);">
 				                	<a4j:ajax event="keyup" status="no" listener="#{pedidosController.calcularTotalPedido}"
-				                			  execute="@this" render="pnlGridDetallePedido" 
+				                			  execute="@this" render="pnlGridDetallePedido pnlMensajes" 
 				                			  oncomplete="fijarFocoDetalleCantidad(this.id);">
 				                	</a4j:ajax>
 				                </h:inputText>
@@ -103,7 +103,7 @@
 				            <rich:column styleClass="autoStyle">
 				                <f:facet name="header"><h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.header.tabla.descripcion.articulo']}"/></f:facet>
         						<p:autoComplete id="themeCustom" value="#{detalle.nombreArticulo}" completeMethod="#{pedidosController.completeNombreArticulo}">
-            						<p:ajax event="itemSelect"  listener="#{pedidosController.onItemSelect}" update=":frmNuevoPedido:pnlGridDetallePedido"/>
+            						<p:ajax event="itemSelect"  listener="#{pedidosController.onItemSelect}" update=":frmNuevoPedido:pnlGridDetallePedido :pnlMensajes"/>
         						</p:autoComplete>
 				            </rich:column>
 				            <rich:column>
@@ -131,9 +131,26 @@
 				                <h:outputText value="#{detalle.articuloDTO.precio * detalle.cantidad}" >
 				                	<f:convertNumber pattern="0.00"/>
 				                </h:outputText>
+				                <h:outputText rendered="#{detalle.articuloDTO.tieneImpuesto}" value="(I)"></h:outputText>
 				            </rich:column>
 				            <f:facet name="footer">
 				                <rich:columnGroup>
+					                <rich:column colspan="8" style="text-align: right; paddin-right: 10px">Total:</rich:column>
+					                <rich:column style="text-align: right; paddin-right: 10px">
+					                    <h:outputText value="#{pedidosController.pedidoDTO.totalSinImpuestos}">
+					                    	<f:convertNumber pattern="0.00"/>
+					                    </h:outputText>
+					                </rich:column>
+					            </rich:columnGroup>
+					            <rich:columnGroup>
+					                <rich:column colspan="8" style="text-align: right; paddin-right: 10px">Iva 12 %:</rich:column>
+					                <rich:column style="text-align: right; paddin-right: 10px">
+					                    <h:outputText value="#{pedidosController.pedidoDTO.totalImpuestos}">
+					                    	<f:convertNumber pattern="0.00"/>
+					                    </h:outputText>
+					                </rich:column>
+					            </rich:columnGroup>
+					            <rich:columnGroup>
 					                <rich:column colspan="8" style="text-align: right; paddin-right: 10px">Total:</rich:column>
 					                <rich:column style="text-align: right; paddin-right: 10px">
 					                    <h:outputText value="#{pedidosController.pedidoDTO.totalCompra}">

@@ -12,15 +12,14 @@
 	<ui:param name="westLength" value="250" />
 	
 	<ui:define name="title">
-		Ventas
+		Cuentas por pagar
 	</ui:define>
 	
 	<ui:define name="header">	
-		<ui:include src="adminBusquedaComprasHeader.xhtml" />
+		<ui:include src="adminBusquedaCuentasPagarHeader.xhtml" />
 	</ui:define>
 	
 	<ui:define name="contentLeft">
-		<!-- <ui:include src="adminBusquedaComprasLeft.xhtml" /> -->
 	</ui:define>
 	
 	<ui:define name="contentCenter">
@@ -31,11 +30,11 @@
 				</h:panelGrid>
 			</f:facet>		
 		
-			<h:panelGroup id="filtrosCompras" layout="block" styleClass="listaReporte">
+			<h:panelGroup id="filtrosVentas" layout="block" styleClass="listaReporte">
 				<h:panelGrid columns="6" width="90%" cellpadding="0" cellspacing="2">
 					<h:panelGrid width="47%" columns="2" columnClasses="columnaIzquierda, columnaDerecha">
 			    	   	<rich:inplaceInput id="numeroFacturaBusqueda" value="#{cuentasController.numeroFactura}" styleClass="styleInputPlaceMediano" defaultLabel="#{msg_erpweb['ec.com.erp.etiqueta.label.lista.busqueda.factura.numero.factura']}">
-			    	   		<a4j:ajax event="keyup" execute="filtrosCompras" listener="#{cuentasController.busquedaFacturasComprasEnter}" onbeforesubmit="if (event.keyCode != 13)  return false;" render="panelCuentasTabla, tableCuentas, pnlMensajes"></a4j:ajax>
+			    	   		<a4j:ajax event="keyup" execute="filtrosVentas" listener="#{cuentasController.busquedaFacturasCuentasCobrarEnter}" onbeforesubmit="if (event.keyCode != 13)  return false;" render="panelCuentasTabla, tableCuentas, pnlMensajes"></a4j:ajax>
 			    	   	</rich:inplaceInput>
 			    	   	<h:panelGroup styleClass="styleClean">
 							<a4j:commandLink styleClass="guardarA" execute="@this" render="numeroFacturaBusqueda pnlMensajes" actionListener="#{cuentasController.borrarBusquedaNumeroFactura}"/>
@@ -43,8 +42,8 @@
 					</h:panelGrid>
 			    	
 			    	<h:panelGrid width="47%" columns="2" columnClasses="columnaIzquierda, columnaDerecha">
-			    	   	<rich:inplaceInput id="numDocumento" value="#{cuentasController.docClienteProveedor}" styleClass="styleInputPlaceMediano" defaultLabel="#{msg_erpweb['ec.com.erp.etiqueta.label.busqueda.pedidos.etiqueta.documento.proveedor']}">
-			    	   		<a4j:ajax event="keyup" execute="filtrosCompras" listener="#{cuentasController.busquedaFacturasComprasEnter}" onbeforesubmit="if (event.keyCode != 13)  return false;" render="panelCuentasTabla, tableCuentas, pnlMensajes"></a4j:ajax>
+			    	   	<rich:inplaceInput id="numDocumento" value="#{cuentasController.docClienteProveedor}" styleClass="styleInputPlaceMediano" defaultLabel="#{msg_erpweb['ec.com.erp.etiqueta.label.busqueda.pedidos.etiqueta.documento.cliente']}">
+			    	   		<a4j:ajax event="keyup" execute="filtrosVentas" listener="#{cuentasController.busquedaFacturasCuentasCobrarEnter}" onbeforesubmit="if (event.keyCode != 13)  return false;" render="panelCuentasTabla, tableCuentas, pnlMensajes"></a4j:ajax>
 			    	   	</rich:inplaceInput>
 			    	   	<h:panelGroup styleClass="styleClean">
 							<a4j:commandLink styleClass="guardarA" execute="@this" render="numDocumento pnlMensajes" actionListener="#{cuentasController.borrarBusquedaDocumento}"/>
@@ -53,7 +52,7 @@
 					
 					<h:panelGrid width="47%" columns="2" columnClasses="columnaIzquierda, columnaDerecha">
 			    	   	<rich:inplaceInput id="razonSocialBusqueda" value="#{cuentasController.nombClienteProveedor}" styleClass="styleInputPlaceMediano" defaultLabel="#{msg_erpweb['ec.com.erp.etiqueta.label.lista.busqueda.factura.razon.Social']}">
-			    	   		<a4j:ajax event="keyup" execute="filtrosCompras" listener="#{cuentasController.busquedaFacturasComprasEnter}" onbeforesubmit="if (event.keyCode != 13)  return false;" render="panelCuentasTabla, tableCuentas, pnlMensajes"></a4j:ajax>
+			    	   		<a4j:ajax event="keyup" execute="filtrosVentas" listener="#{cuentasController.busquedaFacturasCuentasCobrarEnter}" onbeforesubmit="if (event.keyCode != 13)  return false;" render="panelCuentasTabla, tableCuentas, pnlMensajes"></a4j:ajax>
 			    	   	</rich:inplaceInput>
 			    	   	<h:panelGroup styleClass="styleClean">
 							<a4j:commandLink styleClass="guardarA" execute="@this" render="razonSocialBusqueda pnlMensajes" actionListener="#{cuentasController.borrarBusquedaClienteProveedor}"/>
@@ -61,12 +60,12 @@
 					</h:panelGrid>
 					<rich:calendar inputStyle="width: 80px; height: 20px;" value="#{cuentasController.fechaFacturaInicio}" datePattern="yyyy-MM-dd"></rich:calendar>
 					<rich:calendar inputStyle="width: 80px; height: 20px;" value="#{cuentasController.fechaFacturaFin}" datePattern="yyyy-MM-dd"></rich:calendar>
-			    	<a4j:commandButton id="btnBuscarCliente" value="Buscar" styleClass="styleSearch" render="panelCuentasTabla, tableCuentas, pnlMensajes" execute="filtrosCompras" actionListener="#{cuentasController.busquedaFacturasCompras}"/>
+			    	<a4j:commandButton id="btnBuscarCliente" value="Buscar" styleClass="styleSearch" render="panelCuentasTabla, tableCuentas, pnlMensajes" execute="filtrosVentas" actionListener="#{cuentasController.busquedaFacturasCuentasCobrar}"/>
 				</h:panelGrid>						 
 			</h:panelGroup>	
 		</rich:panel>
 	
-		<rich:panel id="panelCuentasTabla" header="Lista de documentos" styleClass="panelPedidos" style="width:100%; height: 84.3%">	
+		<rich:panel id="panelCuentasTabla" header="Lista de cuentas por pagar" styleClass="panelPedidos" style="width:100%; height: 84.3%">	
 			<h:panelGrid id="tablaVaciaPedidos" columns="1" rendered="#{empty cuentasController.facturaCabeceraDTOCols}" style="width:100%; text-align: center; padding-top: 230px">
 				<h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.mensaje.lista.vacio']}"/>
 			</h:panelGrid>	
@@ -133,7 +132,7 @@
 	                </h:outputText>
 	            </rich:column>
 	            <rich:column style="width: 40px; text-align: center;">
-	                <f:facet name="header"><h:outputText value="Pagada" title="#{msg_erpweb['ec.com.erp.etiqueta.label.lista.cabecera.factura.pagada']}"/></f:facet>
+	                <f:facet name="header"><h:outputText value="Cobrada" title="#{msg_erpweb['ec.com.erp.etiqueta.label.lista.cabecera.factura.pagada']}"/></f:facet>
 	                <h:outputText value="#{cuenta.pagado ? 'SI' : 'NO'}" />
 	            </rich:column>
 	            <rich:column styleClass="columna5">
@@ -142,129 +141,24 @@
 						<h:graphicImage name="btnDetalle.png" library="images" style="border:none;border-color:white;" height="16" width="16"/>
 						<f:setPropertyActionListener value="#{cuenta}" target="#{cuentasController.facturaCabeceraDTO}" />											
 					</a4j:commandLink>
-	            </rich:column>	             
-	            <rich:column styleClass="columna5">
-	                <f:facet name="header">Pagos</f:facet>
-	                <a4j:commandLink id="botonPago" title="Ver detalle de factura" render="popUpPagos pnlListaDetallePagos" execute="@this" actionListener="#{cuentasController.simularEvento}" oncomplete="cargarPagos();">
-						<h:graphicImage title="Ingresar nuevo pago" name="pagos.png" library="images" style="border:none;border-color:white;" height="24" width="24" rendered="#{!cuenta.pagado}"/>
-						<h:graphicImage title="Ver detalle de pagos" name="btnDetailPay.png" library="images" style="border:none;border-color:white;" height="24" width="24" rendered="#{cuenta.pagado}"/>
-						<f:setPropertyActionListener value="#{cuenta}" target="#{cuentasController.facturaCabeceraDTO}" />											
-					</a4j:commandLink>
 	            </rich:column>
-	            <rich:column styleClass="columna5">
-	                <f:facet name="header">Cancelar</f:facet>
-	                <h:graphicImage title="La factura ya no se puede cancelar porque se encuentra pagada" rendered="#{cuenta.pagado or cuenta.pagosFacturaDTOCols != null}" name="btnBloqueo.png" library="images" style="border:none;border-color:white;" height="16" width="16"/>
-	                <a4j:commandLink id="botonEditar" rendered="#{!cuenta.pagado and cuenta.pagosFacturaDTOCols == null}" title="Cancelar factura" actionListener="#{cuentasController.cargarFacturaDetalle}"	execute="@this" oncomplete="#{rich:component('popUpConfirmar')}.show();"> 
-						<h:graphicImage name="btnCancelar.png" library="images" style="border:none;border-color:white;" height="16" width="16"/> 
-						<f:setPropertyActionListener value="#{cuenta}" target="#{cuentasController.facturaCabeceraDTO}" />											
-					</a4j:commandLink>	
-	            </rich:column> 
+	            <f:facet name="footer">
+	            	<rich:columnGroup>
+		                <rich:column colspan="8" style="text-align: right; paddin-right: 10px">Total de pagos:</rich:column>
+		                <rich:column style="text-align: right; paddin-right: 10px">
+		                    <h:outputText value="#{cuentasController.totalCuenta}">
+		                    	<f:convertNumber pattern="0.00"/>
+		                    </h:outputText>
+		                </rich:column>
+		                <rich:column>
+		                </rich:column>
+		                <rich:column>
+		                </rich:column>
+		            </rich:columnGroup>
+	            </f:facet>
 	        </rich:dataTable>
         </rich:panel>
         
-        <a4j:jsFunction name="cargarPagos" actionListener="#{cuentasController.cargarDatosPago}" execute="pnlGridAgregarDetalle" render="popUpPagos pnlListaDetallePagos" oncomplete="#{rich:component('popUpPagos')}.show();"></a4j:jsFunction>
-        
-        <!-- Popup para ver el detalle de pagos-->
-		<rich:popupPanel id="popUpPagos" styleClass="panelPedidos" header="#{msg_erpweb['ec.com.erp.etiqueta.header.nueva.pagos.detalle']}" width="935" height="#{cuentasController.tamanioPopUp}" modal="true" domElementAttachment="form">
-			<f:facet name="controls">
-				<a4j:commandLink render="panelCuentasTabla" actionListener="#{cuentasController.consultarFacturas}" oncomplete="#{rich:component('popUpPagos')}.hide(); return false;">
-					<h:graphicImage library="images" name="close.png" style="border:0px" id="closePopUpPago" />
-				</a4j:commandLink>
-			</f:facet>
-			<h:panelGrid id="pnlListaDetallePagos" style="width: 100%;">	
-				<rich:toolbar height="26" itemSeparator="grid" rendered="#{!cuentasController.facturaCabeceraDTO.pagado}">
-					<rich:toolbarGroup>
-						<h:graphicImage name="pagos.png" library="images" style="border:none;border-color:white;" height="16" width="16"/>
-						<h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.header.nueva.pagos.registro']}"/>
-					</rich:toolbarGroup>
-					<rich:toolbarGroup location="right">	
-						<h:panelGroup layout="block" styleClass="botonD" style="padding-top: 3px; margin-top:0px;">
-							<a4j:commandLink styleClass="agregarD" actionListener="#{cuentasController.guardarPagoCompra}" render="pnlListaDetallePagos tablePagos pnlMensajes" execute="pnlGridPagos" title="Click para guardar pago">
-								<h:panelGrid columns="2" cellpadding="3" cellspacing="0">
-									<h:graphicImage name="save_pago.png" library="images" style="border:none;border-color:white;" height="16" width="16"/>
-									<h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.header.nueva.pagos.guardar']}"/>
-								</h:panelGrid>
-							</a4j:commandLink>	
-						</h:panelGroup>	
-					</rich:toolbarGroup>						
-				</rich:toolbar>	
-				<rich:panel style="width: 99.5%; background-color: #F5FAFF;" rendered="#{!cuentasController.facturaCabeceraDTO.pagado}">
-				 	<h:panelGrid id="pnlGridPagos" columns="2" cellspacing="2" cellpadding="5">
-				 		<h:outputText class="styleNegritas" value="#{msg_erpweb['ec.com.erp.etiqueta.header.nueva.pagos.total.factura']}: *" />
-				 		<h:outputText value="#{cuentasController.facturaCabeceraDTO.totalCuenta}" >
-	                		<f:convertNumber pattern="0.00"/>
-	                	</h:outputText>
-	                	
-	                	<h:outputText class="styleNegritas" value="#{msg_erpweb['ec.com.erp.etiqueta.header.nueva.pagos.saldo.factura']}: *" />
-				 		<h:outputText value="#{cuentasController.totalPendiente}" >
-	                		<f:convertNumber pattern="0.00"/>
-	                	</h:outputText>
-	                	
-					 	<h:outputText class="styleNegritas" value="#{msg_erpweb['ec.com.erp.etiqueta.header.nueva.pagos.fechapago']}: *" />
-						<rich:calendar value="#{cuentasController.pagosFacturaDTO.fechaPago}" datePattern="yyyy-MM-dd"></rich:calendar>
-						
-						<h:outputText class="styleNegritas" value="#{msg_erpweb['ec.com.erp.etiqueta.header.nueva.pagos.valorpago']}: *" />
-				 		<h:inputText  style="width:159px" value="#{cuentasController.pagosFacturaDTO.valorPago}" id="precio" onkeypress="return validarDecimal(event);"/>
-				 		
-				 		<h:outputText class="styleNegritas" value="#{msg_erpweb['ec.com.erp.etiqueta.header.nueva.pagos.descripcion']}: *" />
-				 		<h:inputTextarea id="txtObservacion" maxlength="100" styleClass="styleUpperCase estiloTextArea" value="#{cuentasController.pagosFacturaDTO.descripcion}"/>
-				 	</h:panelGrid>
-				</rich:panel>
-				
-				<rich:panel style="width: 99.6%; height: 197px; " header="Detalle de pagos">
-					
-					<h:panelGrid id="tablaVaciaPago" columns="1" rendered="#{empty cuentasController.pagosFacturaDTOCols}" style="width:100%; text-align: center; padding-top: 100px">
-						<h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.mensaje.lista.vacio']}"/>
-					</h:panelGrid>	
-					<rich:panel style="text-align:center; border-left: none; border-right:none; margin-bottom: 2px" rendered="#{not empty cuentasController.pagosFacturaDTOCols}">
-						<rich:dataScroller fastStep="3" for="tablePagos" maxPages="5" rendered="#{not empty cuentasController.pagosFacturaDTOCols}" renderIfSinglePage="false"/>
-					</rich:panel>	
-					<rich:dataTable style="width:100%" value="#{cuentasController.pagosFacturaDTOCols}" rendered="#{not empty cuentasController.pagosFacturaDTOCols}" var="pago" iterationStatusVar="it" id="tablePagos" rows="5">
-			            <rich:column>
-			                <f:facet name="header">Nro.</f:facet>
-			                #{it.index+1}
-			            </rich:column>
-			            <rich:column style="text-align: center;">
-			                <f:facet name="header"><h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.header.nueva.pagos.fechapago']}"/></f:facet>
-			                <h:outputText value="#{pago.fechaPago}">
-	                			<f:convertDateTime pattern="yyyy-MM-dd"/>
-	                		</h:outputText>
-			            </rich:column>
-			            <rich:column>
-			                <f:facet name="header"><h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.header.nueva.pagos.descripcion']}"/></f:facet>
-			                <h:outputText value="#{pago.descripcion}" />
-			            </rich:column>
-			            <rich:column style="text-align: right; padding-right: 5px">
-			                <f:facet name="header"><h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.header.nueva.pagos.valorpago']}"/></f:facet>
-			                <h:outputText value="#{pago.valorPago}">
-			                	<f:convertNumber pattern="0.00"/>
-			                </h:outputText>
-			            </rich:column>
-			            <f:facet name="footer">
-			                <rich:columnGroup>
-				                <rich:column colspan="3" style="text-align: right; paddin-right: 10px">Total:</rich:column>
-				                <rich:column style="text-align: right; paddin-right: 10px">
-				                    <h:outputText value="#{cuentasController.totalPagado}">
-				                    	<f:convertNumber pattern="0.00"/>
-				                    </h:outputText>
-				                </rich:column>
-				            </rich:columnGroup>
-			            </f:facet>
-			        </rich:dataTable>
-		        </rich:panel>
-			</h:panelGrid>
-			<!-- Botones de PopUp -->
-			<h:panelGrid style="margin:auto;" columns="1" cellpadding="0" cellspacing="0">
-				<h:panelGroup layout="block" styleClass="botonD" style="margin-top:5px;">
-					<a4j:commandLink id="btnCancelarPago" render="panelCuentasTabla" actionListener="#{cuentasController.consultarFacturas}" styleClass="cancelarD" oncomplete="#{rich:component('popUpPagos')}.hide(); return false;">
-						<h:panelGrid columns="2" cellpadding="3" cellspacing="0">
-							<h:graphicImage name="btnCancel.png" library="images" style="border:none;border-color:white;" height="16" width="16"/>
-							<h:outputText value="Cerrar" />
-						</h:panelGrid>
-					</a4j:commandLink>
-				</h:panelGroup>
-			</h:panelGrid>
-		</rich:popupPanel>
         
         <!-- Popup para ver el detalle del factura -->
 		<rich:popupPanel id="popUpDetalle" styleClass="panelPedidos" header="#{msg_erpweb['ec.com.erp.etiqueta.label.lista.cabecera.factura.titulo.detalle']}" width="935" height="400" modal="true" domElementAttachment="form">
@@ -280,7 +174,7 @@
 						<h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.mensaje.lista.vacio']}"/>
 					</h:panelGrid>	
 					<rich:panel style="text-align:center; border-left: none; border-right:none; margin-bottom: 2px" rendered="#{not empty cuentasController.facturaCabeceraDTO.facturaDetalleDTOCols}">
-						<rich:dataScroller fastStep="3" for="tableDetalles" maxPages="5" rendered="#{not empty cuentasController.facturaCabeceraDTO.facturaDetalleDTOCols}" renderIfSinglePage="false"/>
+						<rich:dataScroller fastStep="3" for="tableDetalles" maxPages="5" rendered="#{not empty cuentasController.facturaCabeceraDTO.facturaDetalleDTOCols}" renderIfSinglePage="true"/>
 					</rich:panel>	
 					<rich:dataTable style="width:100%" value="#{cuentasController.facturaCabeceraDTO.facturaDetalleDTOCols}" rendered="#{not empty cuentasController.facturaCabeceraDTO.facturaDetalleDTOCols}" var="detalle" iterationStatusVar="it" id="tableDetalles" rows="7">
 			            <rich:column>
@@ -364,47 +258,6 @@
 				</h:panelGroup>
 			</h:panelGrid>
 		</rich:popupPanel>
-		
-		<!-- Popup para confirmar que se guardo el articulo -->
-		<rich:popupPanel id="popUpConfirmar" header="#{msg_erpweb['ec.com.erp.etiqueta.mensaje.confirmacion']}" width="345" height="160" modal="true" domElementAttachment="form">
-			<f:facet name="controls">
-				<h:outputLink value="#"	onclick="#{rich:component('popUpConfirmar')}.hide();">
-					<h:graphicImage library="images" name="close.png" style="border:0px"/>
-				</h:outputLink>
-			</f:facet>
-			
-			<rich:panel style="height: 94%">
-				<h:panelGrid columns="3">
-					<h:graphicImage name="succes.png" library="images" style="border:none;border-color:white;" height="48" width="48"/>
-					<h:panelGroup style="margin-right:20px;">
-					</h:panelGroup>
-					<h:panelGroup style="text-align:justify;">
-						<h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.mensaje.popUp.cancelacion']}" />
-					</h:panelGroup>
-				</h:panelGrid>
-		    </rich:panel>
-			
-			<!-- Botones de PopUp -->
-			<h:panelGrid style="margin:auto; padding-top: 5px;" columns="3" cellpadding="0" cellspacing="0">
-				<h:panelGroup layout="block" styleClass="botonD" style="margin-top:5px; margin-right:20px;">
-					<a4j:commandLink styleClass="cancelarD" execute="@this" render="panelCuentasTabla tableCuentas pnlMensajes" actionListener="#{cuentasController.cancelarFacturasCompras}" oncomplete="#{rich:component('popUpConfirmar')}.hide(); return false;">
-						<h:panelGrid columns="2" cellpadding="3" cellspacing="0">
-							<h:graphicImage name="btnAceptar.png" library="images" style="border:none;border-color:white;" height="16" width="16"/>
-							<h:outputText value="Aceptar" />
-						</h:panelGrid>
-					</a4j:commandLink>
-				</h:panelGroup>
-				
-				<h:panelGroup layout="block" styleClass="botonD" style="margin-top:5px;">
-					<a4j:commandLink styleClass="cancelarD" oncomplete="#{rich:component('popUpConfirmar')}.hide(); return false;" immediate="true">
-						<h:panelGrid columns="2" cellpadding="3" cellspacing="0">
-							<h:graphicImage name="btnCancel.png" library="images" style="border:none;border-color:white;" height="16" width="16"/>
-							<h:outputText value="Cancelar" />
-						</h:panelGrid>
-					</a4j:commandLink>
-				</h:panelGroup>
-			</h:panelGrid>
-		</rich:popupPanel>
         <script>
 			/*<![CDATA[*/
 			$(document).ready(function(){				
@@ -420,21 +273,8 @@
 				te = String.fromCharCode(tecla);
 				return patron.test(te);
 			}
-			function validarDecimal(e) {
-				tecla = (document.all) ? e.keyCode : e.which; 
-				if (tecla==8) return true; 
-				patron =/[0-9\s.0-9\s]/; 
-				te = String.fromCharCode(tecla);
-				return patron.test(te);
-			}
 		/*]]>*/			
 		</script>
-		<h:outputStylesheet>
-			.estiloTextArea{
-				width:350px !important;
-				height: 25px !important;
-			}		
-		</h:outputStylesheet>
 		<a4j:commandLink id="linkopensystem" styleClass="linkopensystem" execute="@this" status="no" actionListener="#{cuentasController.refrescarPantalla}">
 		</a4j:commandLink>	
 	</ui:define>

@@ -31,6 +31,7 @@ import ec.com.erp.cliente.common.constantes.ERPConstantes;
 import ec.com.erp.cliente.common.exception.ERPException;
 import ec.com.erp.cliente.common.factory.ERPFactory;
 import ec.com.erp.cliente.mdl.dto.ArticuloDTO;
+import ec.com.erp.cliente.mdl.dto.ArticuloImpuestoDTO;
 import ec.com.erp.cliente.mdl.dto.CatalogoValorDTO;
 import ec.com.erp.cliente.mdl.dto.ClienteDTO;
 import ec.com.erp.cliente.mdl.dto.DetallePedidoDTO;
@@ -48,15 +49,16 @@ import ec.com.erp.web.pedidos.datamanager.PedidosDataManager;
 
 /**
  * Controlador para administracion de pedidos
+ * 
  * @author hgudino
  *
  */
-@ManagedBean(name="pedidosController", eager = true)
+@ManagedBean(name = "pedidosController", eager = true)
 @ViewScoped
 public class PedidosController extends CommonsController implements Serializable {
 
 	private static final long serialVersionUID = 1L;
-	
+
 	// Variables
 	private PedidoDTO pedidoDTO;
 	private DetallePedidoDTO detallePedidoDTO;
@@ -64,14 +66,14 @@ public class PedidosController extends CommonsController implements Serializable
 	private EstadoPedidoDTO estadoPedidoDTO;
 	private ClienteDTO clienteDTO;
 	private Collection<ClienteDTO> clienteDTOCols;
-	
+
 	// Data Managers
-	@ManagedProperty(value="#{pedidosDataManager}")
+	@ManagedProperty(value = "#{pedidosDataManager}")
 	private PedidosDataManager pedidosDataManager;
-	
-	@ManagedProperty(value="#{loginController}")
+
+	@ManagedProperty(value = "#{loginController}")
 	private LoginController loginController;
-	
+
 	// Variables
 	private Collection<PedidoDTO> pedidosDTOCols;
 	private Collection<ArticuloDTO> articuloDTOCols;
@@ -95,10 +97,10 @@ public class PedidosController extends CommonsController implements Serializable
 	private String mensaje;
 	private String valorAccion;
 	private Boolean mostrarIcono;
-	
+
 	@ManagedProperty("#{articuloService}")
 	private ArticuloService service;
-	
+
 	@PostConstruct
 	public void postConstruct() {
 		Calendar fechaInferior = Calendar.getInstance();
@@ -113,14 +115,15 @@ public class PedidosController extends CommonsController implements Serializable
 		this.pedidoDTO = new PedidoDTO();
 		this.pedidoDTO.setFechaPedido(new Date());
 		this.pedidoDTO.setTotalCompra(BigDecimal.ZERO);
-		SecuenciaDTO secuenciaPedido = ERPFactory.secuencias.getSecuenciaServicio().findObtenerSecuenciaByNombre(PedidoID.NOMBRE_SECUENCIA);
-		this.pedidoDTO.setNumeroPedido("P-"+secuenciaPedido.getValorSecuencia());
+		SecuenciaDTO secuenciaPedido = ERPFactory.secuencias.getSecuenciaServicio()
+				.findObtenerSecuenciaByNombre(PedidoID.NOMBRE_SECUENCIA);
+		this.pedidoDTO.setNumeroPedido("P-" + secuenciaPedido.getValorSecuencia());
 		this.detallePedidoDTO = new DetallePedidoDTO();
 		this.estadoPedidoDTO = new EstadoPedidoDTO();
 		this.detallePedidoDTOCols = new ArrayList<DetallePedidoDTO>();
 		DetallePedidoDTO detalle = null;
 		contDetalle = 1;
-		for(int i=0; i< 10; i++) {
+		for (int i = 0; i < 10; i++) {
 			detalle = new DetallePedidoDTO();
 			detalle.setArticuloDTO(new ArticuloDTO());
 			detalle.getId().setCodigoCompania(contDetalle);
@@ -128,22 +131,28 @@ public class PedidosController extends CommonsController implements Serializable
 			contDetalle++;
 		}
 		this.page = 0;
-		
-		if(pedidosDataManager.getPedidoDTOEditar() != null && pedidosDataManager.getPedidoDTOEditar().getId().getCodigoPedido() != null)
-		{
+
+		if (pedidosDataManager.getPedidoDTOEditar() != null
+				&& pedidosDataManager.getPedidoDTOEditar().getId().getCodigoPedido() != null) {
 			this.setPedidoDTO(pedidosDataManager.getPedidoDTOEditar());
 			this.setClienteDTO(pedidosDataManager.getPedidoDTOEditar().getClienteDTO());
-			this.documentoCliente = this.clienteDTO.getPersonaDTO() == null ? this.clienteDTO.getEmpresaDTO().getNumeroRuc() : this.clienteDTO.getPersonaDTO().getNumeroDocumento();
-			this.setDetallePedidoDTOCols((List<DetallePedidoDTO>)pedidosDataManager.getPedidoDTOEditar().getDetallePedidoDTOCols());
-			if(CollectionUtils.isNotEmpty(this.detallePedidoDTOCols)) {
-				detallePedidoDTOCols.stream().forEach(detalleitem -> detalleitem.setNombreArticulo(detalleitem.getArticuloDTO().getNombreArticulo()));
+			this.documentoCliente = this.clienteDTO.getPersonaDTO() == null
+					? this.clienteDTO.getEmpresaDTO().getNumeroRuc()
+					: this.clienteDTO.getPersonaDTO().getNumeroDocumento();
+			this.setDetallePedidoDTOCols(
+					(List<DetallePedidoDTO>) pedidosDataManager.getPedidoDTOEditar().getDetallePedidoDTOCols());
+			if (CollectionUtils.isNotEmpty(this.detallePedidoDTOCols)) {
+				detallePedidoDTOCols.stream().forEach(
+						detalleitem -> detalleitem.setNombreArticulo(detalleitem.getArticuloDTO().getNombreArticulo()));
 			}
 		}
-		if(FacesContext.getCurrentInstance().getViewRoot().getViewId().equals("/modules/pedidos/adminBusquedaPedidos.xhtml")) {
-			this.pedidosDTOCols = ERPFactory.pedidos.getPedidoServicio().findObtenerPedidosRegistrados(Integer.parseInt(ERPConstantes.ESTADO_ACTIVO_NUMERICO), null, null, null ,null, null);
+		if (FacesContext.getCurrentInstance().getViewRoot().getViewId()
+				.equals("/modules/pedidos/adminBusquedaPedidos.xhtml")) {
+			this.pedidosDTOCols = ERPFactory.pedidos.getPedidoServicio().findObtenerPedidosRegistrados(
+					Integer.parseInt(ERPConstantes.ESTADO_ACTIVO_NUMERICO), null, null, null, null, null);
 		}
 	}
-		
+
 	@Override
 	public CommonDataManager getDataManager() {
 		return pedidosDataManager;
@@ -151,100 +160,127 @@ public class PedidosController extends CommonsController implements Serializable
 
 	@Override
 	public void initialize() {
-		
+
 	}
 
 	@Override
 	public void clearDataManager(ActionEvent event) {
 		super.clearDataManager(event);
 	}
-	
+
 	public void reloadPagina(ActionEvent e) {
 		System.out.println("Reload");
 	}
-	
+
 	public List<ArticuloDTO> completeTheme(String query) {
-        String queryLowerCase = query.toLowerCase();
-        List<ArticuloDTO> allThemes = service.getArticuloDTOCols();
-        return allThemes.stream().filter(t -> t.getNombreArticulo().toLowerCase().contains(queryLowerCase)).collect(Collectors.toList());
-    }
-	
+		String queryLowerCase = query.toLowerCase();
+		List<ArticuloDTO> allThemes = service.getArticuloDTOCols();
+		return allThemes.stream().filter(t -> t.getNombreArticulo().toLowerCase().contains(queryLowerCase))
+				.collect(Collectors.toList());
+	}
+
 	/**
 	 * Calcular el total y subtotal
+	 * 
 	 * @param e
 	 */
 	public void calcularTotalPedido(AjaxBehaviorEvent e) {
 		String idComponete = e.getComponent().getClientId();
-		String[] idCompuesto =  idComponete.split(":");
-		Integer numeroDetalle = Integer.parseInt(idCompuesto[2])+1;
+		String[] idCompuesto = idComponete.split(":");
+		Integer numeroDetalle = Integer.parseInt(idCompuesto[2]) + 1;
 
-		for(DetallePedidoDTO detallePedidoDTO : detallePedidoDTOCols) {
-			if(detallePedidoDTO.getId().getCodigoCompania().intValue() == numeroDetalle.intValue()) {
-				if(detallePedidoDTO.getCantidad() != null && detallePedidoDTO.getArticuloDTO().getPrecio() != null) {
-					BigDecimal subTotal = BigDecimal.valueOf(Double.valueOf(""+detallePedidoDTO.getCantidad())).multiply(detallePedidoDTO.getArticuloDTO().getPrecio());
+		for (DetallePedidoDTO detallePedidoDTO : detallePedidoDTOCols) {
+			if (detallePedidoDTO.getId().getCodigoCompania().intValue() == numeroDetalle.intValue()) {
+				if (detallePedidoDTO.getCantidad() != null && detallePedidoDTO.getArticuloDTO().getPrecio() != null) {
+					if (detallePedidoDTO.getCantidad().intValue() > detallePedidoDTO.getArticuloDTO().getCantidadStock()
+							.intValue()) {
+						detallePedidoDTO.setCantidad(detallePedidoDTO.getArticuloDTO().getCantidadStock());
+						this.setShowMessagesBar(Boolean.TRUE);
+						MensajesController.addWarn(null, ERPWebResources
+								.getString("ec.com.erp.etiqueta.label.busqueda.pedidos.mensaje.error.mayor"));
+						return;
+					}
+					BigDecimal subTotal = BigDecimal.valueOf(Double.valueOf("" + detallePedidoDTO.getCantidad()))
+							.multiply(detallePedidoDTO.getArticuloDTO().getPrecio());
 					detallePedidoDTO.setSubTotal(subTotal);
 					this.calcularTotal();
 				}
+				this.setShowMessagesBar(Boolean.FALSE);
 				break;
 			}
 		}
 	}
-	
+
 	public void onItemSelect(SelectEvent event) {
-        System.out.println(event.getObject());
-        for(DetallePedidoDTO detallePedidoDTOTemp : detallePedidoDTOCols) {
-        	if(detallePedidoDTOTemp.getNombreArticulo() != null) {
-        		String queryLowerCase = detallePedidoDTOTemp.getNombreArticulo().toLowerCase();
-        		ArticuloDTO articuloSeleccionado = this.getArticuloDTOCols().stream()
-                		.filter(articulo -> articulo.getNombreArticulo().toLowerCase().equals(queryLowerCase))
-                		.findFirst().orElse(null);
-        		detallePedidoDTOTemp.setArticuloDTO(articuloSeleccionado);
-        	}
-        	
-			if((detallePedidoDTOTemp.getCantidad() == null ||  detallePedidoDTOTemp.getCantidad().intValue() == 0) && detallePedidoDTOTemp.getArticuloDTO().getPrecio() != null){
+		System.out.println(event.getObject());
+		for (DetallePedidoDTO detallePedidoDTOTemp : detallePedidoDTOCols) {
+			if (detallePedidoDTOTemp.getNombreArticulo() != null) {
+				String queryLowerCase = detallePedidoDTOTemp.getNombreArticulo().toLowerCase();
+				ArticuloDTO articuloSeleccionado = this.getArticuloDTOCols().stream()
+						.filter(articulo -> articulo.getNombreArticulo().toLowerCase().equals(queryLowerCase))
+						.findFirst().orElse(null);
+				if (articuloSeleccionado.getCantidadStock().intValue() == 0) {
+					this.setShowMessagesBar(Boolean.TRUE);
+					MensajesController.addError(null, ERPWebResources
+							.getString("ec.com.erp.etiqueta.label.busqueda.pedidos.mensaje.error.stock"));
+					return;
+				} else {
+					this.setShowMessagesBar(Boolean.FALSE);
+					detallePedidoDTOTemp.setArticuloDTO(articuloSeleccionado);
+				}
+			}
+
+			if ((detallePedidoDTOTemp.getCantidad() == null || detallePedidoDTOTemp.getCantidad().intValue() == 0)
+					&& detallePedidoDTOTemp.getArticuloDTO().getPrecio() != null) {
 				detallePedidoDTOTemp.setCantidad(1);
 			}
-			if(detallePedidoDTOTemp.getCantidad() != null && detallePedidoDTOTemp.getArticuloDTO().getPrecio() != null) {
-				BigDecimal subTotal = BigDecimal.valueOf(Double.valueOf(""+detallePedidoDTOTemp.getCantidad())).multiply(detallePedidoDTOTemp.getArticuloDTO().getPrecio());
+			if (detallePedidoDTOTemp.getCantidad() != null
+					&& detallePedidoDTOTemp.getArticuloDTO().getPrecio() != null) {
+				BigDecimal subTotal = BigDecimal.valueOf(Double.valueOf("" + detallePedidoDTOTemp.getCantidad()))
+						.multiply(detallePedidoDTOTemp.getArticuloDTO().getPrecio());
 				detallePedidoDTOTemp.setSubTotal(subTotal);
-				detallePedidoDTOTemp.setCodigoArticulo(detallePedidoDTOTemp.getArticuloDTO().getId().getCodigoArticulo());
+				detallePedidoDTOTemp
+						.setCodigoArticulo(detallePedidoDTOTemp.getArticuloDTO().getId().getCodigoArticulo());
 				this.calcularTotal();
 			}
 		}
-    }
-	
+	}
+
 	/**
 	 * Metodo para ir a la pantalla menu principal
+	 * 
 	 * @return
 	 */
-	public String regresarMenuPrincipal(){
+	public String regresarMenuPrincipal() {
 		this.loginController.desActivarMenusSeleccionado();
 		this.loginController.setActivarInicio(Boolean.TRUE);
 		return "/modules/principal/menu.xhtml?faces-redirect=true";
 	}
-	
+
 	/**
-	 * Metodo para consultar cliente por documento 
+	 * Metodo para consultar cliente por documento
+	 * 
 	 * @param e
 	 */
 	public void realizarConsultaClienteByDocumento(AjaxBehaviorEvent e) {
-		Collection<ClienteDTO> clienteDTOColsTemp = ERPFactory.clientes.getClientesServicio().findObtenerListaClientes(Integer.parseInt(ERPConstantes.ESTADO_ACTIVO_NUMERICO), documentoCliente, null);
-		if(CollectionUtils.isNotEmpty(clienteDTOColsTemp)) {
+		Collection<ClienteDTO> clienteDTOColsTemp = ERPFactory.clientes.getClientesServicio().findObtenerListaClientes(
+				Integer.parseInt(ERPConstantes.ESTADO_ACTIVO_NUMERICO), documentoCliente, null);
+		if (CollectionUtils.isNotEmpty(clienteDTOColsTemp)) {
 			ClienteDTO clienteDTOTemp = clienteDTOColsTemp.iterator().next();
-			if(clienteDTOTemp != null) {
+			if (clienteDTOTemp != null) {
 				this.setClienteDTO(clienteDTOTemp);
 			}
-		}
-		else
-		{
+		} else {
 			this.setClienteDTO(new ClienteDTO());
 			this.setShowMessagesBar(Boolean.TRUE);
-			MensajesController.addError(null, ERPWebResources.getString("ec.com.erp.etiqueta.label.nuevo.pedidos.mensaje.busqueda.cliente"));
+			MensajesController.addError(null,
+					ERPWebResources.getString("ec.com.erp.etiqueta.label.nuevo.pedidos.mensaje.busqueda.cliente"));
 		}
 	}
-	
+
 	/**
 	 * Agregar nueva fila pedido
+	 * 
 	 * @param e
 	 */
 	public void agragarRegistroDetallePedido(ActionEvent e) {
@@ -254,202 +290,244 @@ public class PedidosController extends CommonsController implements Serializable
 		this.detallePedidoDTOCols.add(detalle);
 		contDetalle++;
 	}
-	
+
 	/**
 	 * Metodo para asignar los valores del articulo seleccionado
+	 * 
 	 * @param e
 	 */
 	public void asignarValoresArticuloPrime(AjaxBehaviorEvent e) {
-		for(DetallePedidoDTO detallePedidoDTOTemp : detallePedidoDTOCols) {
-			if((detallePedidoDTOTemp.getCantidad() == null ||  detallePedidoDTOTemp.getCantidad().intValue() == 0) && detallePedidoDTOTemp.getArticuloDTO().getPrecio() != null){
+		for (DetallePedidoDTO detallePedidoDTOTemp : detallePedidoDTOCols) {
+			if ((detallePedidoDTOTemp.getCantidad() == null || detallePedidoDTOTemp.getCantidad().intValue() == 0)
+					&& detallePedidoDTOTemp.getArticuloDTO().getPrecio() != null) {
 				detallePedidoDTOTemp.setCantidad(1);
 			}
-			if(detallePedidoDTOTemp.getCantidad() != null && detallePedidoDTOTemp.getArticuloDTO().getPrecio() != null) {
-				BigDecimal subTotal = BigDecimal.valueOf(Double.valueOf(""+detallePedidoDTOTemp.getCantidad())).multiply(detallePedidoDTOTemp.getArticuloDTO().getPrecio());
+			if (detallePedidoDTOTemp.getCantidad() != null
+					&& detallePedidoDTOTemp.getArticuloDTO().getPrecio() != null) {
+				BigDecimal subTotal = BigDecimal.valueOf(Double.valueOf("" + detallePedidoDTOTemp.getCantidad()))
+						.multiply(detallePedidoDTOTemp.getArticuloDTO().getPrecio());
 				detallePedidoDTOTemp.setSubTotal(subTotal);
-				detallePedidoDTOTemp.setCodigoArticulo(detallePedidoDTOTemp.getArticuloDTO().getId().getCodigoArticulo());
+				detallePedidoDTOTemp
+						.setCodigoArticulo(detallePedidoDTOTemp.getArticuloDTO().getId().getCodigoArticulo());
 				this.calcularTotal();
 			}
 		}
 	}
-	
+
 	public List<String> completeNombreArticulo(String query) {
-        String queryLowerCase = query.toLowerCase();
-        List<ArticuloDTO> allThemes = this.getArticuloDTOCols().stream()
-        		.filter(t -> t.getNombreArticulo().toLowerCase().contains(queryLowerCase))
-        		.collect(Collectors.toList());
-        List<String> results = new ArrayList<>();
-        allThemes.stream().forEach(articulo -> results.add(articulo.getNombreArticulo()));
-        return results;
-    }
-	
+		String queryLowerCase = query.toLowerCase();
+		List<ArticuloDTO> allThemes = this.getArticuloDTOCols().stream()
+				.filter(t -> t.getNombreArticulo().toLowerCase().contains(queryLowerCase)).collect(Collectors.toList());
+		List<String> results = new ArrayList<>();
+		allThemes.stream().forEach(articulo -> results.add(articulo.getNombreArticulo()));
+		return results;
+	}
+
 	/**
 	 * Seleccion Local
+	 * 
 	 * @param e
 	 */
-	public void seleccionLocal(ValueChangeEvent e){
+	public void seleccionLocal(ValueChangeEvent e) {
 		e.getNewValue();
 	}
-	
+
 	/**
 	 * Metodo para buscar articulos
+	 * 
 	 * @param e
 	 */
-	public void busquedaPedididos(ActionEvent e){
+	public void busquedaPedididos(ActionEvent e) {
 		this.buscarPedidos();
 	}
-	
-	public void busquedaPedididosEnter(AjaxBehaviorEvent e){
+
+	public void busquedaPedididosEnter(AjaxBehaviorEvent e) {
 		this.buscarPedidos();
 	}
-	
-	public void buscarPedidos(){
+
+	public void buscarPedidos() {
 		try {
-			this.pedidosDTOCols = ERPFactory.pedidos.getPedidoServicio().findObtenerPedidosRegistrados(Integer.parseInt(ERPConstantes.ESTADO_ACTIVO_NUMERICO), numeroDocumentoBusqueda, nombreClienteBusqueda, new Timestamp(fechaPedidoInicioBusqueda.getTime()), new Timestamp(fechaPedidoFinBusqueda.getTime()), null);
-			if(CollectionUtils.isEmpty(this.pedidosDTOCols)){
+			this.pedidosDTOCols = ERPFactory.pedidos.getPedidoServicio().findObtenerPedidosRegistrados(
+					Integer.parseInt(ERPConstantes.ESTADO_ACTIVO_NUMERICO), numeroDocumentoBusqueda,
+					nombreClienteBusqueda, new Timestamp(fechaPedidoInicioBusqueda.getTime()),
+					new Timestamp(fechaPedidoFinBusqueda.getTime()), null);
+			if (CollectionUtils.isEmpty(this.pedidosDTOCols)) {
 				this.setShowMessagesBar(Boolean.TRUE);
-				FacesMessage msg = new FacesMessage("No se encontraron resultados para la b\u00FAsqueda realizada.", "ERROR MSG");
-		        msg.setSeverity(FacesMessage.SEVERITY_INFO);
-		        FacesContext.getCurrentInstance().addMessage(null, msg);
+				FacesMessage msg = new FacesMessage("No se encontraron resultados para la b\u00FAsqueda realizada.",
+						"ERROR MSG");
+				msg.setSeverity(FacesMessage.SEVERITY_INFO);
+				FacesContext.getCurrentInstance().addMessage(null, msg);
 			}
 		} catch (ERPException e1) {
 			this.setShowMessagesBar(Boolean.TRUE);
 			FacesMessage msg = new FacesMessage(e1.getMessage(), "ERROR MSG");
-	        msg.setSeverity(FacesMessage.SEVERITY_ERROR);
-	        FacesContext.getCurrentInstance().addMessage(null, msg);
+			msg.setSeverity(FacesMessage.SEVERITY_ERROR);
+			FacesContext.getCurrentInstance().addMessage(null, msg);
 		} catch (Exception e2) {
 			this.setShowMessagesBar(Boolean.TRUE);
 			FacesMessage msg = new FacesMessage(e2.getMessage(), "ERROR MSG");
-	        msg.setSeverity(FacesMessage.SEVERITY_ERROR);
-	        FacesContext.getCurrentInstance().addMessage(null, msg);
+			msg.setSeverity(FacesMessage.SEVERITY_ERROR);
+			FacesContext.getCurrentInstance().addMessage(null, msg);
 		}
 	}
-	
+
 	/**
 	 * Metodo para guardar o actualizar articulos
+	 * 
 	 * @param e
 	 */
-	public void guadarActualizarPedido(ActionEvent e){
+	public void guadarActualizarPedido(ActionEvent e) {
+		Boolean esGuardar = Boolean.TRUE;
+		if(this.pedidoDTO.getId().getCodigoPedido() != null) {
+			esGuardar = Boolean.FALSE;
+		}
 		try {
 			this.setPedidoGuardado(Boolean.FALSE);
-			if(this.validarInformacionRequerida()) {
+			if (this.validarInformacionRequerida()) {
 				this.setShowMessagesBar(Boolean.FALSE);
 				this.pedidoDTO.setCodigoCliente(this.clienteDTO.getId().getCodigoCliente());
+				this.pedidoDTO.setClienteDTO(this.clienteDTO);
 				this.pedidoDTO.getId().setCodigoCompania(Integer.parseInt(ERPConstantes.ESTADO_ACTIVO_NUMERICO));
 				this.pedidoDTO.setUsuarioRegistro(loginController.getUsuariosDTO().getId().getUserId());
 				this.pedidoDTO.setDetallePedidoDTOCols(detallePedidoDTOCols);
-				ERPFactory.pedidos.getPedidoServicio().transGuardarPedido(Integer.parseInt(ERPConstantes.ESTADO_ACTIVO_NUMERICO), this.pedidoDTO);
+				ERPFactory.pedidos.getPedidoServicio()
+						.transGuardarPedido(Integer.parseInt(ERPConstantes.ESTADO_ACTIVO_NUMERICO), this.pedidoDTO);
 				this.setShowMessagesBar(Boolean.TRUE);
 				this.setPedidoGuardado(Boolean.TRUE);
-		        MensajesController.addInfo(null, ERPWebResources.getString("ec.com.erp.etiqueta.label.nuevo.pedidos.mensaje.correcto"));
-			}
-			else
-			{
+				MensajesController.addInfo(null,
+						ERPWebResources.getString("ec.com.erp.etiqueta.label.nuevo.pedidos.mensaje.correcto"));
+			} else {
 				this.setShowMessagesBar(Boolean.TRUE);
 			}
 		} catch (ERPException e1) {
+			if(esGuardar) {
+				this.pedidoDTO.getId().setCodigoPedido(null);
+				this.detallePedidoDTOCols.stream().forEach(detalle ->{
+					detalle.getId().setCodigoDetallePedido(null);
+				});
+			}
 			this.setShowMessagesBar(Boolean.TRUE);
-	        MensajesController.addError(null, e1.getMessage());
+			if(e1.getMessage() == null) {
+				MensajesController.addError(null, ERPWebResources.getString("ec.com.erp.etiqueta.mensaje.error"));
+			}else {
+				MensajesController.addError(null, e1.getMessage());
+			}
 		} catch (Exception e2) {
+			if(esGuardar) {
+				this.pedidoDTO.getId().setCodigoPedido(null);
+				this.detallePedidoDTOCols.stream().forEach(detalle ->{
+					detalle.getId().setCodigoDetallePedido(null);
+				});
+			}
 			this.setShowMessagesBar(Boolean.TRUE);
-			 MensajesController.addError(null, e2.getMessage());
+			MensajesController.addError(null, e2.getMessage());
 		}
 	}
-	
+
 	/**
 	 * Metodo para validar la informacion requerida de la pantalla
 	 */
 	private Boolean validarInformacionRequerida() {
 		Boolean valido = Boolean.TRUE;
-		if(this.clienteDTO == null || this.clienteDTO.getId().getCodigoCliente() == null) {
-			MensajesController.addError(null, ERPWebResources.getString("ec.com.erp.etiqueta.label.nuevo.pedidos.mensaje.requerido.cliente"));
+		if (this.clienteDTO == null || this.clienteDTO.getId().getCodigoCliente() == null) {
+			MensajesController.addError(null,
+					ERPWebResources.getString("ec.com.erp.etiqueta.label.nuevo.pedidos.mensaje.requerido.cliente"));
 		}
-		if(CollectionUtils.isEmpty(detallePedidoDTOCols)) {
+		if (CollectionUtils.isEmpty(detallePedidoDTOCols)) {
 			valido = Boolean.FALSE;
-			MensajesController.addError(null, ERPWebResources.getString("ec.com.erp.etiqueta.label.nuevo.pedidos.mensaje.requerido.detalle"));
-		}else
-		{
+			MensajesController.addError(null,
+					ERPWebResources.getString("ec.com.erp.etiqueta.label.nuevo.pedidos.mensaje.requerido.detalle"));
+		} else {
 			Boolean ban = Boolean.FALSE;
-			for(DetallePedidoDTO detallePedidoDTOAux : detallePedidoDTOCols) {
-				if(detallePedidoDTOAux.getCodigoArticulo() != null) {
+			for (DetallePedidoDTO detallePedidoDTOAux : detallePedidoDTOCols) {
+				if (detallePedidoDTOAux.getCodigoArticulo() != null) {
 					ban = Boolean.TRUE;
 					break;
 				}
 			}
-			if(!ban) {
+			if (!ban) {
 				valido = Boolean.FALSE;
-				MensajesController.addError(null, ERPWebResources.getString("ec.com.erp.etiqueta.label.nuevo.pedidos.mensaje.requerido.detalle"));
+				MensajesController.addError(null,
+						ERPWebResources.getString("ec.com.erp.etiqueta.label.nuevo.pedidos.mensaje.requerido.detalle"));
 			}
 		}
-		
+
 		return valido;
 	}
-	
+
 	/**
 	 * Metodo para buscar articulos
+	 * 
 	 * @param e
 	 */
-	public void busquedaClientes(ActionEvent e){
+	public void busquedaClientes(ActionEvent e) {
 		try {
-			this.clienteDTOCols = ERPFactory.clientes.getClientesServicio().findObtenerListaClientes(Integer.parseInt(ERPConstantes.ESTADO_ACTIVO_NUMERICO), null, null);
-			if(CollectionUtils.isEmpty(this.clienteDTOCols)){
+			this.clienteDTOCols = ERPFactory.clientes.getClientesServicio()
+					.findObtenerListaClientes(Integer.parseInt(ERPConstantes.ESTADO_ACTIVO_NUMERICO), null, null);
+			if (CollectionUtils.isEmpty(this.clienteDTOCols)) {
 				this.setShowMessagesBar(Boolean.TRUE);
-				FacesMessage msg = new FacesMessage("No se encontraron resultados para la b\u00FAsqueda realizada.", "ERROR MSG");
-		        msg.setSeverity(FacesMessage.SEVERITY_INFO);
-		        FacesContext.getCurrentInstance().addMessage(null, msg);
+				FacesMessage msg = new FacesMessage("No se encontraron resultados para la b\u00FAsqueda realizada.",
+						"ERROR MSG");
+				msg.setSeverity(FacesMessage.SEVERITY_INFO);
+				FacesContext.getCurrentInstance().addMessage(null, msg);
 			}
 		} catch (ERPException e1) {
 			this.setShowMessagesBar(Boolean.TRUE);
 			FacesMessage msg = new FacesMessage(e1.getMessage(), "ERROR MSG");
-	        msg.setSeverity(FacesMessage.SEVERITY_ERROR);
-	        FacesContext.getCurrentInstance().addMessage(null, msg);
+			msg.setSeverity(FacesMessage.SEVERITY_ERROR);
+			FacesContext.getCurrentInstance().addMessage(null, msg);
 		} catch (Exception e2) {
 			this.setShowMessagesBar(Boolean.TRUE);
 			FacesMessage msg = new FacesMessage(e2.getMessage(), "ERROR MSG");
-	        msg.setSeverity(FacesMessage.SEVERITY_ERROR);
-	        FacesContext.getCurrentInstance().addMessage(null, msg);
+			msg.setSeverity(FacesMessage.SEVERITY_ERROR);
+			FacesContext.getCurrentInstance().addMessage(null, msg);
 		}
 	}
-	
+
 	/**
 	 * Metodo para agragar el cliente a la vista
 	 */
 	public void agragarCliente(ActionEvent e) {
 		// Verificar si existe en la coleccion el cliente
-		Predicate testPredicate = new BeanPredicate("id.codigoCliente", PredicateUtils.equalPredicate(this.codigoClienteSeleccionado));
+		Predicate testPredicate = new BeanPredicate("id.codigoCliente",
+				PredicateUtils.equalPredicate(this.codigoClienteSeleccionado));
 		// Validacion de objeto existente
-		this.clienteDTO  = (ClienteDTO) CollectionUtils.find(this.clienteDTOCols, testPredicate);
-		this.documentoCliente = this.clienteDTO.getPersonaDTO() == null ? this.clienteDTO.getEmpresaDTO().getNumeroRuc() : this.clienteDTO.getPersonaDTO().getNumeroDocumento();
+		this.clienteDTO = (ClienteDTO) CollectionUtils.find(this.clienteDTOCols, testPredicate);
+		this.documentoCliente = this.clienteDTO.getPersonaDTO() == null ? this.clienteDTO.getEmpresaDTO().getNumeroRuc()
+				: this.clienteDTO.getPersonaDTO().getNumeroDocumento();
 	}
-	
+
 	/**
 	 * Seleccionar cliente del popUp
+	 * 
 	 * @param e
 	 */
-	public void seleccionCliente(ValueChangeEvent e)
-	{
-		this.codigoClienteSeleccionado = (Long)e.getNewValue();
+	public void seleccionCliente(ValueChangeEvent e) {
+		this.codigoClienteSeleccionado = (Long) e.getNewValue();
 	}
-	
+
 	/**
 	 * Seleccionar cliente del popUp
+	 * 
 	 * @param e
 	 */
-	public void seleccionClientes(AjaxBehaviorEvent e)
-	{
+	public void seleccionClientes(AjaxBehaviorEvent e) {
 		System.out.println("Entro selecionar codigo:");
-		System.out.println(":"+this.codigoClienteSeleccionado);
+		System.out.println(":" + this.codigoClienteSeleccionado);
 	}
-	
+
 	/**
 	 * Metodo borrar pantalla y crear un articulo nuevo
+	 * 
 	 * @param e
 	 */
-	public void clearNuevoPedido(ActionEvent e){
+	public void clearNuevoPedido(ActionEvent e) {
 		this.setShowMessagesBar(Boolean.FALSE);
+		this.codigoClienteSeleccionado = null;
 		this.pedidoDTO = new PedidoDTO();
-		SecuenciaDTO secuenciaPedido = ERPFactory.secuencias.getSecuenciaServicio().findObtenerSecuenciaByNombre(PedidoID.NOMBRE_SECUENCIA);
-		this.pedidoDTO.setNumeroPedido("P-"+secuenciaPedido.getValorSecuencia());
+		SecuenciaDTO secuenciaPedido = ERPFactory.secuencias.getSecuenciaServicio()
+				.findObtenerSecuenciaByNombre(PedidoID.NOMBRE_SECUENCIA);
+		this.pedidoDTO.setNumeroPedido("P-" + secuenciaPedido.getValorSecuencia());
 		this.pedidoDTO.setFechaPedido(new Date());
 		this.clienteDTO = new ClienteDTO();
 		this.documentoCliente = "";
@@ -458,7 +536,7 @@ public class PedidosController extends CommonsController implements Serializable
 		this.detallePedidoDTOCols = new ArrayList<DetallePedidoDTO>();
 		DetallePedidoDTO detalle = null;
 		contDetalle = 1;
-		for(int i=0; i< 10; i++) {
+		for (int i = 0; i < 10; i++) {
 			detalle = new DetallePedidoDTO();
 			detalle.setArticuloDTO(new ArticuloDTO());
 			detalle.getId().setCodigoCompania(contDetalle);
@@ -466,99 +544,116 @@ public class PedidosController extends CommonsController implements Serializable
 			contDetalle++;
 		}
 	}
-	
+
 	/**
 	 * Metodo para refrescar pantalla
+	 * 
 	 * @param e
 	 */
-	public void refrescarPantalla(ActionEvent e){
+	public void refrescarPantalla(ActionEvent e) {
 		System.out.println("Ingreso a refrescar pantalla");
 	}
-	
+
 	/**
 	 * Metodo para regresar a la busqueda de articulos
+	 * 
 	 * @param e
 	 */
-	public String regresarBusquedaPedidos(){
+	public String regresarBusquedaPedidos() {
 		this.setPedidoGuardado(Boolean.FALSE);
 		this.pedidosDataManager.setPedidoDTOEditar(new PedidoDTO());
 		return "/modules/pedidos/adminBusquedaPedidos.xhtml?faces-redirect=true";
 	}
-	
+
 	/**
 	 * Metodo para ir a la pantalla de nuevo articulo
+	 * 
 	 * @return
 	 */
-	public String crearNuevoPedido(){
+	public String crearNuevoPedido() {
 		this.setPedidoGuardado(Boolean.FALSE);
 		return "/modules/pedidos/nuevoPedido.xhtml?faces-redirect=true";
 	}
-	
+
 	/**
 	 * Metodo para cargar datos a editar
+	 * 
 	 * @return
 	 */
-	public String  cargarPedidoEditar() {
-		if(this.pedidoDTO == null) {
+	public String cargarPedidoEditar() {
+		if (this.pedidoDTO == null) {
 			return null;
-		}else{
+		} else {
 			this.pedidosDataManager.setPedidoDTOEditar(this.pedidoDTO);
 			return "/modules/pedidos/nuevoPedido.xhtml?faces-redirect=true";
 		}
 	}
-	
+
 	/**
 	 * Metodo para cargar datos del pedido a cancelar o entregar
+	 * 
 	 * @return
 	 */
 	public void cargarDatosPedido(ActionEvent e) {
 		String nombreComponente = e.getComponent().getClientId();
-		if(nombreComponente.contains("btnEntregar")){
+		if (nombreComponente.contains("btnEntregar")) {
 			this.mensaje = ERPWebResources.getString("ec.com.erp.etiqueta.mensaje.confirmacion.estado.entregado");
 			this.mostrarIcono = Boolean.TRUE;
-		}
-		else{
+		} else {
 			this.mensaje = ERPWebResources.getString("ec.com.erp.etiqueta.mensaje.confirmacion.estado.cancelar");
 			this.mostrarIcono = Boolean.FALSE;
 		}
 	}
-	
+
 	/**
 	 * Metodo para cargar datos detalle
+	 * 
 	 * @return
 	 */
 	public void actualizarEstadoPedido(ActionEvent e) {
 		try {
-			ERPFactory.estadopedido.getEstadoPedidoServicio().transActualizarEstadoPorEstadoyPedido(loginController.getUsuariosDTO().getCodigoCompania(), this.pedidoDTO.getId().getCodigoPedido(), this.valorAccion, loginController.getUsuariosDTO().getId().getUserId());
+			ERPFactory.estadopedido.getEstadoPedidoServicio().transActualizarEstadoPorEstadoyPedido(
+					loginController.getUsuariosDTO().getCodigoCompania(), this.pedidoDTO.getId().getCodigoPedido(),
+					this.valorAccion, loginController.getUsuariosDTO().getId().getUserId());
+			this.pedidosDTOCols = ERPFactory.pedidos.getPedidoServicio().findObtenerPedidosRegistrados(
+					Integer.parseInt(ERPConstantes.ESTADO_ACTIVO_NUMERICO), null, null, null, null, null);
 			this.setShowMessagesBar(Boolean.TRUE);
-	        MensajesController.addInfo(null, ERPWebResources.getString("ec.com.erp.etiqueta.mensaje.informacion.estado.actualizado"));
+			MensajesController.addInfo(null,
+					ERPWebResources.getString("ec.com.erp.etiqueta.mensaje.informacion.estado.actualizado"));
 		} catch (ERPException e1) {
 			this.setShowMessagesBar(Boolean.TRUE);
-	        MensajesController.addError(null, e1.getMessage());
+			if(e1.getMessage() == null) {
+				MensajesController.addError(null, ERPWebResources.getString("ec.com.erp.etiqueta.mensaje.error"));
+			}else {
+				MensajesController.addError(null, e1.getMessage());
+			}
 		} catch (Exception e2) {
 			this.setShowMessagesBar(Boolean.TRUE);
-	        MensajesController.addError(null, e2.getMessage());
+			MensajesController.addError(null, e2.getMessage());
 		}
 	}
-	
+
 	/**
 	 * Metodo para cargar datos detalle
+	 * 
 	 * @return
 	 */
 	public void cargarPedidoDetalle(ActionEvent e) {
 		System.out.println("Ingreso a cargar detalle");
 	}
-	
+
 	/**
 	 * Metodo para agregar nuevo detalle al pedido
+	 * 
 	 * @param e
 	 */
-	public void agregarDetallePedido(ActionEvent e){
+	public void agregarDetallePedido(ActionEvent e) {
 		detallePedidoDTOCols.add(new DetallePedidoDTO());
 	}
-	
+
 	/**
-	 * Metodo para eliminar registro 
+	 * Metodo para eliminar registro
+	 * 
 	 * @param detallePedidoDTO
 	 */
 	public void eliminarDetallePedido(DetallePedidoDTO detallePedidoDTO) {
@@ -566,80 +661,91 @@ public class PedidosController extends CommonsController implements Serializable
 		this.calcularTotal();
 		this.ordenarDetalles();
 	}
-	
+
 	/**
 	 * Metodo para reordeneas detalles del pedido
 	 */
 	public void ordenarDetalles() {
 		int cont = 1;
-		for(DetallePedidoDTO detalle : this.detallePedidoDTOCols) {
+		for (DetallePedidoDTO detalle : this.detallePedidoDTOCols) {
 			detalle.getId().setCodigoCompania(cont);
 			cont++;
 		}
 	}
-	
+
 	/**
 	 * Metodo para calcular el total del pedido
 	 */
 	public void calcularTotal() {
 		this.pedidoDTO.setTotalCompra(BigDecimal.ZERO);
-		BigDecimal totalPedido = BigDecimal.ZERO;
+		BigDecimal totalSinImpuesto = BigDecimal.ZERO;
+		BigDecimal totalImpuesto = BigDecimal.ZERO;
+		BigDecimal totalConImpuesto = BigDecimal.ZERO;
 		for (DetallePedidoDTO detallePedidoDTO : detallePedidoDTOCols) {
-			if(detallePedidoDTO.getSubTotal() != null) {
-				totalPedido = totalPedido.add(detallePedidoDTO.getSubTotal());
+			if (detallePedidoDTO.getSubTotal() != null) {
+				totalSinImpuesto = totalSinImpuesto.add(detallePedidoDTO.getSubTotal());
+			}
+			if (detallePedidoDTO.getArticuloDTO().getTieneImpuesto()) {
+				for (ArticuloImpuestoDTO impuesto : detallePedidoDTO.getArticuloDTO().getArticuloImpuestoDTOCols()) {
+					totalImpuesto = totalImpuesto.add(BigDecimal.valueOf((totalSinImpuesto.doubleValue()
+							* impuesto.getImpuestoDTO().getValorImpuesto().doubleValue()) / Double.valueOf(100)));
+				}
 			}
 		}
-		this.pedidoDTO.setTotalCompra(totalPedido);
+		totalConImpuesto = totalSinImpuesto.add(totalImpuesto);
+		this.pedidoDTO.setTotalSinImpuestos(totalSinImpuesto);
+		this.pedidoDTO.setTotalImpuestos(totalImpuesto);
+		this.pedidoDTO.setTotalCompra(totalConImpuesto);
 	}
-	
+
 	/**
 	 * Borrar filtro de numero documento
 	 */
-	public void borrarBusquedaNumeroDocumento(ActionEvent e){
+	public void borrarBusquedaNumeroDocumento(ActionEvent e) {
 		this.numeroDocumentoBusqueda = "";
 		this.setShowMessagesBar(Boolean.FALSE);
 	}
-	
+
 	/**
 	 * Borrar filtro de nombre cliente persona
 	 */
-	public void borrarBusquedaNombreCliente(ActionEvent e){
+	public void borrarBusquedaNombreCliente(ActionEvent e) {
 		this.nombreClienteBusqueda = "";
 		this.setShowMessagesBar(Boolean.FALSE);
 	}
-	
+
 	/**
 	 * Borrar filtro de razon social empresa
 	 */
-	public void borrarBusquedaRazonSocial(ActionEvent e){
+	public void borrarBusquedaRazonSocial(ActionEvent e) {
 		this.razonSocialBusqueda = "";
 		this.setShowMessagesBar(Boolean.FALSE);
 	}
-	
+
 	/**
 	 * Borrar filtro de codigo de barras
 	 */
-	public void borrarBusquedaCodigoBarras(ActionEvent e){
+	public void borrarBusquedaCodigoBarras(ActionEvent e) {
 		this.codigoBarrasBusqueda = "";
 		this.setShowMessagesBar(Boolean.FALSE);
 	}
-	
+
 	/**
 	 * Borrar filtro de nombre articulo
 	 */
-	public void borrarBusquedaDescripcionArticulo(ActionEvent e){
+	public void borrarBusquedaDescripcionArticulo(ActionEvent e) {
 		this.nombreArticuloBusqueda = "";
 		this.setShowMessagesBar(Boolean.FALSE);
 	}
-	
+
 	/**
 	 * Borrar filtro de estado de pedido
 	 */
-	public void borrarBusquedaEstadoPedido(ActionEvent e){
+	public void borrarBusquedaEstadoPedido(ActionEvent e) {
 		this.estadoPedidoBusqueda = "";
 		this.setShowMessagesBar(Boolean.FALSE);
 	}
-	
+
 	public void setPedidosDataManager(PedidosDataManager pedidosDataManager) {
 		this.pedidosDataManager = pedidosDataManager;
 	}

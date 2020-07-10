@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Comparator;
+import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
@@ -169,6 +171,8 @@ public class LoginController extends CommonsController implements Serializable{
 //						this.modulosAdministracionCols.add(moduloPerfilDTO.getModuloDTO());
 //					}
 				}
+				
+				this.setModulosGestionCols(this.modulosGestionCols.stream().sorted(Comparator.comparing(ModuloDTO::getOrden)).collect(Collectors.toList()));
 				
 				this.sessionDataManagerBase.setUserDto(usuariosDTO);
 				

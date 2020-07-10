@@ -91,6 +91,8 @@ public class CuentasController extends CommonsController implements Serializable
 	private Collection<ArticuloDTO> articuloDTOCols;
 	private Collection<PagosFacturaDTO> pagosFacturaDTOCols;
 	private BigDecimal totalPagado;
+	private BigDecimal totalPendiente;
+	private Integer tamanioPopUp;
 	
 	// Data Managers
 	@ManagedProperty(value="#{cuentasDataManager}")
@@ -118,10 +120,14 @@ public class CuentasController extends CommonsController implements Serializable
 	private String codigoBarras;
 	private Boolean documentoCreado;
 	private Boolean crearNuevaFila;
+	private BigDecimal totalCuenta;
 
 	@PostConstruct
 	public void postConstruct() {
+		this.tamanioPopUp = 470;
 		this.totalPagado = BigDecimal.ZERO;
+		this.totalPendiente = BigDecimal.ZERO;
+		this.totalCuenta = BigDecimal.ZERO;
 		this.loginController.activarMenusSeleccionado();
 		this.documentoCreado = Boolean.FALSE;
 		this.facturaCabeceraDTO = new FacturaCabeceraDTO();
@@ -192,6 +198,18 @@ public class CuentasController extends CommonsController implements Serializable
 			tipoDocumento = ERPConstantes.CODIGO_CATALOGO_VALOR_DOCUMENTO_VENTAS;
 			pagado = Boolean.FALSE;
 			this.facturaCabeceraDTOCols = ERPFactory.facturas.getFacturaCabeceraServicio().findObtenerListaFacturas(Integer.parseInt(ERPConstantes.ESTADO_ACTIVO_NUMERICO), numeroFactura, null, null, docClienteProveedor, nombClienteProveedor, pagado, tipoDocumento);
+			this.facturaCabeceraDTOCols.stream().forEach(factura ->
+				this.totalCuenta = this.totalCuenta.add(factura.getTotalCuenta())
+			);
+		}
+		
+		if(FacesContext.getCurrentInstance().getViewRoot().getViewId().equals("/modules/cuentas/adminBusquedaCuentasPagar.xhtml")) {
+			tipoDocumento = ERPConstantes.CODIGO_CATALOGO_VALOR_DOCUMENTO_COMPRAS;
+			pagado = Boolean.FALSE;
+			this.facturaCabeceraDTOCols = ERPFactory.facturas.getFacturaCabeceraServicio().findObtenerListaFacturas(Integer.parseInt(ERPConstantes.ESTADO_ACTIVO_NUMERICO), numeroFactura, null, null, docClienteProveedor, nombClienteProveedor, pagado, tipoDocumento);
+			this.facturaCabeceraDTOCols.stream().forEach(factura ->
+				this.totalCuenta =  this.totalCuenta.add(factura.getTotalCuenta())
+			);
 		}
 	}
 		
@@ -212,6 +230,10 @@ public class CuentasController extends CommonsController implements Serializable
 	
 	public void reloadPagina(ActionEvent e) {
 		System.out.println("Reload");
+	}
+	
+	public void consultarFacturas(ActionEvent e) {
+		this.facturaCabeceraDTOCols = ERPFactory.facturas.getFacturaCabeceraServicio().findObtenerListaFacturas(Integer.parseInt(ERPConstantes.ESTADO_ACTIVO_NUMERICO), numeroFactura, null, null, docClienteProveedor, nombClienteProveedor, pagado, tipoDocumento);
 	}
 	
 	/**
@@ -314,12 +336,22 @@ public class CuentasController extends CommonsController implements Serializable
 			if(this.validarInformacionRequeridaPago()) {
 				this.pagosFacturaDTO.setCodigoFactura(this.facturaCabeceraDTO.getId().getCodigoFactura());
 				this.pagosFacturaDTO.getId().setCodigoCompania(Integer.parseInt(ERPConstantes.ESTADO_ACTIVO_NUMERICO));
+				this.pagosFacturaDTO.setDescripcion(this.pagosFacturaDTO.getDescripcion().toUpperCase());
 				this.pagosFacturaDTO.setUsuarioRegistro(loginController.getUsuariosDTO().getId().getUserId());
 				ERPFactory.transaccion.getTransaccionServicio().transGuardarPago(ERPConstantes.CODIGO_CATALOGO_VALOR_TRANSACCION_GASTO, this.pagosFacturaDTO);
 				this.pagosFacturaDTOCols.add(this.pagosFacturaDTO);
 				this.setShowMessagesBar(Boolean.TRUE);
 				this.totalPagado = this.totalPagado.add(this.pagosFacturaDTO.getValorPago());
-		        MensajesController.addInfo(null, ERPWebResources.getString("ec.com.erp.etiqueta.label.lista.cabecera.factura.mensaje.guardado"));
+				this.totalPendiente = this.totalPendiente.subtract(this.pagosFacturaDTO.getValorPago());
+				this.pagosFacturaDTO = new PagosFacturaDTO();
+				this.pagosFacturaDTO.setFechaPago(new Date());
+				if(this.totalPendiente.intValue() <= 0) {
+					this.facturaCabeceraDTO.setPagado(Boolean.TRUE);
+					this.tamanioPopUp = 270;
+				}else {
+					this.tamanioPopUp = 470;
+				}
+		        MensajesController.addInfo(null, ERPWebResources.getString("ec.com.erp.etiqueta.label.lista.pago.factura.mensaje.pago"));
 			}else{
 				this.setShowMessagesBar(Boolean.TRUE);
 			}
@@ -338,13 +370,23 @@ public class CuentasController extends CommonsController implements Serializable
 		try {
 			if(this.validarInformacionRequeridaPago()) {
 				this.pagosFacturaDTO.setCodigoFactura(this.facturaCabeceraDTO.getId().getCodigoFactura());
+				this.pagosFacturaDTO.setDescripcion(this.pagosFacturaDTO.getDescripcion().toUpperCase());
 				this.pagosFacturaDTO.getId().setCodigoCompania(Integer.parseInt(ERPConstantes.ESTADO_ACTIVO_NUMERICO));
 				this.pagosFacturaDTO.setUsuarioRegistro(loginController.getUsuariosDTO().getId().getUserId());
 				ERPFactory.transaccion.getTransaccionServicio().transGuardarPago(ERPConstantes.CODIGO_CATALOGO_VALOR_TRANSACCION_INGRESO, this.pagosFacturaDTO);
 				this.pagosFacturaDTOCols.add(this.pagosFacturaDTO);
 				this.setShowMessagesBar(Boolean.TRUE);
 				this.totalPagado = this.totalPagado.add(this.pagosFacturaDTO.getValorPago());
-		        MensajesController.addInfo(null, ERPWebResources.getString("ec.com.erp.etiqueta.label.lista.cabecera.factura.mensaje.guardado"));
+				this.totalPendiente = this.totalPendiente.subtract(this.pagosFacturaDTO.getValorPago());
+				this.pagosFacturaDTO = new PagosFacturaDTO();
+				this.pagosFacturaDTO.setFechaPago(new Date());
+				if(this.totalPendiente.intValue() <= 0) {
+					this.facturaCabeceraDTO.setPagado(Boolean.TRUE);
+					this.tamanioPopUp = 270;
+				}else {
+					this.tamanioPopUp = 470;
+				}
+		        MensajesController.addInfo(null, ERPWebResources.getString("ec.com.erp.etiqueta.label.lista.pago.factura.mensaje.pago"));
 			}else{
 				this.setShowMessagesBar(Boolean.TRUE);
 			}
@@ -367,6 +409,10 @@ public class CuentasController extends CommonsController implements Serializable
 		if(this.pagosFacturaDTO.getValorPago() == null) {
 			valido = Boolean.FALSE;
 			MensajesController.addError(null, ERPWebResources.getString("ec.com.erp.etiqueta.mensaje.campo.requerido.pago.valorpago"));
+		}
+		if(this.pagosFacturaDTO.getValorPago() != null && this.pagosFacturaDTO.getValorPago().doubleValue() == 0.0) {
+			valido = Boolean.FALSE;
+			MensajesController.addError(null, ERPWebResources.getString("ec.com.erp.etiqueta.mensaje.campo.requerido.pago.valorencero"));
 		}
 		if(StringUtils.isEmpty(this.pagosFacturaDTO.getDescripcion())) {
 			valido = Boolean.FALSE;
@@ -636,6 +682,12 @@ public class CuentasController extends CommonsController implements Serializable
 			this.pagosFacturaDTOCols.stream().forEach(pago ->{
 				this.totalPagado = this.totalPagado.add(pago.getValorPago());
 			});
+		}
+		this.totalPendiente = this.facturaCabeceraDTO.getTotalCuenta().subtract(this.totalPagado);
+		if(this.facturaCabeceraDTO.getPagado()) {
+			this.tamanioPopUp = 270;
+		}else {
+			this.tamanioPopUp = 470;
 		}
 	}
 	
@@ -1588,5 +1640,29 @@ public void obtenerCodigoBarrasCompraEnter(AjaxBehaviorEvent e) {
 
 	public void setTotalPagado(BigDecimal totalPagado) {
 		this.totalPagado = totalPagado;
+	}
+
+	public BigDecimal getTotalPendiente() {
+		return totalPendiente;
+	}
+
+	public void setTotalPendiente(BigDecimal totalPendiente) {
+		this.totalPendiente = totalPendiente;
+	}
+
+	public Integer getTamanioPopUp() {
+		return tamanioPopUp;
+	}
+
+	public void setTamanioPopUp(Integer tamanioPopUp) {
+		this.tamanioPopUp = tamanioPopUp;
+	}
+
+	public BigDecimal getTotalCuenta() {
+		return totalCuenta;
+	}
+
+	public void setTotalCuenta(BigDecimal totalCuenta) {
+		this.totalCuenta = totalCuenta;
 	}
 }

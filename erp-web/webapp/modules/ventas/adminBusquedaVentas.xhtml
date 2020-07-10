@@ -99,8 +99,8 @@
 	            <rich:column>
 	                <f:facet name="header"><h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.label.lista.cabecera.factura.razonSocial']}"/></f:facet>
 	                <rich:panel id="cliente#{it}" styleClass="tooltip-text" bodyClass="rich-laguna-panel-no-header" style="border: none !important">  
-		        		<h:outputText value="#{cuenta.nombreClienteProveedor.length() > 18 ? cuenta.nombreClienteProveedor.substring(0,18).concat('...') : cuenta.nombreClienteProveedor}" /> 
-						<rich:tooltip id="ttc#{it}" showDelay="500" styleClass="tooltip" layout="block" rendered="#{cuenta.nombreClienteProveedor.length() > 18}">                
+		        		<h:outputText value="#{cuenta.nombreClienteProveedor.length() > 50 ? cuenta.nombreClienteProveedor.substring(0,50).concat('...') : cuenta.nombreClienteProveedor}" /> 
+						<rich:tooltip id="ttc#{it}" showDelay="500" styleClass="tooltip" layout="block" rendered="#{cuenta.nombreClienteProveedor.length() > 50}">                
 							<h:panelGrid>
 								<span style="white-space: nowrap">												
 									<h:outputText value="#{cuenta.nombreClienteProveedor}" />												
@@ -109,7 +109,7 @@
 						</rich:tooltip>       
 					</rich:panel>
 	            </rich:column>
-	            <rich:column>
+	            <!--rich:column>
 	                <f:facet name="header"><h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.label.lista.cabecera.factura.direccion']}"/></f:facet>
 	                <rich:panel id="direccion#{it}" styleClass="tooltip-text" bodyClass="rich-laguna-panel-no-header" style="border: none !important">  
 		        		<h:outputText value="#{cuenta.direccion.length() > 30 ? cuenta.direccion.substring(0,30).concat('...') : cuenta.direccion}" /> 
@@ -121,7 +121,7 @@
 							</h:panelGrid>
 						</rich:tooltip>       
 					</rich:panel>
-	            </rich:column>
+	            </rich:column-->
 	            <rich:column style="width: 60px; text-align: center;">
 	                <f:facet name="header"><h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.label.lista.cabecera.factura.telefono']}"/></f:facet>
 	                <h:outputText value="#{cuenta.telefono}" />
@@ -153,14 +153,16 @@
 	            <rich:column styleClass="columna5">
 	                <f:facet name="header">Pagos</f:facet>
 	                <a4j:commandLink id="botonPago" title="Ver detalle de factura" render="popUpPagos pnlListaDetallePagos" execute="@this" actionListener="#{cuentasController.simularEvento}" oncomplete="cargarPagos();">
-						<h:graphicImage name="pagos.png" library="images" style="border:none;border-color:white;" height="16" width="16"/>
+						<h:graphicImage title="Ingresar nuevo pago" name="pagos.png" library="images" style="border:none;border-color:white;" height="24" width="24" rendered="#{!cuenta.pagado}"/>
+						<h:graphicImage title="Ver detalle de pagos" name="btnDetailPay.png" library="images" style="border:none;border-color:white;" height="24" width="24" rendered="#{cuenta.pagado}"/>
 						<f:setPropertyActionListener value="#{cuenta}" target="#{cuentasController.facturaCabeceraDTO}" />											
 					</a4j:commandLink>
 	            </rich:column>
 	            <rich:column styleClass="columna5">
 	                <f:facet name="header">Cancelar</f:facet>
-	                <a4j:commandLink id="botonEditar" title="Cancelar factura" render="pnlGridVentas, pnlGridDetalleFactura" actionListener="#{cuentasController.cargarFacturaDetalle}"	execute="@this" oncomplete="#{rich:component('popUpConfirmar')}.show();"> 
-						<h:graphicImage name="btnCancelar.png" library="images" style="border:none;border-color:white;" height="16" width="16"/>
+	                <h:graphicImage title="La factura ya no se puede cancelar porque se encuentra pagada" rendered="#{cuenta.pagado or cuenta.pagosFacturaDTOCols != null}" name="btnBloqueo.png" library="images" style="border:none;border-color:white;" height="16" width="16"/>
+	                <a4j:commandLink id="botonEditar" rendered="#{!cuenta.pagado and cuenta.pagosFacturaDTOCols == null}" title="Cancelar factura" render="pnlGridVentas, pnlGridDetalleFactura" actionListener="#{cuentasController.cargarFacturaDetalle}"	execute="@this" oncomplete="#{rich:component('popUpConfirmar')}.show();"> 
+						<h:graphicImage name="btnCancelar.png" library="images" style="border:none;border-color:white;" height="16" width="16"/> 
 						<f:setPropertyActionListener value="#{cuenta}" target="#{cuentasController.facturaCabeceraDTO}" />											
 					</a4j:commandLink>	
 	            </rich:column> 
@@ -170,14 +172,14 @@
         <a4j:jsFunction name="cargarPagos" actionListener="#{cuentasController.cargarDatosPago}" execute="pnlGridAgregarDetalle" render="popUpPagos pnlListaDetallePagos" oncomplete="#{rich:component('popUpPagos')}.show();"></a4j:jsFunction>
         
         <!-- Popup para ver el detalle de pagos-->
-		<rich:popupPanel id="popUpPagos" styleClass="panelPedidos" header="#{msg_erpweb['ec.com.erp.etiqueta.header.nueva.pagos.detalle']}" width="935" height="450" modal="true" domElementAttachment="form">
+		<rich:popupPanel id="popUpPagos" styleClass="panelPedidos" header="#{msg_erpweb['ec.com.erp.etiqueta.header.nueva.pagos.detalle']}" width="935" height="#{cuentasController.tamanioPopUp}" modal="true" domElementAttachment="form">
 			<f:facet name="controls">
-				<h:outputLink value="#"	onclick="#{rich:component('popUpPagos')}.hide();">
+				<a4j:commandLink render="panelCuentasTabla" actionListener="#{cuentasController.consultarFacturas}" oncomplete="#{rich:component('popUpPagos')}.hide(); return false;">
 					<h:graphicImage library="images" name="close.png" style="border:0px" id="closePopUpPago" />
-				</h:outputLink>
+				</a4j:commandLink>
 			</f:facet>
 			<h:panelGrid id="pnlListaDetallePagos" style="width: 100%;">	
-				<rich:toolbar height="26" itemSeparator="grid">
+				<rich:toolbar height="26" itemSeparator="grid" rendered="#{!cuentasController.facturaCabeceraDTO.pagado}">
 					<rich:toolbarGroup>
 						<h:graphicImage name="pagos.png" library="images" style="border:none;border-color:white;" height="16" width="16"/>
 						<h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.header.nueva.pagos.registro']}"/>
@@ -193,8 +195,18 @@
 						</h:panelGroup>	
 					</rich:toolbarGroup>						
 				</rich:toolbar>	
-				<rich:panel style="width: 99.5%; background-color: #F5FAFF;">
+				<rich:panel style="width: 99.5%; background-color: #F5FAFF;" rendered="#{!cuentasController.facturaCabeceraDTO.pagado}">
 				 	<h:panelGrid id="pnlGridPagos" columns="2" cellspacing="2" cellpadding="5">
+				 		<h:outputText class="styleNegritas" value="#{msg_erpweb['ec.com.erp.etiqueta.header.nueva.pagos.total.factura']}: *" />
+				 		<h:outputText value="#{cuentasController.facturaCabeceraDTO.totalCuenta}" >
+	                		<f:convertNumber pattern="0.00"/>
+	                	</h:outputText>
+	                	
+	                	<h:outputText class="styleNegritas" value="#{msg_erpweb['ec.com.erp.etiqueta.header.nueva.pagos.saldo.factura']}: *" />
+				 		<h:outputText value="#{cuentasController.totalPendiente}" >
+	                		<f:convertNumber pattern="0.00"/>
+	                	</h:outputText>
+						
 					 	<h:outputText class="styleNegritas" value="#{msg_erpweb['ec.com.erp.etiqueta.header.nueva.pagos.fechapago']}: *" />
 						<rich:calendar value="#{cuentasController.pagosFacturaDTO.fechaPago}" datePattern="yyyy-MM-dd"></rich:calendar>
 						
@@ -206,13 +218,13 @@
 				 	</h:panelGrid>
 				</rich:panel>
 				
-				<rich:panel style="width: 99.6%; height: 207px; " header="Detalle de pagos">
+				<rich:panel style="width: 99.6%; height: 197px; " header="Detalle de pagos">
 					
 					<h:panelGrid id="tablaVaciaPago" columns="1" rendered="#{empty cuentasController.pagosFacturaDTOCols}" style="width:100%; text-align: center; padding-top: 100px">
 						<h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.mensaje.lista.vacio']}"/>
 					</h:panelGrid>	
 					<rich:panel style="text-align:center; border-left: none; border-right:none; margin-bottom: 2px" rendered="#{not empty cuentasController.pagosFacturaDTOCols}">
-						<rich:dataScroller fastStep="3" for="tableDetalles" maxPages="5" rendered="#{not empty cuentasController.pagosFacturaDTOCols}" renderIfSinglePage="false"/>
+						<rich:dataScroller fastStep="3" for="tablePagos" maxPages="5" rendered="#{not empty cuentasController.pagosFacturaDTOCols}" renderIfSinglePage="false"/>
 					</rich:panel>	
 					<rich:dataTable style="width:100%" value="#{cuentasController.pagosFacturaDTOCols}" rendered="#{not empty cuentasController.pagosFacturaDTOCols}" var="pago" iterationStatusVar="it" id="tablePagos" rows="5">
 			            <rich:column>
@@ -251,7 +263,7 @@
 			<!-- Botones de PopUp -->
 			<h:panelGrid style="margin:auto;" columns="1" cellpadding="0" cellspacing="0">
 				<h:panelGroup layout="block" styleClass="botonD" style="margin-top:5px;">
-					<a4j:commandLink id="btnCancelarPago" styleClass="cancelarD" oncomplete="#{rich:component('popUpPagos')}.hide(); return false;" immediate="true">
+					<a4j:commandLink id="btnCancelarPago" render="panelCuentasTabla" actionListener="#{cuentasController.consultarFacturas}" styleClass="cancelarD" oncomplete="#{rich:component('popUpPagos')}.hide(); return false;">
 						<h:panelGrid columns="2" cellpadding="3" cellspacing="0">
 							<h:graphicImage name="btnCancel.png" library="images" style="border:none;border-color:white;" height="16" width="16"/>
 							<h:outputText value="Cerrar" />
@@ -419,12 +431,19 @@
 				te = String.fromCharCode(tecla);
 				return patron.test(te);
 			}
+			function validarDecimal(e) {
+				tecla = (document.all) ? e.keyCode : e.which; 
+				if (tecla==8) return true; 
+				patron =/[0-9\s.0-9\s]/; 
+				te = String.fromCharCode(tecla);
+				return patron.test(te);
+			}
 		/*]]>*/			
 		</script>
 		<h:outputStylesheet>
 			.estiloTextArea{
-				width:236px !important;
-				height: 50px !important;
+				width:350px !important;
+				height: 25px !important;
 			}		
 		</h:outputStylesheet>
 		<h:commandLink id="linkprintFacture" styleClass="linkprintFacture" action="#{cuentasController.imprimirFactura}" target="_BLANK">

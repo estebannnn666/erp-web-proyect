@@ -66,7 +66,7 @@
 			</h:panelGroup>	
 		</rich:panel>
 	
-		<rich:panel id="panelCuentasTabla" header="Lista de documentos" styleClass="panelPedidos" style="width:100%; height: 84.3%">	
+		<rich:panel id="panelCuentasTabla" header="Lista de cuentas por cobrar" styleClass="panelPedidos" style="width:100%; height: 84.3%">	
 			<h:panelGrid id="tablaVaciaPedidos" columns="1" rendered="#{empty cuentasController.facturaCabeceraDTOCols}" style="width:100%; text-align: center; padding-top: 230px">
 				<h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.mensaje.lista.vacio']}"/>
 			</h:panelGrid>	
@@ -143,13 +143,20 @@
 						<f:setPropertyActionListener value="#{cuenta}" target="#{cuentasController.facturaCabeceraDTO}" />											
 					</a4j:commandLink>
 	            </rich:column>
-	            <rich:column styleClass="columna5">
-	                <f:facet name="header">Cancelar</f:facet>
-	                <a4j:commandLink id="botonEditar" title="Cancelar factura" render="pnlGridVentas, pnlGridDetalleFactura" actionListener="#{cuentasController.cargarFacturaDetalle}"	execute="@this" oncomplete="#{rich:component('popUpConfirmar')}.show();"> 
-						<h:graphicImage name="btnCancelar.png" library="images" style="border:none;border-color:white;" height="16" width="16"/>
-						<f:setPropertyActionListener value="#{cuenta}" target="#{cuentasController.facturaCabeceraDTO}" />											
-					</a4j:commandLink>	
-	            </rich:column> 
+	             <f:facet name="footer">
+	            	<rich:columnGroup>
+		                <rich:column colspan="8" style="text-align: right; paddin-right: 10px">Total de cobros:</rich:column>
+		                <rich:column style="text-align: right; paddin-right: 10px">
+		                    <h:outputText value="#{cuentasController.totalCuenta}">
+		                    	<f:convertNumber pattern="0.00"/>
+		                    </h:outputText>
+		                </rich:column>
+		                <rich:column>
+		                </rich:column>
+		                <rich:column>
+		                </rich:column>
+		            </rich:columnGroup>
+	            </f:facet>
 	        </rich:dataTable>
         </rich:panel>
         
@@ -211,6 +218,32 @@
 			                	<f:convertNumber pattern="0.00"/>
 			                </h:outputText>
 			            </rich:column>
+			            <f:facet name="footer">
+			                <rich:columnGroup>
+				                <rich:column colspan="7" style="text-align: right; paddin-right: 10px">Sub Total:</rich:column>
+				                <rich:column style="text-align: right; paddin-right: 10px">
+				                    <h:outputText value="#{cuentasController.facturaCabeceraDTO.totalSinImpuestos}">
+				                    	<f:convertNumber pattern="0.00"/>
+				                    </h:outputText>
+				                </rich:column>
+				            </rich:columnGroup>
+				            <rich:columnGroup>
+				                <rich:column colspan="7" style="text-align: right; paddin-right: 10px">Iva 12 %:</rich:column>
+				                <rich:column style="text-align: right; paddin-right: 10px">
+				                    <h:outputText value="#{cuentasController.facturaCabeceraDTO.totalImpuestos}">
+				                    	<f:convertNumber pattern="0.00"/>
+				                    </h:outputText>
+				                </rich:column>
+				            </rich:columnGroup>
+				            <rich:columnGroup>
+				                <rich:column colspan="7" style="text-align: right; paddin-right: 10px">Total:</rich:column>
+				                <rich:column style="text-align: right; paddin-right: 10px">
+				                    <h:outputText value="#{cuentasController.facturaCabeceraDTO.totalCuenta}">
+				                    	<f:convertNumber pattern="0.00"/>
+				                    </h:outputText>
+				                </rich:column>
+				            </rich:columnGroup>
+			            </f:facet>
 			        </rich:dataTable>
 		        </rich:panel>
 			</h:panelGrid>
@@ -227,46 +260,6 @@
 			</h:panelGrid>
 		</rich:popupPanel>
 		
-		<!-- Popup para confirmar que se guardo el articulo -->
-		<rich:popupPanel id="popUpConfirmar" header="#{msg_erpweb['ec.com.erp.etiqueta.mensaje.confirmacion']}" width="345" height="160" modal="true" domElementAttachment="form">
-			<f:facet name="controls">
-				<h:outputLink value="#"	onclick="#{rich:component('popUpConfirmar')}.hide();">
-					<h:graphicImage library="images" name="close.png" style="border:0px"/>
-				</h:outputLink>
-			</f:facet>
-			
-			<rich:panel style="height: 94%">
-				<h:panelGrid columns="3">
-					<h:graphicImage name="succes.png" library="images" style="border:none;border-color:white;" height="48" width="48"/>
-					<h:panelGroup style="margin-right:20px;">
-					</h:panelGroup>
-					<h:panelGroup style="text-align:justify;">
-						<h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.mensaje.popUp.cancelacion']}" />
-					</h:panelGroup>
-				</h:panelGrid>
-		    </rich:panel>
-			
-			<!-- Botones de PopUp -->
-			<h:panelGrid style="margin:auto; padding-top: 5px;" columns="3" cellpadding="0" cellspacing="0">
-				<h:panelGroup layout="block" styleClass="botonD" style="margin-top:5px; margin-right:20px;">
-					<a4j:commandLink styleClass="cancelarD" execute="@this" render="panelCuentasTabla tableCuentas pnlMensajes" actionListener="#{cuentasController.cancelarFacturasVentas}" oncomplete="#{rich:component('popUpConfirmar')}.hide(); return false;">
-						<h:panelGrid columns="2" cellpadding="3" cellspacing="0">
-							<h:graphicImage name="btnAceptar.png" library="images" style="border:none;border-color:white;" height="16" width="16"/>
-							<h:outputText value="Aceptar" />
-						</h:panelGrid>
-					</a4j:commandLink>
-				</h:panelGroup>
-				
-				<h:panelGroup layout="block" styleClass="botonD" style="margin-top:5px;">
-					<a4j:commandLink styleClass="cancelarD" oncomplete="#{rich:component('popUpConfirmar')}.hide(); return false;" immediate="true">
-						<h:panelGrid columns="2" cellpadding="3" cellspacing="0">
-							<h:graphicImage name="btnCancel.png" library="images" style="border:none;border-color:white;" height="16" width="16"/>
-							<h:outputText value="Cancelar" />
-						</h:panelGrid>
-					</a4j:commandLink>
-				</h:panelGroup>
-			</h:panelGrid>
-		</rich:popupPanel>
         <script>
 			/*<![CDATA[*/
 			$(document).ready(function(){				

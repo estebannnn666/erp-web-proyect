@@ -96,6 +96,16 @@
 	                	<f:convertNumber pattern="0.00"/>
 	                </h:outputText>
 	            </rich:column>
+	            <f:facet name="footer">
+	                <rich:columnGroup>
+		                <rich:column colspan="7" style="text-align: right; paddin-right: 10px">Total invetario:</rich:column>
+		                <rich:column style="text-align: right; paddin-right: 10px">
+		                    <h:outputText value="#{reporteController.totalInventario}">
+		                    	<f:convertNumber pattern="0.00"/>
+		                    </h:outputText>
+		                </rich:column>
+		            </rich:columnGroup>
+	            </f:facet>
 	        </rich:dataTable>
         </rich:panel>
         <script>

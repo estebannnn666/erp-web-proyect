@@ -2,6 +2,7 @@
 package ec.com.erp.web.reportes.controller;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.sql.Timestamp;
 import java.util.Calendar;
 import java.util.Collection;
@@ -56,12 +57,13 @@ public class ReporteController extends CommonsController implements Serializable
 	private Date fechaInicioBusqueda;
 	private Date fechaFinBusqueda;
 	private String tipoMovimiento;
+	private BigDecimal totalInventario;
 	
 
 	@PostConstruct
 	public void postConstruct() {
 		this.loginController.activarMenusSeleccionado();
-		
+		this.totalInventario = BigDecimal.ZERO;
 		Calendar fechaInferior = Calendar.getInstance();
 		fechaInferior.set(Calendar.MONTH, 0);
 		fechaInferior.set(Calendar.DATE, 1);
@@ -73,6 +75,9 @@ public class ReporteController extends CommonsController implements Serializable
 		this.page = 0;
 		if(FacesContext.getCurrentInstance().getViewRoot().getViewId().equals("/modules/reportes/adminBusquedaReporte.xhtml")) {
 			this.inventarioDTOCols = ERPFactory.inventario.getInventarioServicio().findObtenerListaExistenciasByArticuloFechas(Integer.parseInt(ERPConstantes.ESTADO_ACTIVO_NUMERICO), codigoBarras, null, null);
+			this.inventarioDTOCols.stream().forEach(inventario ->
+				this.totalInventario = this.totalInventario.add(inventario.getValorTotalExistencia())
+			);
 		}
 	}
 		
@@ -253,5 +258,13 @@ public class ReporteController extends CommonsController implements Serializable
 
 	public void setTipoMovimiento(String tipoMovimiento) {
 		this.tipoMovimiento = tipoMovimiento;
+	}
+
+	public BigDecimal getTotalInventario() {
+		return totalInventario;
+	}
+
+	public void setTotalInventario(BigDecimal totalInventario) {
+		this.totalInventario = totalInventario;
 	}
 }

@@ -122,11 +122,10 @@
 	            </rich:column>
 	            <rich:column styleClass="columna5">
 	                <f:facet name="header">Editar</f:facet>
-	                <h:graphicImage rendered="#{pedido.estadoPedidoDTO.codigoValorEstadoPedido != 'REG'}" name="btn_alert.png" library="images" style="border:none;border-color:white;" height="16" width="16" title="El pedido ya no se puede editar"/>
-	                <a4j:commandLink rendered="#{pedido.estadoPedidoDTO.codigoValorEstadoPedido == 'REG'}" id="botonEditar" render="pnlGridDatosCliente panelDireccionCliente pnlGridDetallePedido" action="#{pedidosController.cargarPedidoEditar}"	execute="@this" >
-						<h:graphicImage name="btnEditar.png" library="images" style="border:none;border-color:white;" height="16" width="16"/>
-						<f:setPropertyActionListener value="#{pedido}" target="#{pedidosController.pedidoDTO}" />											
-					</a4j:commandLink>	
+	                <h:graphicImage rendered="#{pedido.estadoPedidoDTO.codigoValorEstadoPedido == 'CAN'}" name="btn_alert.png" library="images" style="border:none;border-color:white;" height="16" width="16" title="El pedido ya no se puede editar porque se encuentra cancelado"/>
+	                <h:graphicImage rendered="#{pedido.estadoPedidoDTO.codigoValorEstadoPedido == 'REG'}" name="btn_alert.png" library="images" style="border:none;border-color:white;" height="16" width="16" title="El pedido ya no se puede editar porque se genero una factura, cancel el pedido"/>
+	                <h:graphicImage rendered="#{pedido.estadoPedidoDTO.codigoValorEstadoPedido == 'ENT'}" name="btn_alert.png" library="images" style="border:none;border-color:white;" height="16" width="16" title="El pedido ya no se puede editar porque se ya se encuentra entregado"/>
+	                <h:graphicImage rendered="#{pedido.estadoPedidoDTO.codigoValorEstadoPedido == 'PEN'}" name="btn_alert.png" library="images" style="border:none;border-color:white;" height="16" width="16" title="El pedido ya no se puede editar porque se ya se encuentra en una guia de despacho"/>
 	            </rich:column>
 	        </rich:dataTable>
         </rich:panel>
@@ -226,7 +225,7 @@
 			<!-- Botones de PopUp -->
 			<h:panelGrid style="margin:auto; padding-top: 5px;" columns="3" cellpadding="0" cellspacing="0">
 				<h:panelGroup layout="block" styleClass="botonD" style="margin-top:5px; margin-right:20px;">
-					<a4j:commandLink styleClass="cancelarD" execute="@this" render="panelPedidosTabla pnlMensajes" actionListener="#{pedidosController.actualizarEstadoPedido}" oncomplete="#{rich:component('mpConfirmacion')}.hide(); return false;">
+					<a4j:commandLink styleClass="cancelarD" execute="@this" render="panelPedidosTabla tablePedidos pnlMensajes" actionListener="#{pedidosController.actualizarEstadoPedido}" oncomplete="#{rich:component('mpConfirmacion')}.hide(); return false;">
 						<h:panelGrid columns="2" cellpadding="3" cellspacing="0">
 							<h:graphicImage name="btnNuevoA.png" library="images" style="border:none;border-color:white;" height="16" width="16"/>
 							<h:outputText value="Aceptar" />
