@@ -30,7 +30,7 @@
 					<h:outputText value="" />
 					<div style="width: 30px"></div>
 					<h:outputText class="styleNegritas" value="#{msg_erpweb['ec.com.erp.etiqueta.label.lista.cabecera.factura.numero.documento']}: *" />
-					<h:inputText style="width:150px" value="#{cuentasController.facturaCabeceraDTO.numeroDocumento}" id="nroDocumentoFac" />
+					<h:inputText style="width:150px" value="#{cuentasController.facturaCabeceraDTO.numeroDocumento}" id="nroDocumentoFac" onkeypress="if (event.keyCode == 13) return false;"/>
 					<h:outputText value="" />
 					<div style="width: 30px"></div>
 					<h:outputText class="styleNegritas" value="#{msg_erpweb['ec.com.erp.etiqueta.label.lista.cabecera.factura.fecha']}: *" />
@@ -41,23 +41,23 @@
 						<a4j:ajax event="keyup" execute="pnlGridVentas" listener="#{cuentasController.realizarConsultaProveedor}" onbeforesubmit="return verifyKeyEnter(event);" render="pnlGridVentas, pnlMensajes"/>
 					</h:inputText>
 					<h:panelGroup layout="block" styleClass="botonB" style="margin-top:5px;">
-						<a4j:commandLink oncomplete="#{rich:component('mpProveedores')}.show(); " styleClass="botonBuscar" actionListener="#{cuentasController.busquedaProveedores}" render="pnlListaProveedor tableProveedores" execute="@this, pnlGridVentas" title="Click para buscar proveedores">							
+						<a4j:commandLink oncomplete="#{rich:component('mpProveedores')}.show(); " styleClass="botonBuscar" actionListener="#{cuentasController.busquedaProveedores}" render="pnlListaProveedor tableProveedores pnlMensajes" execute="@this, pnlGridVentas" title="Click para buscar proveedores">							
 						</a4j:commandLink>	
 					</h:panelGroup>	
 					<div style="width: 30px"></div>
 					<h:outputText class="styleNegritas" value="#{msg_erpweb['ec.com.erp.etiqueta.label.lista.cabecera.factura.telefono']}: *" />
-					<h:inputText style="width:150px" value="#{cuentasController.facturaCabeceraDTO.telefono}" id="telefonoFacVen" maxlength="10" onkeypress="return validarEnteros(event);"/>
+					<h:inputText style="width:150px" value="#{cuentasController.facturaCabeceraDTO.telefono}" id="telefonoFacVen" maxlength="10" onkeypress="if (event.keyCode == 13) return false; return validarEnteros(event);"/>
 					<h:outputText value="" />
 					<div style="width: 30px"></div>
 					<h:outputText class="styleNegritas" value="#{msg_erpweb['ec.com.erp.etiqueta.label.lista.cabecera.factura.pagada']}:" />
 					<h:selectBooleanCheckbox value="#{cuentasController.facturaCabeceraDTO.pagado}"/>
 					
 					<h:outputText class="styleNegritas" value="#{msg_erpweb['ec.com.erp.etiqueta.label.lista.cabecera.factura.razonSocial']}:" />
-					<h:inputText styleClass="styleUpperCase" style="width:150px" value="#{cuentasController.facturaCabeceraDTO.nombreClienteProveedor}" id="razonSocialVen" maxlength="32"/>
+					<h:inputText styleClass="styleUpperCase" style="width:150px" value="#{cuentasController.facturaCabeceraDTO.nombreClienteProveedor}" id="razonSocialVen" maxlength="32" onkeypress="if (event.keyCode == 13) return false;"/>
 					<h:outputText value="" />
 					<div style="width: 30px"></div>
 					<h:outputText class="styleNegritas" value="#{msg_erpweb['ec.com.erp.etiqueta.label.lista.cabecera.factura.direccion']}:" />
-					<h:inputText styleClass="styleUpperCase" style="width:150px" value="#{cuentasController.facturaCabeceraDTO.direccion}" id="direcionVen" maxlength="64"/>
+					<h:inputText styleClass="styleUpperCase" style="width:150px" value="#{cuentasController.facturaCabeceraDTO.direccion}" id="direcionVen" maxlength="64" onkeypress="if (event.keyCode == 13) return false;"/>
 					<h:outputText value="" />
 					<div style="width: 30px"></div>
 					<h:outputText value="" />
@@ -93,7 +93,7 @@
 					 	<rich:dataTable styleClass="styleDetalle" style="width:100%" value="#{cuentasController.facturaDetalleDTOCols}" var="detalle" rowKeyVar="rowIndex" iterationStatusVar="it" id="tableDetallePedido" rows="10">
 					 		<rich:column style="width:5%; text-align: center;">
 				                <f:facet name="header"><h:outputText value="Eliminar"/></f:facet>
-				                <a4j:commandLink id="botonEditar" render="pnlGridDetalleFactura" action="#{cuentasController.eliminarDetalleFactura(detalle)}"	execute="@this" >
+				                <a4j:commandLink id="botonEditar" render="pnlGridDetalleFactura pnlMensajes" action="#{cuentasController.eliminarDetalleFactura(detalle)}"	execute="@this" >
 									<h:outputText value="Eliminar" />
 									<f:setPropertyActionListener value="#{detalle}" target="#{cuentasController.facturaDetalleDTO}" />											
 								</a4j:commandLink>	
@@ -104,7 +104,7 @@
 				            </rich:column>
 				            <rich:column style="width:10%">
 				                <f:facet name="header"><h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.label.nuevo.pedidos.detalle.cantidad.pedido']}"/></f:facet>
-				                <h:inputText style="text-align: right; width:95%; padding-right: 5px" id="cantidadPedida" value="#{detalle.cantidad}" onkeypress="return validarEnteros(event);">
+				                <h:inputText style="text-align: right; width:95%; padding-right: 5px" id="cantidadPedida" value="#{detalle.cantidad}" onkeypress="if (event.keyCode == 13) return false; return validarEnteros(event);">
 				                	<a4j:ajax event="keyup" status="no" listener="#{cuentasController.calcularTotalFacturaKeyUp}" oncomplete="fijarFocoCantidadActual(this.id);"
 				                			  execute="@this" render="pnlGridDetalleFactura" >
 				                	</a4j:ajax>
@@ -120,14 +120,16 @@
 				            </rich:column>				            
 				            <rich:column styleClass="autoStyle" style="width:50%;;">
 				                <f:facet name="header"><h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.label.lista.cabecera.guia.descripcion.producto']}"/></f:facet>
-				                <p:autoComplete id="themeCustom" value="#{detalle.descripcion}" completeMethod="#{cuentasController.completeNombreArticulo}">
-            						<p:ajax event="itemSelect"  listener="#{cuentasController.onItemSelectCompra}" update=":frmNuevoCompra:panelDetallePedido"/>
+				                <p:autoComplete id="themeCustom" value="#{detalle.descripcion}" completeMethod="#{cuentasController.completeNombreArticulo}" onkeypress="if (event.keyCode == 13) return false;">
+            						<p:ajax event="itemSelect"  listener="#{cuentasController.onItemSelectCompra}" update=":frmNuevoCompra:panelDetallePedido :pnlMensajes"/>
         						</p:autoComplete>
 				            </rich:column>
 				            <rich:column style="width:10%">
 				                <f:facet name="header"><h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.label.nuevo.pedidos.articulo.precio.unitario']}"/></f:facet>
-				                <h:inputText style="width:95%; text-align: right; padding-right: 5px" value="#{detalle.valorUnidad}" disabled="true">
-				                	<f:convertNumber pattern="0.00"/>
+				                <h:inputText style="width:95%; text-align: right; padding-right: 5px" value="#{detalle.valorUnidad}" onkeypress="if (event.keyCode == 13) return false; return validarDecimalFactura(event);">
+				                	<f:convertNumber groupingUsed="true" minFractionDigits="2" />
+				                	<a4j:ajax event="blur" status="no" listener="#{cuentasController.calcularTotalFacturaKeyUp}" execute="@this" render="pnlGridDetalleFactura" >
+				                	</a4j:ajax>
 				                </h:inputText>
 				            </rich:column>
 				            <rich:column style="text-align: right; paddin-right: 10px; width:10%">
@@ -135,25 +137,50 @@
 				                <h:outputText value="#{detalle.cantidad * detalle.valorUnidad}">
 				                	<f:convertNumber pattern="0.00"/>
 				                </h:outputText>
+				                <h:outputText rendered="#{detalle.articuloDTO.tieneImpuesto}" value="(I)"></h:outputText>
 				            </rich:column>
 				            <f:facet name="footer">
-				            	<rich:columnGroup>
+				                <rich:columnGroup>
 					                <rich:column colspan="6" style="text-align: right; paddin-right: 10px">Sub Total:</rich:column>
+					                <rich:column style="text-align: right; paddin-right: 10px">
+					                    <h:outputText value="#{cuentasController.facturaCabeceraDTO.subTotal}">
+					                    	<f:convertNumber pattern="0.00"/>
+					                    </h:outputText>
+					                </rich:column>
+					            </rich:columnGroup>
+					            <rich:columnGroup>
+					                <rich:column colspan="6" style="text-align: right; paddin-right: 10px">Descuento:</rich:column>
+					                <rich:column style="text-align: right; paddin-right: 10px">
+					                    <h:outputText value="#{cuentasController.facturaCabeceraDTO.descuento}">
+					                    	<f:convertNumber pattern="0.00"/>
+					                    </h:outputText>
+					                </rich:column>
+					            </rich:columnGroup>
+					            <rich:columnGroup>
+					                <rich:column colspan="6" style="text-align: right; paddin-right: 10px">Tarifa 0%:</rich:column>
 					                <rich:column style="text-align: right; paddin-right: 10px">
 					                    <h:outputText value="#{cuentasController.facturaCabeceraDTO.totalSinImpuestos}">
 					                    	<f:convertNumber pattern="0.00"/>
 					                    </h:outputText>
 					                </rich:column>
 					            </rich:columnGroup>
-				            	<rich:columnGroup>
-					                <rich:column colspan="6" style="text-align: right; paddin-right: 10px">Iva 12 %:</rich:column>
+					            <rich:columnGroup>
+					                <rich:column colspan="6" style="text-align: right; paddin-right: 10px">Tarifa 12%:</rich:column>
 					                <rich:column style="text-align: right; paddin-right: 10px">
 					                    <h:outputText value="#{cuentasController.facturaCabeceraDTO.totalImpuestos}">
 					                    	<f:convertNumber pattern="0.00"/>
 					                    </h:outputText>
 					                </rich:column>
+					            </rich:columnGroup>					            
+					            <rich:columnGroup>
+					                <rich:column colspan="6" style="text-align: right; paddin-right: 10px">Iva 12 %:</rich:column>
+					                <rich:column style="text-align: right; paddin-right: 10px">
+					                    <h:outputText value="#{cuentasController.facturaCabeceraDTO.totalIva}">
+					                    	<f:convertNumber pattern="0.00"/>
+					                    </h:outputText>
+					                </rich:column>
 					            </rich:columnGroup>
-				                <rich:columnGroup>
+					            <rich:columnGroup>
 					                <rich:column colspan="6" style="text-align: right; paddin-right: 10px">Total:</rich:column>
 					                <rich:column style="text-align: right; paddin-right: 10px">
 					                    <h:outputText value="#{cuentasController.facturaCabeceraDTO.totalCuenta}">
@@ -368,6 +395,14 @@
 					tecla = (document.all) ? e.keyCode : e.which; 
 					if (tecla==8) return true; 
 					patron =/[0-9\s]/; 
+					te = String.fromCharCode(tecla);
+					return patron.test(te);
+				}
+				
+				function validarDecimalFactura(e) {
+					tecla = (document.all) ? e.keyCode : e.which;
+					if (tecla==8) return true; 
+					patron =/[0-9\s,0-9\s]/; 
 					te = String.fromCharCode(tecla);
 					return patron.test(te);
 				}

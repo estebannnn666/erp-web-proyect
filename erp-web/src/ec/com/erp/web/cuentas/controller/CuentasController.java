@@ -9,6 +9,8 @@ import java.net.HttpURLConnection;
 import java.net.Proxy;
 import java.net.URL;
 import java.sql.Timestamp;
+import java.text.DecimalFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
@@ -26,6 +28,19 @@ import javax.faces.context.FacesContext;
 import javax.faces.event.ActionEvent;
 import javax.faces.event.AjaxBehaviorEvent;
 import javax.faces.event.ValueChangeEvent;
+import javax.print.Doc;
+import javax.print.DocFlavor;
+import javax.print.DocPrintJob;
+import javax.print.PrintException;
+import javax.print.PrintService;
+import javax.print.PrintServiceLookup;
+import javax.print.SimpleDoc;
+import javax.print.attribute.HashPrintRequestAttributeSet;
+import javax.print.attribute.PrintRequestAttributeSet;
+import javax.print.attribute.standard.Copies;
+import javax.print.attribute.standard.Finishings;
+import javax.print.attribute.standard.MediaSizeName;
+import javax.print.attribute.standard.Sides;
 //import javax.print.Doc;
 //import javax.print.DocFlavor;
 //import javax.print.DocPrintJob;
@@ -121,9 +136,11 @@ public class CuentasController extends CommonsController implements Serializable
 	private Boolean documentoCreado;
 	private Boolean crearNuevaFila;
 	private BigDecimal totalCuenta;
+	private String tipoRuc;
 
 	@PostConstruct
 	public void postConstruct() {
+		this.tipoRuc = ERPConstantes.ESTADO_INACTIVO_NUMERICO;
 		this.tamanioPopUp = 470;
 		this.totalPagado = BigDecimal.ZERO;
 		this.totalPendiente = BigDecimal.ZERO;
@@ -133,7 +150,7 @@ public class CuentasController extends CommonsController implements Serializable
 		this.facturaCabeceraDTO = new FacturaCabeceraDTO();
 		this.pagosFacturaDTO = new PagosFacturaDTO(); 
 		this.facturaCabeceraDTO.setFechaDocumento(new Date());
-		this.facturaCabeceraDTO.setPagado(Boolean.TRUE);
+		this.facturaCabeceraDTO.setPagado(Boolean.FALSE);
 		this.facturaDetalleDTO = new FacturaDetalleDTO();
 		this.facturaCabeceraDTOCols = new ArrayList<FacturaCabeceraDTO>();
 		this.facturaDetalleDTOCols = new ArrayList<FacturaDetalleDTO>();
@@ -253,6 +270,7 @@ public class CuentasController extends CommonsController implements Serializable
 	
 	public void onItemSelect(SelectEvent event) {
         System.out.println(event.getObject());
+        this.setShowMessagesBar(Boolean.FALSE);
         this.crearNuevaFila = Boolean.TRUE;
         for(FacturaDetalleDTO facturaDetalleDTOTemp : facturaDetalleDTOCols) {
         	if(facturaDetalleDTOTemp.getDescripcion() != null) {
@@ -263,10 +281,10 @@ public class CuentasController extends CommonsController implements Serializable
         		facturaDetalleDTOTemp.setArticuloDTO(articuloSeleccionado);
         	}
         	
-			if((facturaDetalleDTOTemp.getCantidad() == null ||  facturaDetalleDTOTemp.getCantidad().intValue() == 0) && facturaDetalleDTOTemp.getArticuloDTO().getPrecio() != null){
+			if((facturaDetalleDTOTemp.getCantidad() == null ||  facturaDetalleDTOTemp.getCantidad().intValue() == 0) && facturaDetalleDTOTemp.getArticuloDTO() != null && facturaDetalleDTOTemp.getArticuloDTO().getPrecio() != null){
 				facturaDetalleDTOTemp.setCantidad(1);
 			}
-			if(facturaDetalleDTOTemp.getCantidad() != null && facturaDetalleDTOTemp.getArticuloDTO().getPrecio() != null) {
+			if(facturaDetalleDTOTemp.getCantidad() != null && facturaDetalleDTOTemp.getArticuloDTO() != null && facturaDetalleDTOTemp.getArticuloDTO().getPrecio() != null && facturaDetalleDTOTemp.getCodigoArticulo() == null) {
 				BigDecimal subTotal = BigDecimal.valueOf(Double.valueOf(""+facturaDetalleDTOTemp.getCantidad())).multiply(facturaDetalleDTOTemp.getArticuloDTO().getPrecio());
 				facturaDetalleDTOTemp.setSubTotal(subTotal);
 				facturaDetalleDTOTemp.setCodigoArticulo(facturaDetalleDTOTemp.getArticuloDTO().getId().getCodigoArticulo());
@@ -293,6 +311,7 @@ public class CuentasController extends CommonsController implements Serializable
 	
 	public void onItemSelectCompra(SelectEvent event) {
         System.out.println(event.getObject());
+        this.setShowMessagesBar(Boolean.FALSE);
         this.crearNuevaFila = Boolean.TRUE;
         for(FacturaDetalleDTO facturaDetalleDTOTemp : facturaDetalleDTOCols) {
         	if(facturaDetalleDTOTemp.getDescripcion() != null) {
@@ -306,7 +325,7 @@ public class CuentasController extends CommonsController implements Serializable
 			if((facturaDetalleDTOTemp.getCantidad() == null ||  facturaDetalleDTOTemp.getCantidad().intValue() == 0) && facturaDetalleDTOTemp.getArticuloDTO().getCosto() != null){
 				facturaDetalleDTOTemp.setCantidad(1);
 			}
-			if(facturaDetalleDTOTemp.getCantidad() != null && facturaDetalleDTOTemp.getArticuloDTO().getCosto() != null) {
+			if(facturaDetalleDTOTemp.getCantidad() != null && facturaDetalleDTOTemp.getArticuloDTO() != null && facturaDetalleDTOTemp.getArticuloDTO().getCosto() != null && facturaDetalleDTOTemp.getCodigoArticulo() == null) {
 				BigDecimal subTotal = BigDecimal.valueOf(Double.valueOf(""+facturaDetalleDTOTemp.getCantidad())).multiply(facturaDetalleDTOTemp.getArticuloDTO().getCosto());
 				facturaDetalleDTOTemp.setSubTotal(subTotal);
 				facturaDetalleDTOTemp.setCodigoArticulo(facturaDetalleDTOTemp.getArticuloDTO().getId().getCodigoArticulo());
@@ -699,6 +718,7 @@ public class CuentasController extends CommonsController implements Serializable
 	public void clearNuevaCuentaFacturaVentas(ActionEvent e){
 		this.setShowMessagesBar(Boolean.FALSE);
 		this.setDocumentoCreado(Boolean.FALSE);
+		this.codigoClienteSeleccionado = null;
 		this.facturaCabeceraDTO = new FacturaCabeceraDTO();
 		this.facturaDetalleDTO = new FacturaDetalleDTO();
 		this.cuentasDataManager.setFacturaCabeceraDTOEditar(new FacturaCabeceraDTO());
@@ -726,6 +746,7 @@ public class CuentasController extends CommonsController implements Serializable
 	public void clearNuevaCuentaFacturaCompra(ActionEvent e){
 		this.setShowMessagesBar(Boolean.FALSE);
 		this.setDocumentoCreado(Boolean.FALSE);
+		this.codigoProveedorSeleccionado = null;
 		this.facturaCabeceraDTO = new FacturaCabeceraDTO();
 		this.facturaCabeceraDTO.setFechaDocumento(new Date());
 		this.facturaCabeceraDTO.setPagado(Boolean.FALSE);
@@ -767,6 +788,7 @@ public class CuentasController extends CommonsController implements Serializable
 			contDetalle++;
 		}
 		this.calcularTotalFactura();
+		this.setShowMessagesBar(Boolean.FALSE);
 	}
 	
 	/**
@@ -774,23 +796,43 @@ public class CuentasController extends CommonsController implements Serializable
 	 */
 	public void calcularTotalFactura() {
 		this.facturaCabeceraDTO.setTotalCuenta(BigDecimal.ZERO);
+		BigDecimal subTotal = BigDecimal.ZERO;
+		BigDecimal totalIva = BigDecimal.ZERO;
 		BigDecimal totalSinImpuesto = BigDecimal.ZERO;
-		BigDecimal totalImpuesto = BigDecimal.ZERO;
 		BigDecimal totalConImpuesto = BigDecimal.ZERO;
+		BigDecimal totalFactura = BigDecimal.ZERO;
+		BigDecimal totalDescuentos = BigDecimal.ZERO;
 		for (FacturaDetalleDTO facturaDetalleDTO : facturaDetalleDTOCols) {
 			if(facturaDetalleDTO.getSubTotal() != null) {
-				totalSinImpuesto = totalSinImpuesto.add(facturaDetalleDTO.getSubTotal());
+				subTotal = subTotal.add(facturaDetalleDTO.getSubTotal());
 			}
 			if(facturaDetalleDTO.getArticuloDTO().getTieneImpuesto()){
+				totalConImpuesto = totalConImpuesto.add(facturaDetalleDTO.getSubTotal());
 				for(ArticuloImpuestoDTO impuesto : facturaDetalleDTO.getArticuloDTO().getArticuloImpuestoDTOCols()){
-					totalImpuesto = totalImpuesto.add(BigDecimal.valueOf((totalSinImpuesto.doubleValue() * impuesto.getImpuestoDTO().getValorImpuesto().doubleValue())/ Double.valueOf(100)));
+					totalIva = totalIva.add(BigDecimal.valueOf((subTotal.doubleValue() * impuesto.getImpuestoDTO().getValorImpuesto().doubleValue())/ Double.valueOf(100)));
+				}
+			}else {
+				if(facturaDetalleDTO.getSubTotal() != null) {
+					totalSinImpuesto = totalSinImpuesto.add(facturaDetalleDTO.getSubTotal());
+				}
+			}
+			if(this.cuentasDataManager.getTipoFactura().equals(ERPConstantes.CODIGO_CATALOGO_VALOR_DOCUMENTO_COMPRAS)) {
+				if(facturaDetalleDTO.getCantidad() != null && facturaDetalleDTO.getValorUnidad() != null && facturaDetalleDTO.getArticuloDTO() != null && facturaDetalleDTO.getArticuloDTO().getCosto() != null && facturaDetalleDTO.getValorUnidad().doubleValue() < facturaDetalleDTO.getArticuloDTO().getCosto().doubleValue()) {
+					totalDescuentos = totalDescuentos.add(BigDecimal.valueOf(facturaDetalleDTO.getArticuloDTO().getCosto().subtract(facturaDetalleDTO.getValorUnidad()).doubleValue()*facturaDetalleDTO.getCantidad()));
+				}
+			}else {
+				if(facturaDetalleDTO.getCantidad() != null && facturaDetalleDTO.getValorUnidad() != null && facturaDetalleDTO.getArticuloDTO() != null && facturaDetalleDTO.getArticuloDTO().getPrecio() != null && facturaDetalleDTO.getValorUnidad().doubleValue() < facturaDetalleDTO.getArticuloDTO().getPrecio().doubleValue()) {
+					totalDescuentos = totalDescuentos.add(BigDecimal.valueOf(facturaDetalleDTO.getArticuloDTO().getPrecio().subtract(facturaDetalleDTO.getValorUnidad()).doubleValue()*facturaDetalleDTO.getCantidad()));
 				}
 			}
 		}
-		totalConImpuesto = totalSinImpuesto.add(totalImpuesto);
+		totalFactura = subTotal.add(totalIva);
+		this.facturaCabeceraDTO.setDescuento(totalDescuentos);
 		this.facturaCabeceraDTO.setTotalSinImpuestos(totalSinImpuesto);
-		this.facturaCabeceraDTO.setTotalImpuestos(totalImpuesto);
-		this.facturaCabeceraDTO.setTotalCuenta(totalConImpuesto);
+		this.facturaCabeceraDTO.setTotalImpuestos(totalConImpuesto);
+		this.facturaCabeceraDTO.setSubTotal(subTotal);
+		this.facturaCabeceraDTO.setTotalIva(totalIva);
+		this.facturaCabeceraDTO.setTotalCuenta(totalFactura);
 	}
 	
 	/**
@@ -836,6 +878,7 @@ public class CuentasController extends CommonsController implements Serializable
 					if(facturaDetalleDTO.getCantidad() == null || facturaDetalleDTO.getCantidad().intValue() == 0){
 						facturaDetalleDTO.setCantidad(1);
 					}
+					this.setShowMessagesBar(Boolean.FALSE);
 				}
 				
 				if(facturaDetalleDTO.getCantidad() != null && facturaDetalleDTO.getValorUnidad() != null) {
@@ -884,6 +927,7 @@ public void obtenerCodigoBarrasCompraEnter(AjaxBehaviorEvent e) {
 					if(facturaDetalleDTO.getCantidad() == null || facturaDetalleDTO.getCantidad().intValue() == 0){
 						facturaDetalleDTO.setCantidad(1);
 					}
+					this.setShowMessagesBar(Boolean.FALSE);
 				}
 				
 				if(facturaDetalleDTO.getCantidad() != null && facturaDetalleDTO.getValorUnidad() != null) {
@@ -932,6 +976,7 @@ public void obtenerCodigoBarrasCompraEnter(AjaxBehaviorEvent e) {
 	public void busquedaClientes(ActionEvent e){
 		try {
 			this.clienteDTOCols = ERPFactory.clientes.getClientesServicio().findObtenerListaClientes(Integer.parseInt(ERPConstantes.ESTADO_ACTIVO_NUMERICO), null, null);
+			this.setShowMessagesBar(Boolean.FALSE);
 		} catch (ERPException e1) {
 	        this.setShowMessagesBar(Boolean.TRUE);
 	        MensajesController.addError(null, e1.getMessage());
@@ -958,6 +1003,7 @@ public void obtenerCodigoBarrasCompraEnter(AjaxBehaviorEvent e) {
 	public void busquedaProveedores(ActionEvent e){
 		try {
 			this.proveedorDTOCols = ERPFactory.proveedor.getProveedorServicio().findObtenerListaProveedores(Integer.parseInt(ERPConstantes.ESTADO_ACTIVO_NUMERICO), null, null);
+			this.setShowMessagesBar(Boolean.FALSE);
 		} catch (ERPException e1) {
 	        this.setShowMessagesBar(Boolean.TRUE);
 	        MensajesController.addError(null, e1.getMessage());
@@ -1021,6 +1067,7 @@ public void obtenerCodigoBarrasCompraEnter(AjaxBehaviorEvent e) {
 				this.facturaCabeceraDTO.setNombreClienteProveedor(clienteDTO.getPersonaDTO() == null ? clienteDTO.getEmpresaDTO().getRazonSocial() : clienteDTO.getPersonaDTO().getNombreCompleto());
 				this.facturaCabeceraDTO.setDireccion(clienteDTO.getPersonaDTO() == null ? clienteDTO.getEmpresaDTO().getContactoEmpresaDTO().getDireccionPrincipal() : clienteDTO.getPersonaDTO().getContactoPersonaDTO().getDireccionPrincipal());
 				this.facturaCabeceraDTO.setTelefono(clienteDTO.getPersonaDTO() == null ? clienteDTO.getEmpresaDTO().getContactoEmpresaDTO().getTelefonoPrincipal() : clienteDTO.getPersonaDTO().getContactoPersonaDTO().getTelefonoPrincipal());
+				this.setShowMessagesBar(Boolean.FALSE);
 			}else{
 				this.setShowMessagesBar(Boolean.TRUE);
 		        MensajesController.addWarn(null, "No se encontr\u00F3 el cliente con el documento ingresado.");
@@ -1044,6 +1091,7 @@ public void obtenerCodigoBarrasCompraEnter(AjaxBehaviorEvent e) {
 				this.facturaCabeceraDTO.setNombreClienteProveedor(proveedorDTO.getPersonaDTO() == null ? proveedorDTO.getEmpresaDTO().getRazonSocial() : proveedorDTO.getPersonaDTO().getNombreCompleto());
 				this.facturaCabeceraDTO.setDireccion(proveedorDTO.getPersonaDTO() == null ? proveedorDTO.getEmpresaDTO().getContactoEmpresaDTO().getDireccionPrincipal() : proveedorDTO.getPersonaDTO().getContactoPersonaDTO().getDireccionPrincipal());
 				this.facturaCabeceraDTO.setTelefono(proveedorDTO.getPersonaDTO() == null ? proveedorDTO.getEmpresaDTO().getContactoEmpresaDTO().getTelefonoPrincipal() : proveedorDTO.getPersonaDTO().getContactoPersonaDTO().getTelefonoPrincipal());
+				this.setShowMessagesBar(Boolean.FALSE);
 			}else{
 				this.setShowMessagesBar(Boolean.TRUE);
 		        MensajesController.addWarn(null, "No se encontr\u00F3 el proveedor con el documento ingresado.");
@@ -1236,16 +1284,6 @@ public void obtenerCodigoBarrasCompraEnter(AjaxBehaviorEvent e) {
 	public String imprimirListaFacturas() {
 		HtmlPdf htmltoPDF;
 		try {
-//			String texto = "Esto es lo que va a la impresora";
-//			PrintService printService = PrintServiceLookup.lookupDefaultPrintService();
-//			DocFlavor flavor = DocFlavor.BYTE_ARRAY.AUTOSENSE;
-//			DocPrintJob docPrintJob = printService.createPrintJob();
-//			Doc doc = new SimpleDoc(texto.getBytes(), flavor, null);
-//			try {
-//				docPrintJob.print(doc, null);
-//			} catch (PrintException e) {
-//				e.printStackTrace();
-//			}
 			// Plantilla rpincipal que permite la conversion de xsl a pdf
 			htmltoPDF = new HtmlPdf(ERPConstantes.PLANTILLA_XSL_FOPRINCIPAL);
 			HashMap<String , String> parametros = new HashMap<String, String>();
@@ -1256,6 +1294,107 @@ public void obtenerCodigoBarrasCompraEnter(AjaxBehaviorEvent e) {
 			MensajesController.addError(null, "Error al imprimir");
 		}
 		return null;
+	}
+	
+	public void imprimirFacturaImpresora(ActionEvent e){
+		try {
+	        SimpleDateFormat formatoFecha = new SimpleDateFormat("dd/MM/yyyy");
+	        DecimalFormat formatoDecimales = new DecimalFormat("#.##");
+			formatoDecimales.setMinimumFractionDigits(2);
+			String fechaFormateada =  formatoFecha.format(this.facturaCabeceraDTO.getFechaDocumento());
+			StringBuilder texto = new StringBuilder();
+			if(this.tipoRuc.equals(ERPConstantes.ESTADO_ACTIVO_NUMERICO)) {
+				texto.append("\n");
+			}
+			texto.append("\n");
+			texto.append("\n");
+			texto.append("\n");
+			texto.append("\n");
+			texto.append("\n");
+			texto.append("\n");
+			texto.append("\n");
+			texto.append("\n");
+			texto.append("\n");
+			texto.append("\n");
+			texto.append("            "+this.facturaCabeceraDTO.getNombreClienteProveedor());
+			texto.append("\n");
+			texto.append("            "+UtilitarioWeb.completarEspaciosCadena(13, this.facturaCabeceraDTO.getRucDocumento())+"          "+fechaFormateada);
+			texto.append("\n");
+			texto.append("\n");
+			if(this.tipoRuc.equals(ERPConstantes.ESTADO_ACTIVO_NUMERICO)) {
+				texto.append("      "+UtilitarioWeb.completarEspaciosCadena(30, this.facturaCabeceraDTO.getDireccion())+"     "+this.facturaCabeceraDTO.getTelefono());
+			}else {
+				texto.append("        "+UtilitarioWeb.completarEspaciosCadena(30, this.facturaCabeceraDTO.getDireccion())+"     "+this.facturaCabeceraDTO.getTelefono());
+			}
+			texto.append("\n");
+			texto.append("\n");
+			texto.append("\n");
+			texto.append("\n");
+			int tamDetalle = 0;
+			BigDecimal subTotal = BigDecimal.ZERO;
+			for(FacturaDetalleDTO detalle : this.facturaCabeceraDTO.getFacturaDetalleDTOCols()) {
+				if(detalle != null && detalle.getCantidad() != null) {
+					texto.append("    "+UtilitarioWeb.completarEspaciosCadena(6, detalle.getCantidad().toString()));
+					texto.append(" "+UtilitarioWeb.completarEspaciosCadena(28, detalle.getDescripcion()));
+					texto.append(""+UtilitarioWeb.completarEspaciosNumeros(8, formatoDecimales.format(detalle.getValorUnidad())));
+					texto.append(" "+UtilitarioWeb.completarEspaciosNumeros(9, formatoDecimales.format(detalle.getSubTotal())));
+					texto.append("\n");
+					subTotal =  subTotal.add(detalle.getSubTotal());
+					tamDetalle++;
+				}
+			}
+			while(tamDetalle < 21 ) {
+				texto.append("\n");
+				tamDetalle++;
+			}
+			texto.append("\n");
+			if(this.tipoRuc.equals(ERPConstantes.ESTADO_ACTIVO_NUMERICO)) {
+				texto.append("                                               "+UtilitarioWeb.completarEspaciosNumeros(9, formatoDecimales.format(subTotal)));
+				texto.append("\n");
+				texto.append("                                               "+UtilitarioWeb.completarEspaciosNumeros(9, formatoDecimales.format(this.facturaCabeceraDTO.getTotalIva())));
+				texto.append("\n");
+				texto.append("\n");
+				texto.append("                                               "+UtilitarioWeb.completarEspaciosNumeros(9, formatoDecimales.format(this.facturaCabeceraDTO.getTotalSinImpuestos())));
+				texto.append("\n");
+				texto.append("                                               "+UtilitarioWeb.completarEspaciosNumeros(9, formatoDecimales.format(this.facturaCabeceraDTO.getTotalCuenta())));
+			}else {
+				texto.append("                                               "+UtilitarioWeb.completarEspaciosNumeros(9, formatoDecimales.format(subTotal)));
+				texto.append("\n");
+				texto.append("                                               "+UtilitarioWeb.completarEspaciosNumeros(9, formatoDecimales.format(this.facturaCabeceraDTO.getDescuento() == null ? 0.0 : this.facturaCabeceraDTO.getDescuento())));
+				texto.append("\n");
+				texto.append("                                               "+UtilitarioWeb.completarEspaciosNumeros(9, formatoDecimales.format(this.facturaCabeceraDTO.getTotalSinImpuestos())));
+				texto.append("\n");
+				texto.append("                                               "+UtilitarioWeb.completarEspaciosNumeros(9, formatoDecimales.format(this.facturaCabeceraDTO.getTotalIva())));
+				texto.append("\n");
+				texto.append("                                               "+UtilitarioWeb.completarEspaciosNumeros(9, formatoDecimales.format(this.facturaCabeceraDTO.getTotalCuenta())));
+			}	
+			texto.append("\n");
+			texto.append("\n");
+			texto.append("\n");
+			texto.append("\n");
+			if(this.tipoRuc.equals(ERPConstantes.ESTADO_INACTIVO_NUMERICO)) {
+				texto.append("\n");
+			}
+			
+			DocFlavor flavor = DocFlavor.BYTE_ARRAY.AUTOSENSE;
+			PrintRequestAttributeSet aset = new HashPrintRequestAttributeSet();
+	        aset.add(MediaSizeName.ISO_A5);
+	        aset.add(new Copies(1));
+	        aset.add(Sides.ONE_SIDED);
+	        aset.add(Finishings.STAPLE);
+	        PrintService printService = PrintServiceLookup.lookupDefaultPrintService();
+	        
+			DocPrintJob docPrintJob = printService.createPrintJob();
+			Doc doc = new SimpleDoc(texto.toString().getBytes(), flavor, null);
+			docPrintJob.print(doc, aset);
+			this.clearNuevaCuentaFacturaVentas(e);
+			this.setShowMessagesBar(Boolean.TRUE);
+			MensajesController.addInfo(null, ERPWebResources.getString("ec.com.erp.etiqueta.pantall.despacho.mensaje.impresion.correcta"));
+		} catch (PrintException execption) {
+			this.setShowMessagesBar(Boolean.TRUE);
+			MensajesController.addError(null, "Error al imprimir");
+			execption.printStackTrace();
+		}
 	}
 	
 	/**
@@ -1664,5 +1803,13 @@ public void obtenerCodigoBarrasCompraEnter(AjaxBehaviorEvent e) {
 
 	public void setTotalCuenta(BigDecimal totalCuenta) {
 		this.totalCuenta = totalCuenta;
+	}
+
+	public String getTipoRuc() {
+		return tipoRuc;
+	}
+
+	public void setTipoRuc(String tipoRuc) {
+		this.tipoRuc = tipoRuc;
 	}
 }

@@ -145,6 +145,13 @@
 	            </rich:column>
 	            <rich:column styleClass="columna5">
 	                <f:facet name="header">Imprimir</f:facet>
+					<a4j:commandLink id="botonImpresion" oncomplete="#{rich:component('mpOpcionesImpresion')}.show();" execute="@this" actionListener="#{cuentasController.simularEvento}">
+						<h:graphicImage name="btnImprimir.png" library="images" style="border:none;border-color:white;" height="20" width="20"/>
+						<f:setPropertyActionListener value="#{cuenta}" target="#{cuentasController.facturaCabeceraDTO}" />											
+					</a4j:commandLink>	
+	            </rich:column>
+	            <rich:column styleClass="columna5">
+	                <f:facet name="header">Ver PDF</f:facet>
 					<a4j:commandLink id="botonImprimir" title="Ver factura en pdf para imprimir" render="pnlMensajes" oncomplete="imprimirFactura()" execute="@this" actionListener="#{cuentasController.cargarFacturaDetalle}">
 						<h:graphicImage name="print_pdf.png" library="images" style="border:none;border-color:white;" height="24" width="24"/>
 						<f:setPropertyActionListener value="#{cuenta}" target="#{cuentasController.facturaCabeceraDTO}" />											
@@ -274,14 +281,14 @@
 		</rich:popupPanel>
         
         <!-- Popup para ver el detalle del factura -->
-		<rich:popupPanel id="popUpDetalle" styleClass="panelPedidos" header="#{msg_erpweb['ec.com.erp.etiqueta.label.lista.cabecera.factura.titulo.detalle']}" width="935" height="400" modal="true" domElementAttachment="form">
+		<rich:popupPanel id="popUpDetalle" styleClass="panelPedidos" header="#{msg_erpweb['ec.com.erp.etiqueta.label.lista.cabecera.factura.titulo.detalle']}" width="935" height="408" modal="true" domElementAttachment="form">
 			<f:facet name="controls">
 				<h:outputLink value="#"	onclick="#{rich:component('popUpDetalle')}.hide();">
 					<h:graphicImage library="images" name="close.png" style="border:0px" id="closePopUpDetalle" />
 				</h:outputLink>
 			</f:facet>
 			<h:panelGrid id="pnlListaDetalleFactura" style="width: 100%;">	
-				<rich:panel style="width: 99.6%; height: 315px; " header="#{msg_erpweb['ec.com.erp.etiqueta.label.lista.cabecera.factura.popup.detalle']}">
+				<rich:panel style="width: 99.6%; height: 340px; " header="#{msg_erpweb['ec.com.erp.etiqueta.label.lista.cabecera.factura.popup.detalle']}">
 					
 					<h:panelGrid id="tablaVaciaDetalle" columns="1" rendered="#{empty cuentasController.facturaCabeceraDTO.facturaDetalleDTOCols}" style="width:100%; text-align: center; padding-top: 230px">
 						<h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.mensaje.lista.vacio']}"/>
@@ -330,33 +337,56 @@
 			                	<f:convertNumber pattern="0.00"/>
 			                </h:outputText>
 			            </rich:column>
-			            
 			            <f:facet name="footer">
-			                <rich:columnGroup>
-				                <rich:column colspan="7" style="text-align: right; paddin-right: 10px">Sub Total:</rich:column>
-				                <rich:column style="text-align: right; paddin-right: 10px">
-				                    <h:outputText value="#{cuentasController.facturaCabeceraDTO.totalSinImpuestos}">
-				                    	<f:convertNumber pattern="0.00"/>
-				                    </h:outputText>
-				                </rich:column>
-				            </rich:columnGroup>
-				            <rich:columnGroup>
-				                <rich:column colspan="7" style="text-align: right; paddin-right: 10px">Iva 12 %:</rich:column>
-				                <rich:column style="text-align: right; paddin-right: 10px">
-				                    <h:outputText value="#{cuentasController.facturaCabeceraDTO.totalImpuestos}">
-				                    	<f:convertNumber pattern="0.00"/>
-				                    </h:outputText>
-				                </rich:column>
-				            </rich:columnGroup>
-				            <rich:columnGroup>
-				                <rich:column colspan="7" style="text-align: right; paddin-right: 10px">Total:</rich:column>
-				                <rich:column style="text-align: right; paddin-right: 10px">
-				                    <h:outputText value="#{cuentasController.facturaCabeceraDTO.totalCuenta}">
-				                    	<f:convertNumber pattern="0.00"/>
-				                    </h:outputText>
-				                </rich:column>
-				            </rich:columnGroup>
-			            </f:facet>
+				                <rich:columnGroup>
+					                <rich:column colspan="7" style="text-align: right; paddin-right: 10px">Sub Total:</rich:column>
+					                <rich:column style="text-align: right; paddin-right: 10px">
+					                    <h:outputText value="#{cuentasController.facturaCabeceraDTO.subTotal}">
+					                    	<f:convertNumber pattern="0.00"/>
+					                    </h:outputText>
+					                </rich:column>
+					            </rich:columnGroup>
+					            <rich:columnGroup>
+					                <rich:column colspan="7" style="text-align: right; paddin-right: 10px">Descuento:</rich:column>
+					                <rich:column style="text-align: right; paddin-right: 10px">
+					                    <h:outputText value="#{cuentasController.facturaCabeceraDTO.descuento}">
+					                    	<f:convertNumber pattern="0.00"/>
+					                    </h:outputText>
+					                </rich:column>
+					            </rich:columnGroup>
+					            <rich:columnGroup>
+					                <rich:column colspan="7" style="text-align: right; paddin-right: 10px">Tarifa 0%:</rich:column>
+					                <rich:column style="text-align: right; paddin-right: 10px">
+					                    <h:outputText value="#{cuentasController.facturaCabeceraDTO.totalSinImpuestos}">
+					                    	<f:convertNumber pattern="0.00"/>
+					                    </h:outputText>
+					                </rich:column>
+					            </rich:columnGroup>
+					            <rich:columnGroup>
+					                <rich:column colspan="7" style="text-align: right; paddin-right: 10px">Tarifa 12%:</rich:column>
+					                <rich:column style="text-align: right; paddin-right: 10px">
+					                    <h:outputText value="#{cuentasController.facturaCabeceraDTO.totalImpuestos}">
+					                    	<f:convertNumber pattern="0.00"/>
+					                    </h:outputText>
+					                </rich:column>
+					            </rich:columnGroup>					            
+					            <rich:columnGroup>
+					                <rich:column colspan="7" style="text-align: right; paddin-right: 10px">Iva 12 %:</rich:column>
+					                <rich:column style="text-align: right; paddin-right: 10px">
+					                    <h:outputText value="#{cuentasController.facturaCabeceraDTO.totalIva}">
+					                    	<f:convertNumber pattern="0.00"/>
+					                    </h:outputText>
+					                </rich:column>
+					            </rich:columnGroup>
+					            <rich:columnGroup>
+					                <rich:column colspan="7" style="text-align: right; paddin-right: 10px">Total:</rich:column>
+					                <rich:column style="text-align: right; paddin-right: 10px">
+					                    <h:outputText value="#{cuentasController.facturaCabeceraDTO.totalCuenta}">
+					                    	<f:convertNumber pattern="0.00"/>
+					                    </h:outputText>
+					                </rich:column>
+					            </rich:columnGroup>
+				            </f:facet>
 			        </rich:dataTable>
 		        </rich:panel>
 			</h:panelGrid>
@@ -413,6 +443,46 @@
 				</h:panelGroup>
 			</h:panelGrid>
 		</rich:popupPanel>
+		
+		<!-- Popup para confirmar que se guardo el documento -->
+		<rich:popupPanel id="mpOpcionesImpresion" header="Seleccione el facturero" width="500" height="130" modal="true" domElementAttachment="form">
+			<f:facet name="controls">
+				<h:outputLink value="#"	onclick="#{rich:component('mpOpcionesImpresion')}.hide();">
+					<h:graphicImage library="images" name="close.png" style="border:0px"/>
+				</h:outputLink>
+			</f:facet>
+			
+			<rich:panel style="height: 94%">
+				<h:panelGrid id="tipoFactura" columns="1">
+					<h:selectOneRadio value = "#{cuentasController.tipoRuc}"> 
+					   <f:selectItem itemValue = "0" itemLabel = "Factura con RUC: 1001594132001" />
+					   <f:selectItem itemValue = "1" itemLabel = "Factura con RUC: 1003635263001" /> 
+					</h:selectOneRadio>   
+				</h:panelGrid>
+		    </rich:panel>
+			
+			<!-- Botones de PopUp -->
+			<h:panelGrid style="margin:auto; padding-top: 5px;" columns="3" cellpadding="0" cellspacing="0">
+				<h:panelGroup layout="block" styleClass="botonD" style="margin-top:5px;margin-right:20px;">
+					<a4j:commandLink styleClass="aceptarD" render="pnlMensajes" actionListener="#{cuentasController.imprimirFacturaImpresora}" oncomplete="#{rich:component('mpOpcionesImpresion')}.hide(); return false;" execute="tipoFactura">
+						<h:panelGrid columns="2" cellpadding="3" cellspacing="0">
+							<h:graphicImage name="btnImprimir.png" library="images" style="border:none;border-color:white;" height="16" width="16"/>
+							<h:outputText value="Imprimir" />
+						</h:panelGrid>
+					</a4j:commandLink>
+				</h:panelGroup>
+			
+				<h:panelGroup layout="block" styleClass="botonD" style="margin-top:5px;">
+					<a4j:commandLink styleClass="cancelarD" oncomplete="#{rich:component('mpOpcionesImpresion')}.hide(); return false;" immediate="true">
+						<h:panelGrid columns="2" cellpadding="3" cellspacing="0">
+							<h:graphicImage name="btnCancel.png" library="images" style="border:none;border-color:white;" height="16" width="16"/>
+							<h:outputText value="Cerrar" />
+						</h:panelGrid>
+					</a4j:commandLink>
+				</h:panelGroup>
+			</h:panelGrid>
+		</rich:popupPanel>
+		
         <script>
 			/*<![CDATA[*/
 			$(document).ready(function(){				

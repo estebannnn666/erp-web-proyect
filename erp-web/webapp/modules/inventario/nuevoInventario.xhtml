@@ -127,7 +127,7 @@
 				</h:outputLink>
 			</f:facet>
 			<h:panelGrid id="pnlListaArticulos" style="width: 100%;">	
-				<rich:panel style="width: 99.6%; height: 315px; " header="#{msg_erpweb['ec.com.erp.etiqueta.titulo.lista.articulos']}">
+				<rich:panel style="width: 99.6%; height: 320px; " header="#{msg_erpweb['ec.com.erp.etiqueta.titulo.lista.articulos']}">
 					
 					<h:panelGrid id="tablaVaciaDetalle" columns="1" rendered="#{empty inventarioController.articuloDTOCols}" style="width:100%; text-align: center; padding-top: 230px">
 						<h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.mensaje.lista.vacio']}"/>
@@ -135,7 +135,7 @@
 					<rich:panel style="text-align:center; border-left: none; border-right:none; margin-bottom: 2px" rendered="#{not empty inventarioController.articuloDTOCols}">
 						<rich:dataScroller fastStep="3" for="tableArticulos" maxPages="5" rendered="#{not empty inventarioController.articuloDTOCols}" renderIfSinglePage="true"/>
 					</rich:panel>	
-					<rich:dataTable style="width:100%" value="#{inventarioController.articuloDTOCols}" rendered="#{not empty inventarioController.articuloDTOCols}" var="articulo" iterationStatusVar="it" id="tableArticulos" rows="7">
+					<rich:dataTable style="width:100%" value="#{inventarioController.articuloDTOCols}" rendered="#{not empty inventarioController.articuloDTOCols}" var="articulo" iterationStatusVar="it" id="tableArticulos" rows="10">
 			             <rich:column style="padding:0px;padding-left:2px" >
 							<h:selectOneRadio onclick="radioButton(this);" id="myRadio" value="#{inventarioController.codigoArticuloSeleccionado}" valueChangeListener="#{inventarioController.seleccionarArticulo}">  
 								<f:selectItem itemValue="#{articulo.id.codigoArticulo}"/> 

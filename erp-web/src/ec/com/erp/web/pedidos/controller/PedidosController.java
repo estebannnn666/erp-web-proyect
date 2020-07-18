@@ -462,6 +462,7 @@ public class PedidosController extends CommonsController implements Serializable
 	 */
 	public void busquedaClientes(ActionEvent e) {
 		try {
+			this.setShowMessagesBar(Boolean.FALSE);
 			this.clienteDTOCols = ERPFactory.clientes.getClientesServicio()
 					.findObtenerListaClientes(Integer.parseInt(ERPConstantes.ESTADO_ACTIVO_NUMERICO), null, null);
 			if (CollectionUtils.isEmpty(this.clienteDTOCols)) {
@@ -678,24 +679,34 @@ public class PedidosController extends CommonsController implements Serializable
 	 */
 	public void calcularTotal() {
 		this.pedidoDTO.setTotalCompra(BigDecimal.ZERO);
+		BigDecimal subTotal = BigDecimal.ZERO;
 		BigDecimal totalSinImpuesto = BigDecimal.ZERO;
-		BigDecimal totalImpuesto = BigDecimal.ZERO;
 		BigDecimal totalConImpuesto = BigDecimal.ZERO;
+		BigDecimal totalIva = BigDecimal.ZERO;
+		BigDecimal totalPedido = BigDecimal.ZERO;
 		for (DetallePedidoDTO detallePedidoDTO : detallePedidoDTOCols) {
 			if (detallePedidoDTO.getSubTotal() != null) {
-				totalSinImpuesto = totalSinImpuesto.add(detallePedidoDTO.getSubTotal());
+				subTotal = subTotal.add(detallePedidoDTO.getSubTotal());
 			}
 			if (detallePedidoDTO.getArticuloDTO().getTieneImpuesto()) {
+				totalConImpuesto = totalConImpuesto.add(detallePedidoDTO.getSubTotal());
 				for (ArticuloImpuestoDTO impuesto : detallePedidoDTO.getArticuloDTO().getArticuloImpuestoDTOCols()) {
-					totalImpuesto = totalImpuesto.add(BigDecimal.valueOf((totalSinImpuesto.doubleValue()
+					totalIva = totalIva.add(BigDecimal.valueOf((subTotal.doubleValue()
 							* impuesto.getImpuestoDTO().getValorImpuesto().doubleValue()) / Double.valueOf(100)));
+				}
+			}else {
+				if (detallePedidoDTO.getSubTotal() != null) {
+					totalSinImpuesto = totalSinImpuesto.add(detallePedidoDTO.getSubTotal());
 				}
 			}
 		}
-		totalConImpuesto = totalSinImpuesto.add(totalImpuesto);
+		totalPedido = subTotal.add(totalIva);
+		this.pedidoDTO.setSubTotal(subTotal);
 		this.pedidoDTO.setTotalSinImpuestos(totalSinImpuesto);
-		this.pedidoDTO.setTotalImpuestos(totalImpuesto);
-		this.pedidoDTO.setTotalCompra(totalConImpuesto);
+		this.pedidoDTO.setTotalImpuestos(totalConImpuesto);
+		this.pedidoDTO.setTotalIva(totalIva);
+		this.pedidoDTO.setTotalCompra(totalPedido);
+		this.pedidoDTO.setDescuento(BigDecimal.ZERO);
 	}
 
 	/**
