@@ -809,7 +809,7 @@ public class CuentasController extends CommonsController implements Serializable
 			if(facturaDetalleDTO.getArticuloDTO().getTieneImpuesto()){
 				totalConImpuesto = totalConImpuesto.add(facturaDetalleDTO.getSubTotal());
 				for(ArticuloImpuestoDTO impuesto : facturaDetalleDTO.getArticuloDTO().getArticuloImpuestoDTOCols()){
-					totalIva = totalIva.add(BigDecimal.valueOf((subTotal.doubleValue() * impuesto.getImpuestoDTO().getValorImpuesto().doubleValue())/ Double.valueOf(100)));
+					totalIva = totalIva.add(BigDecimal.valueOf((facturaDetalleDTO.getSubTotal().doubleValue() * impuesto.getImpuestoDTO().getValorImpuesto().doubleValue())/ Double.valueOf(100)));
 				}
 			}else {
 				if(facturaDetalleDTO.getSubTotal() != null) {

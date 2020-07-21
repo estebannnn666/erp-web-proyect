@@ -162,22 +162,39 @@ public class ClientesController extends CommonsController implements Serializabl
 				this.setShowMessagesBar(Boolean.TRUE);
 			}
 		} catch (ERPException e1) {
-			this.clienteDTO.getPersonaDTO().getId().setCodigoPersona(null);
-			this.clienteDTO.getEmpresaDTO().getId().setCodigoEmpresa(null);
-			this.clienteDTO.getUsuariosDTO().getId().setUserId(null);
+			if(clientesDataManager.getClienteDTOEditar() == null || clientesDataManager.getClienteDTOEditar().getId().getCodigoCliente() == null) {
+				this.clienteDTO.getId().setCodigoCliente(null);
+			}
+			if(this.clienteDTO.getPersonaDTO() != null) {
+				this.clienteDTO.getPersonaDTO().getId().setCodigoPersona(null);
+			}
+			if(this.clienteDTO.getEmpresaDTO() != null) {
+				this.clienteDTO.getEmpresaDTO().getId().setCodigoEmpresa(null);
+			}
+			if(this.clienteDTO.getUsuariosDTO() != null) {
+				this.clienteDTO.getUsuariosDTO().getId().setUserId(null);
+			}
 			this.setShowMessagesBar(Boolean.TRUE);
 			FacesMessage msg = new FacesMessage(e1.getMessage(), "ERROR MSG");
 	        msg.setSeverity(FacesMessage.SEVERITY_ERROR);
 	        FacesContext.getCurrentInstance().addMessage(null, msg);
 		} catch (Exception e2) {
-			this.clienteDTO.getPersonaDTO().getId().setCodigoPersona(null);
-			this.clienteDTO.getEmpresaDTO().getId().setCodigoEmpresa(null);
-			this.clienteDTO.getUsuariosDTO().getId().setUserId(null);
+			if(clientesDataManager.getClienteDTOEditar() == null || clientesDataManager.getClienteDTOEditar().getId().getCodigoCliente() == null) {
+				this.clienteDTO.getId().setCodigoCliente(null);
+			}
+			if(this.clienteDTO.getPersonaDTO() != null) {
+				this.clienteDTO.getPersonaDTO().getId().setCodigoPersona(null);
+			}
+			if(this.clienteDTO.getEmpresaDTO() != null) {
+				this.clienteDTO.getEmpresaDTO().getId().setCodigoEmpresa(null);
+			}
+			if(this.clienteDTO.getUsuariosDTO() != null) {
+				this.clienteDTO.getUsuariosDTO().getId().setUserId(null);
+			}
 			this.setShowMessagesBar(Boolean.TRUE);
 			FacesMessage msg = new FacesMessage(e2.getMessage(), "ERROR MSG");
 	        msg.setSeverity(FacesMessage.SEVERITY_ERROR);
 	        FacesContext.getCurrentInstance().addMessage(null, msg);
-	        System.out.println("Entro 2");
 		}
 		
 	}

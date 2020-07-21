@@ -212,8 +212,10 @@ public class VehiculoController extends CommonsController implements Serializabl
 	 * @param e
 	 */
 	public void abrirPopUp(ActionEvent e){
+		codigoChoferSeleccionado = null;
 		personaExistente = Boolean.FALSE;
 		controlPopUp = Boolean.FALSE;
+		documentoBusqueda = "";
 		bandera = false;
 		vehiculoChoferDTO = new VehiculoChoferDTO();
 		vehiculoChoferDTO.setChoferDTO(new ChoferDTO());

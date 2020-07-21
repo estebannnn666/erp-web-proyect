@@ -161,14 +161,14 @@
         
         
         <!-- Popup para ver el detalle del factura -->
-		<rich:popupPanel id="popUpDetalle" styleClass="panelPedidos" header="#{msg_erpweb['ec.com.erp.etiqueta.label.lista.cabecera.factura.titulo.detalle']}" width="935" height="400" modal="true" domElementAttachment="form">
+		<rich:popupPanel id="popUpDetalle" styleClass="panelPedidos" header="#{msg_erpweb['ec.com.erp.etiqueta.label.lista.cabecera.factura.titulo.detalle']}" width="935" height="408" modal="true" domElementAttachment="form">
 			<f:facet name="controls">
 				<h:outputLink value="#"	onclick="#{rich:component('popUpDetalle')}.hide();">
 					<h:graphicImage library="images" name="close.png" style="border:0px" id="closePopUpDetalle" />
 				</h:outputLink>
 			</f:facet>
 			<h:panelGrid id="pnlListaDetalleFactura" style="width: 100%;">	
-				<rich:panel style="width: 99.6%; height: 315px; " header="#{msg_erpweb['ec.com.erp.etiqueta.label.lista.cabecera.factura.popup.detalle']}">
+				<rich:panel style="width: 99.6%; height: 340px; " header="#{msg_erpweb['ec.com.erp.etiqueta.label.lista.cabecera.factura.popup.detalle']}">
 					
 					<h:panelGrid id="tablaVaciaDetalle" columns="1" rendered="#{empty cuentasController.facturaCabeceraDTO.facturaDetalleDTOCols}" style="width:100%; text-align: center; padding-top: 230px">
 						<h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.mensaje.lista.vacio']}"/>
@@ -202,13 +202,13 @@
 			            <rich:column style="text-align: right; padding-right: 5px">
 			                <f:facet name="header"><h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.header.tabla.articulo.stock']}"/></f:facet>
 			                <h:outputText value="#{detalle.articuloDTO.cantidadStock}">
-			                	<f:convertNumber pattern="0.00"/>
+			                	<f:convertNumber pattern="0"/>
 			                </h:outputText>
 			            </rich:column>
 			            <rich:column style="text-align: right; padding-right: 5px">
 			                <f:facet name="header"><h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.label.nuevo.pedidos.articulo.precio.unitario']}"/></f:facet>
 			                <h:outputText value="#{detalle.articuloDTO.precio}">
-			                	<f:convertNumber pattern="0.00"/>
+			                	<f:convertNumber pattern="0.0000"/>
 			                </h:outputText>
 			            </rich:column>
 			            <rich:column style="text-align: right; padding-right: 5px">
@@ -218,31 +218,55 @@
 			                </h:outputText>
 			            </rich:column>
 			            <f:facet name="footer">
-			                <rich:columnGroup>
-				                <rich:column colspan="7" style="text-align: right; paddin-right: 10px">Sub Total:</rich:column>
-				                <rich:column style="text-align: right; paddin-right: 10px">
-				                    <h:outputText value="#{cuentasController.facturaCabeceraDTO.totalSinImpuestos}">
-				                    	<f:convertNumber pattern="0.00"/>
-				                    </h:outputText>
-				                </rich:column>
-				            </rich:columnGroup>
-				            <rich:columnGroup>
-				                <rich:column colspan="7" style="text-align: right; paddin-right: 10px">Iva 12 %:</rich:column>
-				                <rich:column style="text-align: right; paddin-right: 10px">
-				                    <h:outputText value="#{cuentasController.facturaCabeceraDTO.totalImpuestos}">
-				                    	<f:convertNumber pattern="0.00"/>
-				                    </h:outputText>
-				                </rich:column>
-				            </rich:columnGroup>
-				            <rich:columnGroup>
-				                <rich:column colspan="7" style="text-align: right; paddin-right: 10px">Total:</rich:column>
-				                <rich:column style="text-align: right; paddin-right: 10px">
-				                    <h:outputText value="#{cuentasController.facturaCabeceraDTO.totalCuenta}">
-				                    	<f:convertNumber pattern="0.00"/>
-				                    </h:outputText>
-				                </rich:column>
-				            </rich:columnGroup>
-			            </f:facet>
+				                <rich:columnGroup>
+					                <rich:column colspan="7" style="text-align: right; paddin-right: 10px">Sub Total:</rich:column>
+					                <rich:column style="text-align: right; paddin-right: 10px">
+					                    <h:outputText value="#{cuentasController.facturaCabeceraDTO.subTotal}">
+					                    	<f:convertNumber pattern="0.00"/>
+					                    </h:outputText>
+					                </rich:column>
+					            </rich:columnGroup>
+					            <rich:columnGroup>
+					                <rich:column colspan="7" style="text-align: right; paddin-right: 10px">Descuento:</rich:column>
+					                <rich:column style="text-align: right; paddin-right: 10px">
+					                    <h:outputText value="#{cuentasController.facturaCabeceraDTO.descuento}">
+					                    	<f:convertNumber pattern="0.00"/>
+					                    </h:outputText>
+					                </rich:column>
+					            </rich:columnGroup>
+					            <rich:columnGroup>
+					                <rich:column colspan="7" style="text-align: right; paddin-right: 10px">Tarifa 0%:</rich:column>
+					                <rich:column style="text-align: right; paddin-right: 10px">
+					                    <h:outputText value="#{cuentasController.facturaCabeceraDTO.totalSinImpuestos}">
+					                    	<f:convertNumber pattern="0.00"/>
+					                    </h:outputText>
+					                </rich:column>
+					            </rich:columnGroup>
+					            <rich:columnGroup>
+					                <rich:column colspan="7" style="text-align: right; paddin-right: 10px">Tarifa 12%:</rich:column>
+					                <rich:column style="text-align: right; paddin-right: 10px">
+					                    <h:outputText value="#{cuentasController.facturaCabeceraDTO.totalImpuestos}">
+					                    	<f:convertNumber pattern="0.00"/>
+					                    </h:outputText>
+					                </rich:column>
+					            </rich:columnGroup>					            
+					            <rich:columnGroup>
+					                <rich:column colspan="7" style="text-align: right; paddin-right: 10px">Iva 12 %:</rich:column>
+					                <rich:column style="text-align: right; paddin-right: 10px">
+					                    <h:outputText value="#{cuentasController.facturaCabeceraDTO.totalIva}">
+					                    	<f:convertNumber pattern="0.00"/>
+					                    </h:outputText>
+					                </rich:column>
+					            </rich:columnGroup>
+					            <rich:columnGroup>
+					                <rich:column colspan="7" style="text-align: right; paddin-right: 10px">Total:</rich:column>
+					                <rich:column style="text-align: right; paddin-right: 10px">
+					                    <h:outputText value="#{cuentasController.facturaCabeceraDTO.totalCuenta}">
+					                    	<f:convertNumber pattern="0.00"/>
+					                    </h:outputText>
+					                </rich:column>
+					            </rich:columnGroup>
+				            </f:facet>
 			        </rich:dataTable>
 		        </rich:panel>
 			</h:panelGrid>

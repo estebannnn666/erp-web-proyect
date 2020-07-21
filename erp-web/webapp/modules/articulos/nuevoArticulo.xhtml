@@ -25,24 +25,24 @@
 			 	<legend>#{msg_erpweb['ec.com.erp.etiqueta.header.datos.basicos']}</legend>
 			 	<h:panelGrid id="pnlGridArticulos" columns="2" cellspacing="2" cellpadding="5">
 			 		<h:outputText class="styleNegritas" value="#{msg_erpweb['ec.com.erp.etiqueta.header.tabla.codigo.barras']}: *" />
-			 		<h:inputText class="styleUpperCase" style="width:260px" value="#{articulosController.articuloDTO.codigoBarras}" id="codigoBarras" onkeypress="return validarEnteros(event);"/>
+			 		<h:inputText class="styleUpperCase" style="width:260px" value="#{articulosController.articuloDTO.codigoBarras}" id="codigoBarras" onkeypress="if (event.keyCode == 13) return false; return validarEnteros(event);"/>
 			 		
 			 		<h:outputText class="styleNegritas" value="#{msg_erpweb['ec.com.erp.etiqueta.header.tabla.descripcion.articulo']}: *" />
-			 		<h:inputText class="styleUpperCase" style="width:260px" value="#{articulosController.articuloDTO.nombreArticulo}" id="nombreArticulo" />
+			 		<h:inputText class="styleUpperCase" style="width:260px" value="#{articulosController.articuloDTO.nombreArticulo}" id="nombreArticulo" onkeypress="if (event.keyCode == 13) return false;"/>
 			 		
 			 		<h:outputText class="styleNegritas" value="#{msg_erpweb['ec.com.erp.etiqueta.header.tabla.articulo.peso']}: *" />
-			 		<h:inputText style="width:260px" value="#{articulosController.articuloDTO.peso}" id="peso" onkeypress="return validarDecimal(event);">
+			 		<h:inputText style="width:260px" value="#{articulosController.articuloDTO.peso}" id="peso" onkeypress="if (event.keyCode == 13) return false; return validarDecimal(event);">
 			 			<f:convertNumber pattern="0.00"/>
 			 		</h:inputText>
 			 		
 			 		<h:outputText class="styleNegritas" value="#{msg_erpweb['ec.com.erp.etiqueta.header.tabla.articulo.costo']}: *" />
-			 		<h:inputText  style="width:260px" value="#{articulosController.articuloDTO.costo}" id="costo" onkeypress="return validarDecimal(event);"/>
+			 		<h:inputText  style="width:260px" value="#{articulosController.articuloDTO.costo}" id="costo" onkeypress="if (event.keyCode == 13) return false; return validarDecimal(event);"/>
 			 		
 			 		<h:outputText class="styleNegritas" value="#{msg_erpweb['ec.com.erp.etiqueta.header.tabla.articulo.precio']}: *" />
-			 		<h:inputText  style="width:260px" value="#{articulosController.articuloDTO.precio}" id="precio" onkeypress="return validarDecimal(event);"/>
+			 		<h:inputText  style="width:260px" value="#{articulosController.articuloDTO.precio}" id="precio" onkeypress="if (event.keyCode == 13) return false; return validarDecimal(event);"/>
 			 		
 			 		<h:outputText class="styleNegritas" value="#{msg_erpweb['ec.com.erp.etiqueta.header.tabla.articulo.stock']}: *" />
-			 		<h:inputText style="width:260px" value="#{articulosController.articuloDTO.cantidadStock}" id="cantidadStock" onkeypress="return validarEnteros(event);"/>
+			 		<h:inputText style="width:260px" value="#{articulosController.articuloDTO.cantidadStock}" id="cantidadStock" onkeypress="if (event.keyCode == 13) return false; return validarEnteros(event);"/>
 			 	</h:panelGrid>
 			</fieldset>
 			
@@ -99,12 +99,12 @@
 			</fieldset>
 		</rich:panel>
 		
-		<!-- Popup para agregar nuevo cliente -->
+		<!-- Popup para agregar nuevo impuesto -->
 		<rich:popupPanel id="mpAddImpuesto" styleClass="panelPedidos" header="Seleccionar impuestos" width="935" height="400" modal="true" domElementAttachment="form">
 			<f:facet name="controls">
-				<h:outputLink value="#"	onclick="#{rich:component('mpClientes')}.hide();">
+				<a4j:commandLink actionListener="#{articulosController.cerrarPopUpImpuesto}" oncomplete="#{rich:component('mpAddImpuesto')}.hide(); return false;" render="pnlMensajes">
 					<h:graphicImage library="images" name="close.png" style="border:0px" id="closePopUpBodega" />
-				</h:outputLink>
+				</a4j:commandLink>
 			</f:facet>
 			<h:panelGrid id="pnlListaImpuesto" style="width: 100%;">	
 				<rich:panel style="width: 99.6%; height: 315px; " header="Lista de impuestos">
@@ -144,7 +144,7 @@
 			<!-- Botones de PopUp -->
 			<h:panelGrid style="margin:auto;" columns="2" cellpadding="0" cellspacing="0">
 				<h:panelGroup layout="block" styleClass="botonD" style="margin-top:5px;margin-right:20px;">
-					<a4j:commandLink id="btnAceptarAgregarCliente" execute="@this" render="pnlGridImpuesto tableArticuloImpuesto" styleClass="aceptarD" actionListener="#{articulosController.agregarImpuesto}" oncomplete="#{rich:component('mpAddImpuesto')}.hide(); return false;">
+					<a4j:commandLink id="btnAceptarAgregarCliente" execute="@this" render="pnlGridImpuesto tableArticuloImpuesto pnlMensajes" styleClass="aceptarD" actionListener="#{articulosController.agregarImpuesto}" oncomplete="if(#{!articulosController.impuestoCreado})#{rich:component('mpAddImpuesto')}.hide(); return false;">
 						<h:panelGrid columns="2" cellpadding="3" cellspacing="0">
 							<h:graphicImage name="btnAceptar.png" library="images" style="border:none;border-color:white;" height="16" width="16"/>
 							<h:outputText value="Aceptar" />
@@ -152,7 +152,7 @@
 					</a4j:commandLink>					
 				</h:panelGroup>
 				<h:panelGroup layout="block" styleClass="botonD" style="margin-top:5px;">
-					<a4j:commandLink id="btnCancelarAgregarCliente" styleClass="cancelarD" oncomplete="#{rich:component('mpAddImpuesto')}.hide(); return false;" immediate="true">
+					<a4j:commandLink id="btnCancelarAgregarCliente" styleClass="cancelarD" actionListener="#{articulosController.cerrarPopUpImpuesto}" oncomplete="#{rich:component('mpAddImpuesto')}.hide(); return false;" render="pnlMensajes">
 						<h:panelGrid columns="2" cellpadding="3" cellspacing="0">
 							<h:graphicImage name="btnCancel.png" library="images" style="border:none;border-color:white;" height="16" width="16"/>
 							<h:outputText value="Cancelar" />

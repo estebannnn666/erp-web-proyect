@@ -129,7 +129,7 @@
 				                	<f:convertNumber pattern="0.00"/>
 				                </h:inputText-->
 				                <h:inputText style="width:95%; text-align: right; padding-right: 5px" id="precioUnitario" value="#{detalle.valorUnidad}" onkeypress="if (event.keyCode == 13) return false; return validarDecimalFactura(event);">
-				                	<f:convertNumber groupingUsed="true" minFractionDigits="2" />
+				                	<f:convertNumber groupingUsed="true" minFractionDigits="4" />
 				                	<a4j:ajax event="blur" status="no" listener="#{cuentasController.calcularTotalFacturaKeyUp}" execute="@this" render="pnlGridDetalleFactura" >
 				                	</a4j:ajax>
 				                </h:inputText>
@@ -457,7 +457,7 @@
 				function validarDecimalFactura(e) {
 					tecla = (document.all) ? e.keyCode : e.which;
 					if (tecla==8) return true; 
-					patron =/[0-9\s,0-9\s]/; 
+					patron =/[0-9\s,0-9{4}\s]/; 
 					te = String.fromCharCode(tecla);
 					return patron.test(te);
 				}

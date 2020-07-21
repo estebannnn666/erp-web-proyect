@@ -183,10 +183,12 @@ public class InventarioController extends CommonsController implements Serializa
 					this.inventarioDTO.setValorUnidadSalida(this.inventarioDTO.getValorUnidadEntrada());
 					this.inventarioDTO.setValorTotalSalida(this.inventarioDTO.getValorTotalEntrada());
 					if(inventarioDTOAux == null) {
+						this.setShowMessagesBar(Boolean.TRUE);
 						MensajesController.addError(null, ERPWebResources.getString("ec.com.erp.etiqueta.inventario.mensaje.sin.existencias"));
 						return;
 					}else {
 						if(this.inventarioDTO.getCantidadSalida().intValue() > inventarioDTOAux.getCantidadExistencia().intValue()) {
+							this.setShowMessagesBar(Boolean.TRUE);
 							MensajesController.addError(null, ERPWebResources.getString("ec.com.erp.etiqueta.inventario.mensaje.sin.existencias"));
 							return;
 						}
@@ -261,7 +263,12 @@ public class InventarioController extends CommonsController implements Serializa
 		Predicate testPredicate = new BeanPredicate("id.codigoArticulo", PredicateUtils.equalPredicate(this.codigoArticuloSeleccionado));
 		// Validacion de objeto existente
 		this.articuloDTO  = (ArticuloDTO) CollectionUtils.find(this.articuloDTOCols, testPredicate);
-		this.inventarioDTO.setValorUnidadEntrada(this.articuloDTO.getPrecio());
+		
+		if(this.tipoMovimiento.equals(ERPConstantes.ESTADO_INACTIVO_NUMERICO)) {
+			this.inventarioDTO.setValorUnidadEntrada(this.articuloDTO.getPrecio());
+		}else {
+			this.inventarioDTO.setValorUnidadEntrada(this.articuloDTO.getCosto());
+		}
 		this.inventarioDTO.setCodigoArticulo(this.articuloDTO.getId().getCodigoArticulo());
 		this.inventarioDTO.setCantidadEntrada(null);
 		this.inventarioDTO.setValorTotalEntrada(null);
@@ -305,6 +312,7 @@ public class InventarioController extends CommonsController implements Serializa
 		this.inventarioDataManager.setInventarioDTOEditar(new InventarioDTO());
 		this.codigoBarrasNuevo = "";
 		this.articuloDTO = new ArticuloDTO();
+		this.tipoMovimiento = null;
 	}
 	
 	/**
@@ -395,8 +403,12 @@ public class InventarioController extends CommonsController implements Serializa
 		this.setShowMessagesBar(Boolean.FALSE);
 		Collection<ArticuloDTO> articuloDTOCols = ERPFactory.articulos.getArticuloServicio().findObtenerListaArticulos(Integer.parseInt(ERPConstantes.ESTADO_ACTIVO_NUMERICO), codigoBarrasNuevo, null);
 		if(CollectionUtils.isNotEmpty(articuloDTOCols)) {
-			ArticuloDTO  articuloTem = articuloDTOCols.iterator().next();
-			this.inventarioDTO.setValorUnidadEntrada(articuloTem.getPrecio());
+			ArticuloDTO articuloTem = articuloDTOCols.iterator().next();
+			if(this.tipoMovimiento.equals(ERPConstantes.ESTADO_INACTIVO_NUMERICO)) {
+				this.inventarioDTO.setValorUnidadEntrada(articuloTem.getPrecio());
+			}else {
+				this.inventarioDTO.setValorUnidadEntrada(articuloTem.getCosto());
+			}
 			this.inventarioDTO.setCodigoArticulo(articuloTem.getId().getCodigoArticulo());
 			this.inventarioDTO.setCantidadEntrada(null);
 			this.inventarioDTO.setValorTotalEntrada(null);

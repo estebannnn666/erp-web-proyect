@@ -62,9 +62,11 @@ public class ArticulosController extends CommonsController implements Serializab
 	private Boolean articuloCreado;
 	private Boolean modoEdicion;
 	private ImpuestoDTO impuestoDTO;
+	private Boolean impuestoCreado;
 
 	@PostConstruct
 	public void postConstruct() {
+		this.impuestoCreado = Boolean.FALSE;
 		this.loginController.activarMenusSeleccionado();
 		this.articuloImpuestoDTOCols = new ArrayList<ArticuloImpuestoDTO>();
 		this.impuestoDTOCols = new ArrayList<ImpuestoDTO>();
@@ -235,6 +237,7 @@ public class ArticulosController extends CommonsController implements Serializab
 	 * @param e
 	 */
 	public void clearNuevoArticulo(ActionEvent e){
+		this.impuestoCreado = Boolean.FALSE;
 		this.codigoImpuestoSeleccionado = null;
 		this.articuloImpuestoDTOCols = new ArrayList<ArticuloImpuestoDTO>();
 		this.impuestoDTOCols = new ArrayList<ImpuestoDTO>();
@@ -323,6 +326,8 @@ public class ArticulosController extends CommonsController implements Serializab
 	 * @param e
 	 */
 	public void abrirPopUpImpuesto(ActionEvent e) {
+		this.impuestoCreado = Boolean.FALSE;
+		this.codigoImpuestoSeleccionado = null;
 		this.articuloImpuestoDTO = new ArticuloImpuestoDTO();
 		this.setImpuestoDTOCols(ERPFactory.impuesto.getImpuestoServicio().findObtenerListaImpuestos(Integer.parseInt(ERPConstantes.ESTADO_ACTIVO_NUMERICO), null, null));
 	}
@@ -348,12 +353,30 @@ public class ArticulosController extends CommonsController implements Serializab
 	 * @param e
 	 */
 	public void agregarImpuesto(ActionEvent e) {
-		ArticuloImpuestoDTO detalle = new ArticuloImpuestoDTO();
-		detalle.getId().setCodigoCompania(Integer.parseInt(ERPConstantes.ESTADO_ACTIVO_NUMERICO));
-		detalle.setUsuarioRegistro(loginController.getUsuariosDTO().getId().getUserId());
-		detalle.setImpuestoDTO(this.impuestoDTO);
-		detalle.getId().setCodigoImpuesto(this.impuestoDTO.getId().getCodigoImpuesto());
-		this.articuloImpuestoDTOCols.add(detalle);
+		ArticuloImpuestoDTO impTemp = this.articuloImpuestoDTOCols.stream()
+				.filter(impuesto-> impuesto.getId().getCodigoImpuesto().intValue() == this.impuestoDTO.getId().getCodigoImpuesto().intValue())
+				.findFirst().orElse(null);
+		if(impTemp == null) {
+			ArticuloImpuestoDTO detalle = new ArticuloImpuestoDTO();
+			detalle.getId().setCodigoCompania(Integer.parseInt(ERPConstantes.ESTADO_ACTIVO_NUMERICO));
+			detalle.setUsuarioRegistro(loginController.getUsuariosDTO().getId().getUserId());
+			detalle.setImpuestoDTO(this.impuestoDTO);
+			detalle.getId().setCodigoImpuesto(this.impuestoDTO.getId().getCodigoImpuesto());
+			this.articuloImpuestoDTOCols.add(detalle);
+			this.impuestoCreado = Boolean.FALSE;
+		}else {
+			this.impuestoCreado = Boolean.TRUE;
+			this.setShowMessagesBar(Boolean.TRUE);
+			MensajesController.addError(null, ERPWebResources.getString("ec.com.erp.etiqueta.articulos.mensaje.error.impuesto.existente"));
+		}
+	}
+	
+	/**
+	 * Agregar nuevo impuesto
+	 * @param e
+	 */
+	public void cerrarPopUpImpuesto(ActionEvent e) {
+		this.setShowMessagesBar(Boolean.FALSE);
 	}
 	
 	public void setArticulosDataManager(ArticulosDataManager articulosDataManager) {
@@ -462,5 +485,13 @@ public class ArticulosController extends CommonsController implements Serializab
 
 	public void setImpuestoDTO(ImpuestoDTO impuestoDTO) {
 		this.impuestoDTO = impuestoDTO;
+	}
+
+	public Boolean getImpuestoCreado() {
+		return impuestoCreado;
+	}
+
+	public void setImpuestoCreado(Boolean impuestoCreado) {
+		this.impuestoCreado = impuestoCreado;
 	}
 }

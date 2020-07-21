@@ -172,13 +172,13 @@
 			            <rich:column style="text-align: right; padding-right: 5px">
 			                <f:facet name="header"><h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.header.tabla.articulo.stock']}"/></f:facet>
 			                <h:outputText value="#{detalle.articuloDTO.cantidadStock}">
-			                	<f:convertNumber pattern="0.00"/>
+			                	<f:convertNumber pattern="0"/>
 			                </h:outputText>
 			            </rich:column>
 			            <rich:column style="text-align: right; padding-right: 5px">
 			                <f:facet name="header"><h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.label.nuevo.pedidos.articulo.precio.unitario']}"/></f:facet>
 			                <h:outputText value="#{detalle.articuloDTO.precio}">
-			                	<f:convertNumber pattern="0.00"/>
+			                	<f:convertNumber pattern="0.0000"/>
 			                </h:outputText>
 			            </rich:column>
 			            <rich:column style="text-align: right; padding-right: 5px">
