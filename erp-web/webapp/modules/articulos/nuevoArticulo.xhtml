@@ -21,31 +21,86 @@
 	
 	<ui:define name="contentCenter">		
 		 <rich:panel header="Registro de nuevo articulo" style="width: 100%; background-color: #F5FAFF;">
-	 		 <fieldset>
-			 	<legend>#{msg_erpweb['ec.com.erp.etiqueta.header.datos.basicos']}</legend>
-			 	<h:panelGrid id="pnlGridArticulos" columns="2" cellspacing="2" cellpadding="5">
-			 		<h:outputText class="styleNegritas" value="#{msg_erpweb['ec.com.erp.etiqueta.header.tabla.codigo.barras']}: *" />
-			 		<h:inputText class="styleUpperCase" style="width:260px" value="#{articulosController.articuloDTO.codigoBarras}" id="codigoBarras" onkeypress="if (event.keyCode == 13) return false; return validarEnteros(event);"/>
-			 		
-			 		<h:outputText class="styleNegritas" value="#{msg_erpweb['ec.com.erp.etiqueta.header.tabla.descripcion.articulo']}: *" />
-			 		<h:inputText class="styleUpperCase" style="width:260px" value="#{articulosController.articuloDTO.nombreArticulo}" id="nombreArticulo" onkeypress="if (event.keyCode == 13) return false;"/>
-			 		
-			 		<h:outputText class="styleNegritas" value="#{msg_erpweb['ec.com.erp.etiqueta.header.tabla.articulo.peso']}: *" />
-			 		<h:inputText style="width:260px" value="#{articulosController.articuloDTO.peso}" id="peso" onkeypress="if (event.keyCode == 13) return false; return validarDecimal(event);">
-			 			<f:convertNumber pattern="0.00"/>
-			 		</h:inputText>
-			 		
-			 		<h:outputText class="styleNegritas" value="#{msg_erpweb['ec.com.erp.etiqueta.header.tabla.articulo.costo']}: *" />
-			 		<h:inputText  style="width:260px" value="#{articulosController.articuloDTO.costo}" id="costo" onkeypress="if (event.keyCode == 13) return false; return validarDecimal(event);"/>
-			 		
-			 		<h:outputText class="styleNegritas" value="#{msg_erpweb['ec.com.erp.etiqueta.header.tabla.articulo.precio']}: *" />
-			 		<h:inputText  style="width:260px" value="#{articulosController.articuloDTO.precio}" id="precio" onkeypress="if (event.keyCode == 13) return false; return validarDecimal(event);"/>
-			 		
-			 		<h:outputText class="styleNegritas" value="#{msg_erpweb['ec.com.erp.etiqueta.header.tabla.articulo.stock']}: *" />
-			 		<h:inputText style="width:260px" value="#{articulosController.articuloDTO.cantidadStock}" id="cantidadStock" onkeypress="if (event.keyCode == 13) return false; return validarEnteros(event);"/>
-			 	</h:panelGrid>
-			</fieldset>
-			
+		 	<h:panelGrid columns="2" style="width: 100%" columnClasses="estiloDivArticulos1 estiloDivArticulos2">
+		 		<h:panelGroup>
+			 		<fieldset>
+					 	<legend>#{msg_erpweb['ec.com.erp.etiqueta.header.datos.basicos']}</legend>
+					 	<h:panelGrid id="pnlGridArticulos" columns="2" cellspacing="2" cellpadding="5">
+					 		<h:outputText class="styleNegritas" value="#{msg_erpweb['ec.com.erp.etiqueta.header.tabla.codigo.barras']}: *" />
+					 		<h:inputText class="styleUpperCase" style="width:260px" value="#{articulosController.articuloDTO.codigoBarras}" id="codigoBarras" onkeypress="if (event.keyCode == 13) return false; return validarEnteros(event);"/>
+					 		
+					 		<h:outputText class="styleNegritas" value="#{msg_erpweb['ec.com.erp.etiqueta.header.tabla.descripcion.articulo']}: *" />
+					 		<h:inputText class="styleUpperCase" style="width:260px" value="#{articulosController.articuloDTO.nombreArticulo}" id="nombreArticulo" onkeypress="if (event.keyCode == 13) return false;"/>
+					 		
+					 		<h:outputText class="styleNegritas" value="#{msg_erpweb['ec.com.erp.etiqueta.header.tabla.articulo.peso']}: *" />
+					 		<h:inputText style="width:260px" value="#{articulosController.articuloDTO.peso}" id="peso" onkeypress="if (event.keyCode == 13) return false; return validarDecimal(event);">
+					 			<f:convertNumber pattern="0.00"/>
+					 		</h:inputText>
+					 		
+					 		<h:outputText class="styleNegritas" value="#{msg_erpweb['ec.com.erp.etiqueta.header.tabla.articulo.costo']}: *" />
+					 		<h:inputText  style="width:260px" value="#{articulosController.articuloDTO.costo}" id="costo" onkeypress="if (event.keyCode == 13) return false; return validarDecimal(event);"/>
+					 		
+					 		<h:outputText class="styleNegritas" value="#{msg_erpweb['ec.com.erp.etiqueta.header.tabla.articulo.precio']}: *" />
+					 		<h:inputText  style="width:260px" value="#{articulosController.articuloDTO.precio}" id="precio" onkeypress="if (event.keyCode == 13) return false; return validarDecimal(event);"/>
+					 	</h:panelGrid>
+					</fieldset>
+				</h:panelGroup>
+				<h:panelGroup>
+					<fieldset>
+					 	<legend>Unidades de manejo</legend>
+					 	<rich:toolbar height="26" itemSeparator="grid">
+							<rich:toolbarGroup>
+								<h:graphicImage name="unidadmanejo.png" library="images" style="border:none;border-color:white;" height="16" width="16"/>
+								<h:outputText value="Lista de unidades de manejo"/>
+							</rich:toolbarGroup>
+							<rich:toolbarGroup location="right">	
+								<h:panelGroup layout="block" styleClass="botonD" style="padding-top: 3px; margin-top:0px;">
+									<a4j:commandLink styleClass="agregarD" actionListener="#{articulosController.abrirPopUnidadManejo}" oncomplete="#{rich:component('mpAddUnidadManejo')}.show();" render="mpAddImpuesto pnlUnidadManejo" execute="@this" title="Click para agregar fila">
+										<h:panelGrid columns="2" cellpadding="3" cellspacing="0">
+											<h:graphicImage name="btnNuevoPedido.png" library="images" style="border:none;border-color:white;" height="16" width="16"/>
+											<h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.boton.agregar']}"/>
+										</h:panelGrid>
+									</a4j:commandLink>	
+								</h:panelGroup>	
+							</rich:toolbarGroup>						
+						</rich:toolbar>	
+					
+					 	<h:panelGrid id="pnlGridUnidadManejo" style="width:100%">
+					 		<rich:dataTable styleClass="styleDetalle" style="width:100%" value="#{articulosController.articuloUnidadManejoDTOCols}" var="detalle" rowKeyVar="rowIndex" iterationStatusVar="it" id="tableUnidadManejo" rows="10">
+						 		<rich:column style="width:5%; text-align: center;">
+					                <f:facet name="header"><h:outputText value="Eliminar"/></f:facet>
+					                <a4j:commandLink id="botonEditar" render="pnlGridUnidadManejo" action="#{articulosController.eliminarArticuloUnidadManejo(detalle)}" execute="@this" >
+										<h:outputText value="Eliminar" />
+										<f:setPropertyActionListener value="#{detalle}" target="#{articulosController.articuloUnidadManejoDTO}" />											
+									</a4j:commandLink>	
+					            </rich:column>
+					            <rich:column style="width:5%; text-align: center;">
+					                <f:facet name="header">Nro.</f:facet>
+					                #{rowIndex+1}
+					            </rich:column>
+					            <rich:column style="width:30%">
+					                <f:facet name="header"><h:outputText value="Unidad de manejo"/></f:facet>
+					                <h:outputText style="text-align: left; width:95%; padding-right: 5px" value="#{detalle.tipoUnidadManejoCatalogoValorDTO.nombreCatalogoValor}"></h:outputText>
+					            </rich:column>		
+					            <rich:column style="width:20%"> 
+					                <f:facet name="header"><h:outputText value="Abrebiatura"/></f:facet>
+					                <h:outputText style="text-align: left; width:95%; padding-right: 5px" value="#{detalle.codigoValorUnidadManejo}"></h:outputText>
+					            </rich:column>	
+					            <rich:column style="width:20%"> 
+					                <f:facet name="header"><h:outputText value="Es por defecto"/></f:facet>
+					                <h:outputText style="text-align: left; width:95%; padding-right: 5px" value="#{detalle.esPorDefecto ? 'SI' : 'NO'}"></h:outputText>
+					            </rich:column>		            
+					            <rich:column style="width:30%; text-align: right; paddin-right: 10px">
+					                <f:facet name="header"><h:outputText value="Valor unidad de manejo"/></f:facet>
+					                <h:outputText style="text-align: right; width:95%; padding-right: 5px" value="#{detalle.valorUnidadManejo}">
+					                	<f:convertNumber pattern="0" />
+					                </h:outputText>
+					            </rich:column>
+					        </rich:dataTable>
+					 	</h:panelGrid>
+					</fieldset>
+				</h:panelGroup>
+			</h:panelGrid>
 			<fieldset>
 			 	<legend>Impuestos del articulo</legend>
 			 	
@@ -98,6 +153,50 @@
 			 	</h:panelGrid>
 			</fieldset>
 		</rich:panel>
+		
+		<!-- Popup para agregar nuevo impuesto -->
+		<rich:popupPanel id="mpAddUnidadManejo" styleClass="panelPedidos" header="Agregar unidad de manejo" width="435" height="190" modal="true" domElementAttachment="form">
+			<f:facet name="controls">
+				<a4j:commandLink actionListener="#{articulosController.cerrarPopUpImpuesto}" oncomplete="#{rich:component('mpAddUnidadManejo')}.hide(); return false;" render="pnlMensajes">
+					<h:graphicImage library="images" name="close.png" style="border:0px" id="closePopUpUnidad" />
+				</a4j:commandLink>
+			</f:facet>
+			<rich:panel style="width: 99%; padding-top: 10px; padding-bottom: 10px;">
+				<h:panelGrid id="pnlUnidadManejo" columns="2" cellpadding="3" cellspacing="0" style="width: 100%; padding-left:10px;">	
+					<h:outputText class="styleNegritas" value="Tipo unidad de manejo: *" />
+					<h:selectOneMenu tabindex="1" value="#{articulosController.articuloUnidadManejoDTO.codigoValorUnidadManejo}" valueChangeListener="#{articulosController.seleccionarUnidadManejo}" style="width: 235px" onkeypress="if (event.keyCode == 13) return false;">
+						<f:selectItem itemLabel="SELECCIONE"/>
+						<f:selectItems value="#{articulosController.unidadManejoCatalogoDTOCols}" var="uniMan" itemValue = "#{uniMan.id.codigoCatalogoValor}" itemLabel = "#{uniMan.nombreCatalogoValor}" /> 
+						<f:ajax event="change" render="pnlUnidadManejo" execute="@this"></f:ajax>
+					</h:selectOneMenu>
+					<h:outputText class="styleNegritas" value="Abreviatura unidad de manejo:" />	
+					<h:inputText tabindex="2" style="width:229px" value="#{articulosController.articuloUnidadManejoDTO.codigoValorUnidadManejo}" maxlength="9" disabled="true"/>
+					<h:outputText class="styleNegritas" value="Valor unidad de manejo: *" />	
+					<h:inputText tabindex="2" id="unidadValor" style="width:229px" value="#{articulosController.articuloUnidadManejoDTO.valorUnidadManejo}" maxlength="9" onkeypress="if (event.keyCode == 13) return false; return validarEnteros(event);"/>
+					<h:outputText class="styleNegritas" value="Unidad de manejo por defecto:" />	
+					<h:selectBooleanCheckbox style="margin-left: -0.02em;" value="#{articulosController.articuloUnidadManejoDTO.esPorDefecto}"/>
+				</h:panelGrid>
+			</rich:panel>
+			<!-- Botones de PopUp -->
+			<h:panelGrid style="margin:auto; padding-top:10px" columns="2" cellpadding="0" cellspacing="0">
+				<h:panelGroup layout="block" styleClass="botonD" style="margin-top:5px;margin-right:20px;">
+					<a4j:commandLink id="btnAceptarAgregarUnidadManejo" execute="pnlUnidadManejo" render="pnlGridUnidadManejo tableUnidadManejo pnlMensajes" styleClass="aceptarD" actionListener="#{articulosController.agregarArticuloUnidadManejo}" oncomplete="if(#{!articulosController.unidadManejoCreada})#{rich:component('mpAddUnidadManejo')}.hide(); return false;">
+						<h:panelGrid columns="2" cellpadding="3" cellspacing="0">
+							<h:graphicImage name="btnAceptar.png" library="images" style="border:none;border-color:white;" height="16" width="16"/>
+							<h:outputText value="Aceptar" />
+						</h:panelGrid>
+					</a4j:commandLink>					
+				</h:panelGroup>
+				<h:panelGroup layout="block" styleClass="botonD" style="margin-top:5px;">
+					<a4j:commandLink id="btnCancelarUnidadManejo" styleClass="cancelarD" actionListener="#{articulosController.cerrarPopUpImpuesto}" oncomplete="#{rich:component('mpAddUnidadManejo')}.hide(); return false;" render="pnlMensajes">
+						<h:panelGrid columns="2" cellpadding="3" cellspacing="0">
+							<h:graphicImage name="btnCancel.png" library="images" style="border:none;border-color:white;" height="16" width="16"/>
+							<h:outputText value="Cancelar" />
+						</h:panelGrid>
+					</a4j:commandLink>
+				</h:panelGroup>
+			</h:panelGrid>
+		</rich:popupPanel>
 		
 		<!-- Popup para agregar nuevo impuesto -->
 		<rich:popupPanel id="mpAddImpuesto" styleClass="panelPedidos" header="Seleccionar impuestos" width="935" height="400" modal="true" domElementAttachment="form">
@@ -236,6 +335,18 @@
 				}	
 			/*]]>*/
 		</script>
+		<h:outputStylesheet>
+			.estiloDivArticulos1{
+				width: 60% !important;
+			}	
+			.estiloDivArticulos2{
+				width: 40% !important;
+			}
+			
+			fieldset {
+ 				height: 200px;
+ 			}	
+		</h:outputStylesheet>
 	</ui:define>
 	
 </ui:composition>

@@ -23,6 +23,8 @@ import ec.com.erp.cliente.common.exception.ERPException;
 import ec.com.erp.cliente.common.factory.ERPFactory;
 import ec.com.erp.cliente.mdl.dto.ArticuloDTO;
 import ec.com.erp.cliente.mdl.dto.ArticuloImpuestoDTO;
+import ec.com.erp.cliente.mdl.dto.ArticuloUnidadManejoDTO;
+import ec.com.erp.cliente.mdl.dto.CatalogoValorDTO;
 import ec.com.erp.cliente.mdl.dto.ImpuestoDTO;
 import ec.com.erp.web.articulo.datamanager.ArticulosDataManager;
 import ec.com.erp.web.commons.controller.CommonsController;
@@ -53,7 +55,9 @@ public class ArticulosController extends CommonsController implements Serializab
 	private ArticuloDTO articuloDTO;
 	private Collection<ArticuloDTO> articuloDTOCols;
 	private Collection<ArticuloImpuestoDTO> articuloImpuestoDTOCols;
+	private Collection<ArticuloUnidadManejoDTO> articuloUnidadManejoDTOCols;
 	private Collection<ImpuestoDTO> impuestoDTOCols;
+	private Collection<CatalogoValorDTO> unidadManejoCatalogoDTOCols;
 	private ArticuloImpuestoDTO articuloImpuestoDTO;
 	private String codigoBarrasBusqueda;
 	private String nombreArticuloBusqueda;
@@ -62,16 +66,22 @@ public class ArticulosController extends CommonsController implements Serializab
 	private Boolean articuloCreado;
 	private Boolean modoEdicion;
 	private ImpuestoDTO impuestoDTO;
+	private ArticuloUnidadManejoDTO articuloUnidadManejoDTO;
 	private Boolean impuestoCreado;
+	private Boolean unidadManejoCreada;
 
 	@PostConstruct
 	public void postConstruct() {
 		this.impuestoCreado = Boolean.FALSE;
+		this.unidadManejoCreada = Boolean.FALSE;
 		this.loginController.activarMenusSeleccionado();
+		this.unidadManejoCatalogoDTOCols = new ArrayList<>();
 		this.articuloImpuestoDTOCols = new ArrayList<ArticuloImpuestoDTO>();
+		this.articuloUnidadManejoDTOCols = new ArrayList<>();
 		this.impuestoDTOCols = new ArrayList<ImpuestoDTO>();
 		articuloImpuestoDTO = new ArticuloImpuestoDTO();
 		this.impuestoDTO = new ImpuestoDTO();
+		this.articuloUnidadManejoDTO = new ArticuloUnidadManejoDTO();
 		this.articuloCreado = Boolean.FALSE;
 		this.modoEdicion = Boolean.FALSE;
 		this.articuloDTO = new ArticuloDTO();
@@ -81,6 +91,9 @@ public class ArticulosController extends CommonsController implements Serializab
 			this.setArticuloDTO(articulosDataManager.getArticuloDTOEditar());
 			if(CollectionUtils.isNotEmpty(articulosDataManager.getArticuloDTOEditar().getArticuloImpuestoDTOCols())){
 				this.setArticuloImpuestoDTOCols(articulosDataManager.getArticuloDTOEditar().getArticuloImpuestoDTOCols());
+			}
+			if(CollectionUtils.isNotEmpty(articulosDataManager.getArticuloDTOEditar().getArticuloUnidadManejoDTOCols())){
+				this.setArticuloUnidadManejoDTOCols(articulosDataManager.getArticuloDTOEditar().getArticuloUnidadManejoDTOCols());
 			}
 			this.modoEdicion = Boolean.TRUE;
 		}
@@ -151,7 +164,7 @@ public class ArticulosController extends CommonsController implements Serializab
 					articuloDTO.getId().setCodigoCompania(Integer.parseInt(ERPConstantes.ESTADO_ACTIVO_NUMERICO));
 					articuloDTO.setCodigoBarras(articuloDTO.getCodigoBarras().toUpperCase());
 					articuloDTO.setNombreArticulo(articuloDTO.getNombreArticulo().toUpperCase());
-					ERPFactory.articulos.getArticuloServicio().transGuardarActualizarArticulo(articuloDTO, articuloImpuestoDTOCols);
+					ERPFactory.articulos.getArticuloServicio().transGuardarActualizarArticulo(articuloDTO, articuloImpuestoDTOCols, articuloUnidadManejoDTOCols);
 					this.setShowMessagesBar(Boolean.TRUE);
 					this.setArticuloCreado(Boolean.TRUE);
 					FacesMessage msg = new FacesMessage("El art\u00EDculo se cre\u00F3 correctamente.", "ERROR MSG");
@@ -172,7 +185,7 @@ public class ArticulosController extends CommonsController implements Serializab
 						articuloDTO.getId().setCodigoCompania(Integer.parseInt(ERPConstantes.ESTADO_ACTIVO_NUMERICO));
 						articuloDTO.setCodigoBarras(articuloDTO.getCodigoBarras().toUpperCase());
 						articuloDTO.setNombreArticulo(articuloDTO.getNombreArticulo().toUpperCase());
-						ERPFactory.articulos.getArticuloServicio().transGuardarActualizarArticulo(articuloDTO, articuloImpuestoDTOCols);
+						ERPFactory.articulos.getArticuloServicio().transGuardarActualizarArticulo(articuloDTO, articuloImpuestoDTOCols, articuloUnidadManejoDTOCols);
 						this.setShowMessagesBar(Boolean.TRUE);
 						this.setArticuloCreado(Boolean.TRUE);
 						FacesMessage msg = new FacesMessage("El art\u00EDculo se cre\u00F3 correctamente.", "ERROR MSG");
@@ -225,8 +238,8 @@ public class ArticulosController extends CommonsController implements Serializab
 			MensajesController.addError(null, ERPWebResources.getString("ec.com.erp.etiqueta.articulos.mensaje.campo.requerido.precio.articulo"));
 			validado = Boolean.FALSE;
 		}
-		if(articuloDTO.getCantidadStock() ==  null){
-			MensajesController.addError(null, ERPWebResources.getString("ec.com.erp.etiqueta.articulos.mensaje.campo.requerido.cantidad.stock"));
+		if(CollectionUtils.isEmpty(this.articuloUnidadManejoDTOCols)) {
+			MensajesController.addError(null, ERPWebResources.getString("ec.com.erp.etiqueta.articulos.mensaje.campo.requerido.unidad.manejo"));
 			validado = Boolean.FALSE;
 		}
 		return validado;
@@ -238,10 +251,13 @@ public class ArticulosController extends CommonsController implements Serializab
 	 */
 	public void clearNuevoArticulo(ActionEvent e){
 		this.impuestoCreado = Boolean.FALSE;
+		this.unidadManejoCreada = Boolean.FALSE;
 		this.codigoImpuestoSeleccionado = null;
 		this.articuloImpuestoDTOCols = new ArrayList<ArticuloImpuestoDTO>();
+		this.articuloUnidadManejoDTOCols = new ArrayList<>();
 		this.impuestoDTOCols = new ArrayList<ImpuestoDTO>();
 		this.articuloImpuestoDTO = new ArticuloImpuestoDTO();
+		this.articuloUnidadManejoDTO = new ArticuloUnidadManejoDTO();
 		this.impuestoDTO = new ImpuestoDTO();
 		this.setArticuloCreado(Boolean.FALSE);
 		this.setShowMessagesBar(Boolean.FALSE);
@@ -322,6 +338,14 @@ public class ArticulosController extends CommonsController implements Serializab
 	}
 	
 	/**
+	 * Metodo para eliminar registro de unidad de manejo
+	 * @param articuloUnidadManejoDTO
+	 */
+	public void eliminarArticuloUnidadManejo(ArticuloUnidadManejoDTO articuloUnidadManejoDTO) {
+		articuloUnidadManejoDTOCols.remove(articuloUnidadManejoDTO);
+	}
+	
+	/**
 	 * Abrir popup detalle articulos
 	 * @param e
 	 */
@@ -333,11 +357,20 @@ public class ArticulosController extends CommonsController implements Serializab
 	}
 	
 	/**
+	 * Abrir popup unidad de manejo
+	 * @param e
+	 */
+	public void abrirPopUnidadManejo(ActionEvent e) {
+		this.unidadManejoCreada = Boolean.FALSE;
+		this.articuloUnidadManejoDTO = new ArticuloUnidadManejoDTO();
+		this.setUnidadManejoCatalogoDTOCols(ERPFactory.catalogos.getCatalogoServicio().findObtenerCatalogoByTipo(ERPConstantes.CODIGO_CATALOGO_TIPOS_UNIDAD_MANEJO));
+	}
+	
+	/**
 	 * Seleccionar cliente del popUp
 	 * @param e
 	 */
-	public void seleccionImpuesto(ValueChangeEvent e)
-	{
+	public void seleccionImpuesto(ValueChangeEvent e){
 		this.codigoImpuestoSeleccionado = (Long)e.getNewValue();
 		// Verificar si existe en la coleccion el cliente
 		for(ImpuestoDTO impuesto: this.impuestoDTOCols){
@@ -345,7 +378,18 @@ public class ArticulosController extends CommonsController implements Serializab
 				this.setImpuestoDTO(impuesto);
 			}
 		}
-		System.out.println(""+this.impuestoDTO);
+	}
+	
+	/**
+	 * Metodo para agregar catalogo de unidad de manejo
+	 * @param e
+	 */
+	public void seleccionarUnidadManejo(ValueChangeEvent e) {
+		String valorUnidadManejo = (String)e.getNewValue();
+		CatalogoValorDTO catalogoUnidad = this.unidadManejoCatalogoDTOCols.stream()
+				.filter(catalogo-> catalogo.getId().getCodigoCatalogoValor().equals(valorUnidadManejo))
+				.findFirst().orElse(null);
+		this.articuloUnidadManejoDTO.setTipoUnidadManejoCatalogoValorDTO(catalogoUnidad);
 	}
 	
 	/**
@@ -368,6 +412,36 @@ public class ArticulosController extends CommonsController implements Serializab
 			this.impuestoCreado = Boolean.TRUE;
 			this.setShowMessagesBar(Boolean.TRUE);
 			MensajesController.addError(null, ERPWebResources.getString("ec.com.erp.etiqueta.articulos.mensaje.error.impuesto.existente"));
+		}
+	}
+	
+	/**
+	 * Agregar nuevo impuesto
+	 * @param e
+	 */
+	public void agregarArticuloUnidadManejo(ActionEvent e) {
+		ArticuloUnidadManejoDTO impTemp = this.articuloUnidadManejoDTOCols.stream()
+				.filter(uniManejo -> uniManejo.getCodigoValorUnidadManejo().equals(this.articuloUnidadManejoDTO.getCodigoValorUnidadManejo()) && uniManejo.getValorUnidadManejo().intValue() == this.articuloUnidadManejoDTO.getValorUnidadManejo().intValue())
+				.findFirst().orElse(null);
+		if(impTemp == null) {
+			ArticuloUnidadManejoDTO defectoUniMan = this.articuloUnidadManejoDTOCols.stream()
+					.filter(uniManejo -> uniManejo.getEsPorDefecto() && this.articuloUnidadManejoDTO.getEsPorDefecto())
+					.findFirst().orElse(null);
+			if(defectoUniMan == null) {
+				articuloUnidadManejoDTO.getId().setCodigoCompania(Integer.parseInt(ERPConstantes.ESTADO_ACTIVO_NUMERICO));
+				articuloUnidadManejoDTO.setUsuarioRegistro(loginController.getUsuariosDTO().getId().getUserId());
+				this.articuloUnidadManejoDTOCols.add(articuloUnidadManejoDTO);
+				this.unidadManejoCreada = Boolean.FALSE;
+				this.setShowMessagesBar(Boolean.FALSE);
+			}else {
+				this.unidadManejoCreada = Boolean.TRUE;
+				this.setShowMessagesBar(Boolean.TRUE);
+				MensajesController.addError(null, ERPWebResources.getString("ec.com.erp.etiqueta.articulos.mensaje.campo.requerido.unidad.defecto"));
+			}
+		}else {
+			this.unidadManejoCreada = Boolean.TRUE;
+			this.setShowMessagesBar(Boolean.TRUE);
+			MensajesController.addError(null, ERPWebResources.getString("ec.com.erp.etiqueta.articulos.mensaje.error.unidada.manejo.existente"));
 		}
 	}
 	
@@ -493,5 +567,37 @@ public class ArticulosController extends CommonsController implements Serializab
 
 	public void setImpuestoCreado(Boolean impuestoCreado) {
 		this.impuestoCreado = impuestoCreado;
+	}
+
+	public Collection<ArticuloUnidadManejoDTO> getArticuloUnidadManejoDTOCols() {
+		return articuloUnidadManejoDTOCols;
+	}
+
+	public void setArticuloUnidadManejoDTOCols(Collection<ArticuloUnidadManejoDTO> articuloUnidadManejoDTOCols) {
+		this.articuloUnidadManejoDTOCols = articuloUnidadManejoDTOCols;
+	}
+
+	public ArticuloUnidadManejoDTO getArticuloUnidadManejoDTO() {
+		return articuloUnidadManejoDTO;
+	}
+
+	public void setArticuloUnidadManejoDTO(ArticuloUnidadManejoDTO articuloUnidadManejoDTO) {
+		this.articuloUnidadManejoDTO = articuloUnidadManejoDTO;
+	}
+
+	public Boolean getUnidadManejoCreada() {
+		return unidadManejoCreada;
+	}
+
+	public void setUnidadManejoCreada(Boolean unidadManejoCreada) {
+		this.unidadManejoCreada = unidadManejoCreada;
+	}
+
+	public Collection<CatalogoValorDTO> getUnidadManejoCatalogoDTOCols() {
+		return unidadManejoCatalogoDTOCols;
+	}
+
+	public void setUnidadManejoCatalogoDTOCols(Collection<CatalogoValorDTO> unidadManejoCatalogoDTOCols) {
+		this.unidadManejoCatalogoDTOCols = unidadManejoCatalogoDTOCols;
 	}
 }

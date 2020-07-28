@@ -106,6 +106,14 @@
             						<p:ajax event="itemSelect"  listener="#{pedidosController.onItemSelect}" update=":frmNuevoPedido:pnlGridDetallePedido :pnlMensajes"/>
         						</p:autoComplete>
 				            </rich:column>
+				            <rich:column styleClass="autoStyle" style="width:10%;">
+				                <f:facet name="header"><h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.label.nuevo.pedidos.detalle.unidad.manejo']}"/></f:facet>
+				                <h:selectOneMenu tabindex="1" value="#{detalle.codigoArticuloUnidadManejo}" style="width: 235px" valueChangeListener="#{pedidosController.seleccionarUnidadManejo}" onkeypress="if (event.keyCode == 13) return false;">
+									<f:selectItem itemLabel="SELECCIONE"/>
+									<f:selectItems value="#{detalle.articuloDTO.articuloUnidadManejoDTOCols}" var="uniMan" itemValue = "#{uniMan.id.codigoArticuloUnidadManejo}" itemLabel = "#{uniMan.tipoUnidadManejoCatalogoValorDTO.nombreCatalogoValor} X #{uniMan.valorUnidadManejo}" /> 
+									<f:ajax event="change" render="pnlGridDetalleFactura tableDetallePedido" execute="@this"></f:ajax>
+								</h:selectOneMenu>
+				            </rich:column>
 				            <rich:column>
 				                <f:facet name="header"><h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.header.tabla.codigo.barras']}"/></f:facet>
 				                <h:inputText value="#{detalle.articuloDTO.codigoBarras == null ? 'N/D' : detalle.articuloDTO.codigoBarras}" disabled="true"/>
@@ -128,7 +136,7 @@
 				            </rich:column>
 				            <rich:column style="text-align: right; paddin-right: 10px">
 				                <f:facet name="header"><h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.label.nuevo.pedidos.detalle.subtotal']}"/></f:facet>
-				                <h:outputText value="#{detalle.articuloDTO.precio * detalle.cantidad}" >
+				                <h:outputText value="#{detalle.subTotal}" >
 				                	<f:convertNumber pattern="0.00"/>
 				                </h:outputText>
 				                <h:outputText rendered="#{detalle.articuloDTO.tieneImpuesto}" value="(I)"></h:outputText>

@@ -1,0 +1,113 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:a4j="http://richfaces.org/a4j"
+	xmlns:rich="http://richfaces.org/rich"
+	template="/templates/pages/pageLayout2.xhtml">
+	
+	<ui:param name="idForm" value="frmAdminVendedor" />
+	<ui:param name="form" value="#{vendedorController.form}" />	
+	<ui:param name="controller" value="#{vendedorController}" />
+	<ui:param name="westLength" value="250" />
+	
+	<ui:define name="title">
+		Vendedores
+	</ui:define>
+	
+	<ui:define name="header">	
+		<ui:include src="adminBusquedaVendedorHeader.xhtml" />
+	</ui:define>
+	
+	<ui:define name="contentLeft">
+	</ui:define>
+	
+	<ui:define name="contentCenter">
+		<rich:panel id="panel-content-left" styleClass="panel-content-left" style="width:100% !important;">
+			<f:facet name="header">			
+				<h:panelGrid columns="2" width="99.9%" columnClasses="align-left, align-right" cellpadding="0" cellspacing="0">
+					<h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.criterios.busqueda']}" style="white-space:nowrap" />
+				</h:panelGrid>
+			</f:facet>		
+		
+			<h:panelGroup id="filtrosTransportista" layout="block" styleClass="listaReporte">
+				<h:panelGrid columns="3" width="70%" cellpadding="0" cellspacing="2">
+					<h:panelGrid width="47%" columns="2" columnClasses="columnaIzquierda, columnaDerecha">
+			    	   	<rich:inplaceInput id="numeroDocumento" value="#{vendedorController.numeroDocumentoBusqueda}" styleClass="styleInputPlace" defaultLabel="#{msg_erpweb['ec.com.erp.etiqueta.buscar.documento.cliente']}" onkeypress="return validarEnteros(event);">
+			    	   		<a4j:ajax event="keyup" execute="filtrosTransportista" listener="#{vendedorController.busquedaVendedorEnter}" onbeforesubmit="if (event.keyCode != 13)  return false;" render="listaTransport tabletransporte pnlMensajes"></a4j:ajax>
+			    	   	</rich:inplaceInput>
+			    	   	<h:panelGroup styleClass="styleClean">
+							<a4j:commandLink styleClass="guardarA" execute="@this" render="numeroDocumento pnlMensajes" actionListener="#{vendedorController.borrarBusquedaNumeroDocumento}"/>
+						</h:panelGroup>
+					</h:panelGrid>
+			    	
+			    	<h:panelGrid width="47%" columns="2" columnClasses="columnaIzquierda, columnaDerecha">
+						<rich:inplaceInput id="nombreTransportista" value="#{vendedorController.nombreVendedorBusqueda}" styleClass="styleInputPlace" defaultLabel="#{msg_erpweb['ec.com.erp.etiqueta.buscar.nombre.vendedor']}">
+							<a4j:ajax event="keyup" execute="filtrosTransportista" listener="#{vendedorController.busquedaVendedorEnter}" onbeforesubmit="if (event.keyCode != 13)  return false;" render="listaTransport tabletransporte pnlMensajes"></a4j:ajax>
+						</rich:inplaceInput>
+			    	   	<h:panelGroup styleClass="styleClean">
+							<a4j:commandLink styleClass="guardarA" execute="@this" render="nombreTransportista pnlMensajes" actionListener="#{vendedorController.borrarBusquedaNombreVendedor}"/>
+						</h:panelGroup>
+					</h:panelGrid>
+			    	 <a4j:commandButton id="btnBuscarTransportistas" value="Buscar" styleClass="styleSearch" render="listaTransport tabletransporte pnlMensajes" execute="filtrosTransportista" actionListener="#{vendedorController.busquedaVendedores}"/>
+				</h:panelGrid>						 
+			</h:panelGroup>	
+		</rich:panel>
+		
+		<rich:panel id="listaTransport" styleClass="panelListaArticulos" header="Lista de vendedores" style="height: 84.3%; width:100% !important;">	
+			<h:panelGrid id="tablaVacia" columns="1" rendered="#{empty vendedorController.vendedorDTOCols}" style="width:100%; text-align: center; padding-top: 220px">
+				<h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.mensaje.lista.vacio']}"/>
+			</h:panelGrid>
+			<rich:panel style="text-align:center; border-left: none; border-right:none; border-bottom:none" rendered="#{not empty vendedorController.vendedorDTOCols}">
+				<rich:dataScroller page="#{vendedorController.page}" fastStep="3" for="tabletransporte" maxPages="5" rendered="#{not empty vendedorController.vendedorDTOCols}" renderIfSinglePage="false"/>
+			</rich:panel>			
+			 <rich:dataTable style="width:100%" rendered="#{not empty vendedorController.vendedorDTOCols}" value="#{vendedorController.vendedorDTOCols}" var="transport" iterationStatusVar="it" id="tabletransporte" rows="14">
+	            <rich:column>
+	                <f:facet name="header">Nro.</f:facet>
+	                #{it.index+1}
+	            </rich:column>
+	            <rich:column>
+	                <f:facet name="header"><h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.label.lista.cabecera.documento.vendedor']}"/></f:facet>
+	                <h:outputText value="#{transport.personaDTO.numeroDocumento}" />
+	            </rich:column>
+	            <rich:column>
+	                <f:facet name="header"><h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.label.lista.cabecera.nombre.vendedor']}"/></f:facet>
+	                <h:outputText value="#{transport.personaDTO.nombreCompleto}" />
+	            </rich:column>
+	            <rich:column>
+	                <f:facet name="header"><h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.header.tabla.direccion.cliente']}"/></f:facet>
+	                <h:outputText value="#{transport.personaDTO.contactoPersonaDTO.direccionPrincipal}" />
+	            </rich:column>
+	            <rich:column>
+	                <f:facet name="header"><h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.header.tabla.ciudad.cliente']}"/></f:facet>
+	                <h:outputText value="#{transport.personaDTO.contactoPersonaDTO.ciudad}" />
+	            </rich:column>
+	             <rich:column>
+	                <f:facet name="header"><h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.header.tabla.telefono.cliente']}"/></f:facet>
+	                <h:outputText value="#{transport.personaDTO.contactoPersonaDTO.telefonoPrincipal}" />
+	            </rich:column>
+	            <rich:column styleClass="columna5">
+	                <f:facet name="header">Editar</f:facet>
+	                <a4j:commandLink id="botonEditar" render="pnlGridProveedor, pnlDatosBasicosProveedor, pnlGridContacto" action="#{vendedorController.cargarVendedorEditar}" execute="@this" >
+						<h:graphicImage name="btnEditar.png" library="images" style="border:none;border-color:white;" height="16" width="16"/>
+						<f:setPropertyActionListener value="#{transport}" target="#{vendedorController.vendedorDTO}" />											
+					</a4j:commandLink>	
+	            </rich:column>
+	        </rich:dataTable>
+        </rich:panel>
+        <script>
+			/*<![CDATA[*/
+			$(document).ready(function(){				
+				 openLinkSystem();				
+			});
+			function openLinkSystem(){
+				$('.linkopensystem').trigger('click');
+			}	
+								
+		/*]]>*/			
+		</script>
+		<a4j:commandLink id="linkopensystem" styleClass="linkopensystem" execute="@this" status="no" actionListener="#{vendedorController.refrescarPantalla}">
+		</a4j:commandLink>	
+	</ui:define>
+	
+</ui:composition>

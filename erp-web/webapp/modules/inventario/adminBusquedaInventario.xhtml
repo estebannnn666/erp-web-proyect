@@ -89,6 +89,9 @@
 		                <rich:column rowspan="2">
 		                	<h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.inventario.label.header.detalle']}"/>
 		                </rich:column>
+		                <rich:column rowspan="2">
+		                    <h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.inventario.label.header.unidadmanejo']}"/>
+		                </rich:column>
 		                <rich:column colspan="3">
 		                    <h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.inventario.label.header.entradas']}"/>
 		                </rich:column>
@@ -132,6 +135,9 @@
 	            </rich:column>
 	            <rich:column>
 	                <h:outputText value="#{inventario.detalleMoviento}" />
+	            </rich:column>
+	             <rich:column>
+	                <h:outputText value="#{inventario.articuloUnidadManejoDTO.tipoUnidadManejoCatalogoValorDTO.nombreCatalogoValor.concat('x').concat(inventario.articuloUnidadManejoDTO.valorUnidadManejo)}" />
 	            </rich:column>
 	            <rich:column style="text-align: right; padding-right: 5px">
 	                <h:outputText value="#{inventario.cantidadEntrada == null ? '-' : inventario.cantidadEntrada}" />

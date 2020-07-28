@@ -32,10 +32,12 @@ import ec.com.erp.cliente.common.exception.ERPException;
 import ec.com.erp.cliente.common.factory.ERPFactory;
 import ec.com.erp.cliente.mdl.dto.ArticuloDTO;
 import ec.com.erp.cliente.mdl.dto.ArticuloImpuestoDTO;
+import ec.com.erp.cliente.mdl.dto.ArticuloUnidadManejoDTO;
 import ec.com.erp.cliente.mdl.dto.CatalogoValorDTO;
 import ec.com.erp.cliente.mdl.dto.ClienteDTO;
 import ec.com.erp.cliente.mdl.dto.DetallePedidoDTO;
 import ec.com.erp.cliente.mdl.dto.EstadoPedidoDTO;
+import ec.com.erp.cliente.mdl.dto.InventarioDTO;
 import ec.com.erp.cliente.mdl.dto.PedidoDTO;
 import ec.com.erp.cliente.mdl.dto.SecuenciaDTO;
 import ec.com.erp.cliente.mdl.dto.id.PedidoID;
@@ -191,18 +193,21 @@ public class PedidosController extends CommonsController implements Serializable
 
 		for (DetallePedidoDTO detallePedidoDTO : detallePedidoDTOCols) {
 			if (detallePedidoDTO.getId().getCodigoCompania().intValue() == numeroDetalle.intValue()) {
-				if (detallePedidoDTO.getCantidad() != null && detallePedidoDTO.getArticuloDTO().getPrecio() != null) {
-					if (detallePedidoDTO.getCantidad().intValue() > detallePedidoDTO.getArticuloDTO().getCantidadStock()
-							.intValue()) {
+				if (detallePedidoDTO.getCantidad() != null && detallePedidoDTO.getArticuloDTO().getPrecio() != null && detallePedidoDTO.getCodigoArticuloUnidadManejo() != null) {
+					
+					// Se obtiene existencia actual
+					InventarioDTO inventarioDTOAux = ERPFactory.inventario.getInventarioServicio().findObtenerUltimoInventarioByArticulo(Integer.parseInt(ERPConstantes.ESTADO_ACTIVO_NUMERICO), detallePedidoDTO.getArticuloDTO().getCodigoBarras(), detallePedidoDTO.getCodigoArticuloUnidadManejo());
+					
+					if (detallePedidoDTO.getCantidad().intValue() > inventarioDTOAux.getCantidadExistencia().intValue()) {
 						detallePedidoDTO.setCantidad(detallePedidoDTO.getArticuloDTO().getCantidadStock());
 						this.setShowMessagesBar(Boolean.TRUE);
-						MensajesController.addWarn(null, ERPWebResources
-								.getString("ec.com.erp.etiqueta.label.busqueda.pedidos.mensaje.error.mayor"));
+						MensajesController.addWarn(null, ERPWebResources.getString("ec.com.erp.etiqueta.label.busqueda.pedidos.mensaje.error.mayor"));
 						return;
 					}
-					BigDecimal subTotal = BigDecimal.valueOf(Double.valueOf("" + detallePedidoDTO.getCantidad()))
-							.multiply(detallePedidoDTO.getArticuloDTO().getPrecio());
+					ArticuloUnidadManejoDTO articuloUnidadManejo = obtenerUnidadManejoPorCodigo(detallePedidoDTO.getCodigoArticuloUnidadManejo(), detallePedidoDTO.getArticuloDTO().getArticuloUnidadManejoDTOCols());
+					BigDecimal subTotal = BigDecimal.valueOf(Double.valueOf(""+(detallePedidoDTO.getCantidad().intValue()*articuloUnidadManejo.getValorUnidadManejo().intValue()))).multiply(detallePedidoDTO.getArticuloDTO().getPrecio());
 					detallePedidoDTO.setSubTotal(subTotal);
+					detallePedidoDTO.setArticuloUnidadManejoDTO(articuloUnidadManejo);
 					this.calcularTotal();
 				}
 				this.setShowMessagesBar(Boolean.FALSE);
@@ -212,38 +217,74 @@ public class PedidosController extends CommonsController implements Serializable
 	}
 
 	public void onItemSelect(SelectEvent event) {
-		System.out.println(event.getObject());
 		for (DetallePedidoDTO detallePedidoDTOTemp : detallePedidoDTOCols) {
 			if (detallePedidoDTOTemp.getNombreArticulo() != null) {
 				String queryLowerCase = detallePedidoDTOTemp.getNombreArticulo().toLowerCase();
 				ArticuloDTO articuloSeleccionado = this.getArticuloDTOCols().stream()
 						.filter(articulo -> articulo.getNombreArticulo().toLowerCase().equals(queryLowerCase))
 						.findFirst().orElse(null);
-				if (articuloSeleccionado.getCantidadStock().intValue() == 0) {
-					this.setShowMessagesBar(Boolean.TRUE);
-					MensajesController.addError(null, ERPWebResources
-							.getString("ec.com.erp.etiqueta.label.busqueda.pedidos.mensaje.error.stock"));
-					return;
-				} else {
-					this.setShowMessagesBar(Boolean.FALSE);
-					detallePedidoDTOTemp.setArticuloDTO(articuloSeleccionado);
-				}
+				this.setShowMessagesBar(Boolean.FALSE);
+				detallePedidoDTOTemp.setArticuloDTO(articuloSeleccionado);
 			}
 
-			if ((detallePedidoDTOTemp.getCantidad() == null || detallePedidoDTOTemp.getCantidad().intValue() == 0)
-					&& detallePedidoDTOTemp.getArticuloDTO().getPrecio() != null) {
+			if ((detallePedidoDTOTemp.getCantidad() == null || detallePedidoDTOTemp.getCantidad().intValue() == 0) && detallePedidoDTOTemp.getArticuloDTO().getPrecio() != null) {
 				detallePedidoDTOTemp.setCantidad(1);
 			}
-			if (detallePedidoDTOTemp.getCantidad() != null
-					&& detallePedidoDTOTemp.getArticuloDTO().getPrecio() != null) {
-				BigDecimal subTotal = BigDecimal.valueOf(Double.valueOf("" + detallePedidoDTOTemp.getCantidad()))
-						.multiply(detallePedidoDTOTemp.getArticuloDTO().getPrecio());
+			if (detallePedidoDTOTemp.getCantidad() != null	&& detallePedidoDTOTemp.getArticuloDTO().getPrecio() != null && CollectionUtils.isNotEmpty(detallePedidoDTOTemp.getArticuloDTO().getArticuloUnidadManejoDTOCols())) {
+ 				ArticuloUnidadManejoDTO articuloUnidadManejo = obtenerUnidadManejoPorCodigo(detallePedidoDTOTemp.getCodigoArticuloUnidadManejo(), detallePedidoDTOTemp.getArticuloDTO().getArticuloUnidadManejoDTOCols());
+				BigDecimal subTotal = BigDecimal.valueOf(Double.valueOf(""+(detallePedidoDTOTemp.getCantidad().intValue()*articuloUnidadManejo.getValorUnidadManejo().intValue()))).multiply(detallePedidoDTOTemp.getArticuloDTO().getPrecio());
 				detallePedidoDTOTemp.setSubTotal(subTotal);
-				detallePedidoDTOTemp
-						.setCodigoArticulo(detallePedidoDTOTemp.getArticuloDTO().getId().getCodigoArticulo());
+				detallePedidoDTOTemp.setArticuloUnidadManejoDTO(articuloUnidadManejo);
+				detallePedidoDTOTemp.setCodigoArticuloUnidadManejo(articuloUnidadManejo.getId().getCodigoArticuloUnidadManejo());
+				detallePedidoDTOTemp.setCodigoArticulo(detallePedidoDTOTemp.getArticuloDTO().getId().getCodigoArticulo());
 				this.calcularTotal();
 			}
 		}
+	}
+	
+	/**
+	 * Metodo para agregar calcular 
+	 * @param e
+	 */
+	public void seleccionarUnidadManejo(ValueChangeEvent e) {
+		Integer codigoUnidadManejo = (Integer)e.getNewValue();
+		String idComponete = e.getComponent().getClientId();
+		String[] idCompuesto =  idComponete.split(":");
+		Integer numeroDetalle = Integer.parseInt(idCompuesto[2])+1;
+		
+		for(DetallePedidoDTO detallePedidoDTOTemp : detallePedidoDTOCols) {
+			if(detallePedidoDTOTemp.getId().getCodigoCompania().intValue() == numeroDetalle.intValue()) {
+				if(detallePedidoDTOTemp.getCantidad() != null && detallePedidoDTOTemp.getArticuloDTO().getPrecio() != null && detallePedidoDTOTemp.getCodigoArticuloUnidadManejo() != null) {
+					ArticuloUnidadManejoDTO articuloUnidadManejo = obtenerUnidadManejoPorCodigo(codigoUnidadManejo, detallePedidoDTOTemp.getArticuloDTO().getArticuloUnidadManejoDTOCols());
+					BigDecimal subTotal = BigDecimal.valueOf(Double.valueOf(""+(detallePedidoDTOTemp.getCantidad().intValue()*articuloUnidadManejo.getValorUnidadManejo().intValue()))).multiply(detallePedidoDTOTemp.getArticuloDTO().getPrecio());
+					detallePedidoDTOTemp.setArticuloUnidadManejoDTO(articuloUnidadManejo);
+					detallePedidoDTOTemp.setCodigoArticuloUnidadManejo(articuloUnidadManejo.getId().getCodigoArticuloUnidadManejo());
+					detallePedidoDTOTemp.setSubTotal(subTotal);
+					this.calcularTotal();
+				}
+				break;
+			}
+		}
+	}
+	
+	/**
+	 * Metodo para obtener unidad de manejo por defecto
+	 * @param articuloUnidadManejoCols
+	 * @return
+	 */
+	public ArticuloUnidadManejoDTO obtenerUnidadManejoPorDefecto(Collection<ArticuloUnidadManejoDTO> articuloUnidadManejoCols) {
+		return articuloUnidadManejoCols.stream().filter(unidadManejo ->  unidadManejo.getEsPorDefecto()).findFirst().orElse(null);
+	}
+	
+	/**
+	 * Metodo para obtener unidad de manejo por codigo
+	 * @param articuloUnidadManejoCols
+	 * @return
+	 */
+	public ArticuloUnidadManejoDTO obtenerUnidadManejoPorCodigo(Integer codigoArticuloUnidadManejo, Collection<ArticuloUnidadManejoDTO> articuloUnidadManejoCols) {
+		return articuloUnidadManejoCols
+				.stream().filter(unidadManejo -> unidadManejo.getId().getCodigoArticuloUnidadManejo().intValue() == codigoArticuloUnidadManejo.intValue())
+				.findFirst().orElse(null);
 	}
 
 	/**

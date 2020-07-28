@@ -212,6 +212,9 @@ body {
 	background-image: url("#{resource['images/cuentascobrar.png']}");
 }
 
+.styleVendedor{
+	background-image: url("#{resource['images/vendedor.png']}");
+}
 
 /*Estilos menu centro*/
 .styleArticle a:hover {
@@ -604,6 +607,10 @@ body {
     background-color: transparent;
     border: 0px;
 	overflow-y: auto;
+	border: solid 1px #f3cf4c;
+    background-color: #e2cdf9;
+    margin-right: 5em;
+    font-weight: bold;
 }
 
 ::-webkit-scrollbar {

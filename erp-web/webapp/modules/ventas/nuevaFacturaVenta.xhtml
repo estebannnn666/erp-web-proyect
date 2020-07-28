@@ -24,7 +24,7 @@
 		<rich:panel header="Registro de facturas de productos vendidos" style="width: 100%; background-color: #F5FAFF; height: 98%; overflow-y:auto;">
 			<fieldset>
 				<legend class="styleLegend">#{msg_erpweb['ec.com.erp.etiqueta.label.nuevo.pedidos.etiqueta.datoscliente']}</legend>
-				<h:panelGrid id="pnlGridVentas" columns="10" cellspacing="0" cellpadding="2">
+				<h:panelGrid id="pnlGridVentas" columns="11" cellspacing="0" cellpadding="2">
 					<h:outputText class="styleNegritas" value="#{msg_erpweb['ec.com.erp.etiqueta.label.lista.cabecera.factura.referencia.factura']}: *" />
 					<h:inputText style="width:150px" value="#{cuentasController.facturaCabeceraDTO.codigoReferenciaFactura}" id="refDocumentoFac" disabled="true"/>
 					<h:outputText value="" />
@@ -35,6 +35,7 @@
 					<div style="width: 30px"></div>
 					<h:outputText class="styleNegritas" value="#{msg_erpweb['ec.com.erp.etiqueta.label.lista.cabecera.factura.fecha']}: *" />
 					<rich:calendar value="#{cuentasController.facturaCabeceraDTO.fechaDocumento}" datePattern="yyyy-MM-dd"></rich:calendar>
+					<h:outputText value="" />
 					
 					<h:outputText class="styleNegritas" value="#{msg_erpweb['ec.com.erp.etiqueta.label.lista.cabecera.factura.ruc.documento']}: *" />
 					<h:inputText style="width:150px" value="#{cuentasController.facturaCabeceraDTO.rucDocumento}" id="docClienteProveedor" maxlength="13" onkeypress="if (event.keyCode == 13) return false; return validarEnteros(event);">
@@ -51,6 +52,7 @@
 					<div style="width: 30px"></div>
 					<h:outputText class="styleNegritas" value="#{msg_erpweb['ec.com.erp.etiqueta.label.lista.cabecera.factura.cobrada']}:" />
 					<h:selectBooleanCheckbox value="#{cuentasController.facturaCabeceraDTO.pagado}"/>
+					<h:outputText value="" />
 					
 					<h:outputText class="styleNegritas" value="#{msg_erpweb['ec.com.erp.etiqueta.label.lista.cabecera.factura.razonSocial']}:" />
 					<h:inputText styleClass="styleUpperCase" style="width:150px" value="#{cuentasController.facturaCabeceraDTO.nombreClienteProveedor}" id="razonSocialVen" maxlength="32" onkeypress="if (event.keyCode == 13) return false;"/>
@@ -60,8 +62,13 @@
 					<h:inputText styleClass="styleUpperCase" style="width:150px" value="#{cuentasController.facturaCabeceraDTO.direccion}" id="direcionVen" maxlength="64" onkeypress="if (event.keyCode == 13) return false;"/>
 					<h:outputText value="" />
 					<div style="width: 30px"></div>
-					<h:outputText value="" />
-					<h:outputText value="" />
+					<h:outputText class="styleNegritas" value="#{msg_erpweb['ec.com.erp.etiqueta.label.lista.cabecera.nombre.vendedor']}:" />
+					<h:inputText style="width:150px" value="#{cuentasController.nombreVendedor}" id="nombreVendedor" maxlength="13" onkeypress="if (event.keyCode == 13) return false;">
+					</h:inputText>
+					<h:panelGroup layout="block" styleClass="botonB" style="margin-top:5px;">
+						<a4j:commandLink oncomplete="#{rich:component('mpVendedores')}.show(); " styleClass="botonBuscar" actionListener="#{cuentasController.busquedaVendedores}" render="pnlListaVendedores tableVendedores pnlMensajes" execute="@this, pnlGridVentas" title="Click para buscar vendedores">							
+						</a4j:commandLink>	
+					</h:panelGroup>	
 				</h:panelGrid>
 			</fieldset>
 	 		<fieldset>
@@ -101,7 +108,7 @@
 				                <f:facet name="header">Nro.</f:facet>
 				                #{rowIndex+1}
 				            </rich:column>
-				            <rich:column style="width:10%">
+				            <rich:column style="width:12%">
 				                <f:facet name="header"><h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.label.nuevo.pedidos.detalle.cantidad.pedido']}"/></f:facet>
 				                <h:inputText style="text-align: right; width:95%; padding-right: 5px" id="cantidadPedida" value="#{detalle.cantidad}" onkeypress="if (event.keyCode == 13) return false; return validarEnteros(event);">
 				                	<a4j:ajax event="keyup" status="no" listener="#{cuentasController.calcularTotalFacturaKeyUp}" oncomplete="fijarFocoCantidadActual(this.id);"
@@ -109,7 +116,7 @@
 				                	</a4j:ajax>
 				                </h:inputText>
 				            </rich:column>		
-				            <rich:column style="width:10%"> 
+				            <rich:column style="width:12%"> 
 				                <f:facet name="header"><h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.header.tabla.codigo.barras']}"/></f:facet>
 				                <h:inputText style="text-align: right; width:95%; padding-right: 5px" id="codigoBarras" value="#{detalle.codigoBarras}" onkeypress="if (event.keyCode == 13) return false; return validarEnteros(event);" >
 				                	<a4j:ajax event="keyup" listener="#{cuentasController.obtenerCodigoBarrasEnter}" oncomplete="fijarFocoSiguienteCodigBarras(this.id);"
@@ -117,13 +124,21 @@
 				                	</a4j:ajax>
 				                </h:inputText>
 				            </rich:column>		            
-				            <rich:column styleClass="autoStyle" style="width:40%;;">
+				            <rich:column styleClass="autoStyle" style="width:20%;">
 				                <f:facet name="header"><h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.label.lista.cabecera.guia.descripcion.producto']}"/></f:facet>
 						        <p:autoComplete id="themeCustom" value="#{detalle.descripcion}" completeMethod="#{cuentasController.completeNombreArticulo}" onkeypress="if (event.keyCode == 13) return false;">
             						<p:ajax event="itemSelect"  listener="#{cuentasController.onItemSelect}" update=":frmNuevaVenta:panelDetallePedido :pnlMensajes"/>
         						</p:autoComplete>
 				            </rich:column>
-				            <rich:column style="width:10%">
+				            <rich:column styleClass="autoStyle" style="width:10%;">
+				                <f:facet name="header"><h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.label.nuevo.pedidos.detalle.unidad.manejo']}"/></f:facet>
+				                <h:selectOneMenu tabindex="1" value="#{detalle.codigoArticuloUnidadManejo}" style="width: 235px" valueChangeListener="#{cuentasController.seleccionarUnidadManejo}" onkeypress="if (event.keyCode == 13) return false;">
+									<f:selectItem itemLabel="SELECCIONE"/>
+									<f:selectItems value="#{detalle.articuloDTO.articuloUnidadManejoDTOCols}" var="uniMan" itemValue = "#{uniMan.id.codigoArticuloUnidadManejo}" itemLabel = "#{uniMan.tipoUnidadManejoCatalogoValorDTO.nombreCatalogoValor} X #{uniMan.valorUnidadManejo}" /> 
+									<f:ajax event="change" render="pnlGridDetalleFactura tableDetallePedido" execute="@this"></f:ajax>
+								</h:selectOneMenu>
+				            </rich:column>
+				            <rich:column style="width:12%">
 				                <f:facet name="header"><h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.label.nuevo.pedidos.articulo.precio.unitario']}"/></f:facet>
 				                <!-- h:inputText style="width:95%; text-align: right; padding-right: 5px" value="#{detalle.valorUnidad}" disabled="true">
 				                	<f:convertNumber pattern="0.00"/>
@@ -136,14 +151,14 @@
 				            </rich:column>
 				            <rich:column style="text-align: right; paddin-right: 10px; width:10%">
 				                <f:facet name="header"><h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.label.nuevo.pedidos.detalle.subtotal']}"/></f:facet>
-				                <h:outputText value="#{detalle.cantidad * detalle.valorUnidad}">
+				                <h:outputText value="#{detalle.subTotal}">
 				                	<f:convertNumber pattern="0.00"/>
 				                </h:outputText>
 				                <h:outputText rendered="#{detalle.articuloDTO.tieneImpuesto}" value="(I)"></h:outputText>
 				            </rich:column>
 				            <f:facet name="footer">
 				                <rich:columnGroup>
-					                <rich:column colspan="6" style="text-align: right; paddin-right: 10px">Sub Total:</rich:column>
+					                <rich:column colspan="7" style="text-align: right; paddin-right: 10px">Sub Total:</rich:column>
 					                <rich:column style="text-align: right; paddin-right: 10px">
 					                    <h:outputText value="#{cuentasController.facturaCabeceraDTO.subTotal}">
 					                    	<f:convertNumber pattern="0.00"/>
@@ -151,7 +166,7 @@
 					                </rich:column>
 					            </rich:columnGroup>
 					            <rich:columnGroup>
-					                <rich:column colspan="6" style="text-align: right; paddin-right: 10px">Descuento:</rich:column>
+					                <rich:column colspan="7" style="text-align: right; paddin-right: 10px">Descuento:</rich:column>
 					                <rich:column style="text-align: right; paddin-right: 10px">
 					                    <h:outputText value="#{cuentasController.facturaCabeceraDTO.descuento}">
 					                    	<f:convertNumber pattern="0.00"/>
@@ -159,7 +174,7 @@
 					                </rich:column>
 					            </rich:columnGroup>
 					            <rich:columnGroup>
-					                <rich:column colspan="6" style="text-align: right; paddin-right: 10px">Tarifa 0%:</rich:column>
+					                <rich:column colspan="7" style="text-align: right; paddin-right: 10px">Tarifa 0%:</rich:column>
 					                <rich:column style="text-align: right; paddin-right: 10px">
 					                    <h:outputText value="#{cuentasController.facturaCabeceraDTO.totalSinImpuestos}">
 					                    	<f:convertNumber pattern="0.00"/>
@@ -167,7 +182,7 @@
 					                </rich:column>
 					            </rich:columnGroup>
 					            <rich:columnGroup>
-					                <rich:column colspan="6" style="text-align: right; paddin-right: 10px">Tarifa 12%:</rich:column>
+					                <rich:column colspan="7" style="text-align: right; paddin-right: 10px">Tarifa 12%:</rich:column>
 					                <rich:column style="text-align: right; paddin-right: 10px">
 					                    <h:outputText value="#{cuentasController.facturaCabeceraDTO.totalImpuestos}">
 					                    	<f:convertNumber pattern="0.00"/>
@@ -175,7 +190,7 @@
 					                </rich:column>
 					            </rich:columnGroup>					            
 					            <rich:columnGroup>
-					                <rich:column colspan="6" style="text-align: right; paddin-right: 10px">Iva 12 %:</rich:column>
+					                <rich:column colspan="7" style="text-align: right; paddin-right: 10px">Iva 12 %:</rich:column>
 					                <rich:column style="text-align: right; paddin-right: 10px">
 					                    <h:outputText value="#{cuentasController.facturaCabeceraDTO.totalIva}">
 					                    	<f:convertNumber pattern="0.00"/>
@@ -183,7 +198,7 @@
 					                </rich:column>
 					            </rich:columnGroup>
 					            <rich:columnGroup>
-					                <rich:column colspan="6" style="text-align: right; paddin-right: 10px">Total:</rich:column>
+					                <rich:column colspan="7" style="text-align: right; paddin-right: 10px">Total:</rich:column>
 					                <rich:column style="text-align: right; paddin-right: 10px">
 					                    <h:outputText value="#{cuentasController.facturaCabeceraDTO.totalCuenta}">
 					                    	<f:convertNumber pattern="0.00"/>
@@ -328,6 +343,100 @@
 				</h:panelGroup>
 			</h:panelGrid>
 		</rich:popupPanel>
+		
+		
+		<!--  Pop Up para agregar datos de vendedores -->
+		<rich:popupPanel id="mpVendedores" styleClass="panelPedidos" header="#{msg_erpweb['ec.com.erp.etiqueta.label.lista.factura.etiqueta.seleccion.vendedor']}" width="935" height="380" modal="true" domElementAttachment="form">
+			<f:facet name="controls">
+				<h:outputLink value="#"	onclick="#{rich:component('mpVendedores')}.hide();">
+					<h:graphicImage library="images" name="close.png" style="border:0px" id="closePopUpVendedor" />
+				</h:outputLink>
+			</f:facet>
+			<h:panelGroup id="filtrosVendedor" layout="block" styleClass="listaReporte">
+				<h:panelGrid columns="3" width="70%" cellpadding="0" cellspacing="2">
+					<h:panelGrid width="47%" columns="2" columnClasses="columnaIzquierda, columnaDerecha">
+			    	   	<rich:inplaceInput id="numeroDocumento" value="#{cuentasController.numeroDocumentoBusqueda}" styleClass="styleInputPlace" defaultLabel="#{msg_erpweb['ec.com.erp.etiqueta.buscar.documento.cliente']}" onkeypress="return validarEnteros(event);">
+			    	   		<a4j:ajax event="keyup" execute="filtrosVendedor" listener="#{cuentasController.busquedaVendedorEnter}" onbeforesubmit="if (event.keyCode != 13)  return false;" render="pnlListaVendedores tableVendedores pnlMensajes"></a4j:ajax>
+			    	   	</rich:inplaceInput>
+			    	   	<h:panelGroup styleClass="styleClean">
+							<a4j:commandLink styleClass="guardarA" execute="@this" render="numeroDocumento pnlMensajes" actionListener="#{cuentasController.borrarBusquedaNumeroDocumento}"/>
+						</h:panelGroup>
+					</h:panelGrid>
+			    	
+			    	<h:panelGrid width="47%" columns="2" columnClasses="columnaIzquierda, columnaDerecha">
+						<rich:inplaceInput id="nombreTransportista" value="#{cuentasController.nombreVendedorBusqueda}" styleClass="styleInputPlace" defaultLabel="#{msg_erpweb['ec.com.erp.etiqueta.buscar.nombre.vendedor']}">
+							<a4j:ajax event="keyup" execute="filtrosVendedor" listener="#{cuentasController.busquedaVendedorEnter}" onbeforesubmit="if (event.keyCode != 13)  return false;" render="pnlListaVendedores tableVendedores pnlMensajes"></a4j:ajax>
+						</rich:inplaceInput>
+			    	   	<h:panelGroup styleClass="styleClean">
+							<a4j:commandLink styleClass="guardarA" execute="@this" render="nombreTransportista pnlMensajes" actionListener="#{cuentasController.borrarBusquedaNombreVendedor}"/>
+						</h:panelGroup>
+					</h:panelGrid>
+			    	 <a4j:commandButton id="btnBuscarVendedor" value="Buscar" styleClass="styleSearch" render="pnlListaVendedores tableVendedores pnlMensajes" execute="filtrosVendedor" actionListener="#{cuentasController.busquedaVendedores}"/>
+				</h:panelGrid>						 
+			</h:panelGroup>	
+			<h:panelGrid id="pnlListaVendedores" style="width: 100%;">	
+				<rich:panel style="width: 99.6%; height: 275px;" header="#{msg_erpweb['ec.com.erp.etiqueta.label.lista.cabecera.lista.vendedores']}">
+					<h:panelGrid id="tablaVaciaVendedor" columns="1" rendered="#{empty cuentasController.vendedorDTOCols}" style="width:100%; text-align: center; padding-top: 130px">
+						<h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.mensaje.lista.vacio']}"/>
+					</h:panelGrid>	
+					<rich:panel style="text-align:center; border-left: none; border-right:none; margin-bottom: 2px" rendered="#{not empty cuentasController.vendedorDTOCols}">
+						<rich:dataScroller fastStep="3" for="tableVendedores" maxPages="5" rendered="#{not empty cuentasController.vendedorDTOCols}" renderIfSinglePage="false"/>
+					</rich:panel>	
+					<rich:dataTable style="width:100%" value="#{cuentasController.vendedorDTOCols}" rendered="#{not empty cuentasController.vendedorDTOCols}" var="vende" iterationStatusVar="it" id="tableVendedores" rows="8">
+			            <rich:column style="padding:0px;padding-left:2px" >
+							<h:selectOneRadio onclick="radioButton(this);" id="myRadio" value="#{cuentasController.codigoVendedorSeleccionado}" valueChangeListener="#{cuentasController.seleccionVendedor}">  
+								<f:selectItem itemValue="#{vende.id.codigoVendedor}"/> 
+								<a4j:ajax event="click" execute="@this" render="myRadio"/>								
+							</h:selectOneRadio>
+						</rich:column>
+			            <rich:column>
+			                <f:facet name="header">Nro.</f:facet>
+			                #{it.index+1}
+			            </rich:column>
+			            <rich:column filter="#{vende.personaDTO.numeroDocumento}" filterType="">
+			                <f:facet name="header"><h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.label.lista.cabecera.documento.vendedor']}"/></f:facet>
+			                <h:outputText value="#{vende.personaDTO.numeroDocumento}" />
+			            </rich:column>
+			            <rich:column>
+			                <f:facet name="header"><h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.label.lista.cabecera.nombre.vendedor']}"/></f:facet>
+			                <h:outputText value="#{vende.personaDTO.nombreCompleto}" />
+			            </rich:column>
+			            <rich:column>
+			                <f:facet name="header"><h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.header.tabla.direccion.cliente']}"/></f:facet>
+			                <h:outputText value="#{vende.personaDTO.contactoPersonaDTO.direccionPrincipal}" />
+			            </rich:column>
+			            <rich:column>
+			                <f:facet name="header"><h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.header.tabla.ciudad.cliente']}"/></f:facet>
+			                <h:outputText value="#{vende.personaDTO.contactoPersonaDTO.ciudad}" />
+			            </rich:column>
+			             <rich:column>
+			                <f:facet name="header"><h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.header.tabla.telefono.cliente']}"/></f:facet>
+			                <h:outputText value="#{vende.personaDTO.contactoPersonaDTO.telefonoPrincipal}" />
+			            </rich:column>
+			        </rich:dataTable>
+		        </rich:panel>
+			</h:panelGrid>
+			<!-- Botones de PopUp -->
+			<h:panelGrid style="margin:auto;" columns="2" cellpadding="0" cellspacing="0">
+				<h:panelGroup layout="block" styleClass="botonD" style="margin-top:5px;margin-right:20px;">
+					<a4j:commandLink id="btnAceptarAgregarVendedor" execute="@this" render="pnlGridVentas" styleClass="aceptarD" actionListener="#{cuentasController.agragarVendedor}" oncomplete="#{rich:component('mpVendedores')}.hide(); return false;">
+						<h:panelGrid columns="2" cellpadding="3" cellspacing="0">
+							<h:graphicImage name="btnAceptar.png" library="images" style="border:none;border-color:white;" height="16" width="16"/>
+							<h:outputText value="Aceptar" />
+						</h:panelGrid>
+					</a4j:commandLink>					
+				</h:panelGroup>
+				<h:panelGroup layout="block" styleClass="botonD" style="margin-top:5px;">
+					<a4j:commandLink id="btnCancelarAgregarVendedor" styleClass="cancelarD" oncomplete="#{rich:component('mpVendedores')}.hide(); return false;" immediate="true">
+						<h:panelGrid columns="2" cellpadding="3" cellspacing="0">
+							<h:graphicImage name="btnCancel.png" library="images" style="border:none;border-color:white;" height="16" width="16"/>
+							<h:outputText value="Cancelar" />
+						</h:panelGrid>
+					</a4j:commandLink>
+				</h:panelGroup>
+			</h:panelGrid>
+		</rich:popupPanel>
+		
 		
 		<a4j:jsFunction name="refrescarPantallaPopUp" action="#{cuentasController.calcularValoresArticulo}" execute="pnlGridAgregarDetalle" render="pnlGridAgregarDetalle"></a4j:jsFunction>
 		

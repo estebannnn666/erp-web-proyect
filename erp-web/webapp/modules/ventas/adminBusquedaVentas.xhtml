@@ -225,7 +225,7 @@
 				 	</h:panelGrid>
 				</rich:panel>
 				
-				<rich:panel style="width: 99.6%; height: 197px; " header="Detalle de pagos">
+				<rich:panel style="width: 99.6%; height: 247px; " header="Detalle de pagos">
 					
 					<h:panelGrid id="tablaVaciaPago" columns="1" rendered="#{empty cuentasController.pagosFacturaDTOCols}" style="width:100%; text-align: center; padding-top: 100px">
 						<h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.mensaje.lista.vacio']}"/>
@@ -256,9 +256,25 @@
 			            </rich:column>
 			            <f:facet name="footer">
 			                <rich:columnGroup>
-				                <rich:column colspan="3" style="text-align: right; paddin-right: 10px">Total:</rich:column>
+				                <rich:column colspan="3" style="text-align: right; paddin-right: 10px">Total de cobros:</rich:column>
 				                <rich:column style="text-align: right; paddin-right: 10px">
 				                    <h:outputText value="#{cuentasController.totalPagado}">
+				                    	<f:convertNumber pattern="0.00"/>
+				                    </h:outputText>
+				                </rich:column>
+				            </rich:columnGroup>
+				            <rich:columnGroup>
+				                <rich:column colspan="3" style="text-align: right; paddin-right: 10px">Saldo pendiente:</rich:column>
+				                <rich:column style="text-align: right; paddin-right: 10px">
+				                    <h:outputText value="#{cuentasController.totalPendiente}">
+				                    	<f:convertNumber pattern="0.00"/>
+				                    </h:outputText>
+				                </rich:column>
+				            </rich:columnGroup>
+				            <rich:columnGroup>
+				                <rich:column colspan="3" style="text-align: right; paddin-right: 10px">Total a cobrar:</rich:column>
+				                <rich:column style="text-align: right; paddin-right: 10px">
+				                    <h:outputText value="#{cuentasController.facturaCabeceraDTO.totalCuenta}">
 				                    	<f:convertNumber pattern="0.00"/>
 				                    </h:outputText>
 				                </rich:column>
@@ -269,7 +285,7 @@
 			</h:panelGrid>
 			<!-- Botones de PopUp -->
 			<h:panelGrid style="margin:auto;" columns="1" cellpadding="0" cellspacing="0">
-				<h:panelGroup layout="block" styleClass="botonD" style="margin-top:5px;">
+				<h:panelGroup layout="block" styleClass="botonD" style="margin-top:2px;">
 					<a4j:commandLink id="btnCancelarPago" render="panelCuentasTabla" actionListener="#{cuentasController.consultarFacturas}" styleClass="cancelarD" oncomplete="#{rich:component('popUpPagos')}.hide(); return false;">
 						<h:panelGrid columns="2" cellpadding="3" cellspacing="0">
 							<h:graphicImage name="btnCancel.png" library="images" style="border:none;border-color:white;" height="16" width="16"/>

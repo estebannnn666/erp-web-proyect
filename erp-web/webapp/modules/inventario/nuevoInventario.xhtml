@@ -26,10 +26,11 @@
 			 	<h:panelGrid id="pnlGridInventarios" columns="4" cellspacing="2" cellpadding="5">
 			 		
 			 		<h:outputText class="styleNegritas" value="#{msg_erpweb['ec.com.erp.etiqueta.inventario.label.header.tipomovimiento']}: *" />
-			 		<h:selectOneMenu value="#{inventarioController.tipoMovimiento}" style="background-color:#f9f9d5; background-image: none; width: 165px">
+			 		<h:selectOneMenu value="#{inventarioController.tipoMovimiento}" style="background-color:#f9f9d5; background-image: none; width: 165px" valueChangeListener="#{inventarioController.seleccionarTipoInventario}" onkeypress="if (event.keyCode == 13) return false;">
 						<f:selectItem itemLabel="SELECCIONE"/>
 						<f:selectItem itemLabel="ENTRADA" itemValue="1"/>
 						<f:selectItem itemLabel="SALIDA" itemValue="0"/>
+						<f:ajax event="change" render="pnlGridInventarios pnlMensajes" execute="@this"></f:ajax>
 					</h:selectOneMenu>
 					<h:outputText value="" />
 					<h:outputText value="" />
@@ -41,10 +42,10 @@
 			 		
 					<h:outputText class="styleNegritas" value="#{msg_erpweb['ec.com.erp.etiqueta.header.tabla.codigo.barras']}: *" />
 			 		<h:inputText class="styleUpperCase" style="background-color:#f9f9d5; background-image: none; width:260px" value="#{inventarioController.codigoBarrasNuevo}" id="codBarras" maxlength="32" onkeypress="if (event.keyCode == 13) return false; return validarEnteros(event);">
-			 			<a4j:ajax event="keyup" execute="pnlGridInventarios" listener="#{inventarioController.realizarConsultaArticulos}" onbeforesubmit="return verifyKeyEnter(event);" render="pnlGridInventarios pnlMensajes"/>
+			 			<a4j:ajax event="keyup" execute="pnlGridInventarios pnlMensajes" listener="#{inventarioController.realizarConsultaArticulos}" onbeforesubmit="return verifyKeyEnter(event);" render="pnlGridInventarios pnlMensajes unidadManejo"/>
 			 		</h:inputText>
 			 		<h:panelGroup layout="block" styleClass="botonB" style="margin-top:5px;">
-						<a4j:commandLink oncomplete="#{rich:component('popUpArticulos')}.show();" styleClass="botonBuscar" actionListener="#{inventarioController.busquedaArticulos}" render="pnlListaArticulos tableArticulos" execute="pnlGridInventarios" title="Click para buscar articulos">							
+						<a4j:commandLink oncomplete="#{rich:component('popUpArticulos')}.show();" styleClass="botonBuscar" actionListener="#{inventarioController.busquedaArticulos}" render="pnlListaArticulos tableArticulos pnlMensajes" execute="pnlGridInventarios" title="Click para buscar articulos">							
 						</a4j:commandLink>	
 					</h:panelGroup>	
 			 		<h:panelGrid columns="2" cellpadding="3" cellspacing="0" style="padding-left:10px">
@@ -55,6 +56,15 @@
 					<h:outputText class="styleNegritas" value="#{msg_erpweb['ec.com.erp.etiqueta.header.tabla.descripcion.articulo']}:" />
 					<h:outputText id="nombreArticulo" value="#{inventarioController.inventarioDTO.articuloDTO.nombreArticulo}" />
 			 		<h:outputText value="" />
+			 		<h:outputText value="" />
+			 		
+			 		<h:outputText class="styleNegritas" value="#{msg_erpweb['ec.com.erp.etiqueta.header.datos.unidad.manejo']}: *" />
+	                <h:selectOneMenu id="unidadManejo" tabindex="1" value="#{inventarioController.inventarioDTO.codigoArticuloUnidadManejo}" valueChangeListener="#{inventarioController.seleccionarUnidadManejo}" style="background-color:#f9f9d5; background-image: none; width: 165px" onkeypress="if (event.keyCode == 13) return false;">
+						<f:selectItem itemLabel="SELECCIONE"/>
+						<f:selectItems value="#{inventarioController.inventarioDTO.articuloDTO.articuloUnidadManejoDTOCols}" var="uniMan" itemValue = "#{uniMan.id.codigoArticuloUnidadManejo}" itemLabel = "#{uniMan.tipoUnidadManejoCatalogoValorDTO.nombreCatalogoValor} X #{uniMan.valorUnidadManejo}" />
+						<f:ajax event="change" render="pnlGridInventarios pnlMensajes" execute="@this"></f:ajax> 
+					</h:selectOneMenu>
+					<h:outputText value="" />
 			 		<h:outputText value="" />
 			 		
 			 		<h:outputText class="styleNegritas" value="#{msg_erpweb['ec.com.erp.etiqueta.inventario.label.header.cantidad']}: *" />
@@ -125,12 +135,34 @@
 		
 		
 		<!-- Popup para ver el detalle del factura -->
-		<rich:popupPanel id="popUpArticulos" styleClass="panelPedidos" header="#{msg_erpweb['ec.com.erp.etiqueta.titulo.seleccionar.articulo']}" width="735" height="400" modal="true" domElementAttachment="form">
+		<rich:popupPanel id="popUpArticulos" styleClass="panelPedidos" header="#{msg_erpweb['ec.com.erp.etiqueta.titulo.seleccionar.articulo']}" width="800" height="425" modal="true" domElementAttachment="form">
 			<f:facet name="controls">
 				<h:outputLink value="#"	onclick="#{rich:component('popUpArticulos')}.hide();">
 					<h:graphicImage library="images" name="close.png" style="border:0px" id="closepopUpArticulos" />
 				</h:outputLink>
 			</f:facet>
+			<h:panelGroup id="filtrosArticulo" layout="block" styleClass="listaReporte">
+				<h:panelGrid columns="3" width="70%" cellpadding="0" cellspacing="2">
+					<h:panelGrid width="47%" columns="2" columnClasses="columnaIzquierda, columnaDerecha">
+			    	   	<rich:inplaceInput id="numeroDocumento" value="#{inventarioController.codigoBarrasBusqueda}" styleClass="styleInputPlace" defaultLabel="#{msg_erpweb['ec.com.erp.etiqueta.buscar.documento.cliente']}" onkeypress="return validarEnteros(event);">
+			    	   		<a4j:ajax event="keyup" execute="filtrosArticulo" listener="#{inventarioController.busquedaArticulosEnter}" onbeforesubmit="if (event.keyCode != 13)  return false;" render="pnlListaArticulos tableArticulos pnlMensajes"></a4j:ajax>
+			    	   	</rich:inplaceInput>
+			    	   	<h:panelGroup styleClass="styleClean">
+							<a4j:commandLink styleClass="guardarA" execute="@this" render="numeroDocumento pnlMensajes" actionListener="#{inventarioController.borrarBusquedaCodigoBarra}"/>
+						</h:panelGroup>
+					</h:panelGrid>
+			    	
+			    	<h:panelGrid width="47%" columns="2" columnClasses="columnaIzquierda, columnaDerecha">
+						<rich:inplaceInput id="nombreTransportista" value="#{inventarioController.nombreArticuloBusqueda}" styleClass="styleInputPlace" defaultLabel="#{msg_erpweb['ec.com.erp.etiqueta.buscar.nombre.vendedor']}">
+							<a4j:ajax event="keyup" execute="filtrosArticulo" listener="#{inventarioController.busquedaArticulosEnter}" onbeforesubmit="if (event.keyCode != 13)  return false;" render="pnlListaArticulos tableArticulos pnlMensajes"></a4j:ajax>
+						</rich:inplaceInput>
+			    	   	<h:panelGroup styleClass="styleClean">
+							<a4j:commandLink styleClass="guardarA" execute="@this" render="nombreTransportista pnlMensajes" actionListener="#{inventarioController.borrarBusquedaNombreArticulo}"/>
+						</h:panelGroup>
+					</h:panelGrid>
+			    	 <a4j:commandButton id="btnBuscarArticulo" value="Buscar" styleClass="styleSearch" render="pnlListaArticulos tableArticulos pnlMensajes" execute="filtrosArticulo" actionListener="#{inventarioController.busquedaArticulos}"/>
+				</h:panelGrid>						 
+			</h:panelGroup>	
 			<h:panelGrid id="pnlListaArticulos" style="width: 100%;">	
 				<rich:panel style="width: 99.6%; height: 320px; " header="#{msg_erpweb['ec.com.erp.etiqueta.titulo.lista.articulos']}">
 					
@@ -183,7 +215,7 @@
 			<!-- Botones de PopUp -->
 			<h:panelGrid style="margin:auto;" columns="2" cellpadding="0" cellspacing="0">
 				<h:panelGroup layout="block" styleClass="botonD" style="margin-top:5px;margin-right:20px;">
-					<a4j:commandLink id="btnAceptarAgregarArticulo" execute="@this" render="pnlGridInventarios" styleClass="aceptarD" actionListener="#{inventarioController.agragarArticuloSeleccionado}" oncomplete="#{rich:component('popUpArticulos')}.hide(); return false;">
+					<a4j:commandLink id="btnAceptarAgregarArticulo" execute="@this" render="pnlGridInventarios unidadManejo" styleClass="aceptarD" actionListener="#{inventarioController.agragarArticuloSeleccionado}" oncomplete="#{rich:component('popUpArticulos')}.hide(); return false;">
 						<h:panelGrid columns="2" cellpadding="3" cellspacing="0">
 							<h:graphicImage name="btnAceptar.png" library="images" style="border:none;border-color:white;" height="16" width="16"/>
 							<h:outputText value="Aceptar" />
