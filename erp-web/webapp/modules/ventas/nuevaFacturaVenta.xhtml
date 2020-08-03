@@ -21,7 +21,18 @@
 	</ui:define>
 	
 	<ui:define name="contentCenter">
-		<rich:panel header="Registro de facturas de productos vendidos" style="width: 100%; background-color: #F5FAFF; height: 98%; overflow-y:auto;">
+		<rich:panel header="Registro de documentos de ventas" style="width: 100%; background-color: #F5FAFF; height: 98%; overflow-y:auto;">
+			<fieldset>
+				<legend class="styleLegend">#{msg_erpweb['ec.com.erp.etiqueta.header.datos.cliente']}</legend>
+				<h:panelGrid id="pnlGridCliente" columns="2" cellspacing="2" cellpadding="5">
+					<h:outputText class="styleNegritas" value="#{msg_erpweb['ec.com.erp.etiqueta.header.tabla.tipo.cliente']}: *" />
+					<h:selectOneRadio value="#{cuentasController.facturaCabeceraDTO.codigoValorTipoDocumento}" valueChangeListener="#{cuentasController.seleccionarTipoDocumento}">
+					   	<f:selectItem itemValue="VEN" itemLabel="FACTURA VENTA" />
+					   	<f:selectItem itemValue="NTV" itemLabel="NOTA DE VENTA" />
+					   	<a4j:ajax event="click" execute="@this" render="pnlGridVentas"></a4j:ajax>
+					</h:selectOneRadio>
+				</h:panelGrid>
+			</fieldset>
 			<fieldset>
 				<legend class="styleLegend">#{msg_erpweb['ec.com.erp.etiqueta.label.nuevo.pedidos.etiqueta.datoscliente']}</legend>
 				<h:panelGrid id="pnlGridVentas" columns="11" cellspacing="0" cellpadding="2">
@@ -30,7 +41,7 @@
 					<h:outputText value="" />
 					<div style="width: 30px"></div>
 					<h:outputText class="styleNegritas" value="#{msg_erpweb['ec.com.erp.etiqueta.label.lista.cabecera.factura.numero.factura']}: *" />
-					<h:inputText style="width:150px" value="#{cuentasController.facturaCabeceraDTO.numeroDocumento}" id="nroDocumentoFac" onkeypress="if (event.keyCode == 13) return false;"/>
+					<h:inputText style="width:150px" value="#{cuentasController.facturaCabeceraDTO.numeroDocumento}" id="nroDocumentoFac" maxlength="13" onkeypress="if (event.keyCode == 13) return false;"/>
 					<h:outputText value="" />
 					<div style="width: 30px"></div>
 					<h:outputText class="styleNegritas" value="#{msg_erpweb['ec.com.erp.etiqueta.label.lista.cabecera.factura.fecha']}: *" />
@@ -81,7 +92,7 @@
 							<h:graphicImage name="listaPedidos.png" library="images" style="border:none;border-color:white;" height="16" width="16"/>
 							<h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.label.lista.cabecera.factura.titulo.detalle']}"/>
 						</rich:toolbarGroup>
-						<rich:toolbarGroup location="right">	
+						<rich:toolbarGroup location="right" rendered="false">	
 							<h:panelGroup layout="block" styleClass="botonD" style="padding-top: 3px; margin-top:0px;">
 								<a4j:commandLink styleClass="agregarD" actionListener="#{cuentasController.abrirPopUpDetalleFactura}" oncomplete="#{rich:component('mpAddDetalle')}.show();" render="mpAddDetalle pnlGridAgregarDetalle" execute="@this" title="Click para agregar fila">
 									<h:panelGrid columns="2" cellpadding="3" cellspacing="0">
@@ -491,7 +502,7 @@
 		</rich:popupPanel>
 		
 		<!-- Popup para confirmar que se guardo el documento -->
-		<rich:popupPanel id="mpOpcionesImpresion" header="#{msg_erpweb['ec.com.erp.etiqueta.mensaje.informacion']}" width="500" height="130" modal="true" domElementAttachment="form">
+		<rich:popupPanel id="mpOpcionesImpresion" header="Seleccione el facturero" width="350" height="170" modal="true" domElementAttachment="form">
 			<f:facet name="controls">
 				<h:outputLink value="#"	onclick="#{rich:component('mpOpcionesImpresion')}.hide();">
 					<h:graphicImage library="images" name="close.png" style="border:0px"/>
@@ -500,9 +511,10 @@
 			
 			<rich:panel style="height: 94%">
 				<h:panelGrid id="tipoFactura" columns="1">
-					<h:selectOneRadio value = "#{cuentasController.tipoRuc}"> 
+					<h:selectOneRadio value = "#{cuentasController.tipoRuc}" layout="pageDirection"> 
 					   <f:selectItem itemValue = "0" itemLabel = "Factura con RUC: 1001594132001" />
 					   <f:selectItem itemValue = "1" itemLabel = "Factura con RUC: 1003635263001" /> 
+					   <f:selectItem itemValue = "3" itemLabel = "Nota de venta" /> 
 					</h:selectOneRadio>   
 				</h:panelGrid>
 		    </rich:panel>

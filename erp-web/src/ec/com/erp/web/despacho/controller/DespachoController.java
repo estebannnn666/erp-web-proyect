@@ -31,10 +31,12 @@ import ec.com.erp.cliente.common.constantes.ERPConstantes;
 import ec.com.erp.cliente.common.exception.ERPException;
 import ec.com.erp.cliente.common.factory.ERPFactory;
 import ec.com.erp.cliente.mdl.dto.ArticuloDTO;
+import ec.com.erp.cliente.mdl.dto.ArticuloUnidadManejoDTO;
 import ec.com.erp.cliente.mdl.dto.GuiaDespachoDTO;
 import ec.com.erp.cliente.mdl.dto.GuiaDespachoDetalleDTO;
 import ec.com.erp.cliente.mdl.dto.GuiaDespachoExtrasDTO;
 import ec.com.erp.cliente.mdl.dto.GuiaDespachoPedidoDTO;
+import ec.com.erp.cliente.mdl.dto.InventarioDTO;
 import ec.com.erp.cliente.mdl.dto.PedidoDTO;
 import ec.com.erp.cliente.mdl.dto.SecuenciaDTO;
 import ec.com.erp.cliente.mdl.dto.TransportistaDTO;
@@ -97,6 +99,7 @@ public class DespachoController extends CommonsController implements Serializabl
 	private Boolean despachoCreado;
 	private Boolean sePuedeEliminar;
 	private Collection<ArticuloDTO> articuloDTOCols;
+	private Integer contDetalle;
 
 	@PostConstruct
 	public void postConstruct() {
@@ -108,7 +111,6 @@ public class DespachoController extends CommonsController implements Serializabl
 		UtilitarioWeb.cleanDate(fechaInicio);
 		fechaDespachoBusqueda = fechaInicio.getTime();
 		fechaDespachoBusquedaFin = fechaFin.getTime();
-		
 		this.loginController.activarMenusSeleccionado();
 		this.guiaDespachoDTO = new GuiaDespachoDTO();
 		this.guiaDespachoDTO.setFechaDespacho(new Date());
@@ -127,11 +129,16 @@ public class DespachoController extends CommonsController implements Serializabl
 		this.despachoCreado = Boolean.FALSE;
 		this.sePuedeEliminar = Boolean.FALSE;
 		this.articuloDTOCols = ERPFactory.articulos.getArticuloServicio().findObtenerListaArticulos(1, null, null);
+		contDetalle= 1;
 		GuiaDespachoExtrasDTO guiaDespachoExtrasDTOTemp = null;
 		for(int i = 0; i < 5 ; i++){
 			guiaDespachoExtrasDTOTemp = new GuiaDespachoExtrasDTO();
+			guiaDespachoExtrasDTOTemp.setArticuloDTO(new ArticuloDTO());
+			guiaDespachoExtrasDTOTemp.getId().setCodigoCompania(contDetalle);
 			this.guiaDespachoExtrasDTOCols.add(guiaDespachoExtrasDTOTemp);
+			contDetalle++;
 		}
+		
 		// Cargar datos a editar
 		if(despachoDataManager.getGuiaDespachoDTOEditar() != null && despachoDataManager.getGuiaDespachoDTOEditar().getId().getCodigoGuiaDespacho() != null)
 		{
@@ -194,18 +201,20 @@ public class DespachoController extends CommonsController implements Serializabl
 	private void agregarDetallePedido(PedidoDTO pedidoDTO) {
 		pedidoDTO.getDetallePedidoDTOCols().stream().forEach(detalle ->{
 			GuiaDespachoDetalleDTO detalleGuia = this.guiaDespachoDetalleDTOCols.stream()
-	        		.filter(guiaDetalle -> guiaDetalle.getCodigoArticulo().intValue() == detalle.getCodigoArticulo().intValue())
+	        		.filter(guiaDetalle -> guiaDetalle.getCodigoArticulo().intValue() == detalle.getCodigoArticulo().intValue() && guiaDetalle.getCodigoArticuloUnidadManejo().intValue() == detalle.getCodigoArticuloUnidadManejo().intValue())
 	        		.findFirst().orElse(null);
 			if(detalleGuia == null) {
 				this.guiaDespachoDetalleDTO = new GuiaDespachoDetalleDTO();
 				this.guiaDespachoDetalleDTO.getId().setCodigoCompania(Integer.parseInt(ERPConstantes.ESTADO_ACTIVO_NUMERICO));
 				this.guiaDespachoDetalleDTO.setCodigoArticulo(detalle.getCodigoArticulo());
+				this.guiaDespachoDetalleDTO.setCodigoArticuloUnidadManejo(detalle.getCodigoArticuloUnidadManejo());
+				this.guiaDespachoDetalleDTO.setArticuloUnidadManejoDTO(detalle.getArticuloUnidadManejoDTO());
 				this.guiaDespachoDetalleDTO.setDescripcionProducto(detalle.getArticuloDTO().getNombreArticulo());
 				this.guiaDespachoDetalleDTO.setCantidad(detalle.getCantidad());
 				this.guiaDespachoDetalleDTOCols.add(guiaDespachoDetalleDTO);
 			}else {
 				this.guiaDespachoDetalleDTOCols.stream().forEach(guiaDesp -> {
-					if(guiaDesp.getCodigoArticulo().intValue() == detalle.getCodigoArticulo().intValue()) {
+					if(guiaDesp.getCodigoArticulo().intValue() == detalle.getCodigoArticulo().intValue() && guiaDesp.getCodigoArticuloUnidadManejo().intValue() == detalle.getCodigoArticuloUnidadManejo().intValue()) {
 						guiaDesp.setCantidad(guiaDesp.getCantidad()+detalle.getCantidad());
 					}
 				});
@@ -295,15 +304,103 @@ public class DespachoController extends CommonsController implements Serializabl
 	
 	public void onItemSelectExtra(SelectEvent event) {
         for(GuiaDespachoExtrasDTO detallePedidoDTOTemp : this.guiaDespachoExtrasDTOCols) {
-        	if(detallePedidoDTOTemp.getDescripcionProducto() != null) {
+        	if(detallePedidoDTOTemp.getDescripcionProducto() != null && detallePedidoDTOTemp.getCodigoArticulo() == null) {
         		String queryLowerCase = detallePedidoDTOTemp.getDescripcionProducto().toLowerCase();
         		ArticuloDTO articuloSeleccionado = this.getArticuloDTOCols().stream()
                 		.filter(articulo -> articulo.getNombreArticulo().toLowerCase().equals(queryLowerCase))
                 		.findFirst().orElse(null);
-        		detallePedidoDTOTemp.setCodigoArticulo(articuloSeleccionado.getId().getCodigoArticulo());
+        		detallePedidoDTOTemp.setArticuloDTO(articuloSeleccionado);
         	}
+        	
+        	if((detallePedidoDTOTemp.getCantidad() == null ||  detallePedidoDTOTemp.getCantidad().intValue() == 0) && detallePedidoDTOTemp.getArticuloDTO() != null){
+        		detallePedidoDTOTemp.setCantidad(1);
+			}
+			if(detallePedidoDTOTemp.getCantidad() != null && detallePedidoDTOTemp.getArticuloDTO() != null && detallePedidoDTOTemp.getArticuloDTO().getPrecio() != null && detallePedidoDTOTemp.getCodigoArticulo() == null && CollectionUtils.isNotEmpty(detallePedidoDTOTemp.getArticuloDTO().getArticuloUnidadManejoDTOCols())) {
+				
+        		ArticuloUnidadManejoDTO articuloUnidadManejo = this.obtenerUnidadManejoPorDefecto(detallePedidoDTOTemp.getArticuloDTO().getArticuloUnidadManejoDTOCols());
+        		// Se obtiene existencia actual
+				InventarioDTO inventarioDTOAux = ERPFactory.inventario.getInventarioServicio().findObtenerUltimoInventarioByArticulo(Integer.parseInt(ERPConstantes.ESTADO_ACTIVO_NUMERICO), detallePedidoDTOTemp.getArticuloDTO().getCodigoBarras(), articuloUnidadManejo.getId().getCodigoArticuloUnidadManejo());
+				if (detallePedidoDTOTemp.getCantidad().intValue() > inventarioDTOAux.getCantidadExistencia().intValue()) {
+					this.setShowMessagesBar(Boolean.TRUE);
+					MensajesController.addWarn(null, ERPWebResources.getString("ec.com.erp.etiqueta.label.busqueda.pedidos.mensaje.error.mayor"));
+					return;
+				}
+				detallePedidoDTOTemp.setCodigoArticulo(detallePedidoDTOTemp.getArticuloDTO().getId().getCodigoArticulo());
+        		detallePedidoDTOTemp.setCodigoArticuloUnidadManejo(articuloUnidadManejo.getId().getCodigoArticuloUnidadManejo());
+        		detallePedidoDTOTemp.setArticuloUnidadManejoDTO(articuloUnidadManejo);
+			}
 		}
     }
+	
+	
+	/**
+	 * Metodo para agregar calcular 
+	 * @param e
+	 */
+	public void seleccionarUnidadManejo(ValueChangeEvent e) {
+		Integer codigoUnidadManejo = (Integer)e.getNewValue();
+		String idComponete = e.getComponent().getClientId();
+		String[] idCompuesto =  idComponete.split(":");
+		Integer numeroDetalle = Integer.parseInt(idCompuesto[2])+1;
+		
+		for(GuiaDespachoExtrasDTO guiaDespachoExtrasDTOTemp : guiaDespachoExtrasDTOCols) {
+			if(guiaDespachoExtrasDTOTemp.getId().getCodigoCompania().intValue() == numeroDetalle.intValue()) {
+				if(codigoUnidadManejo != null && guiaDespachoExtrasDTOTemp.getCantidad() != null && guiaDespachoExtrasDTOTemp.getCodigoArticuloUnidadManejo() != null) {
+					ArticuloUnidadManejoDTO articuloUnidadManejo = obtenerUnidadManejoPorCodigo(codigoUnidadManejo, guiaDespachoExtrasDTOTemp.getArticuloDTO().getArticuloUnidadManejoDTOCols());
+					// Se obtiene existencia actual
+					InventarioDTO inventarioDTOAux = ERPFactory.inventario.getInventarioServicio().findObtenerUltimoInventarioByArticulo(Integer.parseInt(ERPConstantes.ESTADO_ACTIVO_NUMERICO), guiaDespachoExtrasDTOTemp.getArticuloDTO().getCodigoBarras(), articuloUnidadManejo.getId().getCodigoArticuloUnidadManejo());
+					if (guiaDespachoExtrasDTOTemp.getCantidad().intValue() > inventarioDTOAux.getCantidadExistencia().intValue()) {
+						this.setShowMessagesBar(Boolean.TRUE);
+						MensajesController.addWarn(null, ERPWebResources.getString("ec.com.erp.etiqueta.label.busqueda.pedidos.mensaje.error.mayor"));
+						return;
+					}
+				}
+				break;
+			}
+		}
+	}
+	
+	public void verificarExistencia(AjaxBehaviorEvent e) {
+		String idComponete = e.getComponent().getClientId();
+		String[] idCompuesto = idComponete.split(":");
+		Integer numeroDetalle = Integer.parseInt(idCompuesto[2]) + 1;
+		for(GuiaDespachoExtrasDTO guiaDespachoExtrasDTOTemp : guiaDespachoExtrasDTOCols) {
+			if (guiaDespachoExtrasDTOTemp.getId().getCodigoCompania().intValue() == numeroDetalle.intValue()) {
+				if (guiaDespachoExtrasDTOTemp.getCantidad() != null && guiaDespachoExtrasDTOTemp.getCodigoArticuloUnidadManejo() != null) {
+					// Se obtiene existencia actual
+					InventarioDTO inventarioDTOAux = ERPFactory.inventario.getInventarioServicio().findObtenerUltimoInventarioByArticulo(Integer.parseInt(ERPConstantes.ESTADO_ACTIVO_NUMERICO), guiaDespachoExtrasDTOTemp.getArticuloDTO().getCodigoBarras(), guiaDespachoExtrasDTOTemp.getCodigoArticuloUnidadManejo());
+					
+					if (guiaDespachoExtrasDTOTemp.getCantidad().intValue() > inventarioDTOAux.getCantidadExistencia().intValue()) {
+						this.setShowMessagesBar(Boolean.TRUE);
+						MensajesController.addWarn(null, ERPWebResources.getString("ec.com.erp.etiqueta.label.busqueda.pedidos.mensaje.error.mayor"));
+						return;
+					}
+				}
+				this.setShowMessagesBar(Boolean.FALSE);
+				break;
+			}
+		}
+	}
+	
+	/**
+	 * Metodo para obtener unidad de manejo por codigo
+	 * @param articuloUnidadManejoCols
+	 * @return
+	 */
+	public ArticuloUnidadManejoDTO obtenerUnidadManejoPorCodigo(Integer codigoArticuloUnidadManejo, Collection<ArticuloUnidadManejoDTO> articuloUnidadManejoCols) {
+		return articuloUnidadManejoCols
+				.stream().filter(unidadManejo -> unidadManejo.getId().getCodigoArticuloUnidadManejo().intValue() == codigoArticuloUnidadManejo.intValue())
+				.findFirst().orElse(null);
+	}
+	
+	/**
+	 * Metodo para obtener unidad de manejo por defecto
+	 * @param articuloUnidadManejoCols
+	 * @return
+	 */
+	public ArticuloUnidadManejoDTO obtenerUnidadManejoPorDefecto(Collection<ArticuloUnidadManejoDTO> articuloUnidadManejoCols) {
+		return articuloUnidadManejoCols.stream().filter(unidadManejo ->  unidadManejo.getEsPorDefecto()).findFirst().orElse(null);
+	}
 	
 	/**
 	 * Metodo cancelar la accion borrar un chofer de la lista del vehiculo
@@ -319,7 +416,10 @@ public class DespachoController extends CommonsController implements Serializabl
 	 */
 	public void agragarRegistroExtra(ActionEvent e) {
 		GuiaDespachoExtrasDTO guiaDespachoExtrasDTOTemp = new GuiaDespachoExtrasDTO();
+		guiaDespachoExtrasDTOTemp.setArticuloDTO(new ArticuloDTO());
+		guiaDespachoExtrasDTOTemp.getId().setCodigoCompania(contDetalle);
 		this.guiaDespachoExtrasDTOCols.add(guiaDespachoExtrasDTOTemp);
+		contDetalle++;
 	}
 	
 	/**
@@ -606,6 +706,11 @@ public class DespachoController extends CommonsController implements Serializabl
 		SecuenciaDTO secuenciaDespacho = ERPFactory.secuencias.getSecuenciaServicio().findObtenerSecuenciaByNombre(GuiaDespachoID.NOMBRE_SECUENCIA);
 		this.guiaDespachoDTO.setNumeroGuiaDespacho("GD-"+secuenciaDespacho.getValorSecuencia());
 		this.guiaDespachoExtrasDTOCols = new ArrayList<GuiaDespachoExtrasDTO>();
+		GuiaDespachoExtrasDTO guiaDespachoExtrasDTOTemp = null;
+		for(int i = 0; i < 5 ; i++){
+			guiaDespachoExtrasDTOTemp = new GuiaDespachoExtrasDTO();
+			this.guiaDespachoExtrasDTOCols.add(guiaDespachoExtrasDTOTemp);
+		}
 		this.guiaDespachoPedidoDTOCols = new ArrayList<GuiaDespachoPedidoDTO>();
 		this.guiaDespachoDetalleDTOCols = new ArrayList<>();
 		this.despachoDataManager.setGuiaDespachoDTOEditar(new GuiaDespachoDTO());
@@ -894,5 +999,13 @@ public class DespachoController extends CommonsController implements Serializabl
 
 	public void setGuiaDespachoDetalleDTO(GuiaDespachoDetalleDTO guiaDespachoDetalleDTO) {
 		this.guiaDespachoDetalleDTO = guiaDespachoDetalleDTO;
+	}
+
+	public Integer getContDetalle() {
+		return contDetalle;
+	}
+
+	public void setContDetalle(Integer contDetalle) {
+		this.contDetalle = contDetalle;
 	}
 }

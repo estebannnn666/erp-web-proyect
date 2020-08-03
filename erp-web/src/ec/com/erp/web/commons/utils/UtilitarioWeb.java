@@ -95,7 +95,7 @@ public class UtilitarioWeb {
 		return cadenaCompleta.toString();
 	}
 	
-	private void testImpresion() {
+	private static void testImpresion() {
 		FacturaCabeceraDTO facturaImprimir = new FacturaCabeceraDTO();
         facturaImprimir.setFechaDocumento(new Date());
         facturaImprimir.setNombreClienteProveedor("HENRY ESTEBAN GUDIÑO BARAHONA");

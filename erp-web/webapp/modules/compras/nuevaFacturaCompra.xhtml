@@ -30,7 +30,7 @@
 					<h:outputText value="" />
 					<div style="width: 30px"></div>
 					<h:outputText class="styleNegritas" value="#{msg_erpweb['ec.com.erp.etiqueta.label.lista.cabecera.factura.numero.documento']}: *" />
-					<h:inputText style="width:150px" value="#{cuentasController.facturaCabeceraDTO.numeroDocumento}" id="nroDocumentoFac" onkeypress="if (event.keyCode == 13) return false;"/>
+					<h:inputText style="width:150px" value="#{cuentasController.facturaCabeceraDTO.numeroDocumento}" maxlength="13" id="nroDocumentoFac" onkeypress="if (event.keyCode == 13) return false;"/>
 					<h:outputText value="" />
 					<div style="width: 30px"></div>
 					<h:outputText class="styleNegritas" value="#{msg_erpweb['ec.com.erp.etiqueta.label.lista.cabecera.factura.fecha']}: *" />
@@ -75,7 +75,7 @@
 							<h:graphicImage name="listaPedidos.png" library="images" style="border:none;border-color:white;" height="16" width="16"/>
 							<h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.label.lista.cabecera.factura.titulo.detalle']}"/>
 						</rich:toolbarGroup>
-						<rich:toolbarGroup location="right">	
+						<rich:toolbarGroup location="right" rendered="false">	
 							<h:panelGroup layout="block" styleClass="botonD" style="padding-top: 3px; margin-top:0px;">
 								<a4j:commandLink styleClass="agregarD" actionListener="#{cuentasController.abrirPopUpDetalleFactura}" oncomplete="#{rich:component('mpAddDetalle')}.show();" render="mpAddDetalle pnlGridAgregarDetalle" execute="@this" title="Click para agregar fila">
 									<h:panelGrid columns="2" cellpadding="3" cellspacing="0">

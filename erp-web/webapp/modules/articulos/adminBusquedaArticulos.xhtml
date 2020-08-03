@@ -95,8 +95,11 @@
 	                </h:outputText>
 	            </rich:column>
 	            <rich:column style="text-align: right; padding-right: 5px">
-	                <f:facet name="header">Stock</f:facet>
-	                <h:outputText value="#{art.cantidadStock}" />
+	                <f:facet name="header"><h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.header.tabla.articulo.porcentaje.comision']}"/></f:facet>
+	                <h:outputText value="#{art.porcentajeComision}">
+	                	<f:convertNumber pattern="0.00"/>
+	                </h:outputText>
+	                <h:outputText value="%"/>
 	            </rich:column>
 	            <rich:column styleClass="columna10">
 	                <f:facet name="header">Editar</f:facet>

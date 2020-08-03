@@ -81,8 +81,8 @@
 	                <f:facet name="header"><h:outputText title="#{msg_erpweb['ec.com.erp.etiqueta.label.lista.cabecera.factura.referencia.documento']}" value="#{msg_erpweb['ec.com.erp.etiqueta.label.lista.cabecera.factura.refedoc.abreviado']}"/></f:facet>
 	                <h:outputText value="#{cuenta.codigoReferenciaFactura}" />
 	            </rich:column>
-	            <rich:column style="width: 70px">
-	                <f:facet name="header"><h:outputText value="Nro. Factura"/></f:facet>
+	            <rich:column style="width: 90px">
+	                <f:facet name="header"><h:outputText value="Nro. Documento"/></f:facet>
 	                <h:outputText value="#{cuenta.numeroDocumento}" />
 	            </rich:column>
 	            <rich:column style="width: 80px; text-align: center;">
@@ -91,7 +91,7 @@
 	                	<f:convertDateTime pattern="yyyy-MM-dd"/>
 	                </h:outputText>
 	            </rich:column>
-	            <rich:column>
+	            <rich:column style="width: 100px;">
 	                <f:facet name="header"><h:outputText value="Ruc / Doc." title="#{msg_erpweb['ec.com.erp.etiqueta.label.lista.cabecera.factura.ruc.documento']}"/></f:facet>
 	                <h:outputText value="#{cuenta.rucDocumento}" />
 	            </rich:column>
@@ -108,7 +108,7 @@
 						</rich:tooltip>       
 					</rich:panel>
 	            </rich:column>
-	            <rich:column>
+	            <!-- rich:column>
 	                <f:facet name="header"><h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.label.lista.cabecera.factura.direccion']}"/></f:facet>
 	                <rich:panel id="direccion#{it}" styleClass="tooltip-text" bodyClass="rich-laguna-panel-no-header" style="border: none !important">  
 		        		<h:outputText value="#{cuenta.direccion.length() > 35 ? cuenta.direccion.substring(0,35).concat('...') : cuenta.direccion}" /> 
@@ -124,10 +124,22 @@
 	            <rich:column style="width: 60px; text-align: center;">
 	                <f:facet name="header"><h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.label.lista.cabecera.factura.telefono']}"/></f:facet>
 	                <h:outputText value="#{cuenta.telefono}" />
-	            </rich:column>
+	            </rich:column-->
 	            <rich:column style="width: 60px; text-align: right; padding-right: 3px;">
 	                <f:facet name="header"><h:outputText value="Total" title="#{msg_erpweb['ec.com.erp.etiqueta.label.lista.cabecera.factura.total.factura']}"/></f:facet>
 	                <h:outputText value="#{cuenta.totalCuenta}" >
+	                	<f:convertNumber pattern="0.00"/>
+	                </h:outputText>
+	            </rich:column>
+	            <rich:column style="width: 70px; text-align: right; padding-right: 3px;">
+	                <f:facet name="header"><h:outputText value="Total pagos" title="#{msg_erpweb['ec.com.erp.etiqueta.label.lista.cabecera.factura.total.factura']}"/></f:facet>
+	                <h:outputText value="#{cuenta.totalPagos}" >
+	                	<f:convertNumber pattern="0.00"/>
+	                </h:outputText>
+	            </rich:column>
+	            <rich:column style="width: 60px; text-align: right; padding-right: 3px;">
+	                <f:facet name="header"><h:outputText value="Saldo" title="#{msg_erpweb['ec.com.erp.etiqueta.label.lista.cabecera.factura.total.factura']}"/></f:facet>
+	                <h:outputText value="#{cuenta.totalCuenta - cuenta.totalPagos}" >
 	                	<f:convertNumber pattern="0.00"/>
 	                </h:outputText>
 	            </rich:column>
@@ -142,13 +154,33 @@
 						<f:setPropertyActionListener value="#{cuenta}" target="#{cuentasController.facturaCabeceraDTO}" />											
 					</a4j:commandLink>
 	            </rich:column>
+	            <rich:column styleClass="columna5">
+	                <f:facet name="header">Pagos</f:facet>
+	                <a4j:commandLink id="botonPago" title="Ver detalle de factura" render="popUpPagos pnlListaDetallePagos" execute="@this" actionListener="#{cuentasController.simularEvento}" oncomplete="cargarPagos();">
+						<h:graphicImage title="Ingresar nuevo pago" name="pagos.png" library="images" style="border:none;border-color:white;" height="24" width="24" rendered="#{!cuenta.pagado}"/>
+						<h:graphicImage title="Ver detalle de pagos" name="btnDetailPay.png" library="images" style="border:none;border-color:white;" height="24" width="24" rendered="#{cuenta.pagado}"/>
+						<f:setPropertyActionListener value="#{cuenta}" target="#{cuentasController.facturaCabeceraDTO}" />											
+					</a4j:commandLink>
+	            </rich:column>
 	            <f:facet name="footer">
 	            	<rich:columnGroup>
-		                <rich:column colspan="8" style="text-align: right; paddin-right: 10px">Total de pagos:</rich:column>
+		                <rich:column colspan="6" style="text-align: right; paddin-right: 10px">Total de pagos:</rich:column>
 		                <rich:column style="text-align: right; paddin-right: 10px">
 		                    <h:outputText value="#{cuentasController.totalCuenta}">
 		                    	<f:convertNumber pattern="0.00"/>
 		                    </h:outputText>
+		                </rich:column>
+		                <rich:column style="text-align: right; paddin-right: 10px">
+		                    <h:outputText value="#{cuentasController.totalPagos}">
+		                    	<f:convertNumber pattern="0.00"/>
+		                    </h:outputText>
+		                </rich:column>
+		                <rich:column style="text-align: right; paddin-right: 10px">
+		                    <h:outputText value="#{cuentasController.totalCuenta - cuentasController.totalPagos}">
+		                    	<f:convertNumber pattern="0.00"/>
+		                    </h:outputText>
+		                </rich:column>
+		                <rich:column>
 		                </rich:column>
 		                <rich:column>
 		                </rich:column>
@@ -159,6 +191,125 @@
 	        </rich:dataTable>
         </rich:panel>
         
+        <a4j:jsFunction name="cargarPagos" actionListener="#{cuentasController.cargarDatosPago}" execute="pnlGridAgregarDetalle" render="popUpPagos pnlListaDetallePagos" oncomplete="#{rich:component('popUpPagos')}.show();"></a4j:jsFunction>
+        
+        <!-- Popup para ver el detalle de pagos-->
+		<rich:popupPanel id="popUpPagos" styleClass="panelPedidos" header="#{msg_erpweb['ec.com.erp.etiqueta.header.nueva.pagos.detalle']}" width="935" height="#{cuentasController.tamanioPopUp}" modal="true" domElementAttachment="form">
+			<f:facet name="controls">
+				<a4j:commandLink render="panelCuentasTabla" actionListener="#{cuentasController.consultarFacturas}" oncomplete="#{rich:component('popUpPagos')}.hide(); return false;">
+					<h:graphicImage library="images" name="close.png" style="border:0px" id="closePopUpPago" />
+				</a4j:commandLink>
+			</f:facet>
+			<h:panelGrid id="pnlListaDetallePagos" style="width: 100%;">	
+				<rich:toolbar height="26" itemSeparator="grid" rendered="#{!cuentasController.facturaCabeceraDTO.pagado}">
+					<rich:toolbarGroup>
+						<h:graphicImage name="pagos.png" library="images" style="border:none;border-color:white;" height="16" width="16"/>
+						<h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.header.nueva.pagos.registro']}"/>
+					</rich:toolbarGroup>
+					<rich:toolbarGroup location="right">	
+						<h:panelGroup layout="block" styleClass="botonD" style="padding-top: 3px; margin-top:0px;">
+							<a4j:commandLink styleClass="agregarD" actionListener="#{cuentasController.guardarPagoCompra}" render="pnlListaDetallePagos tablePagos pnlMensajes" execute="pnlGridPagos" title="Click para guardar pago">
+								<h:panelGrid columns="2" cellpadding="3" cellspacing="0">
+									<h:graphicImage name="save_pago.png" library="images" style="border:none;border-color:white;" height="16" width="16"/>
+									<h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.header.nueva.pagos.guardar']}"/>
+								</h:panelGrid>
+							</a4j:commandLink>	
+						</h:panelGroup>	
+					</rich:toolbarGroup>						
+				</rich:toolbar>	
+				<rich:panel style="width: 99.5%; background-color: #F5FAFF;" rendered="#{!cuentasController.facturaCabeceraDTO.pagado}">
+				 	<h:panelGrid id="pnlGridPagos" columns="2" cellspacing="2" cellpadding="5">
+				 		<h:outputText class="styleNegritas" value="#{msg_erpweb['ec.com.erp.etiqueta.header.nueva.pagos.total.factura']}: *" />
+				 		<h:outputText value="#{cuentasController.facturaCabeceraDTO.totalCuenta}" >
+	                		<f:convertNumber pattern="0.00"/>
+	                	</h:outputText>
+	                	
+	                	<h:outputText class="styleNegritas" value="#{msg_erpweb['ec.com.erp.etiqueta.header.nueva.pagos.saldo.factura']}: *" />
+				 		<h:outputText value="#{cuentasController.totalPendiente}" >
+	                		<f:convertNumber pattern="0.00"/>
+	                	</h:outputText>
+	                	
+					 	<h:outputText class="styleNegritas" value="#{msg_erpweb['ec.com.erp.etiqueta.header.nueva.pagos.fechapago']}: *" />
+						<rich:calendar value="#{cuentasController.pagosFacturaDTO.fechaPago}" datePattern="yyyy-MM-dd"></rich:calendar>
+						
+						<h:outputText class="styleNegritas" value="#{msg_erpweb['ec.com.erp.etiqueta.header.nueva.pagos.valorpago']}: *" />
+				 		<h:inputText  style="width:159px" value="#{cuentasController.pagosFacturaDTO.valorPago}" id="precio" onkeypress="return validarDecimal(event);"/>
+				 		
+				 		<h:outputText class="styleNegritas" value="#{msg_erpweb['ec.com.erp.etiqueta.header.nueva.pagos.descripcion']}: *" />
+				 		<h:inputTextarea id="txtObservacion" maxlength="100" styleClass="styleUpperCase estiloTextArea" value="#{cuentasController.pagosFacturaDTO.descripcion}"/>
+				 	</h:panelGrid>
+				</rich:panel>
+				
+				<rich:panel style="width: 99.6%; height: 247px; " header="Detalle de pagos">
+					
+					<h:panelGrid id="tablaVaciaPago" columns="1" rendered="#{empty cuentasController.pagosFacturaDTOCols}" style="width:100%; text-align: center; padding-top: 100px">
+						<h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.mensaje.lista.vacio']}"/>
+					</h:panelGrid>	
+					<rich:panel style="text-align:center; border-left: none; border-right:none; margin-bottom: 2px" rendered="#{not empty cuentasController.pagosFacturaDTOCols}">
+						<rich:dataScroller fastStep="3" for="tablePagos" maxPages="5" rendered="#{not empty cuentasController.pagosFacturaDTOCols}" renderIfSinglePage="false"/>
+					</rich:panel>	
+					<rich:dataTable style="width:100%" value="#{cuentasController.pagosFacturaDTOCols}" rendered="#{not empty cuentasController.pagosFacturaDTOCols}" var="pago" iterationStatusVar="it" id="tablePagos" rows="5">
+			            <rich:column>
+			                <f:facet name="header">Nro.</f:facet>
+			                #{it.index+1}
+			            </rich:column>
+			            <rich:column style="text-align: center;">
+			                <f:facet name="header"><h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.header.nueva.pagos.fechapago']}"/></f:facet>
+			                <h:outputText value="#{pago.fechaPago}">
+	                			<f:convertDateTime pattern="yyyy-MM-dd"/>
+	                		</h:outputText>
+			            </rich:column>
+			            <rich:column>
+			                <f:facet name="header"><h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.header.nueva.pagos.descripcion']}"/></f:facet>
+			                <h:outputText value="#{pago.descripcion}" />
+			            </rich:column>
+			            <rich:column style="text-align: right; padding-right: 5px">
+			                <f:facet name="header"><h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.header.nueva.pagos.valorpago']}"/></f:facet>
+			                <h:outputText value="#{pago.valorPago}">
+			                	<f:convertNumber pattern="0.00"/>
+			                </h:outputText>
+			            </rich:column>
+			            <f:facet name="footer">
+			                <rich:columnGroup>
+				                <rich:column colspan="3" style="text-align: right; paddin-right: 10px">Total de pagos:</rich:column>
+				                <rich:column style="text-align: right; paddin-right: 10px">
+				                    <h:outputText value="#{cuentasController.totalPagado}">
+				                    	<f:convertNumber pattern="0.00"/>
+				                    </h:outputText>
+				                </rich:column>
+				            </rich:columnGroup>
+				            <rich:columnGroup>
+				                <rich:column colspan="3" style="text-align: right; paddin-right: 10px">Saldo pendiente:</rich:column>
+				                <rich:column style="text-align: right; paddin-right: 10px">
+				                    <h:outputText value="#{cuentasController.totalPendiente}">
+				                    	<f:convertNumber pattern="0.00"/>
+				                    </h:outputText>
+				                </rich:column>
+				            </rich:columnGroup>
+				            <rich:columnGroup>
+				                <rich:column colspan="3" style="text-align: right; paddin-right: 10px">Total a pagar:</rich:column>
+				                <rich:column style="text-align: right; paddin-right: 10px">
+				                    <h:outputText value="#{cuentasController.facturaCabeceraDTO.totalCuenta}">
+				                    	<f:convertNumber pattern="0.00"/>
+				                    </h:outputText>
+				                </rich:column>
+				            </rich:columnGroup>
+			            </f:facet>
+			        </rich:dataTable>
+		        </rich:panel>
+			</h:panelGrid>
+			<!-- Botones de PopUp -->
+			<h:panelGrid style="margin:auto;" columns="1" cellpadding="0" cellspacing="0">
+				<h:panelGroup layout="block" styleClass="botonD" style="margin-top:2px;">
+					<a4j:commandLink id="btnCancelarPago" render="panelCuentasTabla" actionListener="#{cuentasController.consultarFacturas}" styleClass="cancelarD" oncomplete="#{rich:component('popUpPagos')}.hide(); return false;">
+						<h:panelGrid columns="2" cellpadding="3" cellspacing="0">
+							<h:graphicImage name="btnCancel.png" library="images" style="border:none;border-color:white;" height="16" width="16"/>
+							<h:outputText value="Cerrar" />
+						</h:panelGrid>
+					</a4j:commandLink>
+				</h:panelGroup>
+			</h:panelGrid>
+		</rich:popupPanel>
         
         <!-- Popup para ver el detalle del factura -->
 		<rich:popupPanel id="popUpDetalle" styleClass="panelPedidos" header="#{msg_erpweb['ec.com.erp.etiqueta.label.lista.cabecera.factura.titulo.detalle']}" width="935" height="408" modal="true" domElementAttachment="form">
@@ -193,17 +344,10 @@
 			                <f:facet name="header"><h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.header.tabla.descripcion.articulo']}"/></f:facet>
 			                <h:outputText value="#{detalle.articuloDTO.nombreArticulo}" />
 			            </rich:column>
-			            <rich:column style="text-align: right; padding-right: 5px">
-			                <f:facet name="header"><h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.header.tabla.articulo.peso']}"/></f:facet>
-			                <h:outputText value="#{detalle.articuloDTO.peso}">
-			                	<f:convertNumber pattern="0.00"/>
-			                </h:outputText>
-			            </rich:column>
-			            <rich:column style="text-align: right; padding-right: 5px">
-			                <f:facet name="header"><h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.header.tabla.articulo.stock']}"/></f:facet>
-			                <h:outputText value="#{detalle.articuloDTO.cantidadStock}">
-			                	<f:convertNumber pattern="0"/>
-			                </h:outputText>
+			            <rich:column style="text-align: left; padding-left: 5px">
+			                <f:facet name="header"><h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.label.nuevo.pedidos.detalle.unidad.manejo']}"/></f:facet>
+		                	<h:outputText value="#{detalle.articuloUnidadManejoDTO.tipoUnidadManejoCatalogoValorDTO.nombreCatalogoValor} x #{detalle.articuloUnidadManejoDTO.valorUnidadManejo}">
+		                	</h:outputText>
 			            </rich:column>
 			            <rich:column style="text-align: right; padding-right: 5px">
 			                <f:facet name="header"><h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.label.nuevo.pedidos.articulo.precio.unitario']}"/></f:facet>
@@ -219,7 +363,7 @@
 			            </rich:column>
 			            <f:facet name="footer">
 				                <rich:columnGroup>
-					                <rich:column colspan="7" style="text-align: right; paddin-right: 10px">Sub Total:</rich:column>
+					                <rich:column colspan="6" style="text-align: right; paddin-right: 10px">Sub Total:</rich:column>
 					                <rich:column style="text-align: right; paddin-right: 10px">
 					                    <h:outputText value="#{cuentasController.facturaCabeceraDTO.subTotal}">
 					                    	<f:convertNumber pattern="0.00"/>
@@ -227,7 +371,7 @@
 					                </rich:column>
 					            </rich:columnGroup>
 					            <rich:columnGroup>
-					                <rich:column colspan="7" style="text-align: right; paddin-right: 10px">Descuento:</rich:column>
+					                <rich:column colspan="6" style="text-align: right; paddin-right: 10px">Descuento:</rich:column>
 					                <rich:column style="text-align: right; paddin-right: 10px">
 					                    <h:outputText value="#{cuentasController.facturaCabeceraDTO.descuento}">
 					                    	<f:convertNumber pattern="0.00"/>
@@ -235,7 +379,7 @@
 					                </rich:column>
 					            </rich:columnGroup>
 					            <rich:columnGroup>
-					                <rich:column colspan="7" style="text-align: right; paddin-right: 10px">Tarifa 0%:</rich:column>
+					                <rich:column colspan="6" style="text-align: right; paddin-right: 10px">Tarifa 0%:</rich:column>
 					                <rich:column style="text-align: right; paddin-right: 10px">
 					                    <h:outputText value="#{cuentasController.facturaCabeceraDTO.totalSinImpuestos}">
 					                    	<f:convertNumber pattern="0.00"/>
@@ -243,7 +387,7 @@
 					                </rich:column>
 					            </rich:columnGroup>
 					            <rich:columnGroup>
-					                <rich:column colspan="7" style="text-align: right; paddin-right: 10px">Tarifa 12%:</rich:column>
+					                <rich:column colspan="6" style="text-align: right; paddin-right: 10px">Tarifa 12%:</rich:column>
 					                <rich:column style="text-align: right; paddin-right: 10px">
 					                    <h:outputText value="#{cuentasController.facturaCabeceraDTO.totalImpuestos}">
 					                    	<f:convertNumber pattern="0.00"/>
@@ -251,7 +395,7 @@
 					                </rich:column>
 					            </rich:columnGroup>					            
 					            <rich:columnGroup>
-					                <rich:column colspan="7" style="text-align: right; paddin-right: 10px">Iva 12 %:</rich:column>
+					                <rich:column colspan="6" style="text-align: right; paddin-right: 10px">Iva 12 %:</rich:column>
 					                <rich:column style="text-align: right; paddin-right: 10px">
 					                    <h:outputText value="#{cuentasController.facturaCabeceraDTO.totalIva}">
 					                    	<f:convertNumber pattern="0.00"/>
@@ -259,7 +403,7 @@
 					                </rich:column>
 					            </rich:columnGroup>
 					            <rich:columnGroup>
-					                <rich:column colspan="7" style="text-align: right; paddin-right: 10px">Total:</rich:column>
+					                <rich:column colspan="6" style="text-align: right; paddin-right: 10px">Total:</rich:column>
 					                <rich:column style="text-align: right; paddin-right: 10px">
 					                    <h:outputText value="#{cuentasController.facturaCabeceraDTO.totalCuenta}">
 					                    	<f:convertNumber pattern="0.00"/>
@@ -297,8 +441,21 @@
 				te = String.fromCharCode(tecla);
 				return patron.test(te);
 			}
+			function validarDecimal(e) {
+				tecla = (document.all) ? e.keyCode : e.which; 
+				if (tecla==8) return true; 
+				patron =/[0-9\s.0-9\s]/; 
+				te = String.fromCharCode(tecla);
+				return patron.test(te);
+			}
 		/*]]>*/			
 		</script>
+		<h:outputStylesheet>
+			.estiloTextArea{
+				width:350px !important;
+				height: 25px !important;
+			}		
+		</h:outputStylesheet>
 		<a4j:commandLink id="linkopensystem" styleClass="linkopensystem" execute="@this" status="no" actionListener="#{cuentasController.refrescarPantalla}">
 		</a4j:commandLink>	
 	</ui:define>

@@ -163,17 +163,10 @@
 			                <f:facet name="header"><h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.header.tabla.descripcion.articulo']}"/></f:facet>
 			                <h:outputText value="#{detalle.articuloDTO.nombreArticulo}" />
 			            </rich:column>
-			            <rich:column style="text-align: right; padding-right: 5px">
-			                <f:facet name="header"><h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.header.tabla.articulo.peso']}"/></f:facet>
-			                <h:outputText value="#{detalle.articuloDTO.peso}">
-			                	<f:convertNumber pattern="0.00"/>
-			                </h:outputText>
-			            </rich:column>
-			            <rich:column style="text-align: right; padding-right: 5px">
-			                <f:facet name="header"><h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.header.tabla.articulo.stock']}"/></f:facet>
-			                <h:outputText value="#{detalle.articuloDTO.cantidadStock}">
-			                	<f:convertNumber pattern="0"/>
-			                </h:outputText>
+			            <rich:column style="text-align: left; padding-left: 5px">
+			                <f:facet name="header"><h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.label.nuevo.pedidos.detalle.unidad.manejo']}"/></f:facet>
+		                	<h:outputText value="#{detalle.articuloUnidadManejoDTO.tipoUnidadManejoCatalogoValorDTO.nombreCatalogoValor} x #{detalle.articuloUnidadManejoDTO.valorUnidadManejo}">
+		                	</h:outputText>
 			            </rich:column>
 			            <rich:column style="text-align: right; padding-right: 5px">
 			                <f:facet name="header"><h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.label.nuevo.pedidos.articulo.precio.unitario']}"/></f:facet>
@@ -189,7 +182,7 @@
 			            </rich:column>
 			            <f:facet name="footer">
 				                <rich:columnGroup>
-					                <rich:column colspan="7" style="text-align: right; paddin-right: 10px">Subtotal:</rich:column>
+					                <rich:column colspan="6" style="text-align: right; paddin-right: 10px">Subtotal:</rich:column>
 					                <rich:column style="text-align: right; paddin-right: 10px">
 					                    <h:outputText value="#{pedidosController.pedidoDTO.subTotal}">
 					                    	<f:convertNumber pattern="0.00"/>
@@ -197,7 +190,7 @@
 					                </rich:column>
 					            </rich:columnGroup>
 					            <rich:columnGroup>
-					                <rich:column colspan="7" style="text-align: right; paddin-right: 10px">Descuento:</rich:column>
+					                <rich:column colspan="6" style="text-align: right; paddin-right: 10px">Descuento:</rich:column>
 					                <rich:column style="text-align: right; paddin-right: 10px">
 					                    <h:outputText value="#{pedidosController.pedidoDTO.descuento}">
 					                    	<f:convertNumber pattern="0.00"/>
@@ -205,7 +198,7 @@
 					                </rich:column>
 					            </rich:columnGroup>
 					            <rich:columnGroup>
-					                <rich:column colspan="7" style="text-align: right; paddin-right: 10px">Tarifa 0%:</rich:column>
+					                <rich:column colspan="6" style="text-align: right; paddin-right: 10px">Tarifa 0%:</rich:column>
 					                <rich:column style="text-align: right; paddin-right: 10px">
 					                    <h:outputText value="#{pedidosController.pedidoDTO.totalSinImpuestos}">
 					                    	<f:convertNumber pattern="0.00"/>
@@ -213,7 +206,7 @@
 					                </rich:column>
 					            </rich:columnGroup>
 					            <rich:columnGroup>
-					                <rich:column colspan="7" style="text-align: right; paddin-right: 10px">Tarifa 12%:</rich:column>
+					                <rich:column colspan="6" style="text-align: right; paddin-right: 10px">Tarifa 12%:</rich:column>
 					                <rich:column style="text-align: right; paddin-right: 10px">
 					                    <h:outputText value="#{pedidosController.pedidoDTO.totalImpuestos}">
 					                    	<f:convertNumber pattern="0.00"/>
@@ -221,7 +214,7 @@
 					                </rich:column>
 					            </rich:columnGroup>	
 					            <rich:columnGroup>
-					                <rich:column colspan="7" style="text-align: right; paddin-right: 10px">Iva 12 %:</rich:column>
+					                <rich:column colspan="6" style="text-align: right; paddin-right: 10px">Iva 12 %:</rich:column>
 					                <rich:column style="text-align: right; paddin-right: 10px">
 					                    <h:outputText value="#{pedidosController.pedidoDTO.totalIva}">
 					                    	<f:convertNumber pattern="0.00"/>
@@ -229,7 +222,7 @@
 					                </rich:column>
 					            </rich:columnGroup>
 					            <rich:columnGroup>
-					                <rich:column colspan="7" style="text-align: right; paddin-right: 10px">Total:</rich:column>
+					                <rich:column colspan="6" style="text-align: right; paddin-right: 10px">Total:</rich:column>
 					                <rich:column style="text-align: right; paddin-right: 10px">
 					                    <h:outputText value="#{pedidosController.pedidoDTO.totalCompra}">
 					                    	<f:convertNumber pattern="0.00"/>

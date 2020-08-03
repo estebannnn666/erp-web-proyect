@@ -40,6 +40,7 @@ import ec.com.erp.cliente.mdl.dto.EstadoPedidoDTO;
 import ec.com.erp.cliente.mdl.dto.InventarioDTO;
 import ec.com.erp.cliente.mdl.dto.PedidoDTO;
 import ec.com.erp.cliente.mdl.dto.SecuenciaDTO;
+import ec.com.erp.cliente.mdl.dto.VendedorDTO;
 import ec.com.erp.cliente.mdl.dto.id.PedidoID;
 import ec.com.erp.web.commons.controller.CommonsController;
 import ec.com.erp.web.commons.controller.MensajesController;
@@ -99,6 +100,11 @@ public class PedidosController extends CommonsController implements Serializable
 	private String mensaje;
 	private String valorAccion;
 	private Boolean mostrarIcono;
+	private Collection<VendedorDTO> vendedorDTOCols;
+	private String documentoVendedorBusqueda;
+	private String nombreVendedorBusqueda;
+	private String nombreVendedor;
+	private Long codigoVendedorSeleccionado;
 
 	@ManagedProperty("#{articuloService}")
 	private ArticuloService service;
@@ -106,6 +112,10 @@ public class PedidosController extends CommonsController implements Serializable
 	@PostConstruct
 	public void postConstruct() {
 		Calendar fechaInferior = Calendar.getInstance();
+		this.documentoVendedorBusqueda = null;
+		this.nombreVendedorBusqueda = null;
+		this.nombreVendedor = null;
+		this.vendedorDTOCols = new ArrayList<>();
 		fechaInferior.set(Calendar.DATE, 1);
 		UtilitarioWeb.cleanDate(fechaInferior);
 		Calendar fechaSuperior = Calendar.getInstance();
@@ -170,6 +180,73 @@ public class PedidosController extends CommonsController implements Serializable
 		super.clearDataManager(event);
 	}
 
+	/**
+	 * Metodo para buscar vendedores
+	 * @param e
+	 */
+	public void busquedaVendedores(ActionEvent e){
+		this.busquedaVendedor();
+	}
+	
+	/**
+	 * Metodo para buscar vendedores al dar enter
+	 * @param e
+	 */
+	public void busquedaVendedorEnter(AjaxBehaviorEvent e){
+		this.busquedaVendedor();
+	}
+	
+	public void busquedaVendedor() {
+		try {
+			this.vendedorDTOCols = ERPFactory.vendedor.getVendedorServicio().findObtenerListaVendedores(Integer.parseInt(ERPConstantes.ESTADO_ACTIVO_NUMERICO), numeroDocumentoBusqueda, nombreVendedorBusqueda);
+			this.setShowMessagesBar(Boolean.FALSE);
+		} catch (ERPException e1) {
+	        this.setShowMessagesBar(Boolean.TRUE);
+	        MensajesController.addError(null, e1.getMessage());
+	        
+		} catch (Exception e2) {
+	        this.setShowMessagesBar(Boolean.TRUE);
+	        MensajesController.addError(null, e2.getMessage());
+		}
+	}
+	
+	/**
+	 * Seleccionar vendedor del popUp
+	 * @param e
+	 */
+	public void seleccionVendedor(ValueChangeEvent e){
+		this.codigoVendedorSeleccionado = (Long)e.getNewValue();
+	}
+	
+	/**
+	 * Borrar filtro de busqueda por documento vendedor
+	 */
+	public void borrarBusquedaDocumentoVendedor(ActionEvent e){
+		this.documentoVendedorBusqueda = "";
+		this.setShowMessagesBar(Boolean.FALSE);
+	}
+	
+	/**
+	 * Borrar filtro de nombre vendedor
+	 */
+	public void borrarBusquedaNombreVendedor(ActionEvent e){
+		this.nombreVendedorBusqueda = "";
+		this.setShowMessagesBar(Boolean.FALSE);
+	}
+	
+	/**
+	 * Metodo para agragar el vendedor a la vista
+	 */
+	public void agragarVendedor(ActionEvent e) {
+		// Verificar si existe en la coleccion el cliente
+		Predicate testPredicate = new BeanPredicate("id.codigoVendedor", PredicateUtils.equalPredicate(this.codigoVendedorSeleccionado));
+		// Validacion de objeto existente
+		VendedorDTO vendedorDTO  = (VendedorDTO) CollectionUtils.find(this.vendedorDTOCols, testPredicate);
+		this.pedidoDTO.setVendedorDTO(vendedorDTO);
+		this.pedidoDTO.setCodigoVendedor(vendedorDTO.getId().getCodigoVendedor());
+		this.nombreVendedor = vendedorDTO.getPersonaDTO().getNombreCompleto();
+	}
+	
 	public void reloadPagina(ActionEvent e) {
 		System.out.println("Reload");
 	}
@@ -231,12 +308,15 @@ public class PedidosController extends CommonsController implements Serializable
 				detallePedidoDTOTemp.setCantidad(1);
 			}
 			if (detallePedidoDTOTemp.getCantidad() != null	&& detallePedidoDTOTemp.getArticuloDTO().getPrecio() != null && CollectionUtils.isNotEmpty(detallePedidoDTOTemp.getArticuloDTO().getArticuloUnidadManejoDTOCols())) {
- 				ArticuloUnidadManejoDTO articuloUnidadManejo = obtenerUnidadManejoPorCodigo(detallePedidoDTOTemp.getCodigoArticuloUnidadManejo(), detallePedidoDTOTemp.getArticuloDTO().getArticuloUnidadManejoDTOCols());
+ 				ArticuloUnidadManejoDTO articuloUnidadManejo = this.obtenerUnidadManejoPorDefecto(detallePedidoDTOTemp.getArticuloDTO().getArticuloUnidadManejoDTOCols());
 				BigDecimal subTotal = BigDecimal.valueOf(Double.valueOf(""+(detallePedidoDTOTemp.getCantidad().intValue()*articuloUnidadManejo.getValorUnidadManejo().intValue()))).multiply(detallePedidoDTOTemp.getArticuloDTO().getPrecio());
 				detallePedidoDTOTemp.setSubTotal(subTotal);
 				detallePedidoDTOTemp.setArticuloUnidadManejoDTO(articuloUnidadManejo);
 				detallePedidoDTOTemp.setCodigoArticuloUnidadManejo(articuloUnidadManejo.getId().getCodigoArticuloUnidadManejo());
 				detallePedidoDTOTemp.setCodigoArticulo(detallePedidoDTOTemp.getArticuloDTO().getId().getCodigoArticulo());
+				// Se obtiene existencia actual
+				InventarioDTO inventarioDTOAux = ERPFactory.inventario.getInventarioServicio().findObtenerUltimoInventarioByArticulo(Integer.parseInt(ERPConstantes.ESTADO_ACTIVO_NUMERICO), detallePedidoDTOTemp.getArticuloDTO().getCodigoBarras(), detallePedidoDTOTemp.getCodigoArticuloUnidadManejo());
+				detallePedidoDTOTemp.getArticuloDTO().setCantidadStock(inventarioDTOAux.getCantidadExistencia());
 				this.calcularTotal();
 			}
 		}
@@ -260,6 +340,9 @@ public class PedidosController extends CommonsController implements Serializable
 					detallePedidoDTOTemp.setArticuloUnidadManejoDTO(articuloUnidadManejo);
 					detallePedidoDTOTemp.setCodigoArticuloUnidadManejo(articuloUnidadManejo.getId().getCodigoArticuloUnidadManejo());
 					detallePedidoDTOTemp.setSubTotal(subTotal);
+					// Se obtiene existencia actual
+					InventarioDTO inventarioDTOAux = ERPFactory.inventario.getInventarioServicio().findObtenerUltimoInventarioByArticulo(Integer.parseInt(ERPConstantes.ESTADO_ACTIVO_NUMERICO), detallePedidoDTOTemp.getArticuloDTO().getCodigoBarras(), detallePedidoDTOTemp.getCodigoArticuloUnidadManejo());
+					detallePedidoDTOTemp.getArticuloDTO().setCantidadStock(inventarioDTOAux.getCantidadExistencia());
 					this.calcularTotal();
 				}
 				break;
@@ -566,6 +649,10 @@ public class PedidosController extends CommonsController implements Serializable
 	public void clearNuevoPedido(ActionEvent e) {
 		this.setShowMessagesBar(Boolean.FALSE);
 		this.codigoClienteSeleccionado = null;
+		this.codigoVendedorSeleccionado = null;
+		this.documentoVendedorBusqueda = null;
+		this.nombreVendedorBusqueda = null;
+		this.nombreVendedor = null;
 		this.pedidoDTO = new PedidoDTO();
 		SecuenciaDTO secuenciaPedido = ERPFactory.secuencias.getSecuenciaServicio()
 				.findObtenerSecuenciaByNombre(PedidoID.NOMBRE_SECUENCIA);
@@ -850,14 +937,6 @@ public class PedidosController extends CommonsController implements Serializable
 		this.estadoPedidoDTO = estadoPedidoDTO;
 	}
 
-	public String getNumeroDocumentoBusqueda() {
-		return numeroDocumentoBusqueda;
-	}
-
-	public void setNumeroDocumentoBusqueda(String numeroDocumentoBusqueda) {
-		this.numeroDocumentoBusqueda = numeroDocumentoBusqueda;
-	}
-
 	public String getNombreClienteBusqueda() {
 		return nombreClienteBusqueda;
 	}
@@ -1040,5 +1119,54 @@ public class PedidosController extends CommonsController implements Serializable
 
 	public void setService(ArticuloService service) {
 		this.service = service;
+	}
+	
+
+	public Collection<VendedorDTO> getVendedorDTOCols() {
+		return vendedorDTOCols;
+	}
+
+	public void setVendedorDTOCols(Collection<VendedorDTO> vendedorDTOCols) {
+		this.vendedorDTOCols = vendedorDTOCols;
+	}
+
+	public String getNumeroDocumentoBusqueda() {
+		return numeroDocumentoBusqueda;
+	}
+
+	public void setNumeroDocumentoBusqueda(String numeroDocumentoBusqueda) {
+		this.numeroDocumentoBusqueda = numeroDocumentoBusqueda;
+	}
+
+	public String getNombreVendedorBusqueda() {
+		return nombreVendedorBusqueda;
+	}
+
+	public void setNombreVendedorBusqueda(String nombreVendedorBusqueda) {
+		this.nombreVendedorBusqueda = nombreVendedorBusqueda;
+	}
+
+	public String getNombreVendedor() {
+		return nombreVendedor;
+	}
+
+	public void setNombreVendedor(String nombreVendedor) {
+		this.nombreVendedor = nombreVendedor;
+	}
+
+	public Long getCodigoVendedorSeleccionado() {
+		return codigoVendedorSeleccionado;
+	}
+
+	public void setCodigoVendedorSeleccionado(Long codigoVendedorSeleccionado) {
+		this.codigoVendedorSeleccionado = codigoVendedorSeleccionado;
+	}
+
+	public String getDocumentoVendedorBusqueda() {
+		return documentoVendedorBusqueda;
+	}
+
+	public void setDocumentoVendedorBusqueda(String documentoVendedorBusqueda) {
+		this.documentoVendedorBusqueda = documentoVendedorBusqueda;
 	}
 }

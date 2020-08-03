@@ -2,7 +2,11 @@
 package ec.com.erp.web.vendedor.controller;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
+import java.sql.Timestamp;
+import java.util.Calendar;
 import java.util.Collection;
+import java.util.Date;
 
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
@@ -27,6 +31,7 @@ import ec.com.erp.web.commons.controller.MensajesController;
 import ec.com.erp.web.commons.datamanager.CommonDataManager;
 import ec.com.erp.web.commons.login.controller.LoginController;
 import ec.com.erp.web.commons.utils.ERPWebResources;
+import ec.com.erp.web.commons.utils.UtilitarioWeb;
 import ec.com.erp.web.vendedor.datamanager.VendedorDataManager;
 
 /**
@@ -58,6 +63,10 @@ public class VendedorController extends CommonsController implements Serializabl
 	private String nombreVendedorBusqueda;
 	private Integer page;
 	private Boolean vendedorCreado;
+	private BigDecimal totalVentas;
+	private BigDecimal totalComision;
+	private Date fechaFacturaInicio;
+	private Date fechaFacturaFin;
 
 	@PostConstruct
 	public void postConstruct() {
@@ -67,6 +76,8 @@ public class VendedorController extends CommonsController implements Serializabl
 		this.personaDTO = new PersonaDTO();
 		this.contactoDTO = new ContactoDTO();
 		this.page = 0;
+		this.totalVentas = BigDecimal.ZERO;
+		this.totalComision = BigDecimal.ZERO;
 		
 		if(vendedorDataManager.getVendedorDTOEditar() != null && vendedorDataManager.getVendedorDTOEditar().getId().getCodigoVendedor() != null){
 			this.setVendedorDTO(vendedorDataManager.getVendedorDTOEditar());
@@ -91,6 +102,48 @@ public class VendedorController extends CommonsController implements Serializabl
 	@Override
 	public void clearDataManager(ActionEvent event) {
 		super.clearDataManager(event);
+	}
+	
+	/**
+	 * Metodo para cargar datos detalle factura
+	 * @return
+	 */
+	public void cargarDatosVentas(ActionEvent e) {
+		// Inicializar fechas para filtros de busqueda
+		Calendar fechaInferior = Calendar.getInstance();
+		fechaInferior.set(Calendar.DATE, 1);
+		UtilitarioWeb.cleanDate(fechaInferior);
+		Calendar fechaSuperior = Calendar.getInstance();
+		fechaFacturaInicio = fechaInferior.getTime();
+		fechaFacturaFin = fechaSuperior.getTime();
+		this.datosComisionVentas();
+	}
+	
+	/**
+	 * Metodo para cargar datos detalle factura
+	 * @return
+	 */
+	public void consultarVentas(ActionEvent e) {
+		this.datosComisionVentas();
+	}
+	
+	public void datosComisionVentas() {
+		vendedorDTO.setFacturaCabeceraDTOCols(ERPFactory.vendedor.getVendedorServicio().findListaFacturasPorVendedorFechaVenta(Integer.parseInt(ERPConstantes.ESTADO_ACTIVO_NUMERICO), vendedorDTO.getId().getCodigoVendedor(), new Timestamp(fechaFacturaInicio.getTime()), new Timestamp(fechaFacturaFin.getTime())));
+		this.totalVentas = BigDecimal.ZERO;
+		this.totalComision = BigDecimal.ZERO;
+		if(vendedorDTO != null && CollectionUtils.isNotEmpty(vendedorDTO.getFacturaCabeceraDTOCols())) {
+			vendedorDTO.getFacturaCabeceraDTOCols().stream().forEach(factura ->{
+				this.totalVentas = this.totalVentas.add(factura.getTotalCuenta());
+				if(CollectionUtils.isNotEmpty(factura.getFacturaDetalleDTOCols())) {
+					factura.getFacturaDetalleDTOCols().stream().forEach(venta->{
+						if(venta.getArticuloDTO().getPorcentajeComision() != null && venta.getArticuloDTO().getPorcentajeComision().doubleValue() > 0.0) {
+							Double comision = (venta.getArticuloDTO().getPorcentajeComision().doubleValue() * venta.getSubTotal().doubleValue()) / 100;
+							this.totalComision = this.totalComision.add(BigDecimal.valueOf(comision));
+						}
+					});
+				}
+			});
+		}
 	}
 
 	/**
@@ -220,6 +273,13 @@ public class VendedorController extends CommonsController implements Serializabl
 		}
 		
 		return validado;
+	}
+	
+	/**
+	 * Metodo para cargar datos detalle factura
+	 * @return
+	 */
+	public void simularEvento(ActionEvent e) {
 	}
 	
 	/**
@@ -417,5 +477,36 @@ public class VendedorController extends CommonsController implements Serializabl
 	public void setVendedorCreado(Boolean vendedorCreado) {
 		this.vendedorCreado = vendedorCreado;
 	}
+
+	public BigDecimal getTotalVentas() {
+		return totalVentas;
+	}
+
+	public void setTotalVentas(BigDecimal totalVentas) {
+		this.totalVentas = totalVentas;
+	}
+
+	public BigDecimal getTotalComision() {
+		return totalComision;
+	}
+
+	public void setTotalComision(BigDecimal totalComision) {
+		this.totalComision = totalComision;
+	}
 	
+	public Date getFechaFacturaInicio() {
+		return fechaFacturaInicio;
+	}
+
+	public void setFechaFacturaInicio(Date fechaFacturaInicio) {
+		this.fechaFacturaInicio = fechaFacturaInicio;
+	}
+
+	public Date getFechaFacturaFin() {
+		return fechaFacturaFin;
+	}
+
+	public void setFechaFacturaFin(Date fechaFacturaFin) {
+		this.fechaFacturaFin = fechaFacturaFin;
+	}
 }

@@ -176,17 +176,22 @@
 					                <f:facet name="header">Nro.</f:facet>
 					                #{itera.index+1}
 					            </rich:column>
-					            <rich:column styleClass="autoStyle" style="width:75% !important">
+					            <rich:column styleClass="autoStyle" style="width:45% !important">
 					                <f:facet name="header"><h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.label.lista.cabecera.guia.descripcion.producto']}"/></f:facet>
 					                <h:outputText value="#{detalle.descripcionProducto}"></h:outputText>
+					            </rich:column>
+					            <rich:column style="width:15% !important; text-align: left; padding-left: 5px">
+					                <f:facet name="header"><h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.label.nuevo.pedidos.detalle.unidad.manejo']}"/></f:facet>
+				                	<h:outputText value="#{detalle.articuloUnidadManejoDTO.tipoUnidadManejoCatalogoValorDTO.nombreCatalogoValor} x #{detalle.articuloUnidadManejoDTO.valorUnidadManejo}">
+				                	</h:outputText>
 					            </rich:column>
 					            <rich:column style="width:10% !important; text-align:right !important;">
 					                <f:facet name="header"><h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.label.lista.cabecera.guia.cantidad']}"/></f:facet>
 					                <h:outputText value="#{detalle.cantidad}"></h:outputText>
 					            </rich:column>			           					         
-					            <rich:column style="width:10% !important; text-align:center !important;">
+					            <rich:column style="width:20% !important;">
 					                <f:facet name="header"><h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.label.lista.cabecera.observacion.chofer']}"/></f:facet>
-					                <h:inputText maxlength="128" value="#{detalle.observacion}" style="width:120px !important; height: 14px !important;"/>
+					                <h:inputText maxlength="128" value="#{detalle.observacion}" style="width:150px !important; height: 14px !important;"/>
 					            </rich:column>            
 					        </rich:dataTable>						
 							
@@ -224,15 +229,26 @@
 					                <f:facet name="header">Nro.</f:facet>
 					                #{itera.index+1}
 					            </rich:column>
-					            <rich:column styleClass="autoStyle" style="width:75% !important">
+					            <rich:column styleClass="autoStyle" style="width:55% !important">
 					                <f:facet name="header"><h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.label.lista.cabecera.guia.descripcion.producto']}"/></f:facet>
 					                <p:autoComplete id="themeCustom" value="#{pedido.descripcionProducto}" completeMethod="#{despachoController.completeNombreArticuloExtra}">
-	            						<p:ajax event="itemSelect"  listener="#{despachoController.onItemSelectExtra}" update=":frmNuevoGuiaDespacho:panelTablaAdicional"/>
+	            						<p:ajax event="itemSelect"  listener="#{despachoController.onItemSelectExtra}" update=":frmNuevoGuiaDespacho:panelTablaAdicional :pnlMensajes"/>
 	        						</p:autoComplete>
+					            </rich:column>
+					            <rich:column styleClass="autoStyle" style="width:20%;">
+					                <f:facet name="header"><h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.label.nuevo.pedidos.detalle.unidad.manejo']}"/></f:facet>
+					                <h:selectOneMenu tabindex="1" value="#{pedido.codigoArticuloUnidadManejo}" valueChangeListener="#{despachoController.seleccionarUnidadManejo}" style="width: 235px" onkeypress="if (event.keyCode == 13) return false;">
+										<f:selectItem itemLabel="SELECCIONE"/>
+										<f:selectItems value="#{pedido.articuloDTO.articuloUnidadManejoDTOCols}" var="uniMan" itemValue = "#{uniMan.id.codigoArticuloUnidadManejo}" itemLabel = "#{uniMan.tipoUnidadManejoCatalogoValorDTO.nombreCatalogoValor} X #{uniMan.valorUnidadManejo}" />
+										<f:ajax event="change" render="panelTablaAdicional tablePedidosExtra pnlMensajes" execute="@this"></f:ajax> 
+									</h:selectOneMenu>
 					            </rich:column>
 					            <rich:column style="width:10% !important; text-align:right !important;">
 					                <f:facet name="header"><h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.label.lista.cabecera.guia.cantidad']}"/></f:facet>
-					                <h:inputText onkeypress="return validarEnteros(event);" maxlength="10" value="#{pedido.cantidad}" style="width:70px !important; height: 14px !important;"/>
+					                <h:inputText onkeypress="return validarEnteros(event);" maxlength="10" value="#{pedido.cantidad}" style="width:70px !important; height: 14px !important;">
+					                	<a4j:ajax event="blur" status="no" listener="#{despachoController.verificarExistencia}" execute="@this" render="panelTablaAdicional pnlMensajes" >
+				                		</a4j:ajax>
+				                	</h:inputText>
 					            </rich:column>			           					         
 					            <rich:column style="width:10% !important; text-align:center !important;">
 					                <f:facet name="header"><h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.boton.eliminar']}"/></f:facet>

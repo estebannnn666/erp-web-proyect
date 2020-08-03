@@ -87,6 +87,14 @@
 	                <h:outputText value="#{transport.personaDTO.contactoPersonaDTO.telefonoPrincipal}" />
 	            </rich:column>
 	            <rich:column styleClass="columna5">
+	                <f:facet name="header">Ventas</f:facet>
+					<a4j:commandLink id="botonDetalle" title="Ver detalle de ventas" render="popUpDetalle pnlListaDetalleFactura" execute="@this" actionListener="#{vendedorController.simularEvento}" oncomplete="cargarVentas();">
+						<h:graphicImage name="btnDetalle.png" library="images" style="border:none;border-color:white;" height="16" width="16"/>
+						<f:setPropertyActionListener value="#{transport}" target="#{vendedorController.vendedorDTO}" />												
+					</a4j:commandLink>
+					
+	            </rich:column>
+	            <rich:column styleClass="columna5">
 	                <f:facet name="header">Editar</f:facet>
 	                <a4j:commandLink id="botonEditar" render="pnlGridProveedor, pnlDatosBasicosProveedor, pnlGridContacto" action="#{vendedorController.cargarVendedorEditar}" execute="@this" >
 						<h:graphicImage name="btnEditar.png" library="images" style="border:none;border-color:white;" height="16" width="16"/>
@@ -95,6 +103,103 @@
 	            </rich:column>
 	        </rich:dataTable>
         </rich:panel>
+        
+        <a4j:jsFunction name="cargarVentas" actionListener="#{vendedorController.cargarDatosVentas}" execute="pnlGridAgregarDetalle" render="popUpDetalle pnlListaDetalleFactura" oncomplete="#{rich:component('popUpDetalle')}.show();"></a4j:jsFunction>
+        
+        <!-- Popup para ver el detalle del factura -->
+		<rich:popupPanel id="popUpDetalle" styleClass="panelPedidos" header="Registro de ventas" width="935" height="408" modal="true" domElementAttachment="form">
+			<f:facet name="controls">
+				<h:outputLink value="#"	onclick="#{rich:component('popUpDetalle')}.hide();">
+					<h:graphicImage library="images" name="close.png" style="border:0px" id="closePopUpDetalle" />
+				</h:outputLink>
+			</f:facet>
+			<h:panelGroup id="filtrosVentas" layout="block" styleClass="listaReporte">
+				<h:panelGrid columns="3" cellpadding="5" cellspacing="2">
+					<rich:calendar inputStyle="width: 100px; height: 20px;" value="#{vendedorController.fechaFacturaInicio}" datePattern="yyyy-MM-dd"></rich:calendar>
+					<rich:calendar inputStyle="width: 100px; height: 20px;" value="#{vendedorController.fechaFacturaFin}" datePattern="yyyy-MM-dd"></rich:calendar>
+			    	<a4j:commandButton id="btnBuscarCliente" value="Buscar" styleClass="styleSearch" render="pnlListaDetalleFactura tableDetalles pnlMensajes" execute="filtrosVentas" actionListener="#{vendedorController.consultarVentas}"/>
+				</h:panelGrid>						 
+			</h:panelGroup>
+			<h:panelGrid id="pnlListaDetalleFactura" style="width: 100%;">	
+				<rich:panel style="width: 99.6%; height: 305px; " header="Detalle de facturas vendidas">
+					
+					<h:panelGrid id="tablaVaciaDetalle" columns="1" rendered="#{empty vendedorController.vendedorDTO.facturaCabeceraDTOCols}" style="width:100%; text-align: center; padding-top: 150px">
+						<h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.mensaje.lista.vacio']}"/>
+					</h:panelGrid>	
+					<rich:panel style="text-align:center; border-left: none; border-right:none; margin-bottom: 2px" rendered="#{not empty vendedorController.vendedorDTO.facturaCabeceraDTOCols}">
+						<rich:dataScroller fastStep="3" for="tableDetalles" maxPages="5" rendered="#{not empty vendedorController.vendedorDTO.facturaCabeceraDTOCols}" renderIfSinglePage="true"/>
+					</rich:panel>	
+					<rich:dataTable style="width:100%" value="#{vendedorController.vendedorDTO.facturaCabeceraDTOCols}" rendered="#{not empty vendedorController.vendedorDTO.facturaCabeceraDTOCols}" var="detalle" iterationStatusVar="it" id="tableDetalles" rows="7">
+			            <rich:column>
+			                <f:facet name="header">Nro.</f:facet>
+			                #{it.index+1}
+			            </rich:column>
+			            <rich:column>
+			                <f:facet name="header"><h:outputText value="Nro. Documento"/></f:facet>
+			                <h:outputText value="#{detalle.numeroDocumento}" />
+			            </rich:column>
+			            <rich:column style="text-align: center;">
+			                <f:facet name="header"><h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.label.lista.cabecera.factura.fecha']}"/></f:facet>
+			                <h:outputText value="#{detalle.fechaDocumento}">
+			                	<f:convertDateTime pattern="yyyy-MM-dd"/>
+			                </h:outputText>
+			            </rich:column>
+			            <rich:column>
+	                		<f:facet name="header"><h:outputText value="Ruc / Doc." title="#{msg_erpweb['ec.com.erp.etiqueta.label.lista.cabecera.factura.ruc.documento']}"/></f:facet>
+			                <h:outputText value="#{detalle.rucDocumento}" />
+			            </rich:column>
+			            <rich:column>
+			                <f:facet name="header"><h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.label.lista.cabecera.factura.razonSocial']}"/></f:facet>
+			                <rich:panel id="cliente#{it}" styleClass="tooltip-text" bodyClass="rich-laguna-panel-no-header" style="border: none !important">  
+				        		<h:outputText value="#{detalle.nombreClienteProveedor.length() > 50 ? detalle.nombreClienteProveedor.substring(0,50).concat('...') : detalle.nombreClienteProveedor}" /> 
+								<rich:tooltip id="ttc#{it}" showDelay="500" styleClass="tooltip" layout="block" rendered="#{detalle.nombreClienteProveedor.length() > 50}">                
+									<h:panelGrid>
+										<span style="white-space: nowrap">												
+											<h:outputText value="#{detalle.nombreClienteProveedor}" />												
+										</span>
+									</h:panelGrid>
+								</rich:tooltip>       
+							</rich:panel>
+			            </rich:column>
+			            <rich:column style="text-align: right; padding-right: 5px">
+			                <f:facet name="header"><h:outputText value="Total factura"/></f:facet>
+			                <h:outputText value="#{detalle.totalCuenta}" >
+			                	<f:convertNumber pattern="0.00"/>
+			                </h:outputText>
+			            </rich:column>
+			            <f:facet name="footer">				                
+					            <rich:columnGroup>
+					                <rich:column colspan="5" style="text-align: right; paddin-right: 10px">Total venta:</rich:column>
+					                <rich:column style="text-align: right; paddin-right: 10px">
+					                    <h:outputText value="#{vendedorController.totalVentas}">
+					                    	<f:convertNumber pattern="0.00"/>
+					                    </h:outputText>
+					                </rich:column>
+					            </rich:columnGroup>
+					            <rich:columnGroup>
+					                <rich:column colspan="5" style="text-align: right; paddin-right: 10px"><h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.label.lista.detalle.total.comision']}"/></rich:column>
+					                <rich:column style="text-align: right; paddin-right: 10px">
+					                    <h:outputText value="#{vendedorController.totalComision}">
+					                    	<f:convertNumber pattern="0.00"/>
+					                    </h:outputText>
+					                </rich:column>
+					            </rich:columnGroup>
+				            </f:facet>
+			        </rich:dataTable>
+		        </rich:panel>
+			</h:panelGrid>
+			<!-- Botones de PopUp -->
+			<h:panelGrid style="margin:auto;" columns="1" cellpadding="0" cellspacing="0">
+				<h:panelGroup layout="block" styleClass="botonD" style="margin-top:5px;">
+					<a4j:commandLink id="btnCancelarDetalle" styleClass="cancelarD" oncomplete="#{rich:component('popUpDetalle')}.hide(); return false;" immediate="true">
+						<h:panelGrid columns="2" cellpadding="3" cellspacing="0">
+							<h:graphicImage name="btnCancel.png" library="images" style="border:none;border-color:white;" height="16" width="16"/>
+							<h:outputText value="Cancelar" />
+						</h:panelGrid>
+					</a4j:commandLink>
+				</h:panelGroup>
+			</h:panelGrid>
+		</rich:popupPanel>
         <script>
 			/*<![CDATA[*/
 			$(document).ready(function(){				
