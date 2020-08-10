@@ -231,7 +231,7 @@
 					            </rich:column>
 					            <rich:column styleClass="autoStyle" style="width:55% !important">
 					                <f:facet name="header"><h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.label.lista.cabecera.guia.descripcion.producto']}"/></f:facet>
-					                <p:autoComplete id="themeCustom" value="#{pedido.descripcionProducto}" completeMethod="#{despachoController.completeNombreArticuloExtra}">
+					                <p:autoComplete id="themeCustom" value="#{pedido.descripcionProducto}" completeMethod="#{despachoController.completeNombreArticuloExtra}" onkeypress="if (event.keyCode == 13) return false;">
 	            						<p:ajax event="itemSelect"  listener="#{despachoController.onItemSelectExtra}" update=":frmNuevoGuiaDespacho:panelTablaAdicional :pnlMensajes"/>
 	        						</p:autoComplete>
 					            </rich:column>

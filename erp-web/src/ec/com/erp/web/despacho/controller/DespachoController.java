@@ -293,6 +293,7 @@ public class DespachoController extends CommonsController implements Serializabl
 	 * @return
 	 */
 	public List<String> completeNombreArticuloExtra(String query) {
+		this.setShowMessagesBar(Boolean.FALSE);
         String queryLowerCase = query.toLowerCase();
         List<ArticuloDTO> allThemes = this.getArticuloDTOCols().stream()
         		.filter(t -> t.getNombreArticulo().toLowerCase().contains(queryLowerCase))
@@ -318,6 +319,7 @@ public class DespachoController extends CommonsController implements Serializabl
 			if(detallePedidoDTOTemp.getCantidad() != null && detallePedidoDTOTemp.getArticuloDTO() != null && detallePedidoDTOTemp.getArticuloDTO().getPrecio() != null && detallePedidoDTOTemp.getCodigoArticulo() == null && CollectionUtils.isNotEmpty(detallePedidoDTOTemp.getArticuloDTO().getArticuloUnidadManejoDTOCols())) {
 				
         		ArticuloUnidadManejoDTO articuloUnidadManejo = this.obtenerUnidadManejoPorDefecto(detallePedidoDTOTemp.getArticuloDTO().getArticuloUnidadManejoDTOCols());
+        		detallePedidoDTOTemp.setCodigoArticuloUnidadManejo(articuloUnidadManejo.getId().getCodigoArticuloUnidadManejo());
         		// Se obtiene existencia actual
 				InventarioDTO inventarioDTOAux = ERPFactory.inventario.getInventarioServicio().findObtenerUltimoInventarioByArticulo(Integer.parseInt(ERPConstantes.ESTADO_ACTIVO_NUMERICO), detallePedidoDTOTemp.getArticuloDTO().getCodigoBarras(), articuloUnidadManejo.getId().getCodigoArticuloUnidadManejo());
 				if (detallePedidoDTOTemp.getCantidad().intValue() > inventarioDTOAux.getCantidadExistencia().intValue()) {
@@ -326,7 +328,6 @@ public class DespachoController extends CommonsController implements Serializabl
 					return;
 				}
 				detallePedidoDTOTemp.setCodigoArticulo(detallePedidoDTOTemp.getArticuloDTO().getId().getCodigoArticulo());
-        		detallePedidoDTOTemp.setCodigoArticuloUnidadManejo(articuloUnidadManejo.getId().getCodigoArticuloUnidadManejo());
         		detallePedidoDTOTemp.setArticuloUnidadManejoDTO(articuloUnidadManejo);
 			}
 		}

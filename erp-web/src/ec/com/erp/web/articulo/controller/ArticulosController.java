@@ -137,6 +137,8 @@ public class ArticulosController extends CommonsController implements Serializab
 				FacesMessage msg = new FacesMessage("No se encontraron resultados para la b\u00FAsqueda realizada.", "ERROR MSG");
 		        msg.setSeverity(FacesMessage.SEVERITY_INFO);
 		        FacesContext.getCurrentInstance().addMessage(null, msg);
+			}else {
+				this.setShowMessagesBar(Boolean.FALSE);
 			}
 		} catch (ERPException e1) {
 			this.setShowMessagesBar(Boolean.TRUE);

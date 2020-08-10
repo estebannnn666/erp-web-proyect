@@ -145,6 +145,8 @@ public class CuentasController extends CommonsController implements Serializable
 	private String tipoRuc;
 	private String numeroDocumentoBusqueda;
 	private String nombreVendedorBusqueda;
+	private String documentoClienteBusqueda;
+	private String nombreClienteBusqueda;
 	private String nombreVendedor;
 	private Collection<String> tiposDocumentos;
 
@@ -825,6 +827,8 @@ public class CuentasController extends CommonsController implements Serializable
 		this.codigoVendedorSeleccionado = null;
 		this.numeroDocumentoBusqueda = null;
 		this.nombreVendedorBusqueda = null;
+		this.documentoClienteBusqueda = null;
+		this.nombreClienteBusqueda = null;
 		this.nombreVendedor = null;
 		this.facturaCabeceraDTO = new FacturaCabeceraDTO();
 		this.facturaDetalleDTO = new FacturaDetalleDTO();
@@ -1103,12 +1107,31 @@ public class CuentasController extends CommonsController implements Serializable
 	}
 	
 	/**
-	 * Metodo para buscar clientes
+	 * Metodo para buscar vendedores
 	 * @param e
 	 */
 	public void busquedaClientes(ActionEvent e){
+		this.buscarClientes();
+	}
+	
+	/**
+	 * Metodo para buscar vendedores al dar enter
+	 * @param e
+	 */
+	public void busquedaClientesEnter(AjaxBehaviorEvent e){
+		this.buscarClientes();
+	}
+	
+	
+	/**
+	 * Metodo para buscar clientes
+	 * @param e
+	 */
+	public void buscarClientes(){
 		try {
-			this.clienteDTOCols = ERPFactory.clientes.getClientesServicio().findObtenerListaClientes(Integer.parseInt(ERPConstantes.ESTADO_ACTIVO_NUMERICO), null, null);
+			this.clienteDTOCols = ERPFactory.clientes.getClientesServicio().findObtenerListaClientes(Integer.parseInt(ERPConstantes.ESTADO_ACTIVO_NUMERICO), this.documentoClienteBusqueda, this.nombreClienteBusqueda);
+			this.documentoClienteBusqueda = null;
+			this.nombreClienteBusqueda = null;
 			this.setShowMessagesBar(Boolean.FALSE);
 		} catch (ERPException e1) {
 	        this.setShowMessagesBar(Boolean.TRUE);
@@ -1139,6 +1162,8 @@ public class CuentasController extends CommonsController implements Serializable
 	public void busquedaVendedor() {
 		try {
 			this.vendedorDTOCols = ERPFactory.vendedor.getVendedorServicio().findObtenerListaVendedores(Integer.parseInt(ERPConstantes.ESTADO_ACTIVO_NUMERICO), numeroDocumentoBusqueda, nombreVendedorBusqueda);
+			this.numeroDocumentoBusqueda = null;
+			this.nombreVendedorBusqueda = null;
 			this.setShowMessagesBar(Boolean.FALSE);
 		} catch (ERPException e1) {
 	        this.setShowMessagesBar(Boolean.TRUE);
@@ -1453,6 +1478,22 @@ public class CuentasController extends CommonsController implements Serializable
 	 */
 	public void borrarBusquedaNombreVendedor(ActionEvent e){
 		this.nombreVendedorBusqueda = "";
+		this.setShowMessagesBar(Boolean.FALSE);
+	}
+	
+	/**
+	 * Borrar filtro de busqueda por documento cliente
+	 */
+	public void borrarBusquedaDocumentoCliente(ActionEvent e){
+		this.documentoClienteBusqueda = "";
+		this.setShowMessagesBar(Boolean.FALSE);
+	}
+	
+	/**
+	 * Borrar filtro de nombre cliente
+	 */
+	public void borrarBusquedaNombreCliente(ActionEvent e){
+		this.nombreClienteBusqueda = "";
 		this.setShowMessagesBar(Boolean.FALSE);
 	}
 	
@@ -2070,6 +2111,22 @@ public class CuentasController extends CommonsController implements Serializable
 
 	public void setNumeroDocumentoBusqueda(String numeroDocumentoBusqueda) {
 		this.numeroDocumentoBusqueda = numeroDocumentoBusqueda;
+	}
+	
+	public String getDocumentoClienteBusqueda() {
+		return documentoClienteBusqueda;
+	}
+
+	public void setDocumentoClienteBusqueda(String documentoClienteBusqueda) {
+		this.documentoClienteBusqueda = documentoClienteBusqueda;
+	}
+
+	public String getNombreClienteBusqueda() {
+		return nombreClienteBusqueda;
+	}
+
+	public void setNombreClienteBusqueda(String nombreClienteBusqueda) {
+		this.nombreClienteBusqueda = nombreClienteBusqueda;
 	}
 
 	public String getNombreVendedorBusqueda() {

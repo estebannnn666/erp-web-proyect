@@ -25,7 +25,7 @@
 	
 	<ui:define name="contentCenter">	
 		
-		<rich:panel id="panel-content-left" styleClass="panel-content-left" style="width:100% !important;">
+		<rich:panel id="panel-content-left" styleClass="panel-content-left" style="width:99.7% !important;">
 			<f:facet name="header">			
 				<h:panelGrid columns="2" width="99.9%" columnClasses="align-left, align-right" cellpadding="0" cellspacing="0">
 					<h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.criterios.busqueda']}" style="white-space:nowrap" />
@@ -68,15 +68,15 @@
 			</h:panelGroup>	
 		</rich:panel>
 	
-		<rich:panel header="Lista de despachos" style="height: 94.5%; width:100% !important;">	
+		<rich:panel header="Lista de despachos" styleClass="panelListaArticulos" style="height: 85%; width:99.7% !important; margin-bottom: 0.3em;">	
 			<h:panelGrid id="panelTablasDespachos" columns="1" style="width:100%;">
 				<h:panelGrid id="tablaVacia" columns="1" rendered="#{empty despachoController.guiaDespachoDTOCols}" style="width:100%; text-align: center; padding-top: 220px">
 					<h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.mensaje.lista.vacio']}"/>
 				</h:panelGrid>
 				<rich:panel style="text-align:center; border-left: none; border-right:none; border-bottom:none" rendered="#{not empty despachoController.guiaDespachoDTOCols}">
-					<rich:dataScroller page="#{despachoController.page}" fastStep="3" for="tableDespacho" maxPages="5" rendered="#{not empty despachoController.guiaDespachoDTOCols}" renderIfSinglePage="false"/>
+					<rich:dataScroller page="#{despachoController.page}" fastStep="3" for="tableDespacho" maxPages="5" rendered="#{not empty despachoController.guiaDespachoDTOCols}" renderIfSinglePage="true"/>
 				</rich:panel>
-			 	<rich:dataTable style="width:100%" rendered="#{not empty despachoController.guiaDespachoDTOCols}"  value="#{despachoController.guiaDespachoDTOCols}" var="despacho" iterationStatusVar="it" id="tableDespacho" rows="15">
+			 	<rich:dataTable style="width:100%" rendered="#{not empty despachoController.guiaDespachoDTOCols}"  value="#{despachoController.guiaDespachoDTOCols}" var="despacho" iterationStatusVar="it" id="tableDespacho" rows="12">
 		            <rich:column width="20">
 		                <f:facet name="header">Nro.</f:facet>
 		                #{it.index+1}
@@ -164,6 +164,10 @@
 			}
 			.columna10 {
 				width: 10% !important;
+			}
+			
+			.panelListaArticulos .rf-dt-c {
+				padding: 1px 5px 1px 5px !important;
 			}
 		</h:outputStylesheet>
 		<h:commandLink id="linkprintguide" styleClass="linkprintguide" action="#{despachoController.imprimirNotaDespacho}" target="_BLANK">

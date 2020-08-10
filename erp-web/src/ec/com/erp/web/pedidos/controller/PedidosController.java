@@ -90,6 +90,8 @@ public class PedidosController extends CommonsController implements Serializable
 	private Date fechaPedidoFinBusqueda;
 	private String estadoPedidoBusqueda;
 	private String documentoCliente;
+	private String documentoClienteBusqueda;
+	private String nombresClienteBusqueda;
 	private Collection<CatalogoValorDTO> estadoPedidosCatalogoValorDTOCols;
 	private Integer page;
 	private Long codigoClienteSeleccionado;
@@ -578,17 +580,34 @@ public class PedidosController extends CommonsController implements Serializable
 
 		return valido;
 	}
+	
+	/**
+	 * Metodo para buscar vendedores
+	 * @param e
+	 */
+	public void busquedaClientes(ActionEvent e){
+		this.buscarClientes();
+	}
+	
+	/**
+	 * Metodo para buscar vendedores al dar enter
+	 * @param e
+	 */
+	public void busquedaClientesEnter(AjaxBehaviorEvent e){
+		this.buscarClientes();
+	}
 
 	/**
 	 * Metodo para buscar articulos
 	 * 
 	 * @param e
 	 */
-	public void busquedaClientes(ActionEvent e) {
+	public void buscarClientes() {
 		try {
 			this.setShowMessagesBar(Boolean.FALSE);
-			this.clienteDTOCols = ERPFactory.clientes.getClientesServicio()
-					.findObtenerListaClientes(Integer.parseInt(ERPConstantes.ESTADO_ACTIVO_NUMERICO), null, null);
+			this.clienteDTOCols = ERPFactory.clientes.getClientesServicio().findObtenerListaClientes(Integer.parseInt(ERPConstantes.ESTADO_ACTIVO_NUMERICO), this.documentoClienteBusqueda, this.nombresClienteBusqueda);
+			this.documentoClienteBusqueda = null;
+			this.nombresClienteBusqueda = null;
 			if (CollectionUtils.isEmpty(this.clienteDTOCols)) {
 				this.setShowMessagesBar(Boolean.TRUE);
 				FacesMessage msg = new FacesMessage("No se encontraron resultados para la b\u00FAsqueda realizada.",
@@ -653,6 +672,8 @@ public class PedidosController extends CommonsController implements Serializable
 		this.documentoVendedorBusqueda = null;
 		this.nombreVendedorBusqueda = null;
 		this.nombreVendedor = null;
+		this.documentoClienteBusqueda = null;
+		this.nombresClienteBusqueda = null;
 		this.pedidoDTO = new PedidoDTO();
 		SecuenciaDTO secuenciaPedido = ERPFactory.secuencias.getSecuenciaServicio()
 				.findObtenerSecuenciaByNombre(PedidoID.NOMBRE_SECUENCIA);
@@ -882,6 +903,22 @@ public class PedidosController extends CommonsController implements Serializable
 	 */
 	public void borrarBusquedaEstadoPedido(ActionEvent e) {
 		this.estadoPedidoBusqueda = "";
+		this.setShowMessagesBar(Boolean.FALSE);
+	}
+	
+	/**
+	 * Borrar filtro de busqueda por documento cliente
+	 */
+	public void borrarBusquedaDocumentoCliente(ActionEvent e){
+		this.documentoClienteBusqueda = "";
+		this.setShowMessagesBar(Boolean.FALSE);
+	}
+	
+	/**
+	 * Borrar filtro de nombre cliente
+	 */
+	public void borrarBusquedaNombresCliente(ActionEvent e){
+		this.nombresClienteBusqueda = "";
 		this.setShowMessagesBar(Boolean.FALSE);
 	}
 
@@ -1169,4 +1206,21 @@ public class PedidosController extends CommonsController implements Serializable
 	public void setDocumentoVendedorBusqueda(String documentoVendedorBusqueda) {
 		this.documentoVendedorBusqueda = documentoVendedorBusqueda;
 	}
+
+	public String getDocumentoClienteBusqueda() {
+		return documentoClienteBusqueda;
+	}
+
+	public void setDocumentoClienteBusqueda(String documentoClienteBusqueda) {
+		this.documentoClienteBusqueda = documentoClienteBusqueda;
+	}
+
+	public String getNombresClienteBusqueda() {
+		return nombresClienteBusqueda;
+	}
+
+	public void setNombresClienteBusqueda(String nombresClienteBusqueda) {
+		this.nombresClienteBusqueda = nombresClienteBusqueda;
+	}
+	
 }

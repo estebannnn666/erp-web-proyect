@@ -53,7 +53,7 @@
 						<a4j:ajax event="keyup" execute="pnlGridVentas" listener="#{cuentasController.realizarConsultaClientes}" onbeforesubmit="return verifyKeyEnter(event);" render="pnlGridVentas, pnlMensajes"/>
 					</h:inputText>
 					<h:panelGroup layout="block" styleClass="botonB" style="margin-top:5px;">
-						<a4j:commandLink oncomplete="#{rich:component('mpClientes')}.show(); " styleClass="botonBuscar" actionListener="#{cuentasController.busquedaClientes}" render="pnlListaClientes tableClientes pnlMensajes" execute="@this, pnlGridVentas" title="Click para buscar clientes">							
+						<a4j:commandLink oncomplete="#{rich:component('mpClientes')}.show(); " styleClass="botonBuscar" actionListener="#{cuentasController.busquedaClientes}" render="pnlListaClientes tableClientes filtrosClientes pnlMensajes" execute="@this, pnlGridVentas" title="Click para buscar clientes">							
 						</a4j:commandLink>	
 					</h:panelGroup>	
 					<div style="width: 30px"></div>
@@ -281,22 +281,45 @@
 		</rich:popupPanel>
 		
 		<!--  Pop Up para agregar datos de clientes -->
-		<rich:popupPanel id="mpClientes" styleClass="panelPedidos" header="#{msg_erpweb['ec.com.erp.etiqueta.label.nuevo.pedidos.etiqueta.seleccioncliente']}" width="935" height="400" modal="true" domElementAttachment="form">
+		<rich:popupPanel id="mpClientes" styleClass="panelPedidos" header="#{msg_erpweb['ec.com.erp.etiqueta.label.nuevo.pedidos.etiqueta.seleccioncliente']}" width="935" height="425" modal="true" domElementAttachment="form">
 			<f:facet name="controls">
 				<h:outputLink value="#"	onclick="#{rich:component('mpClientes')}.hide();">
 					<h:graphicImage library="images" name="close.png" style="border:0px" id="closePopUpCliente" />
 				</h:outputLink>
 			</f:facet>
+			
+			<h:panelGroup id="filtrosClientes" layout="block" styleClass="listaReporte">
+				<h:panelGrid columns="3" width="70%" cellpadding="0" cellspacing="2">
+					<h:panelGrid width="47%" columns="2" columnClasses="columnaIzquierda, columnaDerecha">
+			    	   	<rich:inplaceInput id="numeroDocumentoCliente" value="#{cuentasController.documentoClienteBusqueda}" styleClass="styleInputPlace" defaultLabel="#{msg_erpweb['ec.com.erp.etiqueta.buscar.documento.cliente']}" onkeypress="return validarEnteros(event);">
+			    	   		<a4j:ajax event="keyup" execute="filtrosClientes" listener="#{cuentasController.busquedaClientesEnter}" onbeforesubmit="if (event.keyCode != 13)  return false;" render="pnlListaClientes tableClientes pnlMensajes"></a4j:ajax>
+			    	   	</rich:inplaceInput>
+			    	   	<h:panelGroup styleClass="styleClean">
+							<a4j:commandLink styleClass="guardarA" execute="@this" render="numeroDocumentoCliente pnlMensajes" actionListener="#{cuentasController.borrarBusquedaDocumentoCliente}"/>
+						</h:panelGroup>
+					</h:panelGrid>
+			    	
+			    	<h:panelGrid width="47%" columns="2" columnClasses="columnaIzquierda, columnaDerecha">
+						<rich:inplaceInput id="nombreCliente" value="#{cuentasController.nombreClienteBusqueda}" styleClass="styleInputPlace" defaultLabel="#{msg_erpweb['ec.com.erp.etiqueta.buscar.nombre.cliente']}">
+							<a4j:ajax event="keyup" execute="filtrosClientes" listener="#{cuentasController.busquedaClientesEnter}" onbeforesubmit="if (event.keyCode != 13)  return false;" render="pnlListaClientes tableClientes pnlMensajes"></a4j:ajax>
+						</rich:inplaceInput>
+			    	   	<h:panelGroup styleClass="styleClean">
+							<a4j:commandLink styleClass="guardarA" execute="@this" render="nombreCliente pnlMensajes" actionListener="#{cuentasController.borrarBusquedaNombreCliente}"/>
+						</h:panelGroup>
+					</h:panelGrid>
+			    	 <a4j:commandButton id="btnBuscarCliente" value="Buscar" styleClass="styleSearch" render="pnlListaClientes tableClientes pnlMensajes" execute="filtrosClientes" actionListener="#{cuentasController.busquedaClientes}"/>
+				</h:panelGrid>						 
+			</h:panelGroup>	
+			
 			<h:panelGrid id="pnlListaClientes" style="width: 100%;">	
-				<rich:panel style="width: 99.6%; height: 315px;" header="#{msg_erpweb['ec.com.erp.etiqueta.label.nuevo.pedidos.etiqueta.listaclientes']}">
-					
-					<h:panelGrid id="tablaVaciaClient" columns="1" rendered="#{empty cuentasController.clienteDTOCols}" style="width:100%; text-align: center; padding-top: 230px">
+				<rich:panel style="width: 99.6%; height: 320px;" header="#{msg_erpweb['ec.com.erp.etiqueta.label.nuevo.pedidos.etiqueta.listaclientes']}">
+					<h:panelGrid id="tablaVaciaClient" columns="1" rendered="#{empty cuentasController.clienteDTOCols}" style="width:100%; text-align: center; padding-top: 160px">
 						<h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.mensaje.lista.vacio']}"/>
 					</h:panelGrid>	
 					<rich:panel style="text-align:center; border-left: none; border-right:none; margin-bottom: 2px" rendered="#{not empty cuentasController.clienteDTOCols}">
 						<rich:dataScroller fastStep="3" for="tableClientes" maxPages="5" rendered="#{not empty cuentasController.clienteDTOCols}" renderIfSinglePage="false"/>
 					</rich:panel>	
-					<rich:dataTable style="width:100%" value="#{cuentasController.clienteDTOCols}" rendered="#{not empty cuentasController.clienteDTOCols}" var="client" iterationStatusVar="it" id="tableClientes" rows="8">
+					<rich:dataTable style="width:100%" value="#{cuentasController.clienteDTOCols}" rendered="#{not empty cuentasController.clienteDTOCols}" var="client" iterationStatusVar="it" id="tableClientes" rows="10">
 			            <rich:column style="padding:0px;padding-left:2px" >
 							<h:selectOneRadio onclick="radioButton(this);" id="myRadio" value="#{cuentasController.codigoClienteSeleccionado}" valueChangeListener="#{cuentasController.seleccionCliente}">  
 								<f:selectItem itemValue="#{client.id.codigoCliente}"/> 
