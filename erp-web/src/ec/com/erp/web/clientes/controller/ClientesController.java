@@ -12,6 +12,7 @@ import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
 import javax.faces.event.ActionEvent;
 import javax.faces.event.AjaxBehaviorEvent;
+import javax.faces.event.ValueChangeEvent;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -200,6 +201,14 @@ public class ClientesController extends CommonsController implements Serializabl
 	}
 	
 	/**
+	 * Metodo para limpiar mensajes
+	 * @param e
+	 */
+	public void eliminarMensaje(ValueChangeEvent e) {
+		this.setShowMessagesBar(Boolean.FALSE);
+	}
+	
+	/**
 	 * Metodo para consultar cliente por numero de documento 
 	 * @param e
 	 */
@@ -247,6 +256,11 @@ public class ClientesController extends CommonsController implements Serializabl
 	public Boolean validarPantallaClientes() {
 		Boolean validado = Boolean.TRUE;
 		// Validacion por tipo de cliente
+		if(StringUtils.isEmpty(this.clienteDTO.getCodigoValorTipoCompra())){
+			MensajesController.addError(null, ERPWebResources.getString("ec.com.erp.etiqueta.mensaje.campo.requerido.tipocliente"));
+			validado = Boolean.FALSE;
+		}
+		
 		if(clienteDTO.getCodigoValorTipoCliente().equals(ERPConstantes.CODIGO_CATALOGO_VALOR_TIPO_CLIENTE_PERSONA)){
 			if(StringUtils.isEmpty(this.personaDTO.getNumeroDocumento())){
 				MensajesController.addError(null, ERPWebResources.getString("ec.com.erp.etiqueta.mensaje.campo.requerido.numerodocumento"));

@@ -43,7 +43,10 @@
 					 		<h:outputText class="styleNegritas" value="#{msg_erpweb['ec.com.erp.etiqueta.header.tabla.articulo.precio']}: *" />
 					 		<h:inputText  style="width:260px" value="#{articulosController.articuloDTO.precio}" id="precio" onkeypress="if (event.keyCode == 13) return false; return validarDecimal(event);"/>
 					 		
-					 		<h:outputText class="styleNegritas" value="#{msg_erpweb['ec.com.erp.etiqueta.header.tabla.articulo.porcentaje.comision']}: *" />
+					 		<h:outputText class="styleNegritas" value="#{msg_erpweb['ec.com.erp.etiqueta.header.tabla.articulo.precio.min']}: *" />
+					 		<h:inputText  style="width:260px" value="#{articulosController.articuloDTO.precioMinorista}" id="precioMinorista" onkeypress="if (event.keyCode == 13) return false; return validarDecimal(event);"/>
+					 		
+					 		<h:outputText class="styleNegritas" value="#{msg_erpweb['ec.com.erp.etiqueta.header.tabla.articulo.porcentaje.comision']}:" />
 					 		<h:inputText  style="width:260px" value="#{articulosController.articuloDTO.porcentajeComision}" id="comision" onkeypress="if (event.keyCode == 13) return false; return validarDecimal(event);"/>
 					 	</h:panelGrid>
 					</fieldset>

@@ -240,6 +240,17 @@ public class ArticulosController extends CommonsController implements Serializab
 			MensajesController.addError(null, ERPWebResources.getString("ec.com.erp.etiqueta.articulos.mensaje.campo.requerido.precio.articulo"));
 			validado = Boolean.FALSE;
 		}
+		
+		if(articuloDTO.getPrecioMinorista() ==  null){
+			MensajesController.addError(null, ERPWebResources.getString("ec.com.erp.etiqueta.articulos.mensaje.campo.requerido.precio.min.articulo"));
+			validado = Boolean.FALSE;
+		}
+		
+//		if(articuloDTO.getPorcentajeComision() ==  null){
+//			MensajesController.addError(null, ERPWebResources.getString("ec.com.erp.etiqueta.articulos.mensaje.campo.requerido.comision.articulo"));
+//			validado = Boolean.FALSE;
+//		}
+		
 		if(CollectionUtils.isEmpty(this.articuloUnidadManejoDTOCols)) {
 			MensajesController.addError(null, ERPWebResources.getString("ec.com.erp.etiqueta.articulos.mensaje.campo.requerido.unidad.manejo"));
 			validado = Boolean.FALSE;

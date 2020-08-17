@@ -89,8 +89,14 @@
 	                </h:outputText>
 	            </rich:column>
 	            <rich:column style="text-align: right; padding-right: 5px">
-	                <f:facet name="header">Precio</f:facet>
+	                <f:facet name="header">Precio mayorista</f:facet>
 	                <h:outputText value="#{art.precio}">
+	                	<f:convertNumber pattern="0.0000"/>
+	                </h:outputText>
+	            </rich:column>
+	            <rich:column style="text-align: right; padding-right: 5px">
+	                <f:facet name="header">Precio minorista</f:facet>
+	                <h:outputText value="#{art.precioMinorista}">
 	                	<f:convertNumber pattern="0.0000"/>
 	                </h:outputText>
 	            </rich:column>

@@ -71,6 +71,10 @@
 	                <h:outputText value="#{client.tipoClienteCatalogoValorDTO.nombreCatalogoValor}" />
 	            </rich:column>
 	            <rich:column>
+	                <f:facet name="header"><h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.header.tabla.tipo.compra']}"/></f:facet>
+	                <h:outputText value="#{client.tipoCompraCatalogoValorDTO.nombreCatalogoValor}" />
+	            </rich:column>
+	            <rich:column>
 	                <f:facet name="header"><h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.header.tabla.documento.cliente']}"/></f:facet>
 	                <h:outputText value="#{client.personaDTO.numeroDocumento == null ? client.empresaDTO.numeroRuc : client.personaDTO.numeroDocumento}" />
 	            </rich:column>

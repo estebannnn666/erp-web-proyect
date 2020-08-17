@@ -23,12 +23,19 @@
 		<rich:panel header="Registro de nuevos clientes" style="width: 100%; background-color: #F5FAFF;">
 			<fieldset>
 				<legend class="styleLegend">#{msg_erpweb['ec.com.erp.etiqueta.header.datos.cliente']}</legend>
-				<h:panelGrid id="pnlGridCliente" columns="2" cellspacing="2" cellpadding="5">
+				<h:panelGrid id="pnlGridCliente" columns="5" cellspacing="2" cellpadding="5">
 					<h:outputText class="styleNegritas" value="#{msg_erpweb['ec.com.erp.etiqueta.header.tabla.tipo.cliente']}: *" />
-					<h:selectOneRadio value="#{clientesController.clienteDTO.codigoValorTipoCliente}">
+					<h:selectOneRadio value="#{clientesController.clienteDTO.codigoValorTipoCliente}" valueChangeListener="#{clientesController.eliminarMensaje}">
 					   	<f:selectItem itemValue="PER" itemLabel="PERSONA" />
 					   	<f:selectItem itemValue="EMP" itemLabel="EMPRESA" />
-					   	<a4j:ajax event="click" execute="@this" render="pnlDatosBasicosCliente"></a4j:ajax>
+					   	<a4j:ajax event="click" execute="@this" render="pnlDatosBasicosCliente pnlMensajes"></a4j:ajax>
+					</h:selectOneRadio>
+					<h:outputText value="" style="padding-right: 100px;"/>
+					<h:outputText class="styleNegritas" value="#{msg_erpweb['ec.com.erp.etiqueta.header.tabla.tipo.compra']}: *" />
+					<h:selectOneRadio value="#{clientesController.clienteDTO.codigoValorTipoCompra}" valueChangeListener="#{clientesController.eliminarMensaje}">
+					   	<f:selectItem itemValue="MAY" itemLabel="MAYORISTA" />
+					   	<f:selectItem itemValue="MIN" itemLabel="MINORISTA" />
+					   	<a4j:ajax event="click" execute="@this" render="pnlDatosBasicosCliente pnlMensajes"></a4j:ajax>
 					</h:selectOneRadio>
 				</h:panelGrid>
 			</fieldset>

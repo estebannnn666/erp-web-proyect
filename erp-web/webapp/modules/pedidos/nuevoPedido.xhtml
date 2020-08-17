@@ -35,7 +35,7 @@
 					
 					<h:outputText class="styleNegritas" value="#{msg_erpweb['ec.com.erp.etiqueta.label.nuevo.pedidos.etiqueta.documentocliente']}: *" />
 					<h:inputText style="width:150px" value="#{pedidosController.documentoCliente}" id="docCliente" maxlength="13" onkeypress="if (event.keyCode == 13) return false; return validarEnteros(event);">
-						<a4j:ajax event="keyup" execute="@this" listener="#{pedidosController.realizarConsultaClienteByDocumento}" onbeforesubmit="return verifyKeyEnter(event);" render="nombreCliente, direccionCliente, pnlMensajes"/>
+						<a4j:ajax event="keyup" execute="@this" listener="#{pedidosController.realizarConsultaClienteByDocumento}" onbeforesubmit="return verifyKeyEnter(event);" render="nombreCliente, direccionCliente, pnlMensajes pnlGridDetallePedido"/>
 					</h:inputText>
 					<h:panelGroup layout="block" styleClass="botonB" style="margin-top:5px;">
 						<a4j:commandLink oncomplete="#{rich:component('mpClientes')}.show(); " styleClass="botonBuscar" actionListener="#{pedidosController.busquedaClientes}" render="filtrosClientes pnlListaClientes tableClientes pnlMensajes" execute="@this" title="Click para buscar clientes">							
@@ -126,7 +126,7 @@
 				            </rich:column>
 				            <rich:column style="width:10%;">
 				                <f:facet name="header"><h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.label.nuevo.pedidos.articulo.precio.unitario']}"/></f:facet>
-				                <h:inputText style="text-align: right" value="#{detalle.articuloDTO.precio}" disabled="true">
+				                <h:inputText style="text-align: right" value="#{pedidosController.clienteDTO.codigoValorTipoCompra != null and pedidosController.clienteDTO.codigoValorTipoCompra eq 'MIN' ? detalle.articuloDTO.precioMinorista :  detalle.articuloDTO.precio}" disabled="true">
 				                	<f:convertNumber pattern="0.00"/>
 				                </h:inputText>
 				            </rich:column>
@@ -287,7 +287,7 @@
 		
 		
 		<!-- Popup para agregar nuevo cliente -->
-		<rich:popupPanel id="mpClientes" styleClass="panelPedidos" header="#{msg_erpweb['ec.com.erp.etiqueta.label.nuevo.pedidos.etiqueta.seleccioncliente']}" width="935" height="425" modal="true" domElementAttachment="form">
+		<rich:popupPanel id="mpClientes" styleClass="panelPedidos" header="#{msg_erpweb['ec.com.erp.etiqueta.label.nuevo.pedidos.etiqueta.seleccioncliente']}" width="1000" height="425" modal="true" domElementAttachment="form">
 			<f:facet name="controls">
 				<h:outputLink value="#"	onclick="#{rich:component('mpClientes')}.hide();">
 					<h:graphicImage library="images" name="close.png" style="border:0px" id="closePopUpBodega" />
@@ -338,6 +338,10 @@
 			                <f:facet name="header"><h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.header.tabla.tipo.cliente']}"/></f:facet>
 			                <h:outputText value="#{client.tipoClienteCatalogoValorDTO.nombreCatalogoValor}" />
 			            </rich:column>
+			            <rich:column>
+			                <f:facet name="header"><h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.header.tabla.tipo.compra']}"/></f:facet>
+			                <h:outputText value="#{client.tipoCompraCatalogoValorDTO.nombreCatalogoValor}" />
+			            </rich:column>
 			            <rich:column filter="#{client.personaDTO.numeroDocumento}" filterType="">
 			                <f:facet name="header"><h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.header.tabla.documento.cliente']}"/></f:facet>
 			                <h:outputText value="#{client.personaDTO.numeroDocumento == null ? client.empresaDTO.numeroRuc : client.personaDTO.numeroDocumento}" />
@@ -364,7 +368,7 @@
 			<!-- Botones de PopUp -->
 			<h:panelGrid style="margin:auto;" columns="2" cellpadding="0" cellspacing="0">
 				<h:panelGroup layout="block" styleClass="botonD" style="margin-top:5px;margin-right:20px;">
-					<a4j:commandLink id="btnAceptarAgregarCliente" execute="@this" render="pnlGridDatosCliente, direccionCliente" styleClass="aceptarD" actionListener="#{pedidosController.agragarCliente}" oncomplete="#{rich:component('mpClientes')}.hide(); return false;">
+					<a4j:commandLink id="btnAceptarAgregarCliente" execute="@this" render="pnlGridDatosCliente, direccionCliente pnlGridDetallePedido" styleClass="aceptarD" actionListener="#{pedidosController.agragarCliente}" oncomplete="#{rich:component('mpClientes')}.hide(); return false;">
 						<h:panelGrid columns="2" cellpadding="3" cellspacing="0">
 							<h:graphicImage name="btnAceptar.png" library="images" style="border:none;border-color:white;" height="16" width="16"/>
 							<h:outputText value="Aceptar" />

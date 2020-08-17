@@ -117,6 +117,7 @@ public class PedidosController extends CommonsController implements Serializable
 		this.documentoVendedorBusqueda = null;
 		this.nombreVendedorBusqueda = null;
 		this.nombreVendedor = null;
+		this.clienteDTO = new ClienteDTO();
 		this.vendedorDTOCols = new ArrayList<>();
 		fechaInferior.set(Calendar.DATE, 1);
 		UtilitarioWeb.cleanDate(fechaInferior);
@@ -311,14 +312,23 @@ public class PedidosController extends CommonsController implements Serializable
 			}
 			if (detallePedidoDTOTemp.getCantidad() != null	&& detallePedidoDTOTemp.getArticuloDTO().getPrecio() != null && CollectionUtils.isNotEmpty(detallePedidoDTOTemp.getArticuloDTO().getArticuloUnidadManejoDTOCols())) {
  				ArticuloUnidadManejoDTO articuloUnidadManejo = this.obtenerUnidadManejoPorDefecto(detallePedidoDTOTemp.getArticuloDTO().getArticuloUnidadManejoDTOCols());
-				BigDecimal subTotal = BigDecimal.valueOf(Double.valueOf(""+(detallePedidoDTOTemp.getCantidad().intValue()*articuloUnidadManejo.getValorUnidadManejo().intValue()))).multiply(detallePedidoDTOTemp.getArticuloDTO().getPrecio());
+				BigDecimal subTotal = BigDecimal.ZERO;
+				if(this.clienteDTO.getCodigoValorTipoCompra() != null && this.clienteDTO.getCodigoValorTipoCompra().equals(ERPConstantes.CODIGO_CATALOGO_VALOR_CLIENTE_MINORISTA)) {
+					subTotal = BigDecimal.valueOf(Double.valueOf(""+(detallePedidoDTOTemp.getCantidad().intValue()*articuloUnidadManejo.getValorUnidadManejo().intValue()))).multiply(detallePedidoDTOTemp.getArticuloDTO().getPrecioMinorista());
+				}else {
+					subTotal = BigDecimal.valueOf(Double.valueOf(""+(detallePedidoDTOTemp.getCantidad().intValue()*articuloUnidadManejo.getValorUnidadManejo().intValue()))).multiply(detallePedidoDTOTemp.getArticuloDTO().getPrecio());
+				}
 				detallePedidoDTOTemp.setSubTotal(subTotal);
 				detallePedidoDTOTemp.setArticuloUnidadManejoDTO(articuloUnidadManejo);
 				detallePedidoDTOTemp.setCodigoArticuloUnidadManejo(articuloUnidadManejo.getId().getCodigoArticuloUnidadManejo());
 				detallePedidoDTOTemp.setCodigoArticulo(detallePedidoDTOTemp.getArticuloDTO().getId().getCodigoArticulo());
 				// Se obtiene existencia actual
 				InventarioDTO inventarioDTOAux = ERPFactory.inventario.getInventarioServicio().findObtenerUltimoInventarioByArticulo(Integer.parseInt(ERPConstantes.ESTADO_ACTIVO_NUMERICO), detallePedidoDTOTemp.getArticuloDTO().getCodigoBarras(), detallePedidoDTOTemp.getCodigoArticuloUnidadManejo());
-				detallePedidoDTOTemp.getArticuloDTO().setCantidadStock(inventarioDTOAux.getCantidadExistencia());
+				if(inventarioDTOAux == null) {
+					detallePedidoDTOTemp.getArticuloDTO().setCantidadStock(0);
+				}else {
+					detallePedidoDTOTemp.getArticuloDTO().setCantidadStock(inventarioDTOAux.getCantidadExistencia());
+				}
 				this.calcularTotal();
 			}
 		}
@@ -344,7 +354,11 @@ public class PedidosController extends CommonsController implements Serializable
 					detallePedidoDTOTemp.setSubTotal(subTotal);
 					// Se obtiene existencia actual
 					InventarioDTO inventarioDTOAux = ERPFactory.inventario.getInventarioServicio().findObtenerUltimoInventarioByArticulo(Integer.parseInt(ERPConstantes.ESTADO_ACTIVO_NUMERICO), detallePedidoDTOTemp.getArticuloDTO().getCodigoBarras(), detallePedidoDTOTemp.getCodigoArticuloUnidadManejo());
-					detallePedidoDTOTemp.getArticuloDTO().setCantidadStock(inventarioDTOAux.getCantidadExistencia());
+					if(inventarioDTOAux == null) {
+						detallePedidoDTOTemp.getArticuloDTO().setCantidadStock(0);
+					}else {
+						detallePedidoDTOTemp.getArticuloDTO().setCantidadStock(inventarioDTOAux.getCantidadExistencia());
+					}
 					this.calcularTotal();
 				}
 				break;
@@ -395,6 +409,22 @@ public class PedidosController extends CommonsController implements Serializable
 			ClienteDTO clienteDTOTemp = clienteDTOColsTemp.iterator().next();
 			if (clienteDTOTemp != null) {
 				this.setClienteDTO(clienteDTOTemp);
+				if(CollectionUtils.isNotEmpty(this.detallePedidoDTOCols)) {
+					this.detallePedidoDTOCols.stream().forEach(detallePed ->{
+						if(detallePed.getCodigoArticulo() != null && detallePed.getCodigoArticuloUnidadManejo() != null) {
+							ArticuloUnidadManejoDTO articuloUnidadManejo = this.obtenerUnidadManejoPorDefecto(detallePed.getArticuloDTO().getArticuloUnidadManejoDTOCols());
+							BigDecimal subTotal = BigDecimal.ZERO;
+							if(this.clienteDTO.getCodigoValorTipoCompra() != null && this.clienteDTO.getCodigoValorTipoCompra().equals(ERPConstantes.CODIGO_CATALOGO_VALOR_CLIENTE_MINORISTA)) {
+								subTotal = BigDecimal.valueOf(Double.valueOf(""+(detallePed.getCantidad().intValue()*articuloUnidadManejo.getValorUnidadManejo().intValue()))).multiply(detallePed.getArticuloDTO().getPrecioMinorista());
+							}else {
+								subTotal = BigDecimal.valueOf(Double.valueOf(""+(detallePed.getCantidad().intValue()*articuloUnidadManejo.getValorUnidadManejo().intValue()))).multiply(detallePed.getArticuloDTO().getPrecio());
+							}
+							detallePed.setSubTotal(subTotal);
+						}
+					});
+					this.calcularTotal();
+				}
+				
 			}
 		} else {
 			this.setClienteDTO(new ClienteDTO());
@@ -586,6 +616,7 @@ public class PedidosController extends CommonsController implements Serializable
 	 * @param e
 	 */
 	public void busquedaClientes(ActionEvent e){
+		this.codigoClienteSeleccionado = null;
 		this.buscarClientes();
 	}
 	
@@ -639,6 +670,22 @@ public class PedidosController extends CommonsController implements Serializable
 		this.clienteDTO = (ClienteDTO) CollectionUtils.find(this.clienteDTOCols, testPredicate);
 		this.documentoCliente = this.clienteDTO.getPersonaDTO() == null ? this.clienteDTO.getEmpresaDTO().getNumeroRuc()
 				: this.clienteDTO.getPersonaDTO().getNumeroDocumento();
+		
+		if(CollectionUtils.isNotEmpty(this.detallePedidoDTOCols)) {
+			this.detallePedidoDTOCols.stream().forEach(detallePed ->{
+				if(detallePed.getCodigoArticulo() != null && detallePed.getCodigoArticuloUnidadManejo() != null) {
+					ArticuloUnidadManejoDTO articuloUnidadManejo = this.obtenerUnidadManejoPorCodigo(detallePed.getCodigoArticuloUnidadManejo(), detallePed.getArticuloDTO().getArticuloUnidadManejoDTOCols());
+					BigDecimal subTotal = BigDecimal.ZERO;
+					if(this.clienteDTO.getCodigoValorTipoCompra() != null && this.clienteDTO.getCodigoValorTipoCompra().equals(ERPConstantes.CODIGO_CATALOGO_VALOR_CLIENTE_MINORISTA)) {
+						subTotal = BigDecimal.valueOf(Double.valueOf(""+(detallePed.getCantidad().intValue()*articuloUnidadManejo.getValorUnidadManejo().intValue()))).multiply(detallePed.getArticuloDTO().getPrecioMinorista());
+					}else {
+						subTotal = BigDecimal.valueOf(Double.valueOf(""+(detallePed.getCantidad().intValue()*articuloUnidadManejo.getValorUnidadManejo().intValue()))).multiply(detallePed.getArticuloDTO().getPrecio());
+					}
+					detallePed.setSubTotal(subTotal);
+				}
+			});
+			this.calcularTotal();
+		}
 	}
 
 	/**
@@ -672,6 +719,7 @@ public class PedidosController extends CommonsController implements Serializable
 		this.documentoVendedorBusqueda = null;
 		this.nombreVendedorBusqueda = null;
 		this.nombreVendedor = null;
+		this.clienteDTO = new ClienteDTO();
 		this.documentoClienteBusqueda = null;
 		this.nombresClienteBusqueda = null;
 		this.pedidoDTO = new PedidoDTO();

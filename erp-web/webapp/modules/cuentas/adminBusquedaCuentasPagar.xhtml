@@ -221,12 +221,12 @@
 				 	<h:panelGrid id="pnlGridPagos" columns="2" cellspacing="2" cellpadding="5">
 				 		<h:outputText class="styleNegritas" value="#{msg_erpweb['ec.com.erp.etiqueta.header.nueva.pagos.total.factura']}: *" />
 				 		<h:outputText value="#{cuentasController.facturaCabeceraDTO.totalCuenta}" >
-	                		<f:convertNumber pattern="0.00"/>
+	                		<f:convertNumber pattern="0.0000"/>
 	                	</h:outputText>
 	                	
 	                	<h:outputText class="styleNegritas" value="#{msg_erpweb['ec.com.erp.etiqueta.header.nueva.pagos.saldo.factura']}: *" />
 				 		<h:outputText value="#{cuentasController.totalPendiente}" >
-	                		<f:convertNumber pattern="0.00"/>
+	                		<f:convertNumber pattern="0.0000"/>
 	                	</h:outputText>
 	                	
 					 	<h:outputText class="styleNegritas" value="#{msg_erpweb['ec.com.erp.etiqueta.header.nueva.pagos.fechapago']}: *" />
@@ -266,7 +266,7 @@
 			            <rich:column style="text-align: right; padding-right: 5px">
 			                <f:facet name="header"><h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.header.nueva.pagos.valorpago']}"/></f:facet>
 			                <h:outputText value="#{pago.valorPago}">
-			                	<f:convertNumber pattern="0.00"/>
+			                	<f:convertNumber pattern="0.0000"/>
 			                </h:outputText>
 			            </rich:column>
 			            <f:facet name="footer">
@@ -282,7 +282,7 @@
 				                <rich:column colspan="3" style="text-align: right; paddin-right: 10px">Saldo pendiente:</rich:column>
 				                <rich:column style="text-align: right; paddin-right: 10px">
 				                    <h:outputText value="#{cuentasController.totalPendiente}">
-				                    	<f:convertNumber pattern="0.00"/>
+				                    	<f:convertNumber pattern="0.0000"/>
 				                    </h:outputText>
 				                </rich:column>
 				            </rich:columnGroup>
@@ -290,7 +290,7 @@
 				                <rich:column colspan="3" style="text-align: right; paddin-right: 10px">Total a pagar:</rich:column>
 				                <rich:column style="text-align: right; paddin-right: 10px">
 				                    <h:outputText value="#{cuentasController.facturaCabeceraDTO.totalCuenta}">
-				                    	<f:convertNumber pattern="0.00"/>
+				                    	<f:convertNumber pattern="0.0000"/>
 				                    </h:outputText>
 				                </rich:column>
 				            </rich:columnGroup>
