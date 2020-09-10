@@ -14,6 +14,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -432,6 +433,7 @@ public class CuentasController extends CommonsController implements Serializable
 					ArticuloUnidadManejoDTO articuloUnidadManejo = obtenerUnidadManejoPorCodigo(codigoUnidadManejo, facturaDetalleDTOTemp.getArticuloDTO().getArticuloUnidadManejoDTOCols());
 					BigDecimal subTotal = BigDecimal.valueOf(Double.valueOf(""+(facturaDetalleDTOTemp.getCantidad().intValue()*articuloUnidadManejo.getValorUnidadManejo().intValue()))).multiply(facturaDetalleDTOTemp.getValorUnidad());
 					facturaDetalleDTOTemp.setSubTotal(subTotal);
+					facturaDetalleDTOTemp.setArticuloUnidadManejoDTO(articuloUnidadManejo);
 					this.calcularTotalFactura();
 				}
 				break;
@@ -671,7 +673,8 @@ public class CuentasController extends CommonsController implements Serializable
 				this.facturaCabeceraDTO.setUsuarioRegistro(loginController.getUsuariosDTO().getId().getUserId());
 				this.facturaDetalleDTOCols.stream().forEach(detail ->{
 					if(detail.getCantidad() != null && detail.getCodigoArticulo() != null) {
-						detail.setDescripcion(detail.getArticuloUnidadManejoDTO().getCodigoValorUnidadManejo()+"x"+detail.getArticuloUnidadManejoDTO().getValorUnidadManejo()+" "+detail.getArticuloDTO().getNombreArticulo());
+//						detail.setDescripcion(detail.getArticuloUnidadManejoDTO().getCodigoValorUnidadManejo()+"x"+detail.getArticuloUnidadManejoDTO().getValorUnidadManejo()+" "+detail.getArticuloDTO().getNombreArticulo());
+						detail.setDescripcion(detail.getArticuloDTO().getNombreArticulo());
 					}
 				});
 				
@@ -1582,6 +1585,16 @@ public class CuentasController extends CommonsController implements Serializable
 	
 	public void imprimirFacturaImpresora(ActionEvent e){
 		try {
+			boolean ban = true;
+			for(FacturaDetalleDTO detalle : this.facturaCabeceraDTO.getFacturaDetalleDTOCols()) {
+				if(detalle == null || detalle.getCantidad() == null) {
+					ban = false;
+				}
+			}
+			if(ban) {
+				this.facturaCabeceraDTO.setFacturaDetalleDTOCols(this.facturaCabeceraDTO.getFacturaDetalleDTOCols().stream().sorted(Comparator.comparing(FacturaDetalleDTO::getOrdenRegistro)).collect(Collectors.toList()));
+			}	
+			
 	        SimpleDateFormat formatoFecha = new SimpleDateFormat("dd/MM/yyyy");
 	        DecimalFormat formatoDecimales = new DecimalFormat("#.##");
 			formatoDecimales.setMinimumFractionDigits(2);
@@ -1622,9 +1635,10 @@ public class CuentasController extends CommonsController implements Serializable
 				for(FacturaDetalleDTO detalle : this.facturaCabeceraDTO.getFacturaDetalleDTOCols()) {
 					if(detalle != null && detalle.getCantidad() != null) {
 						texto.append("    "+UtilitarioWeb.completarEspaciosCadena(6, detalle.getCantidad().toString()));
-						texto.append(" "+UtilitarioWeb.completarEspaciosCadena(28, detalle.getDescripcion()));
+						texto.append(" "+UtilitarioWeb.completarEspaciosCadena(27, detalle.getDescripcion()));
 						texto.append(""+UtilitarioWeb.completarEspaciosNumeros(8, formatoDecimales.format(detalle.getValorUnidad())));
 						texto.append(" "+UtilitarioWeb.completarEspaciosNumeros(9, formatoDecimales.format(detalle.getSubTotal())));
+						texto.append(detalle.getArticuloDTO().getTieneImpuesto() ? "I" : " ");
 						texto.append("\n");
 						subTotal =  subTotal.add(detalle.getSubTotal());
 						tamDetalle++;
@@ -1706,9 +1720,10 @@ public class CuentasController extends CommonsController implements Serializable
 		for(FacturaDetalleDTO detalle : this.facturaCabeceraDTO.getFacturaDetalleDTOCols()) {
 			if(detalle != null && detalle.getCantidad() != null) {
 				texto.append("    "+UtilitarioWeb.completarEspaciosCadena(6, detalle.getCantidad().toString()));
-				texto.append(""+UtilitarioWeb.completarEspaciosCadena(28, detalle.getDescripcion()));
+				texto.append(""+UtilitarioWeb.completarEspaciosCadena(27, detalle.getDescripcion()));
 				texto.append(""+UtilitarioWeb.completarEspaciosNumeros(7, formatoDecimales.format(detalle.getValorUnidad())));
 				texto.append(" "+UtilitarioWeb.completarEspaciosNumeros(9, formatoDecimales.format(detalle.getSubTotal())));
+				texto.append(detalle.getArticuloDTO().getTieneImpuesto() ? "I" : " ");
 				texto.append("\n");
 				subTotal =  subTotal.add(detalle.getSubTotal());
 				tamDetalle++;

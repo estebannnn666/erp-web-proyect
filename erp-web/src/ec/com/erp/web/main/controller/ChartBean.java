@@ -4,7 +4,9 @@ package ec.com.erp.web.main.controller;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collection;
 
 import javax.annotation.PostConstruct;
 import javax.faces.bean.ManagedBean;
@@ -90,7 +92,10 @@ public class ChartBean implements Serializable {
 		fechaInferior.set(Calendar.MONTH,0);
 		// Fecha superior
 		Calendar fechaSuperior = Calendar.getInstance();
-		BigDecimal cuentasCobrar = ERPFactory.facturas.getFacturaCabeceraServicio().findObtenerComprasVentas(Integer.parseInt(ERPConstantes.ESTADO_ACTIVO_NUMERICO), new Timestamp(fechaInferior.getTime().getTime()), new Timestamp(fechaSuperior.getTime().getTime()), ERPConstantes.CODIGO_CATALOGO_VALOR_DOCUMENTO_VENTAS, Boolean.FALSE);
+		Collection<String> tiposDocumentos = new ArrayList<>();
+		tiposDocumentos.add(ERPConstantes.CODIGO_CATALOGO_VALOR_DOCUMENTO_VENTAS);
+		tiposDocumentos.add(ERPConstantes.CODIGO_CATALOGO_VALOR_DOCUMENTO_NOTA_VENTA);
+		BigDecimal cuentasCobrar = ERPFactory.facturas.getFacturaCabeceraServicio().findObtenerComprasVentas(Integer.parseInt(ERPConstantes.ESTADO_ACTIVO_NUMERICO), new Timestamp(fechaInferior.getTime().getTime()), new Timestamp(fechaSuperior.getTime().getTime()), tiposDocumentos, Boolean.FALSE);
 		if(cuentasCobrar != null){
 			valorPendienteCobro = cuentasCobrar.doubleValue();
 		}
@@ -103,7 +108,9 @@ public class ChartBean implements Serializable {
 			fechaInferior.set(Calendar.MONTH,i);
 			fechaSuperior.set(Calendar.MONTH,i);
 			fechaSuperior.add(Calendar.MONTH,1);
-			resultado = ERPFactory.facturas.getFacturaCabeceraServicio().findObtenerComprasVentas(Integer.parseInt(ERPConstantes.ESTADO_ACTIVO_NUMERICO), new Timestamp(fechaInferior.getTime().getTime()), new Timestamp(fechaSuperior.getTime().getTime()), ERPConstantes.CODIGO_CATALOGO_VALOR_DOCUMENTO_COMPRAS, null);
+			Collection<String> tiposDocumentosCompras = new ArrayList<>();
+			tiposDocumentosCompras.add(ERPConstantes.CODIGO_CATALOGO_VALOR_DOCUMENTO_COMPRAS);
+			resultado = ERPFactory.facturas.getFacturaCabeceraServicio().findObtenerComprasVentas(Integer.parseInt(ERPConstantes.ESTADO_ACTIVO_NUMERICO), new Timestamp(fechaInferior.getTime().getTime()), new Timestamp(fechaSuperior.getTime().getTime()), tiposDocumentosCompras, null);
 			if(resultado != null){
 				compras.set(menses[i], resultado.doubleValue());
 				totalCompras = totalCompras + resultado.doubleValue();
@@ -125,7 +132,7 @@ public class ChartBean implements Serializable {
 			fechaInferior.set(Calendar.MONTH,i);
 			fechaSuperior.set(Calendar.MONTH,i);
 			fechaSuperior.add(Calendar.MONTH,1);
-			resultado = ERPFactory.facturas.getFacturaCabeceraServicio().findObtenerComprasVentas(Integer.parseInt(ERPConstantes.ESTADO_ACTIVO_NUMERICO), new Timestamp(fechaInferior.getTime().getTime()), new Timestamp(fechaSuperior.getTime().getTime()), ERPConstantes.CODIGO_CATALOGO_VALOR_DOCUMENTO_VENTAS, null);
+			resultado = ERPFactory.facturas.getFacturaCabeceraServicio().findObtenerComprasVentas(Integer.parseInt(ERPConstantes.ESTADO_ACTIVO_NUMERICO), new Timestamp(fechaInferior.getTime().getTime()), new Timestamp(fechaSuperior.getTime().getTime()), tiposDocumentos, null);
 			if(resultado != null){
 				ventas.set(menses[i], resultado.doubleValue());
 				totalVentas = totalVentas + resultado.doubleValue();
@@ -141,11 +148,16 @@ public class ChartBean implements Serializable {
 	 * Valores estadisticos
 	 */
 	public void obtenerValoresEstadisticos(){
-		Long numeroFacturasConsulta = ERPFactory.facturas.getFacturaCabeceraServicio().findObtenerNumeroFacturasComprasVentas(Integer.parseInt(ERPConstantes.ESTADO_ACTIVO_NUMERICO), ERPConstantes.CODIGO_CATALOGO_VALOR_DOCUMENTO_VENTAS, null);
+		Collection<String> tipoDocumentoVenta = new ArrayList<>();
+		tipoDocumentoVenta.add(ERPConstantes.CODIGO_CATALOGO_VALOR_DOCUMENTO_VENTAS);
+		tipoDocumentoVenta.add(ERPConstantes.CODIGO_CATALOGO_VALOR_DOCUMENTO_NOTA_VENTA);		
+		Collection<String> tipoDocumentoCompra = new ArrayList<>();
+		tipoDocumentoCompra.add(ERPConstantes.CODIGO_CATALOGO_VALOR_DOCUMENTO_COMPRAS);		
+		Long numeroFacturasConsulta = ERPFactory.facturas.getFacturaCabeceraServicio().findObtenerNumeroFacturasComprasVentas(Integer.parseInt(ERPConstantes.ESTADO_ACTIVO_NUMERICO), tipoDocumentoVenta, null);
 		numeroFacturas = numeroFacturasConsulta.intValue();
-		Long cuentasPendientesConsulta = ERPFactory.facturas.getFacturaCabeceraServicio().findObtenerNumeroFacturasComprasVentas(Integer.parseInt(ERPConstantes.ESTADO_ACTIVO_NUMERICO), ERPConstantes.CODIGO_CATALOGO_VALOR_DOCUMENTO_COMPRAS, Boolean.FALSE);
+		Long cuentasPendientesConsulta = ERPFactory.facturas.getFacturaCabeceraServicio().findObtenerNumeroFacturasComprasVentas(Integer.parseInt(ERPConstantes.ESTADO_ACTIVO_NUMERICO), tipoDocumentoCompra, Boolean.FALSE);
 		cuentasPendientes = cuentasPendientesConsulta.intValue();
-		Long numeroFacturasCobrarConsulta = ERPFactory.facturas.getFacturaCabeceraServicio().findObtenerNumeroFacturasComprasVentas(Integer.parseInt(ERPConstantes.ESTADO_ACTIVO_NUMERICO), ERPConstantes.CODIGO_CATALOGO_VALOR_DOCUMENTO_VENTAS, Boolean.FALSE);
+		Long numeroFacturasCobrarConsulta = ERPFactory.facturas.getFacturaCabeceraServicio().findObtenerNumeroFacturasComprasVentas(Integer.parseInt(ERPConstantes.ESTADO_ACTIVO_NUMERICO), tipoDocumentoVenta, Boolean.FALSE);
 		numeroFacturasCobrar = numeroFacturasCobrarConsulta.intValue();
 	}
 	

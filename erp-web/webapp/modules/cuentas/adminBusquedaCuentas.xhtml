@@ -344,6 +344,7 @@
 			                <h:outputText value="#{detalle.subTotal}">
 			                	<f:convertNumber pattern="0.00"/>
 			                </h:outputText>
+			                <h:outputText rendered="#{detalle.articuloDTO.tieneImpuesto}" value="(I)"></h:outputText>
 			            </rich:column>
 			            <f:facet name="footer">
 				                <rich:columnGroup>

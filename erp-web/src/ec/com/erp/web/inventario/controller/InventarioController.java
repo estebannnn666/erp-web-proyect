@@ -306,11 +306,11 @@ public class InventarioController extends CommonsController implements Serializa
 		// Validacion de objeto existente
 		this.articuloDTO  = (ArticuloDTO) CollectionUtils.find(this.articuloDTOCols, testPredicate);
 		
-		if(this.tipoMovimiento.equals(ERPConstantes.ESTADO_INACTIVO_NUMERICO)) {
-			this.inventarioDTO.setValorUnidadEntrada(this.articuloDTO.getPrecio());
-		}else {
-			this.inventarioDTO.setValorUnidadEntrada(this.articuloDTO.getCosto());
-		}
+		//if(this.tipoMovimiento.equals(ERPConstantes.ESTADO_INACTIVO_NUMERICO)) {
+			//this.inventarioDTO.setValorUnidadEntrada(this.articuloDTO.getPrecio());
+		//}else {
+		this.inventarioDTO.setValorUnidadEntrada(this.articuloDTO.getCosto());
+		//}
 		this.inventarioDTO.setCodigoArticulo(this.articuloDTO.getId().getCodigoArticulo());
 		this.inventarioDTO.setCantidadEntrada(null);
 		this.inventarioDTO.setValorTotalEntrada(null);
