@@ -494,6 +494,11 @@ body {
     width: 45px;
 }
 
+.botonComun a.botonReporte {
+    background-image: url("#{resource['images/btnReporte.png']}");
+    width: 45px;
+}
+
 .botonComun a.botonPanel {
     background-image: url("#{resource['images/btnPanel.png']}");
     width: 45px;

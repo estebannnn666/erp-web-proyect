@@ -1,0 +1,159 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:a4j="http://richfaces.org/a4j"
+	xmlns:rich="http://richfaces.org/rich"
+	template="/templates/pages/pageLayout2.xhtml">
+	
+	<ui:param name="idForm" value="frmAdminVendedor" />
+	<ui:param name="form" value="#{vendedorController.form}" />	
+	<ui:param name="controller" value="#{vendedorController}" />
+	<ui:param name="westLength" value="250" />
+	
+	<ui:define name="title">
+		Reporte de ventas
+	</ui:define>
+	
+	<ui:define name="header">	
+		<ui:include src="reporteVentasHeader.xhtml" />
+	</ui:define>
+	
+	<ui:define name="contentLeft">
+	</ui:define>
+	
+	<ui:define name="contentCenter">
+		<rich:panel id="panel-content-left" styleClass="panel-content-left" style="width:100% !important;">
+			<f:facet name="header">			
+				<h:panelGrid columns="2" width="99.9%" columnClasses="align-left, align-right" cellpadding="0" cellspacing="0">
+					<h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.criterios.busqueda']}" style="white-space:nowrap" />
+				</h:panelGrid>
+			</f:facet>		
+		
+			<h:panelGroup id="filtrosVentas" layout="block" styleClass="listaReporte">
+				<h:panelGrid columns="4" width="75%" cellpadding="0" cellspacing="2">
+					<h:panelGrid width="35%" columns="2" columnClasses="columnaIzquierda, columnaDerecha">
+			    	   	<rich:inplaceInput id="documentoCliente" value="#{vendedorController.documentoCliente}" styleClass="styleInputPlace" defaultLabel="#{msg_erpweb['ec.com.erp.etiqueta.buscar.documento.cliente']}" onkeypress="return validarEnteros(event);">
+			    	   		<a4j:ajax event="keyup" execute="filtrosVentas" listener="#{vendedorController.busquedaReporteEnter}" onbeforesubmit="if (event.keyCode != 13)  return false;" render="listaTransport tableReporteVentas pnlMensajes"></a4j:ajax>
+			    	   	</rich:inplaceInput>
+			    	   	<h:panelGroup styleClass="styleClean">
+							<a4j:commandLink styleClass="guardarA" execute="@this" render="documentoCliente pnlMensajes" actionListener="#{vendedorController.borrarBusquedaDocumentoCliente}"/>
+						</h:panelGroup>
+					</h:panelGrid>
+			    	
+			    	<h:panelGrid width="35%" columns="2" columnClasses="columnaIzquierda, columnaDerecha">
+						<rich:inplaceInput id="nombreTransportista" value="#{vendedorController.nombreCliente}" styleClass="styleInputPlace" defaultLabel="#{msg_erpweb['ec.com.erp.etiqueta.buscar.nombre.vendedor']}">
+							<a4j:ajax event="keyup" execute="filtrosVentas" listener="#{vendedorController.busquedaReporteEnter}" onbeforesubmit="if (event.keyCode != 13)  return false;" render="listaTransport tabletransporte pnlMensajes"></a4j:ajax>
+						</rich:inplaceInput>
+			    	   	<h:panelGroup styleClass="styleClean">
+							<a4j:commandLink styleClass="guardarA" execute="@this" render="nombreTransportista pnlMensajes" actionListener="#{vendedorController.borrarBusquedaNombreCliente}"/>
+						</h:panelGroup>
+					</h:panelGrid>
+					
+					<h:panelGrid width="30%" columns="2" columnClasses="columnaIzquierda, columnaDerecha">
+						<rich:calendar inputStyle="width: 100px; height: 20px;" value="#{vendedorController.fechaInicio}" datePattern="yyyy-MM-dd"></rich:calendar>
+						<rich:calendar inputStyle="width: 100px; height: 20px;" value="#{vendedorController.fechaFin}" datePattern="yyyy-MM-dd"></rich:calendar>
+					</h:panelGrid>					
+			    	 <a4j:commandButton id="btnBuscarTransportistas" value="Buscar" styleClass="styleSearch" render="listaTransport tabletransporte pnlMensajes" execute="filtrosVentas" actionListener="#{vendedorController.busquedaReporte}"/>
+				</h:panelGrid>						 
+			</h:panelGroup>	
+		</rich:panel>
+		
+		<rich:panel id="listaTransport" styleClass="panelListaArticulos" header="Lista de vendedores" style="height: 84.3%; width:100% !important;">	
+			<h:panelGrid id="tablaVacia" columns="1" rendered="#{empty vendedorController.reporteVentasCols}" style="width:100%; text-align: center; padding-top: 220px">
+				<h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.mensaje.lista.vacio']}"/>
+			</h:panelGrid>
+			<rich:panel style="text-align:center; border-left: none; border-right:none; border-bottom:none" rendered="#{not empty vendedorController.reporteVentasCols}">
+				<rich:dataScroller page="#{vendedorController.page}" fastStep="3" for="tableReporteVentas" maxPages="5" rendered="#{not empty vendedorController.reporteVentasCols}" renderIfSinglePage="false"/>
+			</rich:panel>			
+			 <rich:dataTable style="width:100%" rendered="#{not empty vendedorController.reporteVentasCols}" value="#{vendedorController.reporteVentasCols}" var="ventas" iterationStatusVar="it" id="tableReporteVentas" rows="14">
+	            <rich:column>
+	                <f:facet name="header">Nro.</f:facet>
+	                #{it.index+1}
+	            </rich:column>
+	            <rich:column>
+	                <f:facet name="header"><h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.label.lista.cabecera.nombre.vendedor']}"/></f:facet>
+	                <h:outputText value="#{ventas.nombreCompleto}" />
+	            </rich:column>
+	            <rich:column>
+	                <f:facet name="header"><h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.header.tabla.descripcion.articulo']}"/></f:facet>
+	                <h:outputText value="#{ventas.nombreArticulo}" />
+	            </rich:column>
+	            <rich:column>
+	                <f:facet name="header"><h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.inventario.label.header.unidadmanejo']}"/></f:facet>
+	                <h:outputText value="#{ventas.codigoValorUnidadManejo} x #{ventas.valorUnidadManejo}" />
+	            </rich:column>
+	            <rich:column style="text-align: right; padding-right: 3px;">
+	                <f:facet name="header"><h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.label.lista.factura.etiqueta.vendedor.precio.mayorista']}"/></f:facet>
+	                <h:outputText value="#{ventas.precioMayorista}" >
+	                	<f:convertNumber pattern="0.00"/>
+	                </h:outputText>
+	            </rich:column>
+	            <rich:column style="text-align: right; padding-right: 3px;">
+	                <f:facet name="header"><h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.label.lista.factura.etiqueta.vendedor.precio.minorista']}"/></f:facet>
+	                <h:outputText value="#{ventas.precioMinorista}" >
+	                	<f:convertNumber pattern="0.00"/>
+	                </h:outputText>
+	            </rich:column>
+	             <rich:column style="text-align: right; padding-right: 3px;">
+	                <f:facet name="header"><h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.label.lista.factura.etiqueta.vendedor.porcentaje.comision']}"/></f:facet>
+	                <h:outputText value="#{ventas.porcentajeComision}">
+	                	<f:convertNumber pattern="0.00"/>
+	                </h:outputText>
+	            </rich:column>
+	            <rich:column style="text-align: right; padding-right: 3px;">
+	                <f:facet name="header"><h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.label.lista.factura.etiqueta.vendedor.cantidad.venta']}"/></f:facet>
+	                <h:outputText value="#{ventas.cantidadVendida}" />
+	            </rich:column>
+	            <rich:column style="text-align: right; padding-right: 3px;">
+	                <f:facet name="header"><h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.label.lista.factura.etiqueta.vendedor.valor.venta']}"/></f:facet>
+	                <h:outputText value="#{ventas.valorVendido}" >
+	                	<f:convertNumber pattern="0.00"/>
+	                </h:outputText>
+	            </rich:column>
+	            <rich:column style="text-align: right; padding-right: 3px;">
+	                <f:facet name="header"><h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.label.lista.factura.etiqueta.vendedor.comision']}"/></f:facet>
+	                <h:outputText value="#{ventas.valoCcomision}">
+	                	<f:convertNumber pattern="0.00"/>
+	                </h:outputText>
+	            </rich:column>
+	            
+	            <f:facet name="footer">
+	            	<rich:columnGroup>
+		                <rich:column colspan="7" style="text-align: right; paddin-right: 10px">Total:</rich:column>
+		                <rich:column style="text-align: right; paddin-right: 10px">
+		                    <h:outputText value="#{vendedorController.totalVendido}">
+		                    </h:outputText>
+		                </rich:column>
+		                <rich:column style="text-align: right; paddin-right: 10px">
+		                    <h:outputText value="#{vendedorController.totalVenta}">
+		                    	<f:convertNumber pattern="0.00"/>
+		                    </h:outputText>
+		                </rich:column>
+		                <rich:column style="text-align: right; paddin-right: 10px">
+		                    <h:outputText value="#{vendedorController.comision}">
+		                    	<f:convertNumber pattern="0.00"/>
+		                    </h:outputText>
+		                </rich:column>		         
+		            </rich:columnGroup>
+	            </f:facet> 
+	        </rich:dataTable>
+        </rich:panel>
+        
+       
+        <script>
+			/*<![CDATA[*/
+			$(document).ready(function(){				
+				 openLinkSystem();				
+			});
+			function openLinkSystem(){
+				$('.linkopensystem').trigger('click');
+			}	
+								
+		/*]]>*/			
+		</script>
+		<a4j:commandLink id="linkopensystem" styleClass="linkopensystem" execute="@this" status="no" actionListener="#{vendedorController.refrescarPantalla}">
+		</a4j:commandLink>	
+	</ui:define>
+	
+</ui:composition>
