@@ -85,10 +85,10 @@
 	                <f:facet name="header">Nro.</f:facet>
 	                #{it.index+1}
 	            </rich:column>
-	            <rich:column style="width: 65px">
+	            <!-- rich:column style="width: 65px">
 	                <f:facet name="header"><h:outputText title="#{msg_erpweb['ec.com.erp.etiqueta.label.lista.cabecera.factura.referencia.documento']}" value="#{msg_erpweb['ec.com.erp.etiqueta.label.lista.cabecera.factura.refedoc.abreviado']}"/></f:facet>
 	                <h:outputText value="#{cuenta.codigoReferenciaFactura}" />
-	            </rich:column>
+	            </rich:column-->
 	            <rich:column style="width: 90px">
 	                <f:facet name="header"><h:outputText value="Nro. Documento"/></f:facet>
 	                <h:outputText value="#{cuenta.numeroDocumento}" />
@@ -116,19 +116,10 @@
 						</rich:tooltip>       
 					</rich:panel>
 	            </rich:column>
-	            <!--rich:column>
-	                <f:facet name="header"><h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.label.lista.cabecera.factura.direccion']}"/></f:facet>
-	                <rich:panel id="direccion#{it}" styleClass="tooltip-text" bodyClass="rich-laguna-panel-no-header" style="border: none !important">  
-		        		<h:outputText value="#{cuenta.direccion.length() > 30 ? cuenta.direccion.substring(0,30).concat('...') : cuenta.direccion}" /> 
-						<rich:tooltip id="ttd#{it}" showDelay="500" styleClass="tooltip" layout="block" rendered="#{cuenta.direccion.length() > 30}">                
-							<h:panelGrid>
-								<span style="white-space: nowrap">												
-									<h:outputText value="#{cuenta.direccion}" />												
-								</span>
-							</h:panelGrid>
-						</rich:tooltip>       
-					</rich:panel>
-	            </rich:column-->
+	            <rich:column>
+	                <f:facet name="header"><h:outputText value="Vendedor"/></f:facet>
+	                <h:outputText value="#{cuenta.vendedorDTO != null ? cuenta.vendedorDTO.personaDTO.primerNombre : 'N/D'} #{cuenta.vendedorDTO != null ? cuenta.vendedorDTO.personaDTO.primerApellido : ''}" />
+	            </rich:column>
 	            <!-- rich:column style="width: 60px; text-align: center;">
 	                <f:facet name="header"><h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.label.lista.cabecera.factura.telefono']}"/></f:facet>
 	                <h:outputText value="#{cuenta.telefono}" />
