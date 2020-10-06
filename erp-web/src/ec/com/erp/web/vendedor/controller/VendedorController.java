@@ -7,6 +7,7 @@ import java.sql.Timestamp;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
+import java.util.HashMap;
 
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
@@ -26,6 +27,8 @@ import ec.com.erp.cliente.common.factory.ERPFactory;
 import ec.com.erp.cliente.mdl.dto.ContactoDTO;
 import ec.com.erp.cliente.mdl.dto.PersonaDTO;
 import ec.com.erp.cliente.mdl.dto.VendedorDTO;
+import ec.com.erp.cliente.mdl.vo.ReporteVentasVO;
+import ec.com.erp.utilitario.commons.util.HtmlPdf;
 import ec.com.erp.web.commons.controller.CommonsController;
 import ec.com.erp.web.commons.controller.MensajesController;
 import ec.com.erp.web.commons.datamanager.CommonDataManager;
@@ -59,6 +62,7 @@ public class VendedorController extends CommonsController implements Serializabl
 	
 	// Variables
 	private Collection<VendedorDTO> vendedorDTOCols;
+	private Collection<ReporteVentasVO> reporteVentasCols;
 	private String numeroDocumentoBusqueda;
 	private String nombreVendedorBusqueda;
 	private Integer page;
@@ -67,6 +71,15 @@ public class VendedorController extends CommonsController implements Serializabl
 	private BigDecimal totalComision;
 	private Date fechaFacturaInicio;
 	private Date fechaFacturaFin;
+	
+	private Long totalVendido;
+	private BigDecimal totalVenta;
+	private BigDecimal comision;
+	
+	private String documentoCliente;
+	private String nombreCliente;
+	private Date fechaInicio;
+	private Date fechaFin;
 
 	@PostConstruct
 	public void postConstruct() {
@@ -78,6 +91,9 @@ public class VendedorController extends CommonsController implements Serializabl
 		this.page = 0;
 		this.totalVentas = BigDecimal.ZERO;
 		this.totalComision = BigDecimal.ZERO;
+		this.totalVendido = 0L;
+		this.totalVenta = BigDecimal.ZERO;
+		this.comision = BigDecimal.ZERO;
 		
 		if(vendedorDataManager.getVendedorDTOEditar() != null && vendedorDataManager.getVendedorDTOEditar().getId().getCodigoVendedor() != null){
 			this.setVendedorDTO(vendedorDataManager.getVendedorDTOEditar());
@@ -86,6 +102,26 @@ public class VendedorController extends CommonsController implements Serializabl
 		}
 		if(FacesContext.getCurrentInstance().getViewRoot().getViewId().equals("/modules/vendedores/adminBusquedaVendedor.xhtml")) {
 			this.vendedorDTOCols = ERPFactory.vendedor.getVendedorServicio().findObtenerListaVendedores(Integer.parseInt(ERPConstantes.ESTADO_ACTIVO_NUMERICO), numeroDocumentoBusqueda, nombreVendedorBusqueda);
+		}
+		if(FacesContext.getCurrentInstance().getViewRoot().getViewId().equals("/modules/vendedores/reporteVentas.xhtml")) {
+			Calendar fechaInferior = Calendar.getInstance();
+			fechaInferior.set(Calendar.DATE, 1);
+			UtilitarioWeb.cleanDate(fechaInferior);
+			Calendar fechaSuperior = Calendar.getInstance();
+			fechaInicio = fechaInferior.getTime();
+			fechaFin = fechaSuperior.getTime();			
+			this.reporteVentasCols = ERPFactory.facturas.getFacturaCabeceraServicio().findObtenerReorteVentas(Integer.parseInt(ERPConstantes.ESTADO_ACTIVO_NUMERICO), documentoCliente, nombreCliente, new Timestamp(fechaInicio.getTime()), new Timestamp(fechaFin.getTime()));
+			if(CollectionUtils.isNotEmpty(reporteVentasCols)) {
+				this.totalVendido = 0L;
+				this.totalVenta = BigDecimal.ZERO;
+				this.comision = BigDecimal.ZERO;
+				this.reporteVentasCols.stream().forEach(venta ->{
+					venta.setValoCcomision((venta.getPorcentajeComision().multiply(venta.getValorVendido())).divide(BigDecimal.valueOf(100)));
+					this.totalVendido = totalVendido + venta.getCantidadVendida();
+					this.totalVenta = totalVenta.add(venta.getValorVendido());
+					this.comision = comision.add(venta.getValoCcomision());
+				});	
+			}
 		}
 	}
 		
@@ -102,6 +138,83 @@ public class VendedorController extends CommonsController implements Serializabl
 	@Override
 	public void clearDataManager(ActionEvent event) {
 		super.clearDataManager(event);
+	}
+	
+	
+	/**
+	 * Metodo para buscar vendedores 
+	 * @param e
+	 */
+	public void busquedaReporte(ActionEvent e){
+		this.buscarReporte();
+	}
+	
+	/**
+	 * Metodo para buscar vendedores al dar enter
+	 * @param e
+	 */
+	public void busquedaReporteEnter(AjaxBehaviorEvent e){
+		this.buscarReporte();
+	}
+	
+	/**
+	 * Metodo para buscar vendedores 
+	 * @param e
+	 */
+	public void buscarReporte(){
+		try {
+			this.setShowMessagesBar(Boolean.FALSE);
+			this.reporteVentasCols = ERPFactory.facturas.getFacturaCabeceraServicio().findObtenerReorteVentas(Integer.parseInt(ERPConstantes.ESTADO_ACTIVO_NUMERICO), documentoCliente, nombreCliente, new Timestamp(fechaInicio.getTime()), new Timestamp(fechaFin.getTime()));
+			if(CollectionUtils.isNotEmpty(reporteVentasCols)) {
+				this.totalVendido = 0L;
+				this.totalVenta = BigDecimal.ZERO;
+				this.comision = BigDecimal.ZERO;
+				this.reporteVentasCols.stream().forEach(venta ->{
+					venta.setValoCcomision((venta.getPorcentajeComision().multiply(venta.getValorVendido())).divide(BigDecimal.valueOf(100)));
+					this.totalVendido = totalVendido + venta.getCantidadVendida();
+					this.totalVenta = totalVenta.add(venta.getValorVendido());
+					this.comision = comision.add(venta.getValoCcomision());
+				});
+			}else {
+				this.setShowMessagesBar(Boolean.TRUE);
+				FacesMessage msg = new FacesMessage("No se encontraron resultados para la b\u00FAsqueda realizada.", "ERROR MSG");
+		        msg.setSeverity(FacesMessage.SEVERITY_INFO);
+		        FacesContext.getCurrentInstance().addMessage(null, msg);
+			}
+		} catch (ERPException e1) {
+			this.setShowMessagesBar(Boolean.TRUE);
+			FacesMessage msg = new FacesMessage(e1.getMessage(), "ERROR MSG");
+	        msg.setSeverity(FacesMessage.SEVERITY_ERROR);
+	        FacesContext.getCurrentInstance().addMessage(null, msg);
+		} catch (Exception e2) {
+			this.setShowMessagesBar(Boolean.TRUE);
+			FacesMessage msg = new FacesMessage(e2.getMessage(), "ERROR MSG");
+	        msg.setSeverity(FacesMessage.SEVERITY_ERROR);
+	        FacesContext.getCurrentInstance().addMessage(null, msg);
+		}
+	}
+	
+	/**
+	 * Metodo para imprimir lista de facturas
+	 */
+	public String imprimirReporteVentas() {
+		if(CollectionUtils.isNotEmpty(this.reporteVentasCols)){
+			HtmlPdf htmltoPDF;
+			try {
+				// Plantilla rpincipal que permite la conversion de xsl a pdf
+				htmltoPDF = new HtmlPdf(ERPConstantes.PLANTILLA_XSL_FOPRINCIPAL);
+				HashMap<String , String> parametros = new HashMap<String, String>();
+				byte contenido[] = htmltoPDF.convertir(ERPFactory.facturas.getFacturaCabeceraServicio().findObtenerXMLReporteVentas(fechaInicio, fechaFin, this.reporteVentasCols).replace("<?xml version=\"1.0\" encoding=\"UTF-8\"?>", ""), "", "",	parametros,	null);
+				UtilitarioWeb.mostrarPDF(contenido);
+			} catch (Exception e) {
+				this.setShowMessagesBar(Boolean.TRUE);
+				MensajesController.addError(null, "Error al imprimir");
+			}
+		}else {
+			this.setShowMessagesBar(Boolean.TRUE);
+			MensajesController.addInfo(null, "No existen datos para imprimir");
+		}
+		return null;
 	}
 	
 	/**
@@ -335,6 +448,14 @@ public class VendedorController extends CommonsController implements Serializabl
 	}
 	
 	/**
+	 * Metodo para ir a la pantalla de reporte de ventas
+	 * @return
+	 */
+	public String reporteVentas(){
+		return "/modules/vendedores/reporteVentas.xhtml?faces-redirect=true";
+	}
+	
+	/**
 	 * Metodo para ir a la pantalla menu principal
 	 * @return
 	 */
@@ -342,6 +463,22 @@ public class VendedorController extends CommonsController implements Serializabl
 		this.loginController.desActivarMenusSeleccionado();
 		this.loginController.setActivarInicio(Boolean.TRUE);
 		return "/modules/principal/menu.xhtml?faces-redirect=true";
+	}
+	
+	/**
+	 * Borrar filtro de codigo de barras
+	 */
+	public void borrarBusquedaDocumentoCliente(ActionEvent e){
+		this.documentoCliente = "";
+		this.setShowMessagesBar(Boolean.FALSE);
+	}
+	
+	/**
+	 * Borrar filtro de nombre vendedor
+	 */
+	public void borrarBusquedaNombreCliente(ActionEvent e){
+		this.nombreCliente = "";
+		this.setShowMessagesBar(Boolean.FALSE);
 	}
 	
 	/**
@@ -508,5 +645,69 @@ public class VendedorController extends CommonsController implements Serializabl
 
 	public void setFechaFacturaFin(Date fechaFacturaFin) {
 		this.fechaFacturaFin = fechaFacturaFin;
+	}
+
+	public Collection<ReporteVentasVO> getReporteVentasCols() {
+		return reporteVentasCols;
+	}
+
+	public void setReporteVentasCols(Collection<ReporteVentasVO> reporteVentasCols) {
+		this.reporteVentasCols = reporteVentasCols;
+	}
+
+	public String getDocumentoCliente() {
+		return documentoCliente;
+	}
+
+	public void setDocumentoCliente(String documentoCliente) {
+		this.documentoCliente = documentoCliente;
+	}
+
+	public String getNombreCliente() {
+		return nombreCliente;
+	}
+
+	public void setNombreCliente(String nombreCliente) {
+		this.nombreCliente = nombreCliente;
+	}
+
+	public Date getFechaInicio() {
+		return fechaInicio;
+	}
+
+	public void setFechaInicio(Date fechaInicio) {
+		this.fechaInicio = fechaInicio;
+	}
+
+	public Date getFechaFin() {
+		return fechaFin;
+	}
+
+	public void setFechaFin(Date fechaFin) {
+		this.fechaFin = fechaFin;
+	}
+
+	public Long getTotalVendido() {
+		return totalVendido;
+	}
+
+	public void setTotalVendido(Long totalVendido) {
+		this.totalVendido = totalVendido;
+	}
+
+	public BigDecimal getTotalVenta() {
+		return totalVenta;
+	}
+
+	public void setTotalVenta(BigDecimal totalVenta) {
+		this.totalVenta = totalVenta;
+	}
+
+	public BigDecimal getComision() {
+		return comision;
+	}
+
+	public void setComision(BigDecimal comision) {
+		this.comision = comision;
 	}
 }

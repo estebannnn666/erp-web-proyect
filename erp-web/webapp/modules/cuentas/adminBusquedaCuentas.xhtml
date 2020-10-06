@@ -109,6 +109,10 @@
 						</rich:tooltip>       
 					</rich:panel>
 	            </rich:column>
+	            <rich:column>
+	                <f:facet name="header"><h:outputText value="Vendedor"/></f:facet>
+	                <h:outputText value="#{cuenta.vendedorDTO != null ? cuenta.vendedorDTO.personaDTO.primerNombre : 'N/D'} #{cuenta.vendedorDTO != null ? cuenta.vendedorDTO.personaDTO.primerApellido : ''}" />
+	            </rich:column>
 	            <rich:column style="width: 60px; text-align: right; padding-right: 3px;">
 	                <f:facet name="header"><h:outputText value="Total" title="#{msg_erpweb['ec.com.erp.etiqueta.label.lista.cabecera.factura.total.factura']}"/></f:facet>
 	                <h:outputText value="#{cuenta.totalCuenta}" >
