@@ -12,6 +12,13 @@
 			</h:panelGroup>
 		</rich:toolbarGroup>
 		
+		<rich:toolbarGroup>
+			<!-- BOTON: NUEVO-->
+			<h:panelGroup layout="block" styleClass="botonComun">
+				<a4j:commandLink value="Descargar" status="on" render="pnlMensajes" styleClass="botonNuevo" actionListener="#{clientesController.descargarClientesFireBase}"/>
+			</h:panelGroup>
+		</rich:toolbarGroup>
+		
 		<rich:toolbarGroup>	
 			<h:panelGroup layout="block" styleClass="botonComun">
 				<a4j:commandLink value="#{msg_erpweb['ec.com.erp.etiqueta.boton.menu']}" styleClass="botonPanel" action="#{clientesController.regresarMenuPrincipal}"/>

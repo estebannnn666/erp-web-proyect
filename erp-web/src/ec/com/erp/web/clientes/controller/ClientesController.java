@@ -363,6 +363,18 @@ public class ClientesController extends CommonsController implements Serializabl
 	}
 	
 	/**
+	 * Metodo para refrescar pantalla
+	 * @param e
+	 */
+	public void descargarClientesFireBase(ActionEvent e){
+		System.out.println("Ingreso a realizar proceson con fire base");
+		ERPFactory.firebase.getFireBaseServicio().transDescargarClientesFireBase();
+		this.setShowMessagesBar(Boolean.TRUE);
+		MensajesController.addInfo(null, "Se ha terminado de descargar la informacion de clientes de los dispositivos moviles");
+		System.out.println("Finalizo proceso con fire base");
+	}
+	
+	/**
 	 * Metodo para ir a la pantalla menu principal
 	 * @return
 	 */
