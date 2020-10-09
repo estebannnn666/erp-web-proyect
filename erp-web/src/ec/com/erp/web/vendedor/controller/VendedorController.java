@@ -115,12 +115,14 @@ public class VendedorController extends CommonsController implements Serializabl
 				this.totalVendido = 0L;
 				this.totalVenta = BigDecimal.ZERO;
 				this.comision = BigDecimal.ZERO;
-				this.reporteVentasCols.stream().forEach(venta ->{
-					venta.setValoCcomision((venta.getPorcentajeComision().multiply(venta.getValorVendido())).divide(BigDecimal.valueOf(100)));
-					this.totalVendido = totalVendido + venta.getCantidadVendida();
-					this.totalVenta = totalVenta.add(venta.getValorVendido());
-					this.comision = comision.add(venta.getValoCcomision());
-				});	
+				for(ReporteVentasVO venta : this.reporteVentasCols) {
+					if(venta.getPorcentajeComision() != null && venta.getValorVendido() != null) {
+						venta.setValoCcomision((venta.getPorcentajeComision().multiply(venta.getValorVendido())).divide(BigDecimal.valueOf(100)));
+						this.totalVendido = totalVendido + venta.getCantidadVendida();
+						this.totalVenta = totalVenta.add(venta.getValorVendido());
+						this.comision = comision.add(venta.getValoCcomision());
+					}
+				};	
 			}
 		}
 	}

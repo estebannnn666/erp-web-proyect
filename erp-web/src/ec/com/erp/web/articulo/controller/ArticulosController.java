@@ -154,6 +154,31 @@ public class ArticulosController extends CommonsController implements Serializab
 	}
 	
 	/**
+	 * Metodo para descargar clientes de fire base
+	 * @param e
+	 */
+	public void descargarArticulosFireBase(ActionEvent e){
+		System.out.println("Ingreso a realizar proceson con fire base");
+		ERPFactory.firebase.getFireBaseServicio().transDescargarArticulosFireBase();
+		this.articuloDTOCols = ERPFactory.articulos.getArticuloServicio().findObtenerListaArticulos(Integer.parseInt(ERPConstantes.ESTADO_ACTIVO_NUMERICO), codigoBarrasBusqueda,nombreArticuloBusqueda);
+		this.setShowMessagesBar(Boolean.TRUE);
+		MensajesController.addInfo(null, "Se ha terminado de descargar la informacion de articulo de los dispositivos moviles");
+		System.out.println("Finalizo proceso con fire base");
+	}
+	
+	/**
+	 * Metodo para subir clientes a fire base
+	 * @param e
+	 */
+	public void cargarArticulosFireBase(ActionEvent e){
+		System.out.println("Ingreso a realizar carga de datos de clientes a fire base");
+		ERPFactory.firebase.getFireBaseServicio().findGuardarArticulosFireBase();
+		this.setShowMessagesBar(Boolean.TRUE);
+		MensajesController.addInfo(null, "Se ha terminado de subir la informacion de articulos para dispositivos moviles");
+		System.out.println("Finalizo proceso de carga a fire base");
+	}
+	
+	/**
 	 * Metodo para guardar o actualizar articulos
 	 * @param e
 	 */

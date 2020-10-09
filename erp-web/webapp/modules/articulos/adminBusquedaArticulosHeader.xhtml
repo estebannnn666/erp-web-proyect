@@ -12,6 +12,18 @@
 			</h:panelGroup>
 		</rich:toolbarGroup>
 		
+		<rich:toolbarGroup>
+			<h:panelGroup layout="block" styleClass="botonComun">
+				<a4j:commandLink value="Descargar" execute="@this" render="pnlMensajes" styleClass="botonDownload" actionListener="#{articulosController.descargarArticulosFireBase}"/>
+			</h:panelGroup>
+		</rich:toolbarGroup>
+		
+		<rich:toolbarGroup>
+			<h:panelGroup layout="block" styleClass="botonComun">
+				<a4j:commandLink value="Cargar" execute="@this" render="pnlMensajes" styleClass="botonUpload" actionListener="#{articulosController.cargarArticulosFireBase}"/>
+			</h:panelGroup>
+		</rich:toolbarGroup>
+		
 		<rich:toolbarGroup>	
 			<h:panelGroup layout="block" styleClass="botonComun">
 				<a4j:commandLink value="#{msg_erpweb['ec.com.erp.etiqueta.boton.menu']}" styleClass="botonPanel" action="#{articulosController.regresarMenuPrincipal}"/>

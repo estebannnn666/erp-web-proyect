@@ -494,6 +494,16 @@ body {
     width: 45px;
 }
 
+.botonComun a.botonDownload {
+    background-image: url("#{resource['images/btnDownload.png']}");
+    width: 45px;
+}
+
+.botonComun a.botonUpload {
+    background-image: url("#{resource['images/btnUpLoad.png']}");
+    width: 45px;
+}
+
 .botonComun a.botonReporte {
     background-image: url("#{resource['images/btnReporte.png']}");
     width: 45px;
