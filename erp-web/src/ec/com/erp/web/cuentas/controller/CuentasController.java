@@ -295,6 +295,27 @@ public class CuentasController extends CommonsController implements Serializable
 	}
 	
 	/**
+	 * Metodo para descargar facturas de fire base
+	 * @param e
+	 */
+	public void descargarFacturasFireBase(ActionEvent e){
+		try {
+			System.out.println("Ingreso a realizar proceson con fire base");
+			ERPFactory.firebase.getFireBaseServicio().transDescargarFacturasFireBase();		
+			this.facturaCabeceraDTOCols = ERPFactory.facturas.getFacturaCabeceraServicio().findObtenerListaFacturas(Integer.parseInt(ERPConstantes.ESTADO_ACTIVO_NUMERICO), numeroFactura, null, null, docClienteProveedor, nombClienteProveedor, pagado, tiposDocumentos);
+			this.setShowMessagesBar(Boolean.TRUE);
+			MensajesController.addInfo(null, "Se ha terminado de descargar la informacion de facturas de los dispositivos moviles");
+			System.out.println("Finalizo proceso con fire base");
+		} catch (ERPException e1) {
+			this.setShowMessagesBar(Boolean.TRUE);
+			MensajesController.addError(null, "Error al descargar facturas de dispositivos moviles");
+		} catch (Exception e2) {
+			this.setShowMessagesBar(Boolean.TRUE);
+			MensajesController.addError(null, "Error al descargar facturas de dispositivos moviles");
+		}
+	}
+	
+	/**
 	 * Metodo para agregar calcular 
 	 * @param e
 	 */

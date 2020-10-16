@@ -16,6 +16,13 @@
 				<h:commandLink value="Imprimir" styleClass="botonImprimirPdf" action="#{cuentasController.imprimirListaFacturas}" target="_blank"/>
 			</h:panelGroup>
 		</rich:toolbarGroup>
+		
+		<rich:toolbarGroup>
+			<h:panelGroup layout="block" styleClass="botonComun">
+				<a4j:commandLink value="Descargar" execute="@this" render="pnlMensajes panelCuentasTabla" styleClass="botonDownload" actionListener="#{cuentasController.descargarFacturasFireBase}"/>
+			</h:panelGroup>
+		</rich:toolbarGroup>
+		
 		<rich:toolbarGroup>	
 			<h:panelGroup layout="block" styleClass="botonComun">
 				<a4j:commandLink value="#{msg_erpweb['ec.com.erp.etiqueta.boton.menu']}" styleClass="botonPanel" action="#{cuentasController.regresarMenuPrincipal}"/>

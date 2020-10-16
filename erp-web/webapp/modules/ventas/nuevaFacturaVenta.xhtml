@@ -74,7 +74,7 @@
 					<h:outputText value="" />
 					<div style="width: 30px"></div>
 					<h:outputText class="styleNegritas" value="#{msg_erpweb['ec.com.erp.etiqueta.label.lista.cabecera.nombre.vendedor']}:" />
-					<h:inputText style="width:150px" value="#{cuentasController.nombreVendedor}" id="nombreVendedor" maxlength="13" onkeypress="if (event.keyCode == 13) return false;">
+					<h:inputText style="width:150px" value="#{cuentasController.nombreVendedor}" id="nombreVendedor" maxlength="64" onkeypress="if (event.keyCode == 13) return false;">
 					</h:inputText>
 					<h:panelGroup layout="block" styleClass="botonB" style="margin-top:5px;">
 						<a4j:commandLink oncomplete="#{rich:component('mpVendedores')}.show(); " styleClass="botonBuscar" actionListener="#{cuentasController.busquedaVendedores}" render="pnlListaVendedores tableVendedores pnlMensajes" execute="@this, pnlGridVentas" title="Click para buscar vendedores">							

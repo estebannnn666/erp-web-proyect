@@ -154,7 +154,7 @@ public class ArticulosController extends CommonsController implements Serializab
 	}
 	
 	/**
-	 * Metodo para descargar clientes de fire base
+	 * Metodo para descargar articulos de fire base
 	 * @param e
 	 */
 	public void descargarArticulosFireBase(ActionEvent e){
@@ -167,7 +167,7 @@ public class ArticulosController extends CommonsController implements Serializab
 	}
 	
 	/**
-	 * Metodo para subir clientes a fire base
+	 * Metodo para subir articulos a fire base
 	 * @param e
 	 */
 	public void cargarArticulosFireBase(ActionEvent e){

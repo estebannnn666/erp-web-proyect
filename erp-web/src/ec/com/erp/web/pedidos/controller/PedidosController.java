@@ -184,6 +184,27 @@ public class PedidosController extends CommonsController implements Serializable
 	}
 
 	/**
+	 * Metodo para descargar facturas de fire base
+	 * @param e
+	 */
+	public void descargarPedidosFireBase(ActionEvent e){
+		try {
+			System.out.println("Ingreso a realizar proceson con fire base");
+			ERPFactory.firebase.getFireBaseServicio().transDescargarPedidosFireBase();	
+			this.pedidosDTOCols = ERPFactory.pedidos.getPedidoServicio().findObtenerPedidosRegistrados(Integer.parseInt(ERPConstantes.ESTADO_ACTIVO_NUMERICO), null, null, null, null, null);
+			this.setShowMessagesBar(Boolean.TRUE);
+			MensajesController.addInfo(null, "Se ha terminado de descargar la informacion de pedidos de los dispositivos moviles");
+			System.out.println("Finalizo proceso con fire base");
+		} catch (ERPException e1) {
+			this.setShowMessagesBar(Boolean.TRUE);
+			MensajesController.addError(null, "Error al descargar pedidos de dispositivos moviles");
+		} catch (Exception e2) {
+			this.setShowMessagesBar(Boolean.TRUE);
+			MensajesController.addError(null, "Error al descargar pedidos de dispositivos moviles");
+		}
+	}
+	
+	/**
 	 * Metodo para buscar vendedores
 	 * @param e
 	 */

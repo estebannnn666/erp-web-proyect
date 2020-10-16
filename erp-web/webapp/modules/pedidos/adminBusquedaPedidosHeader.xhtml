@@ -14,6 +14,12 @@
 		
 		<rich:toolbarGroup>
 			<h:panelGroup layout="block" styleClass="botonComun">
+				<a4j:commandLink value="Descargar" execute="@this" render="pnlMensajes panelPedidosTabla" styleClass="botonDownload" actionListener="#{pedidosController.descargarPedidosFireBase}"/>
+			</h:panelGroup>
+		</rich:toolbarGroup>
+		
+		<rich:toolbarGroup>
+			<h:panelGroup layout="block" styleClass="botonComun">
 				<a4j:commandLink value="#{msg_erpweb['ec.com.erp.etiqueta.boton.menu']}" styleClass="botonPanel" action="#{pedidosController.regresarMenuPrincipal}"/>
 			</h:panelGroup>
 		</rich:toolbarGroup>

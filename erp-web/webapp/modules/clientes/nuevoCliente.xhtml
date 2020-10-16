@@ -44,7 +44,7 @@
 				<h:panelGroup id="pnlDatosBasicosCliente">
 					<h:panelGrid id="pnlGridDocumento" columnClasses="columna1" columns="3" cellspacing="2" cellpadding="5" rendered="#{clientesController.clienteDTO.codigoValorTipoCliente == 'PER'}">
 				 		<h:outputText class="styleNegritas" value="#{msg_erpweb['ec.com.erp.etiqueta.label.nuevo.cliente.documento']}: *" />
-				 		<h:inputText class="styleUpperCase" style="background-color:#f9f9d5; background-image: none; width:260px" value="#{clientesController.personaDTO.numeroDocumento}" id="numeroDocumento" onkeypress="if (event.keyCode == 13) return false; return validarEnteros(event);">
+				 		<h:inputText class="styleUpperCase" maxlength="13" style="background-color:#f9f9d5; background-image: none; width:260px" value="#{clientesController.personaDTO.numeroDocumento}" id="numeroDocumento" onkeypress="if (event.keyCode == 13) return false; return validarEnteros(event);">
 				 			<a4j:ajax event="keyup" execute="pnlDatosBasicosCliente" listener="#{clientesController.realizarConsultaDocumento}" onbeforesubmit="return verifyKeyEnter(event);" render="pnlDatosBasicosCliente, pnlGridDocumento, pnlGridPersona, pnlGridContacto, pnlMensajes"/>
 				 		</h:inputText>
 				 		<h:panelGrid columns="3" cellpadding="3" cellspacing="0" style="padding-left:10px">
@@ -60,29 +60,29 @@
 				 		<h:outputText value=""/>
 				 		
 				 		<h:outputText class="styleNegritas" value="#{msg_erpweb['ec.com.erp.etiqueta.label.nuevo.cliente.primer.apellido']}: *" />
-				 		<h:inputText class="styleUpperCase" style="background-color:#f9f9d5; background-image: none; width:260px" value="#{clientesController.personaDTO.primerApellido}" id="primerApellido">
+				 		<h:inputText class="styleUpperCase" maxlength="32" style="background-color:#f9f9d5; background-image: none; width:260px" value="#{clientesController.personaDTO.primerApellido}" id="primerApellido">
 				 			<a4j:ajax render="nombreCompleto" event="keyup" execute="@this" status="no" listener="#{clientesController.concatenarNombrePersona}"  oncomplete="fijarFoco('primerApellido');"></a4j:ajax>
 				 		</h:inputText>
 				 		<div style="width:20px"></div>
 				 		<h:outputText class="styleNegritas" value="#{msg_erpweb['ec.com.erp.etiqueta.label.nuevo.cliente.segundo.apellido']}: " />
-				 		<h:inputText class="styleUpperCase" style="width:260px" value="#{clientesController.personaDTO.segundoApellido}" id="segundoApellido" required="false">
+				 		<h:inputText class="styleUpperCase" maxlength="32" style="width:260px" value="#{clientesController.personaDTO.segundoApellido}" id="segundoApellido" required="false">
 				 			<a4j:ajax render="nombreCompleto" event="keyup" execute="@this" status="no" listener="#{clientesController.concatenarNombrePersona}"  oncomplete="fijarFoco('segundoApellido');"></a4j:ajax>
 				 		</h:inputText>
 				 		
 				 		<h:outputText class="styleNegritas" value="#{msg_erpweb['ec.com.erp.etiqueta.label.nuevo.cliente.primer.nombre']}: *" />
-				 		<h:inputText class="styleUpperCase" style="background-color:#f9f9d5; background-image: none; width:260px" value="#{clientesController.personaDTO.primerNombre}" id="primerNombre">
+				 		<h:inputText class="styleUpperCase" maxlength="32" style="background-color:#f9f9d5; background-image: none; width:260px" value="#{clientesController.personaDTO.primerNombre}" id="primerNombre">
 				 			<a4j:ajax render="nombreCompleto" event="keyup" execute="@this" status="no" listener="#{clientesController.concatenarNombrePersona}"  oncomplete="fijarFoco('primerNombre');"></a4j:ajax>
 				 		</h:inputText>
 				 		<div style="width:20px"></div>
 				 		<h:outputText class="styleNegritas" value="#{msg_erpweb['ec.com.erp.etiqueta.label.nuevo.cliente.segundo.nombre']}: " />
-				 		<h:inputText class="styleUpperCase" style="width:260px" value="#{clientesController.personaDTO.segundoNombre}" id="segundoNombre" required="false">
+				 		<h:inputText class="styleUpperCase"  maxlength="32" style="width:260px" value="#{clientesController.personaDTO.segundoNombre}" id="segundoNombre" required="false">
 				 			<a4j:ajax render="nombreCompleto" event="keyup" execute="@this" status="no" listener="#{clientesController.concatenarNombrePersona}"  oncomplete="fijarFoco('segundoNombre');"></a4j:ajax>
 				 		</h:inputText>
 				 	</h:panelGrid>
 				 	
 				 	<h:panelGrid id="pnlGridEmpresa" columns="3" cellspacing="2" cellpadding="5" rendered="#{clientesController.clienteDTO.codigoValorTipoCliente == 'EMP'}">
 				 		<h:outputText class="styleNegritas" value="#{msg_erpweb['ec.com.erp.etiqueta.label.nuevo.cliente.empresa.numeroruc']}: *" />
-				 		<h:inputText class="styleUpperCase" style="background-color:#f9f9d5; background-image: none; width:260px" value="#{clientesController.empresaDTO.numeroRuc}" id="numeroRuc" onkeypress="if (event.keyCode == 13) return false;">
+				 		<h:inputText maxlength="13" class="styleUpperCase" style="background-color:#f9f9d5; background-image: none; width:260px" value="#{clientesController.empresaDTO.numeroRuc}" id="numeroRuc" onkeypress="if (event.keyCode == 13) return false;">
 				 			<a4j:ajax event="keyup" execute="@this" listener="#{clientesController.realizarConsultaDocumento}" onbeforesubmit="return verifyKeyEnter(event);" render="pnlGridEmpresa pnlGridContacto pnlMensajes"/>
 				 		</h:inputText>
 				 		<h:panelGrid columns="2" cellpadding="3" cellspacing="0" style="padding-left:10px">
@@ -91,11 +91,11 @@
 						</h:panelGrid>
 				 		
 				 		<h:outputText class="styleNegritas" value="#{msg_erpweb['ec.com.erp.etiqueta.label.nuevo.cliente.empresa.razonSocial']}: *" />
-				 		<h:inputText class="styleUpperCase" style="background-color:#f9f9d5; background-image: none; width:260px" value="#{clientesController.empresaDTO.razonSocial}" id="razonSocial"/>
+				 		<h:inputText class="styleUpperCase" maxlength="128" style="background-color:#f9f9d5; background-image: none; width:260px" value="#{clientesController.empresaDTO.razonSocial}" id="razonSocial"/>
 				 		<h:outputText value=""/>
 				 		
 				 		<h:outputText class="styleNegritas" value="#{msg_erpweb['ec.com.erp.etiqueta.label.nuevo.cliente.empresa.Descripcion']}: " />
-				 		<h:inputText class="styleUpperCase" style="width:260px" value="#{clientesController.empresaDTO.descripcionEmpresa}" id="descripcionEmpresa" required="false"/>
+				 		<h:inputText class="styleUpperCase" maxlength="128" style="width:260px" value="#{clientesController.empresaDTO.descripcionEmpresa}" id="descripcionEmpresa" required="false"/>
 				 		<h:outputText value=""/>
 				 	</h:panelGrid>
 				 </h:panelGroup>
@@ -111,31 +111,31 @@
 			 		<h:outputText value=""/>
 			 		
 			 		<h:outputText class="styleNegritas" value="#{msg_erpweb['ec.com.erp.etiqueta.label.nuevo.cliente.contacto.calle.principal']}: *" />
-			 		<h:inputText class="styleUpperCase" style="background-color:#f9f9d5; background-image: none; width:260px" value="#{clientesController.contactoDTO.callePrincipal}" id="callePrincipal">
+			 		<h:inputText class="styleUpperCase" maxlength="128" style="background-color:#f9f9d5; background-image: none; width:260px" value="#{clientesController.contactoDTO.callePrincipal}" id="callePrincipal">
 			 			<a4j:ajax render="direccion" event="keyup" execute="@this" status="no" listener="#{clientesController.concatenarDireccion}"  oncomplete="fijarFoco('callePrincipal');"></a4j:ajax>
 			 		</h:inputText>
 			 		<div style="width:20px"></div>
 			 		<h:outputText class="styleNegritas" value="#{msg_erpweb['ec.com.erp.etiqueta.label.nuevo.cliente.contacto.numero.casa']}: *" />
-			 		<h:inputText class="styleUpperCase" style="background-color:#f9f9d5; background-image: none; width:260px" value="#{clientesController.contactoDTO.numeroCasa}" id="numeroCasa">
+			 		<h:inputText class="styleUpperCase" maxlength="32" style="background-color:#f9f9d5; background-image: none; width:260px" value="#{clientesController.contactoDTO.numeroCasa}" id="numeroCasa">
 			 			<a4j:ajax render="direccion" event="keyup" execute="@this" status="no" listener="#{clientesController.concatenarDireccion}"  oncomplete="fijarFoco('numeroCasa');"></a4j:ajax>
 			 		</h:inputText>
 			 		
 			 		<h:outputText class="styleNegritas" value="#{msg_erpweb['ec.com.erp.etiqueta.label.nuevo.cliente.contacto.calle.secundaria']}:" />
-			 		<h:inputText class="styleUpperCase" style="width:260px" value="#{clientesController.contactoDTO.calleSecundaria}" id="calleSecundaria">
+			 		<h:inputText class="styleUpperCase" maxlength="128" style="width:260px" value="#{clientesController.contactoDTO.calleSecundaria}" id="calleSecundaria">
 			 			<a4j:ajax render="direccion" event="keyup" execute="@this" status="no" listener="#{clientesController.concatenarDireccion}"  oncomplete="fijarFoco('calleSecundaria');"></a4j:ajax>
 			 		</h:inputText>
 			 		<div style="width:20px"></div>
 			 		<h:outputText class="styleNegritas" value="#{msg_erpweb['ec.com.erp.etiqueta.label.nuevo.cliente.contacto.referencia']}: " />
-			 		<h:inputText class="styleUpperCase" style="width:260px" value="#{clientesController.contactoDTO.referencia}" id="referencia"/>
+			 		<h:inputText class="styleUpperCase" maxlength="256" style="width:260px" value="#{clientesController.contactoDTO.referencia}" id="referencia"/>
 			 		
 			 		<h:outputText class="styleNegritas" value="#{msg_erpweb['ec.com.erp.etiqueta.label.nuevo.cliente.contacto.telefono.convencional']}: *" />
-			 		<h:inputText class="styleUpperCase" style="background-color:#f9f9d5; background-image: none; width:260px" value="#{clientesController.contactoDTO.telefonoPrincipal}" id="telefonoConvencional"/>
+			 		<h:inputText class="styleUpperCase" maxlength="10" style="background-color:#f9f9d5; background-image: none; width:260px" value="#{clientesController.contactoDTO.telefonoPrincipal}" id="telefonoConvencional"/>
 			 		<div style="width:20px"></div>
 			 		<h:outputText class="styleNegritas" value="#{msg_erpweb['ec.com.erp.etiqueta.label.nuevo.cliente.contacto.telefono.celular']}: " />
-			 		<h:inputText class="styleUpperCase" style="width:260px" value="#{clientesController.contactoDTO.telefonoCelular}" id="telefonoCelular"/>
+			 		<h:inputText class="styleUpperCase" maxlength="10" style="width:260px" value="#{clientesController.contactoDTO.telefonoCelular}" id="telefonoCelular"/>
 			 		
 			 		<h:outputText class="styleNegritas" value="#{msg_erpweb['ec.com.erp.etiqueta.label.nuevo.cliente.contacto.ciudad']}: *" />
-			 		<h:inputText class="styleUpperCase" style="background-color:#f9f9d5; background-image: none; width:260px" value="#{clientesController.contactoDTO.ciudad}" id="ciudad"/>
+			 		<h:inputText class="styleUpperCase" maxlength="64" style="background-color:#f9f9d5; background-image: none; width:260px" value="#{clientesController.contactoDTO.ciudad}" id="ciudad"/>
 			 		<div style="width:20px"></div>
 			 		<h:outputText value=""/>
 			 		<h:outputText value=""/>
