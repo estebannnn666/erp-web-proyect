@@ -461,11 +461,16 @@ public class PedidosController extends CommonsController implements Serializable
 	 * @param e
 	 */
 	public void agragarRegistroDetallePedido(ActionEvent e) {
-		DetallePedidoDTO detalle = new DetallePedidoDTO();
-		detalle.setArticuloDTO(new ArticuloDTO());
-		detalle.getId().setCodigoCompania(contDetalle);
-		this.detallePedidoDTOCols.add(detalle);
-		contDetalle++;
+		if(contDetalle <= 20) {
+			DetallePedidoDTO detalle = new DetallePedidoDTO();
+			detalle.setArticuloDTO(new ArticuloDTO());
+			detalle.getId().setCodigoCompania(contDetalle);
+			this.detallePedidoDTOCols.add(detalle);
+			contDetalle++;
+		}else {
+			this.setShowMessagesBar(Boolean.TRUE);
+			MensajesController.addInfo(null, "Solo se puede agregar hasta 20 items por pedido");
+		}
 	}
 
 	/**

@@ -384,7 +384,9 @@ public class CuentasController extends CommonsController implements Serializable
 				this.crearNuevaFila = Boolean.FALSE;
 			}
 		});
-		
+		if(facturaDetalleDTOCols.size() >= 20) {
+			this.crearNuevaFila = Boolean.FALSE;
+		}
 		if(this.crearNuevaFila) {
 			FacturaDetalleDTO detalle = new FacturaDetalleDTO();
 			detalle.setArticuloDTO(new ArticuloDTO());
@@ -428,7 +430,9 @@ public class CuentasController extends CommonsController implements Serializable
 				this.crearNuevaFila = Boolean.FALSE;
 			}
 		});
-		
+		if(facturaDetalleDTOCols.size() >= 20) {
+			this.crearNuevaFila = Boolean.FALSE;
+		}
 		if(this.crearNuevaFila) {
 			FacturaDetalleDTO detalle = new FacturaDetalleDTO();
 			detalle.setArticuloDTO(new ArticuloDTO());
@@ -1088,8 +1092,10 @@ public class CuentasController extends CommonsController implements Serializable
 			if(detail.getCodigoArticulo() == null) {
 				this.crearNuevaFila = Boolean.FALSE;
 			}
-		});
-		
+		});		
+		if(facturaDetalleDTOCols.size() >= 20) {
+			this.crearNuevaFila = Boolean.FALSE;
+		}
 		if(this.crearNuevaFila) {
 			FacturaDetalleDTO detalle = new FacturaDetalleDTO();
 			detalle.setArticuloDTO(new ArticuloDTO());
@@ -1140,7 +1146,9 @@ public class CuentasController extends CommonsController implements Serializable
 				this.crearNuevaFila = Boolean.FALSE;
 			}
 		});
-		
+		if(facturaDetalleDTOCols.size() >= 20) {
+			this.crearNuevaFila = Boolean.FALSE;
+		}
 		if(this.crearNuevaFila) {
 			FacturaDetalleDTO detalle = new FacturaDetalleDTO();
 			detalle.setArticuloDTO(new ArticuloDTO());

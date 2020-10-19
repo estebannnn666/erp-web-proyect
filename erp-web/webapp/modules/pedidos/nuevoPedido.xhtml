@@ -68,7 +68,7 @@
 						</rich:toolbarGroup>
 						<rich:toolbarGroup location="right">	
 							<h:panelGroup layout="block" styleClass="botonD" style="padding-top: 3px; margin-top:0px;">
-								<a4j:commandLink styleClass="agregarD" actionListener="#{pedidosController.agragarRegistroDetallePedido}" render="panelDetallePedido, tableDetallePedido" execute="@this" title="Click para agregar fila">
+								<a4j:commandLink styleClass="agregarD" actionListener="#{pedidosController.agragarRegistroDetallePedido}" render="panelDetallePedido, tableDetallePedido pnlMensajes" execute="@this" title="Click para agregar fila">
 									<h:panelGrid columns="2" cellpadding="3" cellspacing="0">
 										<h:graphicImage name="btnNuevoPedido.png" library="images" style="border:none;border-color:white;" height="16" width="16"/>
 										<h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.boton.agregar']}"/>
