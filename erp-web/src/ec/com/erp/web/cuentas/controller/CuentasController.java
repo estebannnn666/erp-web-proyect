@@ -64,6 +64,7 @@ import org.w3c.dom.Document;
 import ec.com.erp.cliente.common.constantes.ERPConstantes;
 import ec.com.erp.cliente.common.exception.ERPException;
 import ec.com.erp.cliente.common.factory.ERPFactory;
+import ec.com.erp.cliente.common.utils.ValidationUtils;
 import ec.com.erp.cliente.mdl.dto.ArticuloDTO;
 import ec.com.erp.cliente.mdl.dto.ArticuloImpuestoDTO;
 import ec.com.erp.cliente.mdl.dto.ArticuloUnidadManejoDTO;
@@ -166,6 +167,8 @@ public class CuentasController extends CommonsController implements Serializable
 		this.pagosFacturaDTO = new PagosFacturaDTO(); 
 		this.facturaCabeceraDTO.setFechaDocumento(new Date());
 		this.facturaCabeceraDTO.setPagado(Boolean.FALSE);
+		this.facturaCabeceraDTO.setTipoRuc(ERPConstantes.TIPO_RUC_UNO);
+		this.tipoRuc = "0";
 		this.facturaDetalleDTO = new FacturaDetalleDTO();
 		this.facturaCabeceraDTOCols = new ArrayList<FacturaCabeceraDTO>();
 		this.facturaDetalleDTOCols = new ArrayList<FacturaDetalleDTO>();
@@ -308,10 +311,10 @@ public class CuentasController extends CommonsController implements Serializable
 			System.out.println("Finalizo proceso con fire base");
 		} catch (ERPException e1) {
 			this.setShowMessagesBar(Boolean.TRUE);
-			MensajesController.addError(null, "Error al descargar facturas de dispositivos moviles");
+			MensajesController.addError(null, "Error al descargar facturas de dispositivos moviles, "+e1.getMessage() );
 		} catch (Exception e2) {
 			this.setShowMessagesBar(Boolean.TRUE);
-			MensajesController.addError(null, "Error al descargar facturas de dispositivos moviles");
+			MensajesController.addError(null, "Error al descargar facturas de dispositivos moviles, "+e2.getMessage());
 		}
 	}
 	
@@ -328,6 +331,22 @@ public class CuentasController extends CommonsController implements Serializable
 		}else {
 			secuenciaPedido = ERPFactory.secuencias.getSecuenciaServicio().findObtenerSecuenciaByNombre(FacturaCabeceraID.NOMBRE_SECUENCIA_NOTA_VENTA);
 			this.facturaCabeceraDTO.setCodigoReferenciaFactura("NOT-"+secuenciaPedido.getValorSecuencia());
+		}
+	}
+	
+	/**
+	 * Metodo para obtener secuencial de facturas segun el RUC 
+	 * @param e
+	 */
+	public void seleccionarTipoRuc(ValueChangeEvent e) {
+		String tipoRuc = (String)e.getNewValue();
+		if(tipoRuc.equals(ERPConstantes.TIPO_RUC_DOS)) {
+			SecuenciaDTO secuenciaPedido = ERPFactory.secuencias.getSecuenciaServicio().findObtenerSecuenciaByNombre(FacturaCabeceraID.NOMBRE_SECUENCIA_FACTURA_RUC_UNO);
+			String numeroFactura = ValidationUtils.obtenerSecuencialFactura(5, String.valueOf(secuenciaPedido.getValorSecuencia()));
+			this.facturaCabeceraDTO.setNumeroDocumento(numeroFactura);
+			this.tipoRuc = "1";
+		}else {
+			this.facturaCabeceraDTO.setNumeroDocumento("");
 		}
 	}
 	
@@ -837,7 +856,13 @@ public class CuentasController extends CommonsController implements Serializable
 	 * @return
 	 */
 	public void simularEvento(ActionEvent e) {
-		this.tipoRuc = ERPConstantes.ESTADO_INACTIVO_NUMERICO;
+		if(this.facturaCabeceraDTO != null && this.facturaCabeceraDTO.getTipoRuc() != null) {
+			if(this.facturaCabeceraDTO.getTipoRuc().equals(ERPConstantes.TIPO_RUC_DOS)) {
+				this.tipoRuc = ERPConstantes.ESTADO_ACTIVO_NUMERICO;
+			}else {
+				this.tipoRuc = ERPConstantes.ESTADO_INACTIVO_NUMERICO;
+			}
+		}
 		this.setShowMessagesBar(Boolean.FALSE);
 	}
 	
@@ -887,6 +912,8 @@ public class CuentasController extends CommonsController implements Serializable
 		this.cuentasDataManager.setTipoFactura(ERPConstantes.CODIGO_CATALOGO_VALOR_DOCUMENTO_VENTAS);
 		SecuenciaDTO secuenciaPedido = ERPFactory.secuencias.getSecuenciaServicio().findObtenerSecuenciaByNombre(FacturaCabeceraID.NOMBRE_SECUENCIA_VENTA);
 		this.facturaCabeceraDTO.setCodigoReferenciaFactura("FAC-"+secuenciaPedido.getValorSecuencia());
+		this.facturaCabeceraDTO.setTipoRuc(ERPConstantes.TIPO_RUC_UNO);
+		this.tipoRuc = "0";
 		this.facturaCabeceraDTO.setFechaDocumento(new Date());
 		this.facturaCabeceraDTO.setPagado(Boolean.FALSE);
 		FacturaDetalleDTO detalle = null;
@@ -1632,9 +1659,7 @@ public class CuentasController extends CommonsController implements Serializable
 			if(this.tipoRuc.equals("3")) {
 				this.imprimirNotaVenta(texto, fechaFormateada, formatoDecimales);
 			}else {
-				if(this.tipoRuc.equals(ERPConstantes.ESTADO_ACTIVO_NUMERICO)) {
-					texto.append("\n");
-				}
+				texto.append("\n");
 				texto.append("\n");
 				texto.append("\n");
 				texto.append("\n");
@@ -1647,15 +1672,11 @@ public class CuentasController extends CommonsController implements Serializable
 				texto.append("\n");
 				texto.append("            "+this.facturaCabeceraDTO.getNombreClienteProveedor());
 				texto.append("\n");
-				texto.append("            "+UtilitarioWeb.completarEspaciosCadena(13, this.facturaCabeceraDTO.getRucDocumento())+"          "+fechaFormateada);
+				texto.append("\n");
+				texto.append("            "+UtilitarioWeb.completarEspaciosCadena(13, this.facturaCabeceraDTO.getRucDocumento())+"            "+fechaFormateada);
 				texto.append("\n");
 				texto.append("\n");
-				if(this.tipoRuc.equals(ERPConstantes.ESTADO_ACTIVO_NUMERICO)) {
-					texto.append("      "+UtilitarioWeb.completarEspaciosCadena(30, this.facturaCabeceraDTO.getDireccion())+"     "+this.facturaCabeceraDTO.getTelefono());
-				}else {
-					texto.append("        "+UtilitarioWeb.completarEspaciosCadena(30, this.facturaCabeceraDTO.getDireccion())+"     "+this.facturaCabeceraDTO.getTelefono());
-				}
-				texto.append("\n");
+				texto.append("        "+UtilitarioWeb.completarEspaciosCadena(30, this.facturaCabeceraDTO.getDireccion())+"     "+this.facturaCabeceraDTO.getTelefono());				
 				texto.append("\n");
 				texto.append("\n");
 				texto.append("\n");
@@ -1678,33 +1699,23 @@ public class CuentasController extends CommonsController implements Serializable
 					tamDetalle++;
 				}
 				texto.append("\n");
-				if(this.tipoRuc.equals(ERPConstantes.ESTADO_ACTIVO_NUMERICO)) {
-					texto.append("                                               "+UtilitarioWeb.completarEspaciosNumeros(9, formatoDecimales.format(subTotal)));
-					texto.append("\n");
-					texto.append("                                               "+UtilitarioWeb.completarEspaciosNumeros(9, formatoDecimales.format(this.facturaCabeceraDTO.getTotalIva())));
-					texto.append("\n");
-					texto.append("\n");
-					texto.append("                                               "+UtilitarioWeb.completarEspaciosNumeros(9, formatoDecimales.format(this.facturaCabeceraDTO.getTotalSinImpuestos())));
-					texto.append("\n");
-					texto.append("                                               "+UtilitarioWeb.completarEspaciosNumeros(9, formatoDecimales.format(this.facturaCabeceraDTO.getTotalCuenta())));
-				}else {
-					texto.append("                                               "+UtilitarioWeb.completarEspaciosNumeros(9, formatoDecimales.format(subTotal)));
-					texto.append("\n");
-					texto.append("                                               "+UtilitarioWeb.completarEspaciosNumeros(9, formatoDecimales.format(this.facturaCabeceraDTO.getDescuento() == null ? 0.0 : this.facturaCabeceraDTO.getDescuento())));
-					texto.append("\n");
-					texto.append("                                               "+UtilitarioWeb.completarEspaciosNumeros(9, formatoDecimales.format(this.facturaCabeceraDTO.getTotalSinImpuestos())));
-					texto.append("\n");
-					texto.append("                                               "+UtilitarioWeb.completarEspaciosNumeros(9, formatoDecimales.format(this.facturaCabeceraDTO.getTotalIva())));
-					texto.append("\n");
-					texto.append("                                               "+UtilitarioWeb.completarEspaciosNumeros(9, formatoDecimales.format(this.facturaCabeceraDTO.getTotalCuenta())));
-				}	
+				
+				texto.append("                                               "+UtilitarioWeb.completarEspaciosNumeros(9, formatoDecimales.format(subTotal)));
+				texto.append("\n");
+				texto.append("                                               "+UtilitarioWeb.completarEspaciosNumeros(9, formatoDecimales.format(this.facturaCabeceraDTO.getDescuento() == null ? 0.0 : this.facturaCabeceraDTO.getDescuento())));
+				texto.append("\n");
+				texto.append("                                               "+UtilitarioWeb.completarEspaciosNumeros(9, formatoDecimales.format(this.facturaCabeceraDTO.getTotalSinImpuestos())));
+				texto.append("\n");
+				texto.append("                                               "+UtilitarioWeb.completarEspaciosNumeros(9, formatoDecimales.format(this.facturaCabeceraDTO.getTotalIva())));
+				texto.append("\n");
+				texto.append("                                               "+UtilitarioWeb.completarEspaciosNumeros(9, formatoDecimales.format(this.facturaCabeceraDTO.getTotalCuenta())));
+				
 				texto.append("\n");
 				texto.append("\n");
 				texto.append("\n");
 				texto.append("\n");
-				if(this.tipoRuc.equals(ERPConstantes.ESTADO_INACTIVO_NUMERICO)) {
-					texto.append("\n");
-				}
+				texto.append("\n");
+				texto.append("\n");
 			}
 			
 			DocFlavor flavor = DocFlavor.BYTE_ARRAY.AUTOSENSE;
@@ -1721,6 +1732,7 @@ public class CuentasController extends CommonsController implements Serializable
 			this.clearNuevaCuentaFacturaVentas(e);
 			this.setShowMessagesBar(Boolean.TRUE);
 			MensajesController.addInfo(null, ERPWebResources.getString("ec.com.erp.etiqueta.pantall.despacho.mensaje.impresion.correcta"));
+			this.clearNuevaCuentaFacturaVentas(e);
 		} catch (PrintException execption) {
 			this.setShowMessagesBar(Boolean.TRUE);
 			MensajesController.addError(null, "Error al imprimir");

@@ -23,12 +23,19 @@
 	<ui:define name="contentCenter">
 		<rich:panel header="Registro de documentos de ventas" style="width: 100%; background-color: #F5FAFF; height: 98%; overflow-y:auto;">
 			<fieldset>
-				<legend class="styleLegend">#{msg_erpweb['ec.com.erp.etiqueta.header.datos.cliente']}</legend>
-				<h:panelGrid id="pnlGridCliente" columns="2" cellspacing="2" cellpadding="5">
-					<h:outputText class="styleNegritas" value="#{msg_erpweb['ec.com.erp.etiqueta.header.tabla.tipo.cliente']}: *" />
+				<legend class="styleLegend">Configuraciones de documentos</legend>
+				<h:panelGrid id="pnlGridCliente" columns="5" cellspacing="2" cellpadding="5">
+					<h:outputText class="styleNegritas" value="Tipo de comprobante: *" />
 					<h:selectOneRadio value="#{cuentasController.facturaCabeceraDTO.codigoValorTipoDocumento}" valueChangeListener="#{cuentasController.seleccionarTipoDocumento}">
 					   	<f:selectItem itemValue="VEN" itemLabel="FACTURA VENTA" />
 					   	<f:selectItem itemValue="NTV" itemLabel="NOTA DE VENTA" />
+					   	<a4j:ajax event="click" execute="@this" render="pnlGridVentas"></a4j:ajax>
+					</h:selectOneRadio>
+					<h:outputText value="" />
+					<h:outputText class="styleNegritas" value="Tipo de RUC: *" />
+					<h:selectOneRadio value="#{cuentasController.facturaCabeceraDTO.tipoRuc}" valueChangeListener="#{cuentasController.seleccionarTipoRuc}">
+					   	<f:selectItem itemValue="FA1" itemLabel="RUC: 1001594132001" />
+					   	<f:selectItem itemValue="FA2" itemLabel="RUC: 1003635263001" />
 					   	<a4j:ajax event="click" execute="@this" render="pnlGridVentas"></a4j:ajax>
 					</h:selectOneRadio>
 				</h:panelGrid>
@@ -41,7 +48,7 @@
 					<h:outputText value="" />
 					<div style="width: 30px"></div>
 					<h:outputText class="styleNegritas" value="#{msg_erpweb['ec.com.erp.etiqueta.label.lista.cabecera.factura.numero.factura']}: *" />
-					<h:inputText style="width:150px" value="#{cuentasController.facturaCabeceraDTO.numeroDocumento}" id="nroDocumentoFac" maxlength="13" onkeypress="if (event.keyCode == 13) return false;"/>
+					<h:inputText style="width:150px" disabled="#{cuentasController.facturaCabeceraDTO.tipoRuc == 'FA2'}" value="#{cuentasController.facturaCabeceraDTO.numeroDocumento}" id="nroDocumentoFac" maxlength="13" onkeypress="if (event.keyCode == 13) return false;"/>
 					<h:outputText value="" />
 					<div style="width: 30px"></div>
 					<h:outputText class="styleNegritas" value="#{msg_erpweb['ec.com.erp.etiqueta.label.lista.cabecera.factura.fecha']}: *" />
@@ -343,8 +350,17 @@
 			                <h:outputText value="#{client.personaDTO.numeroDocumento == null ? client.empresaDTO.numeroRuc : client.personaDTO.numeroDocumento}" />
 			            </rich:column>
 			            <rich:column>
-			                <f:facet name="header"><h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.header.tabla.nombre.cliente']}"/></f:facet>
-			                <h:outputText value="#{client.personaDTO.nombreCompleto == null ? client.empresaDTO.razonSocial : client.personaDTO.nombreCompleto}" />
+			                <f:facet name="header"><h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.header.tabla.nombre.cliente']}"/></f:facet>			                
+			                <rich:panel id="cliente#{it}" styleClass="tooltip-text" bodyClass="rich-laguna-panel-no-header" style="border: none !important">  
+			                	<h:outputText value="#{client.personaDTO.nombreCompleto == null ? (client.empresaDTO.razonSocial.length() > 20 ? client.empresaDTO.razonSocial.substring(0,20).concat('...') : client.empresaDTO.razonSocial) : (client.personaDTO.nombreCompleto.length() > 20 ? client.personaDTO.nombreCompleto.substring(0,20).concat('...') : client.personaDTO.nombreCompleto)}" />
+								<rich:tooltip id="ttc#{it}" showDelay="500" styleClass="tooltip" layout="block" rendered="#{client.personaDTO.nombreCompleto == null ? client.empresaDTO.razonSocial.length() > 20 : client.personaDTO.nombreCompleto.length() > 20}">                
+									<h:panelGrid>
+										<span style="white-space: nowrap">					
+											<h:outputText value="#{client.personaDTO.nombreCompleto == null ? client.empresaDTO.razonSocial : client.personaDTO.nombreCompleto}" />											
+										</span>
+									</h:panelGrid>
+								</rich:tooltip>       
+							</rich:panel>
 			            </rich:column>
 			            <rich:column>
 			                <f:facet name="header"><h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.header.tabla.direccion.cliente']}"/></f:facet>
@@ -500,7 +516,7 @@
 			<!-- Botones de PopUp -->
 			<h:panelGrid style="margin:auto; padding-top: 5px;" columns="3" cellpadding="0" cellspacing="0">
 				<h:panelGroup layout="block" styleClass="botonD" style="margin-top:5px;margin-right:20px;">
-					<a4j:commandLink styleClass="aceptarD" render="pnlMensajes" oncomplete="#{rich:component('mpOpcionesImpresion')}.show(); #{rich:component('mpConfirmacion')}.hide(); return false;" execute="@this" actionListener="#{cuentasController.simularEvento}">
+					<a4j:commandLink styleClass="aceptarD" render="pnlMensajes mpOpcionesImpresion" oncomplete="#{rich:component('mpOpcionesImpresion')}.show(); #{rich:component('mpConfirmacion')}.hide(); return false;" execute="@this" actionListener="#{cuentasController.simularEvento}">
 						<h:panelGrid columns="2" cellpadding="3" cellspacing="0">
 							<h:graphicImage name="btnImprimir.png" library="images" style="border:none;border-color:white;" height="16" width="16"/>
 							<h:outputText value="Imprimir" />
@@ -558,7 +574,7 @@
 				</h:panelGroup>
 			
 				<h:panelGroup layout="block" styleClass="botonD" style="margin-top:5px;">
-					<a4j:commandLink  styleClass="cancelarD" oncomplete="#{rich:component('mpOpcionesImpresion')}.hide(); return false;" immediate="true">
+					<a4j:commandLink  styleClass="cancelarD" action="#{cuentasController.regresarBusquedaFacturasVentas}" oncomplete="#{rich:component('mpOpcionesImpresion')}.hide(); return false;" immediate="true">
 						<h:panelGrid columns="2" cellpadding="3" cellspacing="0">
 							<h:graphicImage name="btnCancel.png" library="images" style="border:none;border-color:white;" height="16" width="16"/>
 							<h:outputText value="Cerrar" />

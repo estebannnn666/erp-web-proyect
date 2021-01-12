@@ -133,8 +133,17 @@
 	            <rich:column>
 	                <h:outputText value="#{inventario.fechaMovimiento}" />
 	            </rich:column>
-	            <rich:column>
-	                <h:outputText value="#{inventario.detalleMoviento}" />
+	            <rich:column>	                
+	                <rich:panel id="movim#{it}" styleClass="tooltip-text" bodyClass="rich-laguna-panel-no-header" style="border: none !important">  
+		        		<h:outputText value="#{inventario.detalleMoviento.length() > 40 ? inventario.detalleMoviento.substring(0,40).concat('...') : inventario.detalleMoviento}" /> 
+						<rich:tooltip id="ttc#{it}" showDelay="500" styleClass="tooltip" layout="block" rendered="#{inventario.detalleMoviento.length() > 40}">                
+							<h:panelGrid>
+								<span style="white-space: nowrap">												
+									<h:outputText value="#{inventario.detalleMoviento}" />												
+								</span>
+							</h:panelGrid>
+						</rich:tooltip>       
+					</rich:panel>
 	            </rich:column>
 	             <rich:column>
 	                <h:outputText value="#{inventario.articuloUnidadManejoDTO.tipoUnidadManejoCatalogoValorDTO.nombreCatalogoValor.concat('x').concat(inventario.articuloUnidadManejoDTO.valorUnidadManejo)}" />
@@ -229,7 +238,14 @@
 			.columnaTable5{
 				width: 25% !important;
 			}
-			
+			.tooltip-text {     
+			  	cursor: arrow;    
+			  	border-width: 2px;     
+			  	text-align: center;       
+			  	display: table-cell;       
+			  	vertical-align: middle;   
+				background-color: #FFFFFF !important;  	  
+		  	}	
 		</h:outputStylesheet>
 		<h:commandLink id="linkprintInvetario" styleClass="linkprintInvetario" action="#{inventarioController.imprimirKardex}" target="_BLANK">
 		</h:commandLink>

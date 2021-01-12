@@ -158,12 +158,21 @@ public class ArticulosController extends CommonsController implements Serializab
 	 * @param e
 	 */
 	public void descargarArticulosFireBase(ActionEvent e){
-		System.out.println("Ingreso a realizar proceson con fire base");
-		ERPFactory.firebase.getFireBaseServicio().transDescargarArticulosFireBase();
-		this.articuloDTOCols = ERPFactory.articulos.getArticuloServicio().findObtenerListaArticulos(Integer.parseInt(ERPConstantes.ESTADO_ACTIVO_NUMERICO), codigoBarrasBusqueda,nombreArticuloBusqueda);
-		this.setShowMessagesBar(Boolean.TRUE);
-		MensajesController.addInfo(null, "Se ha terminado de descargar la informacion de articulo de los dispositivos moviles");
-		System.out.println("Finalizo proceso con fire base");
+		try {
+			System.out.println("Ingreso a realizar proceson con fire base");
+			ERPFactory.firebase.getFireBaseServicio().transDescargarArticulosFireBase();
+			this.articuloDTOCols = ERPFactory.articulos.getArticuloServicio().findObtenerListaArticulos(Integer.parseInt(ERPConstantes.ESTADO_ACTIVO_NUMERICO), codigoBarrasBusqueda,nombreArticuloBusqueda);
+			this.setShowMessagesBar(Boolean.TRUE);
+			MensajesController.addInfo(null, "Se ha terminado de descargar la informacion de articulo de los dispositivos moviles");
+			System.out.println("Finalizo proceso con fire base");
+		} catch (ERPException e1) {
+			this.setShowMessagesBar(Boolean.TRUE);
+			MensajesController.addError(null, "Error al descargar articulos de dispositivos moviles, "+e1.getMessage() );
+		} catch (Exception e2) {
+			this.setShowMessagesBar(Boolean.TRUE);
+			MensajesController.addError(null, "Error al descargar articulos de dispositivos moviles, "+e2.getMessage());
+		}
+		
 	}
 	
 	/**
@@ -171,11 +180,19 @@ public class ArticulosController extends CommonsController implements Serializab
 	 * @param e
 	 */
 	public void cargarArticulosFireBase(ActionEvent e){
-		System.out.println("Ingreso a realizar carga de datos de clientes a fire base");
-		ERPFactory.firebase.getFireBaseServicio().findGuardarArticulosFireBase();
-		this.setShowMessagesBar(Boolean.TRUE);
-		MensajesController.addInfo(null, "Se ha terminado de subir la informacion de articulos para dispositivos moviles");
-		System.out.println("Finalizo proceso de carga a fire base");
+		try {
+			System.out.println("Ingreso a realizar carga de datos de clientes a fire base");
+			ERPFactory.firebase.getFireBaseServicio().findGuardarArticulosFireBase();
+			this.setShowMessagesBar(Boolean.TRUE);
+			MensajesController.addInfo(null, "Se ha terminado de subir la informacion de articulos para dispositivos moviles");
+			System.out.println("Finalizo proceso de carga a fire base");
+		} catch (ERPException e1) {
+			this.setShowMessagesBar(Boolean.TRUE);
+			MensajesController.addError(null, "Error al cargar articulos a dispositivos moviles, "+e1.getMessage() );
+		} catch (Exception e2) {
+			this.setShowMessagesBar(Boolean.TRUE);
+			MensajesController.addError(null, "Error al cargar articulos a dispositivos moviles, "+e2.getMessage());
+		}
 	}
 	
 	/**

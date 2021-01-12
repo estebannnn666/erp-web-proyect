@@ -106,8 +106,8 @@
 	            <rich:column>
 	                <f:facet name="header"><h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.label.lista.cabecera.factura.razonSocial']}"/></f:facet>
 	                <rich:panel id="cliente#{it}" styleClass="tooltip-text" bodyClass="rich-laguna-panel-no-header" style="border: none !important">  
-		        		<h:outputText value="#{cuenta.nombreClienteProveedor.length() > 22 ? cuenta.nombreClienteProveedor.substring(0,22).concat('...') : cuenta.nombreClienteProveedor}" /> 
-						<rich:tooltip id="ttc#{it}" showDelay="500" styleClass="tooltip" layout="block" rendered="#{cuenta.nombreClienteProveedor.length() > 22}">                
+		        		<h:outputText value="#{cuenta.nombreClienteProveedor.length() > 20 ? cuenta.nombreClienteProveedor.substring(0,20).concat('...') : cuenta.nombreClienteProveedor}" /> 
+						<rich:tooltip id="ttc#{it}" showDelay="500" styleClass="tooltip" layout="block" rendered="#{cuenta.nombreClienteProveedor.length() > 20}">                
 							<h:panelGrid>
 								<span style="white-space: nowrap">												
 									<h:outputText value="#{cuenta.nombreClienteProveedor}" />												
