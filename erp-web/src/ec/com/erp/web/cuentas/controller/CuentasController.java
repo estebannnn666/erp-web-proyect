@@ -1324,6 +1324,7 @@ public class CuentasController extends CommonsController implements Serializable
 		this.facturaCabeceraDTO.setNombreClienteProveedor(this.clienteDTO.getPersonaDTO() == null ? this.clienteDTO.getEmpresaDTO().getRazonSocial() : this.clienteDTO.getPersonaDTO().getNombreCompleto());
 		this.facturaCabeceraDTO.setDireccion(this.clienteDTO.getPersonaDTO() == null ? this.clienteDTO.getEmpresaDTO().getContactoEmpresaDTO().getDireccionPrincipal() : this.clienteDTO.getPersonaDTO().getContactoPersonaDTO().getDireccionPrincipal());
 		this.facturaCabeceraDTO.setTelefono(this.clienteDTO.getPersonaDTO() == null ? this.clienteDTO.getEmpresaDTO().getContactoEmpresaDTO().getTelefonoPrincipal() : this.clienteDTO.getPersonaDTO().getContactoPersonaDTO().getTelefonoPrincipal());
+		this.facturaCabeceraDTO.setTipoCliente(this.clienteDTO.getCodigoValorTipoCompra());
 		if(CollectionUtils.isNotEmpty(this.facturaDetalleDTOCols)) {
 			this.facturaDetalleDTOCols.stream().forEach(detalleFact ->{
 				if(detalleFact.getCodigoArticulo() != null && detalleFact.getCodigoArticuloUnidadManejo() != null) {
@@ -1384,6 +1385,7 @@ public class CuentasController extends CommonsController implements Serializable
 				this.facturaCabeceraDTO.setNombreClienteProveedor(this.clienteDTO.getPersonaDTO() == null ? this.clienteDTO.getEmpresaDTO().getRazonSocial() : this.clienteDTO.getPersonaDTO().getNombreCompleto());
 				this.facturaCabeceraDTO.setDireccion(this.clienteDTO.getPersonaDTO() == null ? this.clienteDTO.getEmpresaDTO().getContactoEmpresaDTO().getDireccionPrincipal() : this.clienteDTO.getPersonaDTO().getContactoPersonaDTO().getDireccionPrincipal());
 				this.facturaCabeceraDTO.setTelefono(this.clienteDTO.getPersonaDTO() == null ? this.clienteDTO.getEmpresaDTO().getContactoEmpresaDTO().getTelefonoPrincipal() : this.clienteDTO.getPersonaDTO().getContactoPersonaDTO().getTelefonoPrincipal());
+				this.facturaCabeceraDTO.setTipoCliente(this.clienteDTO.getCodigoValorTipoCompra());
 				this.setShowMessagesBar(Boolean.FALSE);
 				if(CollectionUtils.isNotEmpty(this.facturaDetalleDTOCols)) {
 					this.facturaDetalleDTOCols.stream().forEach(detalleFact ->{

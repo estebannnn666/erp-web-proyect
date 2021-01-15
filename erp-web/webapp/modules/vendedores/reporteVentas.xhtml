@@ -95,9 +95,21 @@
 	                	<f:convertNumber pattern="0.00"/>
 	                </h:outputText>
 	            </rich:column>
-	             <rich:column style="text-align: right; padding-right: 3px;">
-	                <f:facet name="header"><h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.label.lista.factura.etiqueta.vendedor.porcentaje.comision']}"/></f:facet>
+	            <rich:column style="text-align: right; padding-right: 3px;">
+	                <f:facet name="header"><h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.label.lista.factura.etiqueta.vendedor.porcentaje.comision.minorista']}"/></f:facet>
 	                <h:outputText value="#{ventas.porcentajeComision}">
+	                	<f:convertNumber pattern="0.00"/>
+	                </h:outputText>
+	            </rich:column>
+	            <rich:column style="text-align: right; padding-right: 3px;">
+	                <f:facet name="header"><h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.label.lista.factura.etiqueta.vendedor.porcentaje.comision.mayorista']}"/></f:facet>
+	                <h:outputText value="#{ventas.porcentajeComisionMayor}">
+	                	<f:convertNumber pattern="0.00"/>
+	                </h:outputText>
+	            </rich:column>
+	            <rich:column style="text-align: center; padding-right: 3px;">
+	                <f:facet name="header"><h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.label.lista.factura.etiqueta.vendedor.comision.tipo']}"/></f:facet>
+	                <h:outputText value="#{ventas.tipoCliente eq 'MAY' ? 'Al POR MAYOR' : 'AL POR MENOR'}">
 	                	<f:convertNumber pattern="0.00"/>
 	                </h:outputText>
 	            </rich:column>
@@ -110,17 +122,17 @@
 	                <h:outputText value="#{ventas.valorVendido}" >
 	                	<f:convertNumber pattern="0.00"/>
 	                </h:outputText>
-	            </rich:column>
+	            </rich:column>	         
 	            <rich:column style="text-align: right; padding-right: 3px;">
 	                <f:facet name="header"><h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.label.lista.factura.etiqueta.vendedor.comision']}"/></f:facet>
-	                <h:outputText value="#{ventas.valoCcomision}">
+	                <h:outputText value="#{ventas.valoComisionTotal}">
 	                	<f:convertNumber pattern="0.00"/>
 	                </h:outputText>
 	            </rich:column>
 	            
 	            <f:facet name="footer">
 	            	<rich:columnGroup>
-		                <rich:column colspan="7" style="text-align: right; paddin-right: 10px">Total:</rich:column>
+		                <rich:column colspan="9" style="text-align: right; paddin-right: 10px">Total:</rich:column>
 		                <rich:column style="text-align: right; paddin-right: 10px">
 		                    <h:outputText value="#{vendedorController.totalVendido}">
 		                    </h:outputText>
@@ -131,7 +143,7 @@
 		                    </h:outputText>
 		                </rich:column>
 		                <rich:column style="text-align: right; paddin-right: 10px">
-		                    <h:outputText value="#{vendedorController.comision}">
+		                    <h:outputText value="#{vendedorController.comisionTotal}">
 		                    	<f:convertNumber pattern="0.00"/>
 		                    </h:outputText>
 		                </rich:column>		         

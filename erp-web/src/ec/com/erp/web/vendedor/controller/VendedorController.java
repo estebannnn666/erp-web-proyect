@@ -69,13 +69,16 @@ public class VendedorController extends CommonsController implements Serializabl
 	private Boolean vendedorCreado;
 	private BigDecimal totalVentas;
 	private BigDecimal totalComision;
+	private BigDecimal totalComisionMenor;
+	private BigDecimal totalComisionMayor;
 	private Date fechaFacturaInicio;
 	private Date fechaFacturaFin;
 	
 	private Long totalVendido;
 	private BigDecimal totalVenta;
-	private BigDecimal comision;
-	
+	private BigDecimal comisionMenor;
+	private BigDecimal comisionMayor;
+	private BigDecimal comisionTotal;
 	private String documentoCliente;
 	private String nombreCliente;
 	private Date fechaInicio;
@@ -91,10 +94,13 @@ public class VendedorController extends CommonsController implements Serializabl
 		this.page = 0;
 		this.totalVentas = BigDecimal.ZERO;
 		this.totalComision = BigDecimal.ZERO;
+		this.totalComisionMenor = BigDecimal.ZERO;
+		this.totalComisionMayor = BigDecimal.ZERO;
 		this.totalVendido = 0L;
 		this.totalVenta = BigDecimal.ZERO;
-		this.comision = BigDecimal.ZERO;
-		
+		this.comisionMenor = BigDecimal.ZERO;
+		this.comisionMayor = BigDecimal.ZERO;
+		this.comisionTotal = BigDecimal.ZERO;
 		if(vendedorDataManager.getVendedorDTOEditar() != null && vendedorDataManager.getVendedorDTOEditar().getId().getCodigoVendedor() != null){
 			this.setVendedorDTO(vendedorDataManager.getVendedorDTOEditar());
 			this.setPersonaDTO(vendedorDataManager.getVendedorDTOEditar().getPersonaDTO());
@@ -114,14 +120,26 @@ public class VendedorController extends CommonsController implements Serializabl
 			if(CollectionUtils.isNotEmpty(reporteVentasCols)) {
 				this.totalVendido = 0L;
 				this.totalVenta = BigDecimal.ZERO;
-				this.comision = BigDecimal.ZERO;
+				this.comisionTotal = BigDecimal.ZERO; 
 				for(ReporteVentasVO venta : this.reporteVentasCols) {
-					if(venta.getPorcentajeComision() != null && venta.getValorVendido() != null) {
-						venta.setValoCcomision((venta.getPorcentajeComision().multiply(venta.getValorVendido())).divide(BigDecimal.valueOf(100)));
+					if(venta.getPorcentajeComision() != null && venta.getPorcentajeComisionMayor() != null && venta.getValorVendido() != null) {
 						this.totalVendido = totalVendido + venta.getCantidadVendida();
 						this.totalVenta = totalVenta.add(venta.getValorVendido());
-						this.comision = comision.add(venta.getValoCcomision());
+						this.comisionMenor = BigDecimal.ZERO;
+						this.comisionMayor = BigDecimal.ZERO;
+						venta.setValoComisionMayor(BigDecimal.ZERO);
+						venta.setValoComisionMenor(BigDecimal.ZERO);
+						if(venta.getTipoCliente().equals(ERPConstantes.CODIGO_CATALOGO_VALOR_CLIENTE_MAYORISTA)) {
+							venta.setValoComisionMayor((venta.getPorcentajeComisionMayor().multiply(venta.getValorVendido())).divide(BigDecimal.valueOf(100)));
+							this.comisionMayor = comisionMayor.add(venta.getValoComisionMayor());
+						}else {
+							venta.setValoComisionMenor((venta.getPorcentajeComision().multiply(venta.getValorVendido())).divide(BigDecimal.valueOf(100)));
+							this.comisionMenor = comisionMenor.add(venta.getValoComisionMenor());
+						}
 					}
+					venta.setValoComisionTotal(comisionMayor.add(comisionMenor));
+					this.comisionTotal = this.comisionTotal.add(comisionMayor).add(comisionMenor);
+					
 				};	
 			}
 		}
@@ -170,12 +188,23 @@ public class VendedorController extends CommonsController implements Serializabl
 			if(CollectionUtils.isNotEmpty(reporteVentasCols)) {
 				this.totalVendido = 0L;
 				this.totalVenta = BigDecimal.ZERO;
-				this.comision = BigDecimal.ZERO;
+				this.comisionTotal = BigDecimal.ZERO;
 				this.reporteVentasCols.stream().forEach(venta ->{
-					venta.setValoCcomision((venta.getPorcentajeComision().multiply(venta.getValorVendido())).divide(BigDecimal.valueOf(100)));
 					this.totalVendido = totalVendido + venta.getCantidadVendida();
-					this.totalVenta = totalVenta.add(venta.getValorVendido());
-					this.comision = comision.add(venta.getValoCcomision());
+					this.totalVenta = totalVenta.add(venta.getValorVendido());	
+					this.comisionMenor = BigDecimal.ZERO;
+					this.comisionMayor = BigDecimal.ZERO;
+					venta.setValoComisionMayor(BigDecimal.ZERO);
+					venta.setValoComisionMenor(BigDecimal.ZERO);
+					if(venta.getTipoCliente().equals(ERPConstantes.CODIGO_CATALOGO_VALOR_CLIENTE_MAYORISTA)) {
+						venta.setValoComisionMayor((venta.getPorcentajeComisionMayor().multiply(venta.getValorVendido())).divide(BigDecimal.valueOf(100)));
+						this.comisionMayor = comisionMayor.add(venta.getValoComisionMayor());
+					}else {
+						venta.setValoComisionMenor((venta.getPorcentajeComision().multiply(venta.getValorVendido())).divide(BigDecimal.valueOf(100)));
+						this.comisionMenor = comisionMenor.add(venta.getValoComisionMenor());
+					}
+					venta.setValoComisionTotal(comisionMayor.add(comisionMenor));
+					this.comisionTotal = this.comisionTotal.add(comisionMayor).add(comisionMenor);
 				});
 			}else {
 				this.setShowMessagesBar(Boolean.TRUE);
@@ -245,6 +274,8 @@ public class VendedorController extends CommonsController implements Serializabl
 	public void datosComisionVentas() {
 		vendedorDTO.setFacturaCabeceraDTOCols(ERPFactory.vendedor.getVendedorServicio().findListaFacturasPorVendedorFechaVenta(Integer.parseInt(ERPConstantes.ESTADO_ACTIVO_NUMERICO), vendedorDTO.getId().getCodigoVendedor(), new Timestamp(fechaFacturaInicio.getTime()), new Timestamp(fechaFacturaFin.getTime())));
 		this.totalVentas = BigDecimal.ZERO;
+		this.totalComisionMenor = BigDecimal.ZERO;
+		this.totalComisionMayor = BigDecimal.ZERO;
 		this.totalComision = BigDecimal.ZERO;
 		if(vendedorDTO != null && CollectionUtils.isNotEmpty(vendedorDTO.getFacturaCabeceraDTOCols())) {
 			vendedorDTO.getFacturaCabeceraDTOCols().stream().forEach(factura ->{
@@ -252,9 +283,15 @@ public class VendedorController extends CommonsController implements Serializabl
 				if(CollectionUtils.isNotEmpty(factura.getFacturaDetalleDTOCols())) {
 					factura.getFacturaDetalleDTOCols().stream().forEach(venta->{
 						if(venta.getArticuloDTO().getPorcentajeComision() != null && venta.getArticuloDTO().getPorcentajeComision().doubleValue() > 0.0) {
-							Double comision = (venta.getArticuloDTO().getPorcentajeComision().doubleValue() * venta.getSubTotal().doubleValue()) / 100;
-							this.totalComision = this.totalComision.add(BigDecimal.valueOf(comision));
+							if(factura.getTipoCliente().equals(ERPConstantes.CODIGO_CATALOGO_VALOR_CLIENTE_MAYORISTA)) {
+								Double comision = (venta.getArticuloDTO().getPorcentajeComisionMayor().doubleValue() * venta.getSubTotal().doubleValue()) / 100;
+								this.totalComisionMayor = totalComisionMayor.add(BigDecimal.valueOf(comision));
+							}else {
+								Double comision = (venta.getArticuloDTO().getPorcentajeComision().doubleValue() * venta.getSubTotal().doubleValue()) / 100;
+								this.totalComisionMenor = totalComisionMenor.add(BigDecimal.valueOf(comision));
+							}
 						}
+						this.totalComision = this.totalComision.add(this.totalComisionMayor).add(this.totalComisionMenor);
 					});
 				}
 			});
@@ -625,14 +662,6 @@ public class VendedorController extends CommonsController implements Serializabl
 		this.totalVentas = totalVentas;
 	}
 
-	public BigDecimal getTotalComision() {
-		return totalComision;
-	}
-
-	public void setTotalComision(BigDecimal totalComision) {
-		this.totalComision = totalComision;
-	}
-	
 	public Date getFechaFacturaInicio() {
 		return fechaFacturaInicio;
 	}
@@ -705,11 +734,51 @@ public class VendedorController extends CommonsController implements Serializabl
 		this.totalVenta = totalVenta;
 	}
 
-	public BigDecimal getComision() {
-		return comision;
+	public BigDecimal getTotalComision() {
+		return totalComision;
 	}
 
-	public void setComision(BigDecimal comision) {
-		this.comision = comision;
+	public void setTotalComision(BigDecimal totalComision) {
+		this.totalComision = totalComision;
+	}
+
+	public BigDecimal getTotalComisionMenor() {
+		return totalComisionMenor;
+	}
+
+	public void setTotalComisionMenor(BigDecimal totalComisionMenor) {
+		this.totalComisionMenor = totalComisionMenor;
+	}
+
+	public BigDecimal getTotalComisionMayor() {
+		return totalComisionMayor;
+	}
+
+	public void setTotalComisionMayor(BigDecimal totalComisionMayor) {
+		this.totalComisionMayor = totalComisionMayor;
+	}
+
+	public BigDecimal getComisionMenor() {
+		return comisionMenor;
+	}
+
+	public void setComisionMenor(BigDecimal comisionMenor) {
+		this.comisionMenor = comisionMenor;
+	}
+
+	public BigDecimal getComisionMayor() {
+		return comisionMayor;
+	}
+
+	public void setComisionMayor(BigDecimal comisionMayor) {
+		this.comisionMayor = comisionMayor;
+	}
+
+	public BigDecimal getComisionTotal() {
+		return comisionTotal;
+	}
+
+	public void setComisionTotal(BigDecimal comisionTotal) {
+		this.comisionTotal = comisionTotal;
 	}
 }

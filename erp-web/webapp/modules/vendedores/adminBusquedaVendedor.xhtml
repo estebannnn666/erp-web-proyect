@@ -107,7 +107,7 @@
         <a4j:jsFunction name="cargarVentas" actionListener="#{vendedorController.cargarDatosVentas}" execute="pnlGridAgregarDetalle" render="popUpDetalle pnlListaDetalleFactura" oncomplete="#{rich:component('popUpDetalle')}.show();"></a4j:jsFunction>
         
         <!-- Popup para ver el detalle del factura -->
-		<rich:popupPanel id="popUpDetalle" styleClass="panelPedidos" header="Registro de ventas" width="935" height="408" modal="true" domElementAttachment="form">
+		<rich:popupPanel id="popUpDetalle" styleClass="panelPedidos" header="Registro de ventas" width="935" height="440" modal="true" domElementAttachment="form">
 			<f:facet name="controls">
 				<h:outputLink value="#"	onclick="#{rich:component('popUpDetalle')}.hide();">
 					<h:graphicImage library="images" name="close.png" style="border:0px" id="closePopUpDetalle" />
@@ -121,7 +121,7 @@
 				</h:panelGrid>						 
 			</h:panelGroup>
 			<h:panelGrid id="pnlListaDetalleFactura" style="width: 100%;">	
-				<rich:panel style="width: 99.6%; height: 305px; " header="Detalle de facturas vendidas">
+				<rich:panel style="width: 99.6%; height: 338px; " header="Detalle de facturas vendidas">
 					
 					<h:panelGrid id="tablaVaciaDetalle" columns="1" rendered="#{empty vendedorController.vendedorDTO.facturaCabeceraDTOCols}" style="width:100%; text-align: center; padding-top: 150px">
 						<h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.mensaje.lista.vacio']}"/>
@@ -161,6 +161,10 @@
 								</rich:tooltip>       
 							</rich:panel>
 			            </rich:column>
+			            <rich:column>
+			                <f:facet name="header"><h:outputText value="Tipo cliente"/></f:facet>
+			                <h:outputText value="#{detalle.tipoCliente eq 'MAY' ? 'MAYORISTA':'MINORISTA'}" />
+			            </rich:column>
 			            <rich:column style="text-align: right; padding-right: 5px">
 			                <f:facet name="header"><h:outputText value="Total factura"/></f:facet>
 			                <h:outputText value="#{detalle.totalCuenta}" >
@@ -169,7 +173,7 @@
 			            </rich:column>
 			            <f:facet name="footer">				                
 					            <rich:columnGroup>
-					                <rich:column colspan="5" style="text-align: right; paddin-right: 10px">Total venta:</rich:column>
+					                <rich:column colspan="6" style="text-align: right; paddin-right: 10px">Total venta:</rich:column>
 					                <rich:column style="text-align: right; paddin-right: 10px">
 					                    <h:outputText value="#{vendedorController.totalVentas}">
 					                    	<f:convertNumber pattern="0.00"/>
@@ -177,7 +181,23 @@
 					                </rich:column>
 					            </rich:columnGroup>
 					            <rich:columnGroup>
-					                <rich:column colspan="5" style="text-align: right; paddin-right: 10px"><h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.label.lista.detalle.total.comision']}"/></rich:column>
+					                <rich:column colspan="6" style="text-align: right; paddin-right: 10px"><h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.label.lista.detalle.total.comision.menor']}"/></rich:column>
+					                <rich:column style="text-align: right; paddin-right: 10px">
+					                    <h:outputText value="#{vendedorController.totalComisionMenor}">
+					                    	<f:convertNumber pattern="0.00"/>
+					                    </h:outputText>
+					                </rich:column>
+					            </rich:columnGroup>
+					            <rich:columnGroup>
+					                <rich:column colspan="6" style="text-align: right; paddin-right: 10px"><h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.label.lista.detalle.total.comision.mayor']}"/></rich:column>
+					                <rich:column style="text-align: right; paddin-right: 10px">
+					                    <h:outputText value="#{vendedorController.totalComisionMayor}">
+					                    	<f:convertNumber pattern="0.00"/>
+					                    </h:outputText>
+					                </rich:column>
+					            </rich:columnGroup>
+					            <rich:columnGroup>
+					                <rich:column colspan="6" style="text-align: right; paddin-right: 10px"><h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.label.lista.detalle.total.comision']}"/></rich:column>
 					                <rich:column style="text-align: right; paddin-right: 10px">
 					                    <h:outputText value="#{vendedorController.totalComision}">
 					                    	<f:convertNumber pattern="0.00"/>

@@ -101,8 +101,15 @@
 	                </h:outputText>
 	            </rich:column>
 	            <rich:column style="text-align: right; padding-right: 5px">
-	                <f:facet name="header"><h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.header.tabla.articulo.porcentaje.comision']}"/></f:facet>
+	                <f:facet name="header"><h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.header.tabla.articulo.porcentaje.comision.label']}"/></f:facet>
 	                <h:outputText value="#{art.porcentajeComision}">
+	                	<f:convertNumber pattern="0.00"/>
+	                </h:outputText>
+	                <h:outputText value="%"/>
+	            </rich:column>
+	            <rich:column style="text-align: right; padding-right: 5px">
+	                <f:facet name="header"><h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.header.tabla.articulo.porcentaje.comision.mayor.label']}"/></f:facet>
+	                <h:outputText value="#{art.porcentajeComisionMayor}">
 	                	<f:convertNumber pattern="0.00"/>
 	                </h:outputText>
 	                <h:outputText value="%"/>

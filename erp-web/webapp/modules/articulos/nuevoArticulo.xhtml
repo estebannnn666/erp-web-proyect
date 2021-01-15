@@ -23,7 +23,7 @@
 		 <rich:panel header="Registro de nuevo articulo" style="width: 100%; background-color: #F5FAFF;">
 		 	<h:panelGrid columns="2" style="width: 100%" columnClasses="estiloDivArticulos1 estiloDivArticulos2">
 		 		<h:panelGroup>
-			 		<fieldset>
+			 		<fieldset style="height: 238px">
 					 	<legend>#{msg_erpweb['ec.com.erp.etiqueta.header.datos.basicos']}</legend>
 					 	<h:panelGrid id="pnlGridArticulos" columns="2" cellspacing="2" cellpadding="5">
 					 		<h:outputText class="styleNegritas" value="#{msg_erpweb['ec.com.erp.etiqueta.header.tabla.codigo.barras']}: *" />
@@ -48,11 +48,14 @@
 					 		
 					 		<h:outputText class="styleNegritas" value="#{msg_erpweb['ec.com.erp.etiqueta.header.tabla.articulo.porcentaje.comision']}:" />
 					 		<h:inputText  style="width:260px" value="#{articulosController.articuloDTO.porcentajeComision}" id="comision" onkeypress="if (event.keyCode == 13) return false; return validarDecimal(event);"/>
+					 		
+					 		<h:outputText class="styleNegritas" value="#{msg_erpweb['ec.com.erp.etiqueta.header.tabla.articulo.porcentaje.comision.mayor']}:" />
+					 		<h:inputText  style="width:260px" value="#{articulosController.articuloDTO.porcentajeComisionMayor}" id="comisionMayor" onkeypress="if (event.keyCode == 13) return false; return validarDecimal(event);"/>
 					 	</h:panelGrid>
 					</fieldset>
 				</h:panelGroup>
 				<h:panelGroup>
-					<fieldset>
+					<fieldset style="height: 238px">
 					 	<legend>Unidades de manejo</legend>
 					 	<rich:toolbar height="26" itemSeparator="grid">
 							<rich:toolbarGroup>
@@ -107,7 +110,7 @@
 					</fieldset>
 				</h:panelGroup>
 			</h:panelGrid>
-			<fieldset>
+			<fieldset style="height: 185px;">
 			 	<legend>Impuestos del articulo</legend>
 			 	
 			 	<rich:toolbar height="26" itemSeparator="grid">
@@ -347,11 +350,7 @@
 			}	
 			.estiloDivArticulos2{
 				width: 40% !important;
-			}
-			
-			fieldset {
- 				height: 200px;
- 			}	
+			}	
 		</h:outputStylesheet>
 	</ui:define>
 	
