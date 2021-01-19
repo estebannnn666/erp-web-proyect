@@ -56,6 +56,38 @@
 				</h:panelGroup>
 				<h:panelGroup>
 					<fieldset style="height: 238px">
+					 	<legend>#{msg_erpweb['ec.com.erp.etiqueta.header.imagen.articulo']}</legend>
+					 	<h:panelGrid columns="2" styleClass="texto11 paddingTop10" id="pnlFoto" columnClasses="ch1,ch2">			
+							<h:panelGrid id="foto" columns="1">
+								<rich:panel style="height: 200px;">
+									<h:graphicImage style="margin: -0.9em;" styleClass="border fotoSize" rendered="#{articulosController.articuloDTO.imagen == null}" library="images" name="not_image.jpg" width="300" height="200" />
+									<a4j:mediaOutput rendered="#{articulosController.articuloDTO.imagen != null}" style="width:280px; height:180px;" element="img" styleClass="border fotoSize filaBlanco" mimeType="image/jpeg" value="NONE" createContent="#{articulosDataManager.paintFotografia}" cacheable="false">
+										<f:param value="#{articulosDataManager.timeStamp}" name="time" />
+									</a4j:mediaOutput>
+								</rich:panel>				
+							</h:panelGrid>
+							<h:panelGrid columns="1">
+								<rich:panel style="height: 200px;">
+									<rich:fileUpload listHeight="30" styleClass="upload border" 
+										fileUploadListener="#{articulosController.uploadListener}" id="fileUpload" 
+										acceptedTypes="#{msg_erpweb['ec.com.erp.etiqueta.tipos.formatos.permitidos']}"
+										deleteLabel="#{msg_erpweb['ec.com.erp.etiqueta.boton.borrar']}"
+										noDuplicate="true"
+										ontyperejected="alert('Solo se permiten archivos de tipo JPG, GIF, PNG y BMP ');" maxFilesQuantity="1"
+										addLabel="#{msg_erpweb['ec.com.erp.etiqueta.boton.examinar']}" clearAllLabel="#{msg_erpweb['ec.com.erp.etiqueta.boton.limpiar']}"
+										clearLabel="#{msg_erpweb['ec.com.erp.etiqueta.boton.limpiar']}" doneLabel="#{msg_erpweb['ec.com.erp.etiqueta.boton.aceptar']}"
+										uploadLabel="#{msg_erpweb['ec.com.erp.etiqueta.boton.cargar']}" render="pnlMensajes pnlFoto foto" execute="@this">
+										<a4j:ajax event="uploadcomplete" execute="@none" render="pnlFoto foto"></a4j:ajax>
+									</rich:fileUpload>
+								</rich:panel>
+							</h:panelGrid>
+						</h:panelGrid>
+					</fieldset>
+				</h:panelGroup>
+			</h:panelGrid>
+			<h:panelGrid columns="2" style="width: 100%" columnClasses="estiloDivArticulos1 estiloDivArticulos2">
+				<h:panelGroup>
+					<fieldset style="height: 185px">
 					 	<legend>Unidades de manejo</legend>
 					 	<rich:toolbar height="26" itemSeparator="grid">
 							<rich:toolbarGroup>
@@ -96,11 +128,11 @@
 					                <h:outputText style="text-align: left; width:95%; padding-right: 5px" value="#{detalle.codigoValorUnidadManejo}"></h:outputText>
 					            </rich:column>	
 					            <rich:column style="width:20%"> 
-					                <f:facet name="header"><h:outputText value="Es por defecto"/></f:facet>
-					                <h:outputText style="text-align: left; width:95%; padding-right: 5px" value="#{detalle.esPorDefecto ? 'SI' : 'NO'}"></h:outputText>
+					                <f:facet name="header"><h:outputText value="Por defecto"/></f:facet>
+					                <h:outputText style="text-align: left; padding-right: 5px" value="#{detalle.esPorDefecto ? 'SI' : 'NO'}"></h:outputText>
 					            </rich:column>		            
 					            <rich:column style="width:30%; text-align: right; paddin-right: 10px">
-					                <f:facet name="header"><h:outputText value="Valor unidad de manejo"/></f:facet>
+					                <f:facet name="header"><h:outputText value="V. Unidad manejo"/></f:facet>
 					                <h:outputText style="text-align: right; width:95%; padding-right: 5px" value="#{detalle.valorUnidadManejo}">
 					                	<f:convertNumber pattern="0" />
 					                </h:outputText>
@@ -109,58 +141,60 @@
 					 	</h:panelGrid>
 					</fieldset>
 				</h:panelGroup>
+		 		<h:panelGroup>
+					<fieldset style="height: 185px;">
+					 	<legend>#{msg_erpweb['ec.com.erp.etiqueta.header.impuestos.articulo']}</legend>
+					 	
+					 	<rich:toolbar height="26" itemSeparator="grid">
+							<rich:toolbarGroup>
+								<h:graphicImage name="listaPedidos.png" library="images" style="border:none;border-color:white;" height="16" width="16"/>
+								<h:outputText value="Lista de impuestos"/>
+							</rich:toolbarGroup>
+							<rich:toolbarGroup location="right">	
+								<h:panelGroup layout="block" styleClass="botonD" style="padding-top: 3px; margin-top:0px;">
+									<a4j:commandLink styleClass="agregarD" actionListener="#{articulosController.abrirPopUpImpuesto}" oncomplete="#{rich:component('mpAddImpuesto')}.show();" render="mpAddImpuesto pnlListaImpuesto" execute="@this" title="Click para agregar fila">
+										<h:panelGrid columns="2" cellpadding="3" cellspacing="0">
+											<h:graphicImage name="btnNuevoPedido.png" library="images" style="border:none;border-color:white;" height="16" width="16"/>
+											<h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.boton.agregar']}"/>
+										</h:panelGrid>
+									</a4j:commandLink>	
+								</h:panelGroup>	
+							</rich:toolbarGroup>						
+						</rich:toolbar>	
+						
+					 	<h:panelGrid id="pnlGridImpuesto" style="width:100%">
+					 		<rich:dataTable styleClass="styleDetalle" style="width:100%" value="#{articulosController.articuloImpuestoDTOCols}" var="detalle" rowKeyVar="rowIndex" iterationStatusVar="it" id="tableArticuloImpuesto" rows="100">
+						 		<rich:column style="width:5%; text-align: center;">
+					                <f:facet name="header"><h:outputText value="Eliminar"/></f:facet>
+					                <a4j:commandLink id="botonEditar" render="pnlGridImpuesto" action="#{articulosController.eliminarImpuestoArticulo(detalle)}"	execute="@this" >
+										<h:outputText value="Eliminar" />
+										<f:setPropertyActionListener value="#{detalle}" target="#{articulosController.articuloImpuestoDTO}" />											
+									</a4j:commandLink>	
+					            </rich:column>
+					            <rich:column style="width:5%; text-align: center;">
+					                <f:facet name="header">Nro.</f:facet>
+					                #{rowIndex+1}
+					            </rich:column>
+					            <rich:column style="width:25%">
+					                <f:facet name="header"><h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.label.nuevo.impuesto.articulo.nombre']}"/></f:facet>
+					                <h:outputText style="text-align: right; width:95%; padding-right: 5px" value="#{detalle.impuestoDTO.nombreImpuesto}"></h:outputText>
+					            </rich:column>		
+					            <rich:column style="width:50%"> 
+					                <f:facet name="header"><h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.label.nuevo.impuesto.articulo.descripcion']}"/></f:facet>
+					                <h:outputText style="text-align: right; width:95%; padding-right: 5px" value="#{detalle.impuestoDTO.descripcion}"></h:outputText>
+					            </rich:column>		            
+					            <rich:column style="width:15%; text-align: right; paddin-right: 10px">
+					                <f:facet name="header"><h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.label.nuevo.impuesto.articulo.valor']}"/></f:facet>
+					                <h:outputText style="text-align: right; width:95%; padding-right: 5px" value="#{detalle.impuestoDTO.valorImpuesto}">
+					                	<f:convertNumber pattern="0.00" />
+					                </h:outputText>
+					                %
+					            </rich:column>
+					        </rich:dataTable>
+					 	</h:panelGrid>
+					</fieldset>
+				</h:panelGroup>
 			</h:panelGrid>
-			<fieldset style="height: 185px;">
-			 	<legend>Impuestos del articulo</legend>
-			 	
-			 	<rich:toolbar height="26" itemSeparator="grid">
-					<rich:toolbarGroup>
-						<h:graphicImage name="listaPedidos.png" library="images" style="border:none;border-color:white;" height="16" width="16"/>
-						<h:outputText value="Lista de impuestos"/>
-					</rich:toolbarGroup>
-					<rich:toolbarGroup location="right">	
-						<h:panelGroup layout="block" styleClass="botonD" style="padding-top: 3px; margin-top:0px;">
-							<a4j:commandLink styleClass="agregarD" actionListener="#{articulosController.abrirPopUpImpuesto}" oncomplete="#{rich:component('mpAddImpuesto')}.show();" render="mpAddImpuesto pnlListaImpuesto" execute="@this" title="Click para agregar fila">
-								<h:panelGrid columns="2" cellpadding="3" cellspacing="0">
-									<h:graphicImage name="btnNuevoPedido.png" library="images" style="border:none;border-color:white;" height="16" width="16"/>
-									<h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.boton.agregar']}"/>
-								</h:panelGrid>
-							</a4j:commandLink>	
-						</h:panelGroup>	
-					</rich:toolbarGroup>						
-				</rich:toolbar>	
-				
-			 	<h:panelGrid id="pnlGridImpuesto" style="width:100%">
-			 		<rich:dataTable styleClass="styleDetalle" style="width:100%" value="#{articulosController.articuloImpuestoDTOCols}" var="detalle" rowKeyVar="rowIndex" iterationStatusVar="it" id="tableArticuloImpuesto" rows="100">
-				 		<rich:column style="width:5%; text-align: center;">
-			                <f:facet name="header"><h:outputText value="Eliminar"/></f:facet>
-			                <a4j:commandLink id="botonEditar" render="pnlGridImpuesto" action="#{articulosController.eliminarImpuestoArticulo(detalle)}"	execute="@this" >
-								<h:outputText value="Eliminar" />
-								<f:setPropertyActionListener value="#{detalle}" target="#{articulosController.articuloImpuestoDTO}" />											
-							</a4j:commandLink>	
-			            </rich:column>
-			            <rich:column style="width:5%; text-align: center;">
-			                <f:facet name="header">Nro.</f:facet>
-			                #{rowIndex+1}
-			            </rich:column>
-			            <rich:column style="width:25%">
-			                <f:facet name="header"><h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.label.nuevo.impuesto.articulo.nombre']}"/></f:facet>
-			                <h:outputText style="text-align: right; width:95%; padding-right: 5px" value="#{detalle.impuestoDTO.nombreImpuesto}"></h:outputText>
-			            </rich:column>		
-			            <rich:column style="width:50%"> 
-			                <f:facet name="header"><h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.label.nuevo.impuesto.articulo.descripcion']}"/></f:facet>
-			                <h:outputText style="text-align: right; width:95%; padding-right: 5px" value="#{detalle.impuestoDTO.descripcion}"></h:outputText>
-			            </rich:column>		            
-			            <rich:column style="width:15%; text-align: right; paddin-right: 10px">
-			                <f:facet name="header"><h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.label.nuevo.impuesto.articulo.valor']}"/></f:facet>
-			                <h:outputText style="text-align: right; width:95%; padding-right: 5px" value="#{detalle.impuestoDTO.valorImpuesto}">
-			                	<f:convertNumber pattern="0.00" />
-			                </h:outputText>
-			                %
-			            </rich:column>
-			        </rich:dataTable>
-			 	</h:panelGrid>
-			</fieldset>
 		</rich:panel>
 		
 		<!-- Popup para agregar nuevo impuesto -->
@@ -346,10 +380,10 @@
 		</script>
 		<h:outputStylesheet>
 			.estiloDivArticulos1{
-				width: 60% !important;
+				width: 50% !important;
 			}	
 			.estiloDivArticulos2{
-				width: 40% !important;
+				width: 50% !important;
 			}	
 		</h:outputStylesheet>
 	</ui:define>

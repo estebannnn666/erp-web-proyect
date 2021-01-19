@@ -17,6 +17,8 @@ import javax.faces.event.ValueChangeEvent;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.richfaces.event.FileUploadEvent;
+import org.richfaces.model.UploadedFile;
 
 import ec.com.erp.cliente.common.constantes.ERPConstantes;
 import ec.com.erp.cliente.common.exception.ERPException;
@@ -32,6 +34,7 @@ import ec.com.erp.web.commons.controller.MensajesController;
 import ec.com.erp.web.commons.datamanager.CommonDataManager;
 import ec.com.erp.web.commons.login.controller.LoginController;
 import ec.com.erp.web.commons.utils.ERPWebResources;
+import ec.com.erp.web.commons.utils.UtilitarioWeb;
 
 /**
  * Controlador para administracion de articulos
@@ -117,6 +120,33 @@ public class ArticulosController extends CommonsController implements Serializab
 		super.clearDataManager(event);
 	}
 
+	public void uploadListener(FileUploadEvent event) throws Exception{
+		UploadedFile item = event.getUploadedFile();
+		Long a = Long.valueOf(item.getSize());
+		if(a.longValue() > 200000L) {
+			this.setShowMessagesBar(Boolean.TRUE);
+			MensajesController.addError(null, ERPWebResources.getString("ec.com.erp.error.tamanio.nopermitido.imagen"));
+		}else {
+			this.articuloDTO.setImagen(item.getData());
+			this.articulosDataManager.setImagen(item.getData());
+		}
+	}
+	
+	/**
+	 * Metodo para imprimir lista de facturas
+	 */
+	public String imprimirCatalogo() {
+		try {
+			Collection<ArticuloDTO> articulosCatalogo = ERPFactory.articulos.getArticuloServicio().findObtenerArticulosCatalogos(Integer.parseInt(ERPConstantes.ESTADO_ACTIVO_NUMERICO), codigoBarrasBusqueda,nombreArticuloBusqueda);
+			byte[] contenido = ERPFactory.articulos.getArticuloServicio().findObtenerReporteCatalogo(articulosCatalogo);
+			UtilitarioWeb.mostrarPDF(contenido);
+		} catch (Exception e) {
+			this.setShowMessagesBar(Boolean.TRUE);
+			MensajesController.addError(null, "Error al imprimir");
+		}
+		return null;
+	}
+	
 	/**
 	 * Metodo para buscar articulos
 	 * @param e
@@ -316,6 +346,7 @@ public class ArticulosController extends CommonsController implements Serializab
 		this.impuestoDTO = new ImpuestoDTO();
 		this.setArticuloCreado(Boolean.FALSE);
 		this.setShowMessagesBar(Boolean.FALSE);
+		this.articulosDataManager.setImagen(null);
 		this.articuloDTO = new ArticuloDTO();
 		this.articulosDataManager.setArticuloDTOEditar(new ArticuloDTO());
 	}
@@ -329,6 +360,8 @@ public class ArticulosController extends CommonsController implements Serializab
 			return null;
 		}else{
 			this.articulosDataManager.setArticuloDTOEditar(this.articuloDTO);
+			this.articuloDTO.setImagen(ERPFactory.articulos.getArticuloServicio().findObtenerImagen(Integer.parseInt(ERPConstantes.ESTADO_ACTIVO_NUMERICO), this.articuloDTO.getId().getCodigoArticulo()));
+			this.articulosDataManager.setImagen(this.articuloDTO.getImagen());
 			return "/modules/articulos/nuevoArticulo.xhtml?faces-redirect=true";
 		}
 	}

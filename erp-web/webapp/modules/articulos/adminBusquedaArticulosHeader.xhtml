@@ -12,6 +12,12 @@
 			</h:panelGroup>
 		</rich:toolbarGroup>
 		
+		<rich:toolbarGroup>	
+			<h:panelGroup layout="block" styleClass="botonComun">
+				<h:commandLink value="Catalogo" styleClass="botonImprimirPdf" action="#{articulosController.imprimirCatalogo}" target="_blank"/>
+			</h:panelGroup>
+		</rich:toolbarGroup>
+		
 		<rich:toolbarGroup>
 			<h:panelGroup layout="block" styleClass="botonComun">
 				<a4j:commandLink value="Descargar" execute="@this" render="pnlMensajes" styleClass="botonDownload" actionListener="#{articulosController.descargarArticulosFireBase}"/>
