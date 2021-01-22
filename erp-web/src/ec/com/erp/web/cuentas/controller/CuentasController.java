@@ -1629,10 +1629,12 @@ public class CuentasController extends CommonsController implements Serializable
 	public String imprimirListaFacturas() {
 		HtmlPdf htmltoPDF;
 		try {
+			String tipoReporte = FacesContext.getCurrentInstance().getExternalContext().getRequestParameterMap().get("tipoReporte");
+			String tituloReporte = FacesContext.getCurrentInstance().getExternalContext().getRequestParameterMap().get("tituloReporte");
 			// Plantilla rpincipal que permite la conversion de xsl a pdf
 			htmltoPDF = new HtmlPdf(ERPConstantes.PLANTILLA_XSL_FOPRINCIPAL);
 			HashMap<String , String> parametros = new HashMap<String, String>();
-			byte contenido[] = htmltoPDF.convertir(ERPFactory.facturas.getFacturaCabeceraServicio().finObtenerXMLReporteFacturas(facturaCabeceraDTOCols).replace("<?xml version=\"1.0\" encoding=\"UTF-8\"?>", ""), "", "",	parametros,	null);
+			byte contenido[] = htmltoPDF.convertir(ERPFactory.facturas.getFacturaCabeceraServicio().finObtenerXMLReporteFacturas(facturaCabeceraDTOCols, tituloReporte, tipoReporte).replace("<?xml version=\"1.0\" encoding=\"UTF-8\"?>", ""), "", "",	parametros,	null);
 			UtilitarioWeb.mostrarPDF(contenido);
 		} catch (Exception e) {
 			this.setShowMessagesBar(Boolean.TRUE);

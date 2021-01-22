@@ -13,7 +13,10 @@
 		</rich:toolbarGroup> 
 		<rich:toolbarGroup>	
 			<h:panelGroup layout="block" styleClass="botonComun">
-				<h:commandLink value="Imprimir" styleClass="botonImprimirPdf" action="#{cuentasController.imprimirListaFacturas}" target="_blank"/>
+				<h:commandLink value="Imprimir" styleClass="botonImprimirPdf" action="#{cuentasController.imprimirListaFacturas}" target="_blank">
+					<f:param name="tipoReporte" value="COM" />
+					<f:param name="tituloReporte" value="LISTA DE FACTURAS DE COMPRAS" />
+				</h:commandLink>
 			</h:panelGroup>
 		</rich:toolbarGroup>
 		<rich:toolbarGroup>	

@@ -102,7 +102,11 @@
 	            </rich:column>
 	            <f:facet name="footer">
 	                <rich:columnGroup>
-		                <rich:column colspan="8" style="text-align: right; paddin-right: 10px">Total invetario:</rich:column>
+		                <rich:column colspan="6" style="text-align: right; paddin-right: 10px">Total invetario:</rich:column>
+		                <rich:column style="text-align: right; paddin-right: 10px">
+		                    <h:outputText value="#{reporteController.totalStock}"></h:outputText>
+		                </rich:column>
+		                <rich:column></rich:column>
 		                <rich:column style="text-align: right; paddin-right: 10px">
 		                    <h:outputText value="#{reporteController.totalInventario}">
 		                    	<f:convertNumber pattern="0.00"/>

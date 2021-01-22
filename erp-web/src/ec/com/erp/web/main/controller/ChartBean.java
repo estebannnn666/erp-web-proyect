@@ -47,7 +47,7 @@ public class ChartBean implements Serializable {
 	private Integer cuentasPendientes;
 	private Integer numeroClientes;
 	private Integer clientesNuevos;
-	private Integer inventarioTotal;
+	private BigDecimal inventarioTotal;
 	private Integer stockDisponible;
 	private Double valorPendienteCobro;
 	private Integer numeroFacturasCobrar;
@@ -60,7 +60,7 @@ public class ChartBean implements Serializable {
 		cuentasPendientes = 0;
 		numeroClientes = 0;
 		clientesNuevos = 0;
-		inventarioTotal = 0;
+		inventarioTotal = BigDecimal.ZERO;
 		stockDisponible = 0;
 		valorPendienteCobro = 0.0;
 		numeroFacturasCobrar = 0;
@@ -181,8 +181,7 @@ public class ChartBean implements Serializable {
 	 * Metodo para obtener stock existente
 	 */
 	public void obtenerStockExistente(){
-		Long inventarioTotalConsulta = ERPFactory.inventario.getInventarioServicio().findObtenerCantidadTotalEntradas(Integer.parseInt(ERPConstantes.ESTADO_ACTIVO_NUMERICO), Boolean.FALSE);
-		inventarioTotal = inventarioTotalConsulta.intValue();
+		inventarioTotal = ERPFactory.inventario.getInventarioServicio().findObtenerTotalExistencias(Integer.parseInt(ERPConstantes.ESTADO_ACTIVO_NUMERICO));
 		Long stockDisponibleConsulta = ERPFactory.inventario.getInventarioServicio().findObtenerCantidadTotalEntradas(Integer.parseInt(ERPConstantes.ESTADO_ACTIVO_NUMERICO), Boolean.TRUE);
 		stockDisponible = stockDisponibleConsulta.intValue();
 	}
@@ -263,11 +262,11 @@ public class ChartBean implements Serializable {
 		this.clientesNuevos = clientesNuevos;
 	}
 
-	public Integer getInventarioTotal() {
+	public BigDecimal getInventarioTotal() {
 		return inventarioTotal;
 	}
 
-	public void setInventarioTotal(Integer inventarioTotal) {
+	public void setInventarioTotal(BigDecimal inventarioTotal) {
 		this.inventarioTotal = inventarioTotal;
 	}
 

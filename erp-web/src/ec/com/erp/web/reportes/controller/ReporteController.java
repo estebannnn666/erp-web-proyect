@@ -58,12 +58,14 @@ public class ReporteController extends CommonsController implements Serializable
 	private Date fechaFinBusqueda;
 	private String tipoMovimiento;
 	private BigDecimal totalInventario;
+	private Integer totalStock;
 	
 
 	@PostConstruct
 	public void postConstruct() {
 		this.loginController.activarMenusSeleccionado();
 		this.totalInventario = BigDecimal.ZERO;
+		this.totalStock = 0;
 		Calendar fechaInferior = Calendar.getInstance();
 		fechaInferior.set(Calendar.MONTH, 0);
 		fechaInferior.set(Calendar.DATE, 1);
@@ -75,9 +77,10 @@ public class ReporteController extends CommonsController implements Serializable
 		this.page = 0;
 		if(FacesContext.getCurrentInstance().getViewRoot().getViewId().equals("/modules/reportes/adminBusquedaReporte.xhtml")) {
 			this.inventarioDTOCols = ERPFactory.inventario.getInventarioServicio().findObtenerListaExistenciasByArticuloFechas(Integer.parseInt(ERPConstantes.ESTADO_ACTIVO_NUMERICO), codigoBarras, null, null);
-			this.inventarioDTOCols.stream().forEach(inventario ->
-				this.totalInventario = this.totalInventario.add(inventario.getValorTotalExistencia())
-			);
+			this.inventarioDTOCols.stream().forEach(inventario -> {
+				this.totalInventario = this.totalInventario.add(inventario.getValorTotalExistencia());
+				this.totalStock = this.totalStock + inventario.getCantidadExistencia();
+			});
 		}
 	}
 		
@@ -125,11 +128,17 @@ public class ReporteController extends CommonsController implements Serializable
 			UtilitarioWeb.cleanDate(fechaInicio);
 			UtilitarioWeb.cleanDate(fechaFin);
 			fechaFin.add(Calendar.DATE, 1);
-			
+			this.totalInventario = BigDecimal.ZERO;
+			this.totalStock = 0;
 			this.inventarioDTOCols = ERPFactory.inventario.getInventarioServicio().findObtenerListaExistenciasByArticuloFechas(Integer.parseInt(ERPConstantes.ESTADO_ACTIVO_NUMERICO), codigoBarras, new Timestamp(fechaInicio.getTime().getTime()), new Timestamp(fechaFin.getTime().getTime()));
 			if(CollectionUtils.isEmpty(this.inventarioDTOCols)){
 				this.setShowMessagesBar(Boolean.TRUE);
 				MensajesController.addInfo(null, ERPWebResources.getString("ec.com.erp.etiqueta.mensaje.lista.resultado"));
+			}else {
+				this.inventarioDTOCols.stream().forEach(inventario -> {
+					this.totalInventario = this.totalInventario.add(inventario.getValorTotalExistencia());
+					this.totalStock = this.totalStock + inventario.getCantidadExistencia();
+				});
 			}
 		} catch (ERPException e1) {
 			this.setShowMessagesBar(Boolean.TRUE);
@@ -266,5 +275,13 @@ public class ReporteController extends CommonsController implements Serializable
 
 	public void setTotalInventario(BigDecimal totalInventario) {
 		this.totalInventario = totalInventario;
+	}
+
+	public Integer getTotalStock() {
+		return totalStock;
+	}
+
+	public void setTotalStock(Integer totalStock) {
+		this.totalStock = totalStock;
 	}
 }

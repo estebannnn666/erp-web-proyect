@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
@@ -29,6 +30,7 @@ import ec.com.erp.cliente.mdl.dto.CatalogoValorDTO;
 import ec.com.erp.cliente.mdl.dto.SecuenciaDTO;
 import ec.com.erp.cliente.mdl.dto.TransaccionDTO;
 import ec.com.erp.cliente.mdl.dto.id.TransaccionID;
+import ec.com.erp.utilitario.commons.util.HtmlPdf;
 import ec.com.erp.web.commons.controller.CommonsController;
 import ec.com.erp.web.commons.controller.MensajesController;
 import ec.com.erp.web.commons.datamanager.CommonDataManager;
@@ -57,6 +59,7 @@ public class TransaccionController extends CommonsController implements Serializ
 	
 	// Variables
 	private TransaccionDTO transaccionDTO;
+	private Collection<TransaccionDTO> transaccionDTOCols;
 	private Collection<TransaccionDTO> transaccionIngresosDTOCols;
 	private Collection<TransaccionDTO> transaccionGastosDTOCols;
 	private Collection<CatalogoValorDTO> transaccionesCols;
@@ -72,6 +75,7 @@ public class TransaccionController extends CommonsController implements Serializ
 	@PostConstruct
 	public void postConstruct() {
 		this.loginController.activarMenusSeleccionado();
+		this.transaccionDTOCols = new ArrayList<>();
 		this.transaccionIngresosDTOCols = new ArrayList<>();
 		this.transaccionGastosDTOCols = new ArrayList<>();
 		this.transaccionCreada = Boolean.FALSE;
@@ -97,7 +101,7 @@ public class TransaccionController extends CommonsController implements Serializ
 			this.modoEdicion = Boolean.TRUE;
 		}
 		if(FacesContext.getCurrentInstance().getViewRoot().getViewId().equals("/modules/transacciones/adminBusquedaTransaccion.xhtml")) {
-			Collection<TransaccionDTO> transaccionDTOCols = ERPFactory.transaccion.getTransaccionServicio().findObtenerListaTransacciones(Integer.parseInt(ERPConstantes.ESTADO_ACTIVO_NUMERICO), new Timestamp(fechaInferior.getTime().getTime()), new Timestamp(fechaSuperior.getTime().getTime()),null);
+			this.transaccionDTOCols = ERPFactory.transaccion.getTransaccionServicio().findObtenerListaTransacciones(Integer.parseInt(ERPConstantes.ESTADO_ACTIVO_NUMERICO), new Timestamp(fechaInferior.getTime().getTime()), new Timestamp(fechaSuperior.getTime().getTime()),null);
 			if(CollectionUtils.isNotEmpty(transaccionDTOCols)) {
 				// Obtener ingresos
 				this.transaccionIngresosDTOCols = transaccionDTOCols.stream()
@@ -148,6 +152,26 @@ public class TransaccionController extends CommonsController implements Serializ
 		this.buscarTransacciones();
 	}
 	
+	
+	
+	/**
+	 * Metodo para imprimir lista de facturas
+	 */
+	public String imprimirTransacciones() {
+		HtmlPdf htmltoPDF;
+		try {
+			// Plantilla rpincipal que permite la conversion de xsl a pdf
+			htmltoPDF = new HtmlPdf(ERPConstantes.PLANTILLA_XSL_FOPRINCIPAL);
+			HashMap<String , String> parametros = new HashMap<String, String>();
+			byte contenido[] = htmltoPDF.convertir(ERPFactory.transaccion.getTransaccionServicio().findObtenerXMLReporteTransacciones(this.transaccionDTOCols, this.fechaInicioTransaccion, this.fechaFinTransaccion).replace("<?xml version=\"1.0\" encoding=\"UTF-8\"?>", ""), "", "",	parametros,	null);
+			UtilitarioWeb.mostrarPDF(contenido);
+		} catch (Exception e) {
+			this.setShowMessagesBar(Boolean.TRUE);
+			MensajesController.addError(null, "Error al imprimir");
+		}
+		return null;
+	}
+	
 	public void buscarTransacciones(){
 		try {
 			Calendar fechaInicio = Calendar.getInstance();
@@ -158,7 +182,7 @@ public class TransaccionController extends CommonsController implements Serializ
 			UtilitarioWeb.cleanDate(fechaFin);
 			fechaFin.add(Calendar.DATE, 1);
 			
-			Collection<TransaccionDTO> transaccionDTOCols = ERPFactory.transaccion.getTransaccionServicio().findObtenerListaTransacciones(Integer.parseInt(ERPConstantes.ESTADO_ACTIVO_NUMERICO), new Timestamp(fechaInicio.getTime().getTime()), new Timestamp(fechaFin.getTime().getTime()),null);
+			this.transaccionDTOCols = ERPFactory.transaccion.getTransaccionServicio().findObtenerListaTransacciones(Integer.parseInt(ERPConstantes.ESTADO_ACTIVO_NUMERICO), new Timestamp(fechaInicio.getTime().getTime()), new Timestamp(fechaFin.getTime().getTime()),null);
 			if(CollectionUtils.isEmpty(transaccionDTOCols)){
 				this.transaccionIngresosDTOCols = new ArrayList<>();
 				this.transaccionGastosDTOCols = new ArrayList<>();
@@ -169,6 +193,7 @@ public class TransaccionController extends CommonsController implements Serializ
 		        msg.setSeverity(FacesMessage.SEVERITY_INFO);
 		        FacesContext.getCurrentInstance().addMessage(null, msg);
 			}else {
+				this.setShowMessagesBar(Boolean.FALSE);
 				// Obtener ingresos
 				this.transaccionIngresosDTOCols = transaccionDTOCols.stream()
 						.filter(transac -> transac.getCodigoValorTransaccion().equals(ERPConstantes.CODIGO_CATALOGO_VALOR_TRANSACCION_INGRESO))

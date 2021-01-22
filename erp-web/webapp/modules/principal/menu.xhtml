@@ -81,7 +81,10 @@
 							<div style="height: 37px; border-bottom: 2px solid #ffffff; padding-top: 5px; padding-left: 10px;">
 								<h:outputText style="font-size: 16px; color: #ffffff" value="Inventario"></h:outputText>
 								<br/>
-								<h:outputText style="font-size: 16px; font-weight: bold; color: #ffffff" value="#{chartBean.inventarioTotal}"></h:outputText>
+								<b style="font-size: 16px; color: #ffffff; padding-right: 5px;">$</b>
+								<h:outputText style="font-size: 16px; font-weight: bold; color: #ffffff" value="#{chartBean.inventarioTotal}">
+									<f:convertNumber pattern="0.00"/>
+								</h:outputText>
 							</div>
 							<div style="padding-top: 5px; padding-left: 10px;">
 								<h:outputText style="font-size: 12px; color: #ffffff" value="Articulos en stock: #{chartBean.stockDisponible}"></h:outputText>
