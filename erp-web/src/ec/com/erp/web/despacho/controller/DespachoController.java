@@ -32,9 +32,11 @@ import ec.com.erp.cliente.common.exception.ERPException;
 import ec.com.erp.cliente.common.factory.ERPFactory;
 import ec.com.erp.cliente.mdl.dto.ArticuloDTO;
 import ec.com.erp.cliente.mdl.dto.ArticuloUnidadManejoDTO;
+import ec.com.erp.cliente.mdl.dto.FacturaCabeceraDTO;
 import ec.com.erp.cliente.mdl.dto.GuiaDespachoDTO;
 import ec.com.erp.cliente.mdl.dto.GuiaDespachoDetalleDTO;
 import ec.com.erp.cliente.mdl.dto.GuiaDespachoExtrasDTO;
+import ec.com.erp.cliente.mdl.dto.GuiaDespachoFacturaDTO;
 import ec.com.erp.cliente.mdl.dto.GuiaDespachoPedidoDTO;
 import ec.com.erp.cliente.mdl.dto.InventarioDTO;
 import ec.com.erp.cliente.mdl.dto.PedidoDTO;
@@ -69,12 +71,16 @@ public class DespachoController extends CommonsController implements Serializabl
 	private Collection<GuiaDespachoDTO> guiaDespachoDTOCols;
 	private Collection<GuiaDespachoPedidoDTO> guiaDespachoPedidoDTOCols;
 	private GuiaDespachoPedidoDTO guiaDespachoPedidoDTO;
+	private Collection<GuiaDespachoFacturaDTO> guiaDespachoFacturaDTOCols;
+	private GuiaDespachoFacturaDTO guiaDespachoFacturaDTO;
 	private Collection<GuiaDespachoExtrasDTO> guiaDespachoExtrasDTOCols;
 	private GuiaDespachoExtrasDTO guiaDespachoExtrasDTO;
 	private Collection<GuiaDespachoDetalleDTO> guiaDespachoDetalleDTOCols;
 	private GuiaDespachoDetalleDTO guiaDespachoDetalleDTO;
 	private Collection<PedidoDTO> pedidosDTOCols;
+	private Collection<FacturaCabeceraDTO> facturasDTOCols;
 	private PedidoDTO pedidoDTO;
+	private FacturaCabeceraDTO facturaCabeceraDTO;
 	// Data Managers
 	@ManagedProperty(value="#{despachoDataManager}")
 	private DespachoDataManager despachoDataManager;
@@ -117,13 +123,16 @@ public class DespachoController extends CommonsController implements Serializabl
 		SecuenciaDTO secuenciaDespacho = ERPFactory.secuencias.getSecuenciaServicio().findObtenerSecuenciaByNombre(GuiaDespachoID.NOMBRE_SECUENCIA);
 		this.guiaDespachoDTO.setNumeroGuiaDespacho("GD-"+secuenciaDespacho.getValorSecuencia());
 		this.guiaDespachoPedidoDTO = new GuiaDespachoPedidoDTO();
+		this.guiaDespachoFacturaDTO = new GuiaDespachoFacturaDTO();
 		this.guiaDespachoExtrasDTO = new GuiaDespachoExtrasDTO();
 		this.guiaDespachoDetalleDTO = new GuiaDespachoDetalleDTO();
-		this.guiaDespachoDTOCols = new ArrayList<GuiaDespachoDTO>();
-		this.guiaDespachoPedidoDTOCols = new ArrayList<GuiaDespachoPedidoDTO>();
-		this.guiaDespachoExtrasDTOCols = new ArrayList<GuiaDespachoExtrasDTO>();
+		this.guiaDespachoDTOCols = new ArrayList<>();
+		this.guiaDespachoPedidoDTOCols = new ArrayList<>();
+		this.guiaDespachoFacturaDTOCols = new ArrayList<>();
+		this.guiaDespachoExtrasDTOCols = new ArrayList<>();
 		this.guiaDespachoDetalleDTOCols = new ArrayList<>();
-		this.pedidosDTOCols = new ArrayList<PedidoDTO>();
+		this.pedidosDTOCols = new ArrayList<>();
+		this.facturasDTOCols = new ArrayList<>();
 		this.page = 0;
 		this.orden = 1;
 		this.despachoCreado = Boolean.FALSE;
@@ -146,6 +155,7 @@ public class DespachoController extends CommonsController implements Serializabl
 			this.setGuiaDespachoExtrasDTOCols(ERPFactory.despacho.getGuiaDespachoServicio().findObtenerListaGuiaDespachoExtrasByNumeroGuia(Integer.parseInt(ERPConstantes.ESTADO_ACTIVO_NUMERICO), despachoDataManager.getGuiaDespachoDTOEditar().getNumeroGuiaDespacho()));
 			this.setGuiaDespachoDetalleDTOCols(ERPFactory.despacho.getGuiaDespachoServicio().findObtenerListaGuiaDespachoDetalleByNumeroGuia(Integer.parseInt(ERPConstantes.ESTADO_ACTIVO_NUMERICO), despachoDataManager.getGuiaDespachoDTOEditar().getNumeroGuiaDespacho()));
 			this.setGuiaDespachoPedidoDTOCols(ERPFactory.despacho.getGuiaDespachoServicio().findObtenerListaGuiaDespachoPedidosByNumeroGuiaDespacho(Integer.parseInt(ERPConstantes.ESTADO_ACTIVO_NUMERICO), despachoDataManager.getGuiaDespachoDTOEditar().getNumeroGuiaDespacho()));
+			this.setGuiaDespachoFacturaDTOCols(ERPFactory.despacho.getGuiaDespachoServicio().findObtenerListaGuiaDespachoFacturasByNumeroGuiaDespacho(Integer.parseInt(ERPConstantes.ESTADO_ACTIVO_NUMERICO), despachoDataManager.getGuiaDespachoDTOEditar().getNumeroGuiaDespacho()));
 		}
 		if(FacesContext.getCurrentInstance().getViewRoot().getViewId().equals("/modules/despachos/adminBusquedaDespacho.xhtml")) {
 			this.guiaDespachoDTOCols = ERPFactory.despacho.getGuiaDespachoServicio().findObtenerListaDespachosByFiltrosBusqueda(Integer.parseInt(ERPConstantes.ESTADO_ACTIVO_NUMERICO), numeroGuiaDespachoBusqueda, null, null, placaBusqueda, null, nombreChoferBusqueda);
@@ -198,6 +208,28 @@ public class DespachoController extends CommonsController implements Serializabl
 		}
 	}
 	
+	/**
+	 * Metodo para agragar el facturas a la vista
+	 */
+	public void agragarFactura(ActionEvent e) {
+		for(FacturaCabeceraDTO factura : this.facturasDTOCols) {
+			if(factura != null && factura.getSeleccionada() != null && factura.getSeleccionada()) {
+				// Verificar si existe en la coleccion el pedido
+				Predicate testPredicate = new BeanPredicate("id.codigoFactura", PredicateUtils.equalPredicate(factura.getId().getCodigoFactura()));
+				// Validacion de objeto existente
+				this.facturaCabeceraDTO  = (FacturaCabeceraDTO) CollectionUtils.find(this.facturasDTOCols, testPredicate);
+				this.guiaDespachoFacturaDTO = new GuiaDespachoFacturaDTO();
+				this.guiaDespachoFacturaDTO.setCodigoFactura(this.facturaCabeceraDTO.getId().getCodigoFactura());
+				this.guiaDespachoFacturaDTO.setFacturaCabeceraDTO(this.facturaCabeceraDTO);
+				this.guiaDespachoFacturaDTO.setOrden(orden);
+				this.guiaDespachoFacturaDTOCols.add(guiaDespachoFacturaDTO);
+				agregarDetalleFactura(this.facturaCabeceraDTO);
+				orden++;
+				controlPopUp = Boolean.TRUE;
+			}
+		}
+	}
+	
 	private void agregarDetallePedido(PedidoDTO pedidoDTO) {
 		pedidoDTO.getDetallePedidoDTOCols().stream().forEach(detalle ->{
 			GuiaDespachoDetalleDTO detalleGuia = this.guiaDespachoDetalleDTOCols.stream()
@@ -220,8 +252,30 @@ public class DespachoController extends CommonsController implements Serializabl
 				});
 			}
 		});
-		
-		
+	}
+	
+	private void agregarDetalleFactura(FacturaCabeceraDTO facturaDTO) {
+		facturaDTO.getFacturaDetalleDTOCols().stream().forEach(detalle ->{
+			GuiaDespachoDetalleDTO detalleGuia = this.guiaDespachoDetalleDTOCols.stream()
+	        		.filter(guiaDetalle -> guiaDetalle.getCodigoArticulo().intValue() == detalle.getCodigoArticulo().intValue() && guiaDetalle.getCodigoArticuloUnidadManejo().intValue() == detalle.getCodigoArticuloUnidadManejo().intValue())
+	        		.findFirst().orElse(null);
+			if(detalleGuia == null) {
+				this.guiaDespachoDetalleDTO = new GuiaDespachoDetalleDTO();
+				this.guiaDespachoDetalleDTO.getId().setCodigoCompania(Integer.parseInt(ERPConstantes.ESTADO_ACTIVO_NUMERICO));
+				this.guiaDespachoDetalleDTO.setCodigoArticulo(detalle.getCodigoArticulo());
+				this.guiaDespachoDetalleDTO.setCodigoArticuloUnidadManejo(detalle.getCodigoArticuloUnidadManejo());
+				this.guiaDespachoDetalleDTO.setArticuloUnidadManejoDTO(detalle.getArticuloUnidadManejoDTO());
+				this.guiaDespachoDetalleDTO.setDescripcionProducto(detalle.getArticuloDTO().getNombreArticulo());
+				this.guiaDespachoDetalleDTO.setCantidad(detalle.getCantidad());
+				this.guiaDespachoDetalleDTOCols.add(guiaDespachoDetalleDTO);
+			}else {
+				this.guiaDespachoDetalleDTOCols.stream().forEach(guiaDesp -> {
+					if(guiaDesp.getCodigoArticulo().intValue() == detalle.getCodigoArticulo().intValue() && guiaDesp.getCodigoArticuloUnidadManejo().intValue() == detalle.getCodigoArticuloUnidadManejo().intValue()) {
+						guiaDesp.setCantidad(guiaDesp.getCantidad()+detalle.getCantidad());
+					}
+				});
+			}
+		});
 	}
 	
 	/**
@@ -251,7 +305,33 @@ public class DespachoController extends CommonsController implements Serializabl
 	}
 	
 	/**
-	 * Metodo para borrar un chofer de la lista del vehiculo
+	 * Metodo para abrir y consultar datos de facturas pendientes de despacho
+	 * @param e
+	 */
+	public void abrirPopUpFacturas(ActionEvent e){
+		controlPopUp = Boolean.FALSE;
+		this.facturasDTOCols = ERPFactory.facturas.getFacturaCabeceraServicio().findObtenerListaFacturas(Integer.parseInt(ERPConstantes.ESTADO_ACTIVO_NUMERICO), null, null, null, null, null, null, null);
+		Collection<FacturaCabeceraDTO> facturasDTOAuxCols = new ArrayList<>();
+		Boolean ban;
+		if(CollectionUtils.isNotEmpty(this.guiaDespachoFacturaDTOCols) && CollectionUtils.isNotEmpty(this.facturasDTOCols)) {
+			for(FacturaCabeceraDTO facturaDTO : this.facturasDTOCols) {
+				ban = Boolean.TRUE;
+				for(GuiaDespachoFacturaDTO guiaDespachoFacturaDTO: this.guiaDespachoFacturaDTOCols) {
+					if(guiaDespachoFacturaDTO.getCodigoFactura().longValue() == facturaDTO.getId().getCodigoFactura().longValue()) {
+						ban = Boolean.FALSE;
+						break;
+					}
+				}
+				if(ban) {
+					facturasDTOAuxCols.add(facturaDTO);
+				}
+			}
+			this.setFacturasDTOCols(facturasDTOAuxCols);
+		}
+	}
+	
+	/**
+	 * Metodo para borrar un pedido de la lista del despacho
 	 * @param e
 	 */
 	public void borrarPedido(ActionEvent e) {
@@ -266,11 +346,34 @@ public class DespachoController extends CommonsController implements Serializabl
 	}
 	
 	/**
-	 * Metodo cancelar la accion borrar un chofer de la lista del vehiculo
+	 * Metodo para borrar una factura de la lista del despacho
+	 * @param e
+	 */
+	public void borrarFactura(ActionEvent e) {
+		try {
+			ERPFactory.despacho.getGuiaDespachoServicio().transEliminarFacturaDespacho(this.guiaDespachoDTO.getNumeroGuiaDespacho(), this.guiaDespachoFacturaDTO);
+			this.guiaDespachoFacturaDTOCols.remove(this.guiaDespachoFacturaDTO);
+			quitarArticulosFactura(this.guiaDespachoFacturaDTO);
+		} catch (Exception e2) {
+			this.setShowMessagesBar(Boolean.TRUE);
+			MensajesController.addError(null, ERPWebResources.getString("ec.com.erp.etiqueta.label.lista.guia.despacho.mensaje.error.eliminar"));
+		}
+	}
+	
+	/**
+	 * Metodo cancelar la accion borrar un pedido de la lista del despacho
 	 * @param e
 	 */
 	public void cancelarBorrarPedido(ActionEvent e) {
 		this.guiaDespachoPedidoDTO = new GuiaDespachoPedidoDTO();
+	}
+	
+	/**
+	 * Metodo cancelar la accion borrar una factura de la lista del despacho
+	 * @param e
+	 */
+	public void cancelarBorrarFactura(ActionEvent e) {
+		this.guiaDespachoFacturaDTO = new GuiaDespachoFacturaDTO();
 	}
 	
 	/**
@@ -450,6 +553,29 @@ public class DespachoController extends CommonsController implements Serializabl
 		}
 	}
 	
+	/**
+	 * Metodo para validar si se se debe mostrar el popup de confirmacion al eliminar factura
+	 * @return
+	 */
+	public void validarEstadoFactura(ActionEvent e) {
+		this.sePuedeEliminar = Boolean.FALSE;
+		if(this.guiaDespachoFacturaDTO.getId().getCodigoGuiaDespachoFactura() == null) {
+			this.guiaDespachoFacturaDTOCols.remove(this.guiaDespachoFacturaDTO);
+			quitarArticulosFactura(this.guiaDespachoFacturaDTO);
+		}else {
+			if(this.guiaDespachoFacturaDTO.getFacturaCabeceraDTO().getCodigoValorEstado().equals("ENT")) {
+				this.setShowMessagesBar(Boolean.TRUE);
+				MensajesController.addError(null, ERPWebResources.getString("ec.com.erp.etiqueta.label.lista.guia.despacho.mensaje.eliminar.entregado"));
+			}else {
+				this.sePuedeEliminar = Boolean.TRUE;
+			}
+		}
+	}
+	
+	/**
+	 * Metodo para quitar articulos del pedido
+	 * @param guiaDespachoPedidoDTO
+	 */
 	public void quitarArticulosPedido(GuiaDespachoPedidoDTO guiaDespachoPedidoDTO) {
 		guiaDespachoPedidoDTO.getPedidoDTO().getDetallePedidoDTOCols().stream().forEach(detalle ->{
 			GuiaDespachoDetalleDTO detalleGuia = this.guiaDespachoDetalleDTOCols.stream()
@@ -463,7 +589,30 @@ public class DespachoController extends CommonsController implements Serializabl
 				});
 			}
 		});
-		this.guiaDespachoDetalleDTOCols = this.guiaDespachoDetalleDTOCols.stream().filter(detalle -> detalle.getCantidad().intValue() != 0)
+		this.guiaDespachoDetalleDTOCols = this.guiaDespachoDetalleDTOCols.stream()
+				.filter(detalle -> detalle.getCantidad().intValue() != 0)
+				.collect(Collectors.toList());
+	}
+	
+	/**
+	 * Metodo para quitar articulos del pedido
+	 * @param guiaDespachoPedidoDTO
+	 */
+	public void quitarArticulosFactura(GuiaDespachoFacturaDTO guiaDespachoFacturaDTO) {
+		guiaDespachoFacturaDTO.getFacturaCabeceraDTO().getFacturaDetalleDTOCols().stream().forEach(detalle ->{
+			GuiaDespachoDetalleDTO detalleGuia = this.guiaDespachoDetalleDTOCols.stream()
+	        		.filter(guiaDetalle -> guiaDetalle.getCodigoArticulo().intValue() == detalle.getCodigoArticulo().intValue())
+	        		.findFirst().orElse(null);
+			if(detalleGuia != null) {
+				this.guiaDespachoDetalleDTOCols.stream().forEach(guiaDesp -> {
+					if(guiaDesp.getCodigoArticulo().intValue() == detalle.getCodigoArticulo().intValue()) {
+						guiaDesp.setCantidad(guiaDesp.getCantidad()-detalle.getCantidad());
+					}
+				});
+			}
+		});
+		this.guiaDespachoDetalleDTOCols = this.guiaDespachoDetalleDTOCols.stream()
+				.filter(detalle -> detalle.getCantidad().intValue() != 0)
 				.collect(Collectors.toList());
 	}
 	
@@ -1008,5 +1157,37 @@ public class DespachoController extends CommonsController implements Serializabl
 
 	public void setContDetalle(Integer contDetalle) {
 		this.contDetalle = contDetalle;
+	}
+
+	public Collection<GuiaDespachoFacturaDTO> getGuiaDespachoFacturaDTOCols() {
+		return guiaDespachoFacturaDTOCols;
+	}
+
+	public void setGuiaDespachoFacturaDTOCols(Collection<GuiaDespachoFacturaDTO> guiaDespachoFacturaDTOCols) {
+		this.guiaDespachoFacturaDTOCols = guiaDespachoFacturaDTOCols;
+	}
+
+	public GuiaDespachoFacturaDTO getGuiaDespachoFacturaDTO() {
+		return guiaDespachoFacturaDTO;
+	}
+
+	public void setGuiaDespachoFacturaDTO(GuiaDespachoFacturaDTO guiaDespachoFacturaDTO) {
+		this.guiaDespachoFacturaDTO = guiaDespachoFacturaDTO;
+	}
+
+	public Collection<FacturaCabeceraDTO> getFacturasDTOCols() {
+		return facturasDTOCols;
+	}
+
+	public void setFacturasDTOCols(Collection<FacturaCabeceraDTO> facturasDTOCols) {
+		this.facturasDTOCols = facturasDTOCols;
+	}
+
+	public FacturaCabeceraDTO getFacturaCabeceraDTO() {
+		return facturaCabeceraDTO;
+	}
+
+	public void setFacturaCabeceraDTO(FacturaCabeceraDTO facturaCabeceraDTO) {
+		this.facturaCabeceraDTO = facturaCabeceraDTO;
 	}
 }
