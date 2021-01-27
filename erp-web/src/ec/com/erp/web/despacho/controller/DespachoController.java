@@ -181,7 +181,7 @@ public class DespachoController extends CommonsController implements Serializabl
 	 */
 	public void agragarPedido(ActionEvent e) {
 		for(PedidoDTO pedido : this.pedidosDTOCols) {
-			if(pedido.getSeleccionado()) {
+			if(pedido != null && pedido.getSeleccionado() != null && pedido.getSeleccionado()) {
 				// Verificar si existe en la coleccion el pedido
 				Predicate testPredicate = new BeanPredicate("id.codigoPedido", PredicateUtils.equalPredicate(pedido.getId().getCodigoPedido()));
 				// Validacion de objeto existente
