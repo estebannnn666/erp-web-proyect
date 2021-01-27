@@ -83,7 +83,78 @@
 			</fieldset>
 			  
 			<!-- LISTA DE PEDIDOS ASIGNADOS A LA GUIA -->		
-			<h:panelGrid id="divPrincipal" style="width: 100%" columns="1" styleClass="panelPedidos">
+			<h:panelGrid id="divPrincipal" style="width: 100%" columns="2" styleClass="panelPedidos" columnClasses="estiloDivPedidos">
+				<h:panelGroup id="flotanteizquierda3" style="width: 100%">
+					<rich:toolbar height="26" itemSeparator="grid">
+						<rich:toolbarGroup>
+							<h:graphicImage name="listachofer.png" library="images" style="border:none;border-color:white;" height="16" width="16"/>
+							<h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.pantall.despacho.lista.destinos.pedidos']}"/>
+						</rich:toolbarGroup>
+						<rich:toolbarGroup location="right">	
+							<h:panelGroup layout="block" styleClass="botonD" style="padding-top: 3px; margin-top:0px;">
+								<a4j:commandLink oncomplete="#{rich:component('mpPedidos')}.show();" styleClass="agregarD" actionListener="#{despachoController.abrirPopUpPedidos}" render="mpPedidos tablePedidos" execute="@this" title="Click para agregar">
+									<h:panelGrid columns="2" cellpadding="3" cellspacing="0">
+										<h:graphicImage name="addChofer1.png" library="images" style="border:none;border-color:white;" height="16" width="16"/>
+										<h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.boton.agregar']}"/>
+									</h:panelGrid>
+								</a4j:commandLink>	
+							</h:panelGroup>	
+						</rich:toolbarGroup>					
+					</rich:toolbar>	
+					<rich:panel style="height: 206px;">
+						<h:panelGrid id="panelTablaFacturas" columns="1" style="width:100%;">
+							<h:panelGrid id="tablaVaciaFacturas" columns="1" rendered="#{empty despachoController.guiaDespachoFacturaDTOCols}" style="width:100%; text-align: center; padding-top: 100px">
+								<h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.mensaje.lista.vacio']}"/>
+							</h:panelGrid>		
+											
+							<rich:panel style="text-align:center; border-left: none; border-right:none;" rendered="#{not empty despachoController.guiaDespachoFacturaDTOCols}">
+								<rich:dataScroller page="#{despachoController.page}" fastStep="3" for="tableFacturasGuia" maxPages="5" rendered="#{not empty despachoController.guiaDespachoPedidoDTOCols}" renderIfSinglePage="false"/>
+							</rich:panel>
+							<rich:dataTable style="width:100%" value="#{despachoController.guiaDespachoFacturaDTOCols}" rendered="#{not empty despachoController.guiaDespachoFacturaDTOCols}" var="factura" iterationStatusVar="it" id="tableFacturasGuia" rows="5">
+					            <rich:column>
+					                <f:facet name="header"><h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.label.lista.cabecera.guia.orden']}"/></f:facet>
+					                <h:outputText value="#{factura.orden}" />
+					            </rich:column>
+					            <rich:column>
+					                <f:facet name="header"><h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.label.lista.cabecera.guia.cliente']}"/></f:facet>
+					                <rich:panel rendered="#{factura.facturaCabeceraDTO.nombreClienteProveedor.length() > 20}" styleClass="tooltip-text" bodyClass="rich-laguna-panel-no-header" style="border: none !important">  
+						        		<h:outputText value="#{factura.facturaCabeceraDTO.nombreClienteProveedor.length() > 20 ? factura.facturaCabeceraDTO.nombreClienteProveedor.substring(0,20).concat('...') : factura.facturaCabeceraDTO.nombreClienteProveedor}"/> 
+									</rich:panel>
+									<rich:panel rendered="#{factura.facturaCabeceraDTO.nombreClienteProveedor.length() le 20}" styleClass="tooltip-text" bodyClass="rich-laguna-panel-no-header" style="border: none !important">  
+						        		<h:outputText value="#{factura.facturaCabeceraDTO.nombreClienteProveedor}"/> 
+									</rich:panel>
+					            </rich:column>
+					            <rich:column>
+					                <f:facet name="header"><h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.label.lista.cabecera.guia.destino']}"/></f:facet>
+					                <rich:panel rendered="#{factura.facturaCabeceraDTO.direccion.length() > 25}" styleClass="tooltip-text" bodyClass="rich-laguna-panel-no-header" style="border: none !important">  
+						        		<h:outputText value="#{factura.facturaCabeceraDTO.direccion.length() > 25 ? factura.facturaCabeceraDTO.direccion.substring(0,25).concat('...') : factura.facturaCabeceraDTO.direccion}" title="#{factura.facturaCabeceraDTO.direccion}"/> 
+									</rich:panel>
+									<rich:panel rendered="#{factura.facturaCabeceraDTO.direccion.length() le 25}" styleClass="tooltip-text" bodyClass="rich-laguna-panel-no-header" style="border: none !important">  
+						        		<h:outputText value="#{factura.facturaCabeceraDTO.direccion}"/> 
+									</rich:panel>
+					            </rich:column>
+					            <rich:column style="width: 80px; text-align: right; padding-right: 3px;">
+					                <f:facet name="header"><h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.label.lista.cabecera.guia.total.pedido']}"/></f:facet>
+					                <h:outputText value="#{factura.facturaCabeceraDTO.totalCuenta}">
+					                	<f:convertNumber pattern="0.00"/>
+	                				</h:outputText>
+					            </rich:column>
+					            <rich:column>
+					                <f:facet name="header"><h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.label.lista.cabecera.guia.observacion']}"/></f:facet>
+					                <h:inputText value="#{factura.observacion}" maxlength="64"/>
+					            </rich:column>					         
+					            <rich:column styleClass="columna5">
+					                <f:facet name="header"><h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.boton.eliminar']}"/></f:facet>
+					                <a4j:commandLink id="botonEliminarFactura" execute="@this" actionListener="#{despachoController.cargarDatosEliminar}" oncomplete="validarEstadoFactura();">
+										<h:graphicImage library="images" name="deleteReg.png" title="Borrar" width="16" height="16"/>
+										<f:setPropertyActionListener value="#{factura}" target="#{despachoController.guiaDespachoFacturaDTO}" />											
+									</a4j:commandLink>	
+					            </rich:column>            
+					        </rich:dataTable>						
+						</h:panelGrid>
+					</rich:panel>
+				</h:panelGroup>
+				
 				<h:panelGroup id="flotanteizquierda2" style="width: 100%">
 					<rich:toolbar height="26" itemSeparator="grid">
 						<rich:toolbarGroup>
@@ -265,8 +336,9 @@
 			</h:panelGrid>
 		</rich:panel>
 		<a4j:jsFunction name="validarEstadoPedido" render="panelTablaPedidos panelTablaDetalle pnlMensajes" actionListener="#{despachoController.validarEstadoPedido}" oncomplete="if(#{despachoController.sePuedeEliminar})#{rich:component('mpEliminarPedido')}.show(); return false;"></a4j:jsFunction>
+		<a4j:jsFunction name="validarEstadoFactura" render="panelTablaFacturas panelTablaDetalle pnlMensajes" actionListener="#{despachoController.validarEstadoFactura}" oncomplete="if(#{despachoController.sePuedeEliminar})#{rich:component('mpEliminarPedido')}.show(); return false;"></a4j:jsFunction>
 		<a4j:jsFunction name="validarExtras" render="panelTablaAdicional pnlMensajes" actionListener="#{despachoController.validarExtras}" oncomplete="if(#{despachoController.sePuedeEliminar})#{rich:component('mpEliminarExtras')}.show(); return false;"></a4j:jsFunction>
-		<!-- Popup para agregar nuevo chofer -->
+		<!-- Popup para agregar pedidos -->
 		<rich:popupPanel id="mpPedidos" header="#{msg_erpweb['ec.com.erp.etiqueta.label.nuevo.pedidos.titulo.lista.pedido']}" width="1000" height="450" modal="true" domElementAttachment="form">
 			<f:facet name="controls">
 				<h:outputLink value="#"	onclick="#{rich:component('mpPedidos')}.hide();">
@@ -343,6 +415,83 @@
 			</h:panelGrid>
 		</rich:popupPanel>
 		
+		
+		<!-- Popup para agregar pedidos -->
+		<rich:popupPanel id="mpPedidos" header="#{msg_erpweb['ec.com.erp.etiqueta.label.nuevo.pedidos.titulo.lista.pedido']}" width="1000" height="450" modal="true" domElementAttachment="form">
+			<f:facet name="controls">
+				<h:outputLink value="#"	onclick="#{rich:component('mpPedidos')}.hide();">
+					<h:graphicImage library="images" name="close.png" style="border:0px" id="closePopUpChofer" />
+				</h:outputLink>
+			</f:facet>
+			
+			<rich:panel header="Facturas pendientes de entrega" style="height: 370px">
+				<h:panelGrid id="tablaVaciaFactura" columns="1" rendered="#{empty despachoController.pedidosDTOCols}" style="width:100%; text-align: center; padding-top: 160px">
+					<h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.mensaje.lista.vacio']}"/>
+				</h:panelGrid>
+				<rich:panel style="text-align:center; border-left: none; border-right:none; border-bottom:none" rendered="#{not empty despachoController.pedidosDTOCols}">
+					<rich:dataScroller for="tableFactura" maxPages="5" rendered="#{not empty despachoController.pedidosDTOCols}" renderIfSinglePage="false"/>
+				</rich:panel>
+				<rich:dataTable style="width:100%" value="#{despachoController.pedidosDTOCols}" rendered="#{not empty despachoController.pedidosDTOCols}" var="pedido" iterationStatusVar="it" id="tableFactura" rows="8">
+					<rich:column style="padding:0px;padding-left:2px" >
+						<h:selectBooleanCheckbox id="myCheck" value="#{pedido.seleccionado}">
+				        </h:selectBooleanCheckbox>
+					</rich:column>
+		            <rich:column>
+		                <f:facet name="header">Nro.</f:facet>
+		                #{it.index+1}
+		            </rich:column>
+		            <rich:column>
+		                <f:facet name="header"><h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.header.tabla.tipo.cliente']}"/></f:facet>
+		                <h:outputText value="#{pedido.clienteDTO.tipoClienteCatalogoValorDTO.nombreCatalogoValor}" />
+		            </rich:column>
+		            <rich:column>
+		                <f:facet name="header"><h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.header.tabla.nombre.cliente']}"/></f:facet>
+		                <h:outputText value="#{pedido.clienteDTO.personaDTO.nombreCompleto == null ? pedido.clienteDTO.empresaDTO.razonSocial : pedido.clienteDTO.personaDTO.nombreCompleto}" />
+		            </rich:column>
+		            <rich:column>
+		                <f:facet name="header"><h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.header.tabla.direccion.cliente']}"/></f:facet>
+		                <h:outputText value="#{pedido.clienteDTO.personaDTO == null ? pedido.clienteDTO.empresaDTO.contactoEmpresaDTO.direccionPrincipal : pedido.clienteDTO.personaDTO.contactoPersonaDTO.direccionPrincipal}" />
+		            </rich:column>
+		            <rich:column>
+		                <f:facet name="header"><h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.label.nuevo.pedidos.etiqueta.fechapedido']}"/></f:facet>
+		                <h:outputText value="#{pedido.fechaPedido}">
+		                	<f:convertDateTime pattern="yyyy-MM-dd"/>
+		                </h:outputText>
+		            </rich:column>
+		            <rich:column style="width: 60px; text-align: right; padding-right: 3px;">
+		                <f:facet name="header"><h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.label.nuevo.pedidos.detalle.total']}"/></f:facet>
+		                <h:outputText value="#{pedido.totalCompra}">
+		                	<f:convertNumber pattern="0.00"/>
+		                </h:outputText>
+		            </rich:column>
+		            <rich:column>
+		                <f:facet name="header"><h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.label.nuevo.pedidos.etiqueta.estadoPedido']}"/></f:facet>
+		                <h:outputText value="#{pedido.estadoPedidoDTO.estadoCatalogoValorDTO.nombreCatalogoValor}" />
+		            </rich:column>
+		        </rich:dataTable>
+		    </rich:panel>
+			
+			<!-- Botones de PopUp -->
+			<h:panelGrid style="margin:auto;" columns="2" cellpadding="0" cellspacing="0">
+				<h:panelGroup layout="block" styleClass="botonD" style="margin-top:5px;margin-right:20px;">
+					<a4j:commandLink id="btnAceptarAgregarFactura" execute="tableFactura" render="panelTablaPedidos panelTablaDetalle" styleClass="aceptarD" actionListener="#{despachoController.agragarPedido}" oncomplete="if(#{despachoController.controlPopUp})#{rich:component('mpPedidos')}.hide(); return false;">
+						<h:panelGrid columns="2" cellpadding="3" cellspacing="0">
+							<h:graphicImage name="btnAceptar.png" library="images" style="border:none;border-color:white;" height="16" width="16"/>
+							<h:outputText value="Aceptar" />
+						</h:panelGrid>
+					</a4j:commandLink>					
+				</h:panelGroup>
+	
+				<h:panelGroup layout="block" styleClass="botonD" style="margin-top:5px;">
+					<a4j:commandLink id="btnCancelarAgregarFactura" styleClass="cancelarD" oncomplete="#{rich:component('mpPedidos')}.hide(); return false;" immediate="true">
+						<h:panelGrid columns="2" cellpadding="3" cellspacing="0">
+							<h:graphicImage name="btnCancel.png" library="images" style="border:none;border-color:white;" height="16" width="16"/>
+							<h:outputText value="Cancelar" />
+						</h:panelGrid>
+					</a4j:commandLink>
+				</h:panelGroup>
+			</h:panelGrid>
+		</rich:popupPanel>
 		
 		<!-- Popup para confirmar que se guardo la guia de despacho -->
 		<rich:popupPanel id="mpConfirmacion" header="#{msg_erpweb['ec.com.erp.etiqueta.mensaje.informacion']}" width="345" height="160" modal="true" domElementAttachment="form">
