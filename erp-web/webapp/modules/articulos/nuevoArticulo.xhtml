@@ -72,12 +72,12 @@
 										fileUploadListener="#{articulosController.uploadListener}" id="fileUpload" 
 										acceptedTypes="#{msg_erpweb['ec.com.erp.etiqueta.tipos.formatos.permitidos']}"
 										deleteLabel="#{msg_erpweb['ec.com.erp.etiqueta.boton.borrar']}"
-										noDuplicate="true"
+										noDuplicate="true" 
 										ontyperejected="alert('Solo se permiten archivos de tipo JPG, GIF, PNG y BMP ');" maxFilesQuantity="1"
 										addLabel="#{msg_erpweb['ec.com.erp.etiqueta.boton.examinar']}" clearAllLabel="#{msg_erpweb['ec.com.erp.etiqueta.boton.limpiar']}"
 										clearLabel="#{msg_erpweb['ec.com.erp.etiqueta.boton.limpiar']}" doneLabel="#{msg_erpweb['ec.com.erp.etiqueta.boton.aceptar']}"
-										uploadLabel="#{msg_erpweb['ec.com.erp.etiqueta.boton.cargar']}" render="pnlMensajes pnlFoto foto" execute="@this">
-										<a4j:ajax event="uploadcomplete" execute="@none" render="pnlFoto foto"></a4j:ajax>
+										uploadLabel="#{msg_erpweb['ec.com.erp.etiqueta.boton.cargar']}" render="pnlFoto foto" execute="@this">
+										<a4j:ajax event="uploadcomplete" execute="@this" render="pnlFoto foto" oncomplete="validarTamanio();"></a4j:ajax>
 									</rich:fileUpload>
 								</rich:panel>
 							</h:panelGrid>
@@ -85,6 +85,7 @@
 					</fieldset>
 				</h:panelGroup>
 			</h:panelGrid>
+			<a4j:jsFunction name="validarTamanio" actionListener="#{articulosController.validarTamanioImagen}" execute="pnlFoto" render="pnlMensajes"></a4j:jsFunction>
 			<h:panelGrid columns="2" style="width: 100%" columnClasses="estiloDivArticulos1 estiloDivArticulos2">
 				<h:panelGroup>
 					<fieldset style="height: 185px">
@@ -344,6 +345,7 @@
 				</h:panelGroup>
 			</h:panelGrid>
 		</rich:popupPanel>
+		
 		<script type="text/javascript">
 			/*<![CDATA[*/	
 				function radioButton(radio) {

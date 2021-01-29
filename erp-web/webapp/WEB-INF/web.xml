@@ -45,7 +45,7 @@ id="WebApp_ID" version="3.1">
 	</context-param>
     <context-param>
         <param-name>org.richfaces.fileUpload.maxRequestSize</param-name>
-        <param-value>100000</param-value>
+        <param-value>6000000</param-value>
     </context-param>
     <context-param>
         <param-name>org.richfaces.fileUpload.createTempFiles</param-name>

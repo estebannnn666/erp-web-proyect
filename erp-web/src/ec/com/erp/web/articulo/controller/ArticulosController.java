@@ -72,9 +72,12 @@ public class ArticulosController extends CommonsController implements Serializab
 	private ArticuloUnidadManejoDTO articuloUnidadManejoDTO;
 	private Boolean impuestoCreado;
 	private Boolean unidadManejoCreada;
+	private Boolean imagenValida;
+	
 
 	@PostConstruct
 	public void postConstruct() {
+		this.imagenValida = Boolean.FALSE;
 		this.impuestoCreado = Boolean.FALSE;
 		this.unidadManejoCreada = Boolean.FALSE;
 		this.loginController.activarMenusSeleccionado();
@@ -121,14 +124,22 @@ public class ArticulosController extends CommonsController implements Serializab
 	}
 
 	public void uploadListener(FileUploadEvent event) throws Exception{
+		this.imagenValida = Boolean.FALSE;
 		UploadedFile item = event.getUploadedFile();
 		Long a = Long.valueOf(item.getSize());
-		if(a.longValue() > 200000L) {
-			this.setShowMessagesBar(Boolean.TRUE);
-			MensajesController.addError(null, ERPWebResources.getString("ec.com.erp.error.tamanio.nopermitido.imagen"));
+		if(a.longValue() > 6000000L) {
+			this.imagenValida = Boolean.FALSE;
 		}else {
+			this.imagenValida = Boolean.TRUE;
 			this.articuloDTO.setImagen(item.getData());
 			this.articulosDataManager.setImagen(item.getData());
+		}
+	}
+	
+	public void validarTamanioImagen(ActionEvent e) {
+		if(!this.imagenValida) {
+			this.setShowMessagesBar(Boolean.TRUE);
+			MensajesController.addError("ERROR", ERPWebResources.getString("ec.com.erp.error.tamanio.nopermitido.imagen"));
 		}
 	}
 	
@@ -687,5 +698,13 @@ public class ArticulosController extends CommonsController implements Serializab
 
 	public void setUnidadManejoCatalogoDTOCols(Collection<CatalogoValorDTO> unidadManejoCatalogoDTOCols) {
 		this.unidadManejoCatalogoDTOCols = unidadManejoCatalogoDTOCols;
+	}
+
+	public Boolean getImagenValida() {
+		return imagenValida;
+	}
+
+	public void setImagenValida(Boolean imagenValida) {
+		this.imagenValida = imagenValida;
 	}
 }

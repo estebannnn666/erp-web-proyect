@@ -104,6 +104,7 @@ public class DespachoController extends CommonsController implements Serializabl
 	private Boolean controlPopUp;
 	private Boolean despachoCreado;
 	private Boolean sePuedeEliminar;
+	private Boolean puedeEliminarFactura;
 	private Collection<ArticuloDTO> articuloDTOCols;
 	private Integer contDetalle;
 
@@ -137,6 +138,7 @@ public class DespachoController extends CommonsController implements Serializabl
 		this.orden = 1;
 		this.despachoCreado = Boolean.FALSE;
 		this.sePuedeEliminar = Boolean.FALSE;
+		this.puedeEliminarFactura = Boolean.FALSE;
 		this.articuloDTOCols = ERPFactory.articulos.getArticuloServicio().findObtenerListaArticulos(1, null, null);
 		contDetalle= 1;
 		GuiaDespachoExtrasDTO guiaDespachoExtrasDTOTemp = null;
@@ -310,7 +312,7 @@ public class DespachoController extends CommonsController implements Serializabl
 	 */
 	public void abrirPopUpFacturas(ActionEvent e){
 		controlPopUp = Boolean.FALSE;
-		this.facturasDTOCols = ERPFactory.facturas.getFacturaCabeceraServicio().findObtenerListaFacturas(Integer.parseInt(ERPConstantes.ESTADO_ACTIVO_NUMERICO), null, null, null, null, null, null, null);
+		this.facturasDTOCols = ERPFactory.facturas.getFacturaCabeceraServicio().findObtenerListaFacturasSinDespachar(Integer.parseInt(ERPConstantes.ESTADO_ACTIVO_NUMERICO), null, null, null);
 		Collection<FacturaCabeceraDTO> facturasDTOAuxCols = new ArrayList<>();
 		Boolean ban;
 		if(CollectionUtils.isNotEmpty(this.guiaDespachoFacturaDTOCols) && CollectionUtils.isNotEmpty(this.facturasDTOCols)) {
@@ -558,17 +560,12 @@ public class DespachoController extends CommonsController implements Serializabl
 	 * @return
 	 */
 	public void validarEstadoFactura(ActionEvent e) {
-		this.sePuedeEliminar = Boolean.FALSE;
+		this.puedeEliminarFactura = Boolean.FALSE;
 		if(this.guiaDespachoFacturaDTO.getId().getCodigoGuiaDespachoFactura() == null) {
 			this.guiaDespachoFacturaDTOCols.remove(this.guiaDespachoFacturaDTO);
 			quitarArticulosFactura(this.guiaDespachoFacturaDTO);
 		}else {
-			if(this.guiaDespachoFacturaDTO.getFacturaCabeceraDTO().getCodigoValorEstado().equals("ENT")) {
-				this.setShowMessagesBar(Boolean.TRUE);
-				MensajesController.addError(null, ERPWebResources.getString("ec.com.erp.etiqueta.label.lista.guia.despacho.mensaje.eliminar.entregado"));
-			}else {
-				this.sePuedeEliminar = Boolean.TRUE;
-			}
+			this.puedeEliminarFactura = Boolean.TRUE;
 		}
 	}
 	
@@ -765,6 +762,7 @@ public class DespachoController extends CommonsController implements Serializabl
 				guiaDespachoDTO.getId().setCodigoCompania(Integer.parseInt(ERPConstantes.ESTADO_ACTIVO_NUMERICO));
 				guiaDespachoDTO.setUsuarioRegistro(this.loginController.getUsuariosDTO().getId().getUserId());
 				guiaDespachoDTO.setGuiaDespachoPedidoDTOCols(guiaDespachoPedidoDTOCols);
+				guiaDespachoDTO.setGuiaDespachoFacturaDTOCols(guiaDespachoFacturaDTOCols);
 				guiaDespachoDTO.setGuiaDespachoExtrasDTOCols(guiaDespachoExtrasDTOCols);
 				guiaDespachoDTO.setGuiaDespachoDetalleDTOCols(guiaDespachoDetalleDTOCols);
 				
@@ -810,7 +808,7 @@ public class DespachoController extends CommonsController implements Serializabl
 			MensajesController.addError(null, ERPWebResources.getString("ec.com.erp.etiqueta.mensaje.campo.requerido.principal.nombre"));
 			validado = Boolean.FALSE;
 		}
-		if(CollectionUtils.isEmpty(this.guiaDespachoPedidoDTOCols) && CollectionUtils.isEmpty(this.guiaDespachoExtrasDTOCols)){
+		if(CollectionUtils.isEmpty(this.guiaDespachoFacturaDTOCols) && CollectionUtils.isEmpty(this.guiaDespachoPedidoDTOCols) && CollectionUtils.isEmpty(this.guiaDespachoExtrasDTOCols)){
 			MensajesController.addError(null, ERPWebResources.getString("ec.com.erp.etiqueta.mensaje.campo.requerido.lista.destinos.extras"));
 			validado = Boolean.FALSE;
 		}
@@ -849,6 +847,7 @@ public class DespachoController extends CommonsController implements Serializabl
 	 * @param e
 	 */
 	public void clearNuevoDespacho(ActionEvent e){
+		this.orden = 1;
 		this.setDespachoCreado(Boolean.FALSE);
 		this.setShowMessagesBar(Boolean.FALSE);
 		this.guiaDespachoDTO = new GuiaDespachoDTO();
@@ -862,6 +861,7 @@ public class DespachoController extends CommonsController implements Serializabl
 			this.guiaDespachoExtrasDTOCols.add(guiaDespachoExtrasDTOTemp);
 		}
 		this.guiaDespachoPedidoDTOCols = new ArrayList<GuiaDespachoPedidoDTO>();
+		this.guiaDespachoFacturaDTOCols = new ArrayList<>();
 		this.guiaDespachoDetalleDTOCols = new ArrayList<>();
 		this.despachoDataManager.setGuiaDespachoDTOEditar(new GuiaDespachoDTO());
 	}
@@ -1189,5 +1189,13 @@ public class DespachoController extends CommonsController implements Serializabl
 
 	public void setFacturaCabeceraDTO(FacturaCabeceraDTO facturaCabeceraDTO) {
 		this.facturaCabeceraDTO = facturaCabeceraDTO;
+	}
+
+	public Boolean getPuedeEliminarFactura() {
+		return puedeEliminarFactura;
+	}
+
+	public void setPuedeEliminarFactura(Boolean puedeEliminarFactura) {
+		this.puedeEliminarFactura = puedeEliminarFactura;
 	}
 }
