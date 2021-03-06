@@ -2,6 +2,7 @@
 package ec.com.erp.web.clientes.controller;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Collection;
 
 import javax.annotation.PostConstruct;
@@ -14,17 +15,22 @@ import javax.faces.event.ActionEvent;
 import javax.faces.event.AjaxBehaviorEvent;
 import javax.faces.event.ValueChangeEvent;
 
+import org.apache.commons.beanutils.BeanPredicate;
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections.Predicate;
+import org.apache.commons.collections.PredicateUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import ec.com.erp.cliente.common.constantes.ERPConstantes;
 import ec.com.erp.cliente.common.exception.ERPException;
 import ec.com.erp.cliente.common.factory.ERPFactory;
+import ec.com.erp.cliente.mdl.dto.CatalogoValorDTO;
 import ec.com.erp.cliente.mdl.dto.ClienteDTO;
 import ec.com.erp.cliente.mdl.dto.ContactoDTO;
 import ec.com.erp.cliente.mdl.dto.EmpresaDTO;
 import ec.com.erp.cliente.mdl.dto.PersonaDTO;
 import ec.com.erp.cliente.mdl.dto.UsuariosDTO;
+import ec.com.erp.cliente.mdl.dto.VendedorDTO;
 import ec.com.erp.web.clientes.datamanager.ClientesDataManager;
 import ec.com.erp.web.commons.controller.CommonsController;
 import ec.com.erp.web.commons.controller.MensajesController;
@@ -50,6 +56,9 @@ public class ClientesController extends CommonsController implements Serializabl
 	private EmpresaDTO empresaDTO;
 	private ContactoDTO contactoDTO;
 	private String repetirContrasenia;
+	private Long codigoVendedorSeleccionado;
+	private String nombreVendedor;
+	private String nombreVendedorBusqueda;
 	
 	// Data Managers
 	@ManagedProperty(value="#{clientesDataManager}")
@@ -60,6 +69,8 @@ public class ClientesController extends CommonsController implements Serializabl
 	
 	// Variables
 	private Collection<ClienteDTO> clienteDTOCols;
+	private Collection<VendedorDTO> vendedorDTOCols;
+	private Collection<CatalogoValorDTO> zonasSectorCols;
 	private String numeroDocumentoBusqueda;
 	private String nombreClienteBusqueda;
 	private Integer page;
@@ -70,11 +81,13 @@ public class ClientesController extends CommonsController implements Serializabl
 		this.loginController.activarMenusSeleccionado();
 		this.clienteCreado = Boolean.FALSE;
 		this.clienteDTO = new ClienteDTO();
+		this.vendedorDTOCols = new ArrayList<>();
 		this.clienteDTO.setPersonaDTO(new PersonaDTO());
 		this.clienteDTO.setEmpresaDTO(new EmpresaDTO());
 		this.clienteDTO.setUsuariosDTO(new UsuariosDTO());
 		this.clienteDTO.setCodigoValorTipoCliente(ERPConstantes.CODIGO_CATALOGO_VALOR_TIPO_CLIENTE_PERSONA);
 		this.clienteDTO.setCodigoTipoCliente(ERPConstantes.CODIGO_CATALOGO_TIPOS_CLIENTES);
+		this.zonasSectorCols = ERPFactory.catalogos.getCatalogoServicio().findObtenerCatalogoByTipo(ERPConstantes.CODIGO_CATALOGO_TIPOS_ZONA_CLIENTE);
 		this.personaDTO = new PersonaDTO();
 		this.empresaDTO = new EmpresaDTO();
 		this.contactoDTO = new ContactoDTO();
@@ -85,6 +98,7 @@ public class ClientesController extends CommonsController implements Serializabl
 			this.setClienteDTO(clientesDataManager.getClienteDTOEditar());
 			this.setPersonaDTO(clientesDataManager.getClienteDTOEditar().getPersonaDTO());
 			this.setEmpresaDTO(clientesDataManager.getClienteDTOEditar().getEmpresaDTO());
+			this.nombreVendedor = clientesDataManager.getClienteDTOEditar().getCodigoVendedor() == null ? "" : clientesDataManager.getClienteDTOEditar().getVendedorDTO().getPersonaDTO().getNombreCompleto();
 			this.setContactoDTO(clientesDataManager.getClienteDTOEditar().getPersonaDTO() == null ? clientesDataManager.getClienteDTOEditar().getEmpresaDTO().getContactoEmpresaDTO() : clientesDataManager.getClienteDTOEditar().getPersonaDTO().getContactoPersonaDTO());
 		}
 		if(FacesContext.getCurrentInstance().getViewRoot().getViewId().equals("/modules/clientes/adminBusquedaClientes.xhtml")) {
@@ -316,6 +330,10 @@ public class ClientesController extends CommonsController implements Serializabl
 		this.setClienteCreado(Boolean.FALSE);
 		this.setShowMessagesBar(Boolean.FALSE);
 		this.clienteDTO = new ClienteDTO();
+		this.codigoVendedorSeleccionado = null;
+		this.numeroDocumentoBusqueda = null;
+		this.nombreVendedor = null;
+		this.nombreVendedorBusqueda = null;
 		this.clientesDataManager.setClienteDTOEditar(new ClienteDTO());
 		this.clienteDTO.setCodigoValorTipoCliente(ERPConstantes.CODIGO_CATALOGO_VALOR_TIPO_CLIENTE_PERSONA);
 		this.clienteDTO.setCodigoTipoCliente(ERPConstantes.CODIGO_CATALOGO_TIPOS_CLIENTES);
@@ -470,6 +488,67 @@ public class ClientesController extends CommonsController implements Serializabl
 		this.contactoDTO.setDireccionPrincipal(direccionConcatenada);
 	}
 	
+	/**
+	 * Metodo para agragar el vendedor a la vista
+	 */
+	public void agragarVendedor(ActionEvent e) {
+		// Verificar si existe en la coleccion el cliente
+		Predicate testPredicate = new BeanPredicate("id.codigoVendedor", PredicateUtils.equalPredicate(this.codigoVendedorSeleccionado));
+		// Validacion de objeto existente
+		VendedorDTO vendedorDTO  = (VendedorDTO) CollectionUtils.find(this.vendedorDTOCols, testPredicate);
+		this.clienteDTO.setVendedorDTO(vendedorDTO);
+		this.clienteDTO.setCodigoVendedor(vendedorDTO.getId().getCodigoVendedor());
+		this.nombreVendedor = vendedorDTO.getPersonaDTO().getNombreCompleto();
+	}
+	
+	/**
+	 * Metodo para buscar vendedores
+	 * @param e
+	 */
+	public void busquedaVendedores(ActionEvent e){
+		this.busquedaVendedor();
+	}
+	
+	/**
+	 * Metodo para buscar vendedores al dar enter
+	 * @param e
+	 */
+	public void busquedaVendedorEnter(AjaxBehaviorEvent e){
+		this.busquedaVendedor();
+	}
+	
+	public void busquedaVendedor() {
+		try {
+			this.vendedorDTOCols = ERPFactory.vendedor.getVendedorServicio().findObtenerListaVendedores(Integer.parseInt(ERPConstantes.ESTADO_ACTIVO_NUMERICO), numeroDocumentoBusqueda, nombreVendedorBusqueda);
+			this.numeroDocumentoBusqueda = null;
+			this.nombreVendedorBusqueda = null;
+			this.setShowMessagesBar(Boolean.FALSE);
+		} catch (ERPException e1) {
+	        this.setShowMessagesBar(Boolean.TRUE);
+	        MensajesController.addError(null, e1.getMessage());
+	        
+		} catch (Exception e2) {
+	        this.setShowMessagesBar(Boolean.TRUE);
+	        MensajesController.addError(null, e2.getMessage());
+		}
+	}
+	
+	/**
+	 * Borrar filtro de nombre vendedor
+	 */
+	public void borrarBusquedaNombreVendedor(ActionEvent e){
+		this.nombreVendedorBusqueda = "";
+		this.setShowMessagesBar(Boolean.FALSE);
+	}
+	
+	/**
+	 * Seleccionar vendedor del popUp
+	 * @param e
+	 */
+	public void seleccionVendedor(ValueChangeEvent e){
+		this.codigoVendedorSeleccionado = (Long)e.getNewValue();
+	}
+	
 	public void setClientesDataManager(ClientesDataManager clientesDataManager) {
 		this.clientesDataManager = clientesDataManager;
 	}
@@ -568,5 +647,45 @@ public class ClientesController extends CommonsController implements Serializabl
 
 	public void setClienteCreado(Boolean clienteCreado) {
 		this.clienteCreado = clienteCreado;
+	}
+
+	public Collection<CatalogoValorDTO> getZonasSectorCols() {
+		return zonasSectorCols;
+	}
+
+	public void setZonasSectorCols(Collection<CatalogoValorDTO> zonasSectorCols) {
+		this.zonasSectorCols = zonasSectorCols;
+	}
+	
+	public Long getCodigoVendedorSeleccionado() {
+		return codigoVendedorSeleccionado;
+	}
+
+	public void setCodigoVendedorSeleccionado(Long codigoVendedorSeleccionado) {
+		this.codigoVendedorSeleccionado = codigoVendedorSeleccionado;
+	}
+	
+	public Collection<VendedorDTO> getVendedorDTOCols() {
+		return vendedorDTOCols;
+	}
+
+	public void setVendedorDTOCols(Collection<VendedorDTO> vendedorDTOCols) {
+		this.vendedorDTOCols = vendedorDTOCols;
+	}
+
+	public String getNombreVendedor() {
+		return nombreVendedor;
+	}
+
+	public void setNombreVendedor(String nombreVendedor) {
+		this.nombreVendedor = nombreVendedor;
+	}
+	
+	public String getNombreVendedorBusqueda() {
+		return nombreVendedorBusqueda;
+	}
+
+	public void setNombreVendedorBusqueda(String nombreVendedorBusqueda) {
+		this.nombreVendedorBusqueda = nombreVendedorBusqueda;
 	}
 }
