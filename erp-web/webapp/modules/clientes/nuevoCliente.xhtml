@@ -147,12 +147,18 @@
 			 		<h:outputText class="styleNegritas" value="#{msg_erpweb['ec.com.erp.etiqueta.label.nuevo.cliente.contacto.ciudad']}: *" />
 			 		<h:inputText class="styleUpperCase" maxlength="64" style="background-color:#f9f9d5; background-image: none; width:260px" value="#{clientesController.contactoDTO.ciudad}" id="ciudad"/>
 			 		<div style="width:20px"></div>
-			 		<h:outputText class="styleNegritas" value="#{msg_erpweb['ec.com.erp.etiqueta.label.nuevo.cliente.contacto.zona.sector']}: *" />
+			 		<h:outputText class="styleNegritas" value="#{msg_erpweb['ec.com.erp.etiqueta.label.nuevo.cliente.contacto.zona.sector']}:" />
 			 		<h:selectOneMenu value="#{clientesController.contactoDTO.codigoValorZona}" style="background-color:#f9f9d5; background-image: none; width: 266px">
 						<f:selectItem itemLabel="SELECCIONE"/>
 						<f:selectItems value="#{clientesController.zonasSectorCols}"  var="licencia" itemValue = "#{licencia.id.codigoCatalogoValor}" itemLabel = "#{licencia.nombreCatalogoValor}" /> 
 					</h:selectOneMenu>
 			 		
+			 		<h:outputText class="styleNegritas" value="Email:" />
+			 		<h:inputText maxlength="128" style="width:260px" value="#{clientesController.contactoDTO.email}" id="email">
+			 		</h:inputText>
+			 		<div style="width:20px"></div>
+			 		<h:outputText class="styleNegritas" value="" />
+					<h:outputText class="styleNegritas" value="" />			 		
 			 	</h:panelGrid>
 			</fieldset>
 		</rich:panel>

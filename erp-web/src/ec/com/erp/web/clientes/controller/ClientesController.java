@@ -72,6 +72,7 @@ public class ClientesController extends CommonsController implements Serializabl
 	private Collection<VendedorDTO> vendedorDTOCols;
 	private Collection<CatalogoValorDTO> zonasSectorCols;
 	private String numeroDocumentoBusqueda;
+	private String numeroDocumentoVendedor;
 	private String nombreClienteBusqueda;
 	private Integer page;
 	private Boolean clienteCreado;
@@ -102,7 +103,7 @@ public class ClientesController extends CommonsController implements Serializabl
 			this.setContactoDTO(clientesDataManager.getClienteDTOEditar().getPersonaDTO() == null ? clientesDataManager.getClienteDTOEditar().getEmpresaDTO().getContactoEmpresaDTO() : clientesDataManager.getClienteDTOEditar().getPersonaDTO().getContactoPersonaDTO());
 		}
 		if(FacesContext.getCurrentInstance().getViewRoot().getViewId().equals("/modules/clientes/adminBusquedaClientes.xhtml")) {
-			this.clienteDTOCols = ERPFactory.clientes.getClientesServicio().findObtenerListaClientes(Integer.parseInt(ERPConstantes.ESTADO_ACTIVO_NUMERICO), numeroDocumentoBusqueda, nombreClienteBusqueda);
+			this.clienteDTOCols = ERPFactory.clientes.getClientesServicio().findObtenerListaClientes(Integer.parseInt(ERPConstantes.ESTADO_ACTIVO_NUMERICO), numeroDocumentoBusqueda, nombreClienteBusqueda, numeroDocumentoVendedor);
 		}
 		
 	}
@@ -136,7 +137,7 @@ public class ClientesController extends CommonsController implements Serializabl
 	
 	public void buscarClientes(){
 		try {
-			this.clienteDTOCols = ERPFactory.clientes.getClientesServicio().findObtenerListaClientes(Integer.parseInt(ERPConstantes.ESTADO_ACTIVO_NUMERICO), numeroDocumentoBusqueda, nombreClienteBusqueda);
+			this.clienteDTOCols = ERPFactory.clientes.getClientesServicio().findObtenerListaClientes(Integer.parseInt(ERPConstantes.ESTADO_ACTIVO_NUMERICO), numeroDocumentoBusqueda, nombreClienteBusqueda, numeroDocumentoVendedor);
 			if(CollectionUtils.isEmpty(this.clienteDTOCols)){
 				this.setShowMessagesBar(Boolean.TRUE);
 				FacesMessage msg = new FacesMessage("No se encontraron resultados para la b\u00FAsqueda realizada.", "ERROR MSG");
@@ -332,6 +333,7 @@ public class ClientesController extends CommonsController implements Serializabl
 		this.clienteDTO = new ClienteDTO();
 		this.codigoVendedorSeleccionado = null;
 		this.numeroDocumentoBusqueda = null;
+		this.numeroDocumentoVendedor = null;
 		this.nombreVendedor = null;
 		this.nombreVendedorBusqueda = null;
 		this.clientesDataManager.setClienteDTOEditar(new ClienteDTO());
@@ -388,7 +390,7 @@ public class ClientesController extends CommonsController implements Serializabl
 		try {
 			System.out.println("Ingreso a realizar proceson con fire base");
 			ERPFactory.firebase.getFireBaseServicio().transDescargarClientesFireBase();
-			this.clienteDTOCols = ERPFactory.clientes.getClientesServicio().findObtenerListaClientes(Integer.parseInt(ERPConstantes.ESTADO_ACTIVO_NUMERICO), null, null);
+			this.clienteDTOCols = ERPFactory.clientes.getClientesServicio().findObtenerListaClientes(Integer.parseInt(ERPConstantes.ESTADO_ACTIVO_NUMERICO), null, null, null);
 			this.setShowMessagesBar(Boolean.TRUE);
 			MensajesController.addInfo(null, "Se ha terminado de descargar la informacion de clientes de los dispositivos moviles");
 			System.out.println("Finalizo proceso con fire base");
@@ -439,6 +441,13 @@ public class ClientesController extends CommonsController implements Serializabl
 		this.setShowMessagesBar(Boolean.FALSE);
 	}
 	
+	/**
+	 * Borrar filtro de codigo de barras
+	 */
+	public void borrarBusquedaDocumentoVendedor(ActionEvent e){
+		this.numeroDocumentoVendedor = "";
+		this.setShowMessagesBar(Boolean.FALSE);
+	}
 	/**
 	 * Borrar filtro de codigo de barras
 	 */
@@ -687,5 +696,13 @@ public class ClientesController extends CommonsController implements Serializabl
 
 	public void setNombreVendedorBusqueda(String nombreVendedorBusqueda) {
 		this.nombreVendedorBusqueda = nombreVendedorBusqueda;
+	}
+
+	public String getNumeroDocumentoVendedor() {
+		return numeroDocumentoVendedor;
+	}
+
+	public void setNumeroDocumentoVendedor(String numeroDocumentoVendedor) {
+		this.numeroDocumentoVendedor = numeroDocumentoVendedor;
 	}
 }

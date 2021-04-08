@@ -32,7 +32,7 @@
 			</f:facet>		
 		
 			<h:panelGroup id="filtrosCliente" layout="block" styleClass="listaReporte">
-				<h:panelGrid columns="3" width="70%" cellpadding="0" cellspacing="2">
+				<h:panelGrid columns="4" width="90%" cellpadding="0" cellspacing="2">
 					<h:panelGrid width="47%" columns="2" columnClasses="columnaIzquierda, columnaDerecha">
 			    	   	<rich:inplaceInput id="documentoCliente" value="#{clientesController.numeroDocumentoBusqueda}" styleClass="styleInputPlace" defaultLabel="#{msg_erpweb['ec.com.erp.etiqueta.buscar.documento.cliente']}">
 			    	   		<a4j:ajax event="keyup" execute="filtrosCliente" listener="#{clientesController.busquedaClienteEnter}" onbeforesubmit="if (event.keyCode != 13)  return false;" render="listaClientes tableCliente pnlMensajes"></a4j:ajax>
@@ -50,6 +50,16 @@
 							<a4j:commandLink styleClass="guardarA" execute="@this" render="nombreCliente pnlMensajes" actionListener="#{clientesController.borrarBusquedaNombreCliente}"/>
 						</h:panelGroup>
 					</h:panelGrid>
+					
+					<h:panelGrid width="47%" columns="2" columnClasses="columnaIzquierda, columnaDerecha">
+						<rich:inplaceInput id="documentoVendedor" value="#{clientesController.numeroDocumentoVendedor}" styleClass="styleInputPlace" defaultLabel="Documento vendedor">
+							<a4j:ajax event="keyup" execute="filtrosCliente" listener="#{clientesController.busquedaClienteEnter}" onbeforesubmit="if (event.keyCode != 13)  return false;" render="listaClientes tableCliente pnlMensajes"></a4j:ajax>
+						</rich:inplaceInput>
+			    	   	<h:panelGroup styleClass="styleClean">
+							<a4j:commandLink styleClass="guardarA" execute="@this" render="documentoVendedor pnlMensajes" actionListener="#{clientesController.borrarBusquedaDocumentoVendedor}"/>
+						</h:panelGroup>
+					</h:panelGrid>
+					
 			    	 <a4j:commandButton id="btnBuscarCliente" value="Buscar" styleClass="styleSearch" render="listaClientes tableCliente pnlMensajes" execute="filtrosCliente" actionListener="#{clientesController.busquedaClientes}"/>
 				</h:panelGrid>						 
 			</h:panelGroup>	

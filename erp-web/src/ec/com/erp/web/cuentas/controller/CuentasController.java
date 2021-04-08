@@ -1223,7 +1223,7 @@ public class CuentasController extends CommonsController implements Serializable
 	 */
 	public void buscarClientes(){
 		try {
-			this.clienteDTOCols = ERPFactory.clientes.getClientesServicio().findObtenerListaClientes(Integer.parseInt(ERPConstantes.ESTADO_ACTIVO_NUMERICO), this.documentoClienteBusqueda, this.nombreClienteBusqueda);
+			this.clienteDTOCols = ERPFactory.clientes.getClientesServicio().findObtenerListaClientes(Integer.parseInt(ERPConstantes.ESTADO_ACTIVO_NUMERICO), this.documentoClienteBusqueda, this.nombreClienteBusqueda, null);
 			this.documentoClienteBusqueda = null;
 			this.nombreClienteBusqueda = null;
 			this.setShowMessagesBar(Boolean.FALSE);

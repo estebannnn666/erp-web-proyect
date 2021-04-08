@@ -425,7 +425,7 @@ public class PedidosController extends CommonsController implements Serializable
 	 */
 	public void realizarConsultaClienteByDocumento(AjaxBehaviorEvent e) {
 		Collection<ClienteDTO> clienteDTOColsTemp = ERPFactory.clientes.getClientesServicio().findObtenerListaClientes(
-				Integer.parseInt(ERPConstantes.ESTADO_ACTIVO_NUMERICO), documentoCliente, null);
+				Integer.parseInt(ERPConstantes.ESTADO_ACTIVO_NUMERICO), documentoCliente, null, null);
 		if (CollectionUtils.isNotEmpty(clienteDTOColsTemp)) {
 			ClienteDTO clienteDTOTemp = clienteDTOColsTemp.iterator().next();
 			if (clienteDTOTemp != null) {
@@ -662,7 +662,7 @@ public class PedidosController extends CommonsController implements Serializable
 	public void buscarClientes() {
 		try {
 			this.setShowMessagesBar(Boolean.FALSE);
-			this.clienteDTOCols = ERPFactory.clientes.getClientesServicio().findObtenerListaClientes(Integer.parseInt(ERPConstantes.ESTADO_ACTIVO_NUMERICO), this.documentoClienteBusqueda, this.nombresClienteBusqueda);
+			this.clienteDTOCols = ERPFactory.clientes.getClientesServicio().findObtenerListaClientes(Integer.parseInt(ERPConstantes.ESTADO_ACTIVO_NUMERICO), this.documentoClienteBusqueda, this.nombresClienteBusqueda, null);
 			this.documentoClienteBusqueda = null;
 			this.nombresClienteBusqueda = null;
 			if (CollectionUtils.isEmpty(this.clienteDTOCols)) {
