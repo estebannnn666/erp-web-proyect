@@ -65,8 +65,8 @@
 			 		<h:outputText class="styleNegritas" value="#{msg_erpweb['ec.com.erp.etiqueta.header.tabla.descripcion.articulo']}:" />
 			 		<h:outputText class="styleUpperCase" style="width:260px" value="#{inventarioController.articuloDTO.nombreArticulo}" />
 			 		
-			 		<h:outputText class="styleNegritas" value="#{msg_erpweb['ec.com.erp.etiqueta.header.tabla.articulo.peso']}: " />
-			 		<h:outputText class="styleUpperCase" style="width:260px" value="#{inventarioController.articuloDTO.peso}"/>
+			 		<h:outputText class="styleNegritas" value="#{msg_erpweb['ec.com.erp.etiqueta.header.tabla.articulo.precio.min']}: " />
+			 		<h:outputText class="styleUpperCase" style="width:260px" value="#{inventarioController.articuloDTO.precioMinorista}"/>
 			 		<h:outputText value=""/>
 			 		<h:outputText class="styleNegritas" value="#{msg_erpweb['ec.com.erp.etiqueta.header.tabla.articulo.precio']}:" />
 			 		<h:outputText class="styleUpperCase" style="width:260px" value="#{inventarioController.articuloDTO.precio}" />
@@ -92,23 +92,17 @@
 		                <rich:column rowspan="2">
 		                    <h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.inventario.label.header.unidadmanejo']}"/>
 		                </rich:column>
-		                <rich:column colspan="3">
+		                <rich:column colspan="4">
 		                    <h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.inventario.label.header.entradas']}"/>
 		                </rich:column>
-		                <rich:column colspan="3">
+		                <rich:column colspan="4">
 		                    <h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.inventario.label.header.salidas']}"/>
 		                </rich:column>
-		                <rich:column colspan="3">
+		                <rich:column colspan="4">
 		                    <h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.inventario.label.header.existencias']}"/>
 		                </rich:column>
 		                <rich:column breakRowBefore="true">
-		                    <h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.inventario.label.header.cantidad']}"/>
-		                </rich:column>
-		                <rich:column>
-		                    <h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.inventario.label.header.valorunidad']}"/>
-		                </rich:column>
-		                <rich:column>
-		                    <h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.inventario.label.header.valortotal']}"/>
+		                    <h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.inventario.label.header.cajas']}"/>
 		                </rich:column>
 		                <rich:column>
 		                    <h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.inventario.label.header.cantidad']}"/>
@@ -118,6 +112,21 @@
 		                </rich:column>
 		                <rich:column>
 		                    <h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.inventario.label.header.valortotal']}"/>
+		                </rich:column>
+		                <rich:column>
+		                    <h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.inventario.label.header.cajas']}"/>
+		                </rich:column>
+		                <rich:column>
+		                    <h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.inventario.label.header.cantidad']}"/>
+		                </rich:column>
+		                <rich:column>
+		                    <h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.inventario.label.header.valorunidad']}"/>
+		                </rich:column>
+		                <rich:column>
+		                    <h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.inventario.label.header.valortotal']}"/>
+		                </rich:column>
+		                <rich:column>
+		                    <h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.inventario.label.header.cajas']}"/>
 		                </rich:column>
 		                <rich:column>
 		                    <h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.inventario.label.header.cantidad']}"/>
@@ -131,12 +140,14 @@
 		            </rich:columnGroup>
 		        </f:facet>
 	            <rich:column>
-	                <h:outputText value="#{inventario.fechaMovimiento}" />
+	                <h:outputText value="#{inventario.fechaMovimiento}">
+	                	<f:convertDateTime pattern="yyyy-MM-dd HH:mm" />
+	                </h:outputText>
 	            </rich:column>
 	            <rich:column>	                
 	                <rich:panel id="movim#{it}" styleClass="tooltip-text" bodyClass="rich-laguna-panel-no-header" style="border: none !important">  
-		        		<h:outputText value="#{inventario.detalleMoviento.length() > 40 ? inventario.detalleMoviento.substring(0,40).concat('...') : inventario.detalleMoviento}" /> 
-						<rich:tooltip id="ttc#{it}" showDelay="500" styleClass="tooltip" layout="block" rendered="#{inventario.detalleMoviento.length() > 40}">                
+		        		<h:outputText value="#{inventario.detalleMoviento.length() > 20 ? inventario.detalleMoviento.substring(0,20).concat('...') : inventario.detalleMoviento}" /> 
+						<rich:tooltip id="ttc#{it}" showDelay="500" styleClass="tooltip" layout="block" rendered="#{inventario.detalleMoviento.length() > 20}">                
 							<h:panelGrid>
 								<span style="white-space: nowrap">												
 									<h:outputText value="#{inventario.detalleMoviento}" />												
@@ -149,16 +160,26 @@
 	                <h:outputText value="#{inventario.articuloUnidadManejoDTO.tipoUnidadManejoCatalogoValorDTO.nombreCatalogoValor.concat('x').concat(inventario.articuloUnidadManejoDTO.valorUnidadManejo)}" />
 	            </rich:column>
 	            <rich:column style="text-align: right; padding-right: 5px">
+	                <h:outputText value="#{inventario.cantidadEntrada == null ? '-' : inventario.cantidadEntrada / inventario.articuloUnidadManejoDTO.valorUnidadManejo}">
+	                	<f:convertNumber pattern="0"/>
+	                </h:outputText>
+	            </rich:column>
+	            <rich:column style="text-align: right; padding-right: 5px">
 	                <h:outputText value="#{inventario.cantidadEntrada == null ? '-' : inventario.cantidadEntrada}" />
 	            </rich:column>
 	            <rich:column style="text-align: right; padding-right: 5px">
 	                <h:outputText value="#{inventario.valorUnidadEntrada == null ? '-' : inventario.valorUnidadEntrada}">
-	                	<f:convertNumber pattern="0.00"/>
+	                	<f:convertNumber pattern="0.0000"/>
 	                </h:outputText>
 	            </rich:column>
 	            <rich:column style="text-align: right; padding-right: 5px">
 	                <h:outputText value="#{inventario.valorTotalEntrada == null ? '-' : inventario.valorTotalEntrada}" >
-	                	<f:convertNumber pattern="0.00"/>
+	                	<f:convertNumber pattern="0.0000"/>
+	                </h:outputText>
+	            </rich:column>
+	            <rich:column style="text-align: right; padding-right: 5px">
+	                <h:outputText value="#{inventario.cantidadSalida == null ? '-' : inventario.cantidadSalida / inventario.articuloUnidadManejoDTO.valorUnidadManejo}">
+	                	<f:convertNumber pattern="0"/>
 	                </h:outputText>
 	            </rich:column>
 	            <rich:column style="text-align: right; padding-right: 5px">
@@ -166,12 +187,17 @@
 	            </rich:column>
 	            <rich:column style="text-align: right; padding-right: 5px">
 	                <h:outputText value="#{inventario.valorUnidadSalida == null ? '-' : inventario.valorUnidadSalida}" >
-	                	<f:convertNumber pattern="0.00"/>
+	                	<f:convertNumber pattern="0.0000"/>
 	                </h:outputText>
 	            </rich:column>
 	            <rich:column style="text-align: right; padding-right: 5px">
 	                <h:outputText value="#{inventario.valorTotalSalida == null ? '-' : inventario.valorTotalSalida}" >
-	                	<f:convertNumber pattern="0.00"/>
+	                	<f:convertNumber pattern="0.0000"/>
+	                </h:outputText>
+	            </rich:column>
+	            <rich:column style="text-align: right; padding-right: 5px">
+	                <h:outputText value="#{inventario.cantidadExistencia / inventario.articuloUnidadManejoDTO.valorUnidadManejo}">
+	                	<f:convertNumber pattern="0"/>
 	                </h:outputText>
 	            </rich:column>
 	            <rich:column style="text-align: right; padding-right: 5px">
@@ -179,12 +205,12 @@
 	            </rich:column>
 	            <rich:column style="text-align: right; padding-right: 5px">
 	                <h:outputText value="#{inventario.valorUnidadExistencia}">
-	                	<f:convertNumber pattern="0.00"/>
+	                	<f:convertNumber pattern="0.0000"/>
 	                </h:outputText>
 	            </rich:column>
 	            <rich:column style="text-align: right; padding-right: 5px">
 	                <h:outputText value="#{inventario.valorTotalExistencia}">
-	                	<f:convertNumber pattern="0.00"/>
+	                	<f:convertNumber pattern="0.0000"/>
 	                </h:outputText>
 	            </rich:column>
 	        </rich:dataTable>

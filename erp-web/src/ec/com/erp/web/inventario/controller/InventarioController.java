@@ -27,6 +27,7 @@ import org.apache.commons.lang3.StringUtils;
 import ec.com.erp.cliente.common.constantes.ERPConstantes;
 import ec.com.erp.cliente.common.exception.ERPException;
 import ec.com.erp.cliente.common.factory.ERPFactory;
+import ec.com.erp.cliente.common.utils.ValidationUtils;
 import ec.com.erp.cliente.mdl.dto.ArticuloDTO;
 import ec.com.erp.cliente.mdl.dto.ArticuloUnidadManejoDTO;
 import ec.com.erp.cliente.mdl.dto.InventarioDTO;
@@ -178,11 +179,12 @@ public class InventarioController extends CommonsController implements Serializa
 				this.inventarioDTO.setUsuarioRegistro(loginController.getUsuariosDTO().getId().getUserId());
 				this.inventarioDTO.getId().setCodigoCompania(Integer.parseInt(ERPConstantes.ESTADO_ACTIVO_NUMERICO));
 				// Se obtiene existencia actual
-				InventarioDTO inventarioDTOAux = ERPFactory.inventario.getInventarioServicio().findObtenerUltimoInventarioByArticulo(Integer.parseInt(ERPConstantes.ESTADO_ACTIVO_NUMERICO), this.codigoBarrasNuevo, inventarioDTO.getCodigoArticuloUnidadManejo());
+				InventarioDTO inventarioDTOAux = ERPFactory.inventario.getInventarioServicio().findObtenerUltimoInventarioByArticulo(Integer.parseInt(ERPConstantes.ESTADO_ACTIVO_NUMERICO), this.codigoBarrasNuevo);
 				
 				if(this.tipoMovimiento.equals(ERPConstantes.ESTADO_INACTIVO_NUMERICO)) {
-					this.inventarioDTO.setCantidadSalida(this.inventarioDTO.getCantidadEntrada());
-					this.inventarioDTO.setValorUnidadSalida(this.inventarioDTO.getValorUnidadEntrada());
+					Integer unidades = this.inventarioDTO.getCantidadEntrada().intValue() * this.inventarioDTO.getArticuloUnidadManejoDTO().getValorUnidadManejo().intValue();
+					this.inventarioDTO.setCantidadSalida(unidades);
+					this.inventarioDTO.setValorUnidadSalida(ValidationUtils.redondear(this.inventarioDTO.getValorUnidadEntrada(), 4));
 					this.inventarioDTO.setValorTotalSalida(this.inventarioDTO.getValorTotalEntrada());
 					if(inventarioDTOAux == null) {
 						this.setShowMessagesBar(Boolean.TRUE);
@@ -195,22 +197,22 @@ public class InventarioController extends CommonsController implements Serializa
 							return;
 						}
 					}
-					this.inventarioDTO.setCantidadExistencia(inventarioDTOAux.getCantidadExistencia().intValue() - this.inventarioDTO.getCantidadSalida());
+					this.inventarioDTO.setCantidadExistencia(inventarioDTOAux.getCantidadExistencia().intValue() - unidades);
 					this.inventarioDTO.setValorUnidadExistencia(this.inventarioDTO.getValorUnidadSalida());
-					Double cantidadUnidades = Double.valueOf(this.inventarioDTO.getCantidadExistencia() * this.inventarioDTO.getArticuloUnidadManejoDTO().getValorUnidadManejo());
-					this.inventarioDTO.setValorTotalExistencia(this.inventarioDTO.getValorUnidadExistencia().multiply(BigDecimal.valueOf(cantidadUnidades)));
+					this.inventarioDTO.setValorTotalExistencia(ValidationUtils.redondear(this.inventarioDTO.getValorUnidadExistencia().multiply(BigDecimal.valueOf(this.inventarioDTO.getCantidadExistencia())), 4));
 					this.inventarioDTO.setCantidadEntrada(null);
 					this.inventarioDTO.setValorUnidadEntrada(null);
 					this.inventarioDTO.setValorTotalEntrada(null);
 				}else {
-					this.inventarioDTO.setValorUnidadExistencia(this.inventarioDTO.getValorUnidadEntrada());
+					this.inventarioDTO.setValorUnidadExistencia(ValidationUtils.redondear(this.inventarioDTO.getValorUnidadEntrada(), 4));
+					Integer unidades = this.inventarioDTO.getCantidadEntrada().intValue() * this.inventarioDTO.getArticuloUnidadManejoDTO().getValorUnidadManejo().intValue();
+					this.inventarioDTO.setCantidadEntrada(unidades);
 					if(inventarioDTOAux == null) {
-						this.inventarioDTO.setCantidadExistencia(this.inventarioDTO.getCantidadEntrada());
+						this.inventarioDTO.setCantidadExistencia(unidades);
 						this.inventarioDTO.setValorTotalExistencia(this.inventarioDTO.getValorTotalEntrada());
 					}else {
-						this.inventarioDTO.setCantidadExistencia(inventarioDTOAux.getCantidadExistencia().intValue() + this.inventarioDTO.getCantidadEntrada());
-						Double cantidadUnidades = Double.valueOf(this.inventarioDTO.getCantidadExistencia() * this.inventarioDTO.getArticuloUnidadManejoDTO().getValorUnidadManejo());
-						this.inventarioDTO.setValorTotalExistencia(this.inventarioDTO.getValorUnidadExistencia().multiply(BigDecimal.valueOf(cantidadUnidades)));
+						this.inventarioDTO.setCantidadExistencia(inventarioDTOAux.getCantidadExistencia().intValue() + unidades);
+						this.inventarioDTO.setValorTotalExistencia(ValidationUtils.redondear(this.inventarioDTO.getValorUnidadExistencia().multiply(BigDecimal.valueOf(this.inventarioDTO.getCantidadExistencia())),4));
 					}
 					this.inventarioDTO.setCantidadSalida(null);
 					this.inventarioDTO.setValorUnidadSalida(null);
@@ -454,11 +456,7 @@ public class InventarioController extends CommonsController implements Serializa
 		Collection<ArticuloDTO> articuloDTOCols = ERPFactory.articulos.getArticuloServicio().findObtenerListaArticulos(Integer.parseInt(ERPConstantes.ESTADO_ACTIVO_NUMERICO), codigoBarrasNuevo, null);
 		if(CollectionUtils.isNotEmpty(articuloDTOCols)) {
 			ArticuloDTO articuloTem = articuloDTOCols.iterator().next();
-			if(this.tipoMovimiento.equals(ERPConstantes.ESTADO_INACTIVO_NUMERICO)) {
-				this.inventarioDTO.setValorUnidadEntrada(articuloTem.getPrecio());
-			}else {
-				this.inventarioDTO.setValorUnidadEntrada(articuloTem.getCosto());
-			}
+			this.inventarioDTO.setValorUnidadEntrada(articuloTem.getCosto());
 			this.inventarioDTO.setCodigoArticulo(articuloTem.getId().getCodigoArticulo());
 			this.inventarioDTO.setCantidadEntrada(null);
 			this.inventarioDTO.setValorTotalEntrada(null);
@@ -495,13 +493,8 @@ public class InventarioController extends CommonsController implements Serializa
 	 */
 	public void seleccionarTipoInventario(ValueChangeEvent e) {
 		this.setShowMessagesBar(Boolean.FALSE);
-		String codigoTipoInventario = (String)e.getNewValue();
 		if(this.inventarioDTO.getArticuloDTO() != null) {
-			if(codigoTipoInventario.equals(ERPConstantes.ESTADO_INACTIVO_NUMERICO)) {
-				this.inventarioDTO.setValorUnidadEntrada(this.inventarioDTO.getArticuloDTO().getPrecio());
-			}else {
-				this.inventarioDTO.setValorUnidadEntrada(this.inventarioDTO.getArticuloDTO().getCosto());
-			}
+			this.inventarioDTO.setValorUnidadEntrada(this.inventarioDTO.getArticuloDTO().getCosto());
 			this.calcularTotalMovimientoKeyUp(null);
 		}
 	}
@@ -513,7 +506,7 @@ public class InventarioController extends CommonsController implements Serializa
 	public void calcularTotalMovimientoKeyUp(AjaxBehaviorEvent e) {
 		if(this.inventarioDTO.getCantidadEntrada() != null && this.inventarioDTO.getValorUnidadEntrada() != null && this.inventarioDTO.getCodigoArticuloUnidadManejo() != null) {
 			Double totalUnidades = Double.valueOf(this.inventarioDTO.getCantidadEntrada().intValue() * this.inventarioDTO.getArticuloUnidadManejoDTO().getValorUnidadManejo().intValue());
-			BigDecimal subTotal = BigDecimal.valueOf(totalUnidades).multiply(this.inventarioDTO.getValorUnidadEntrada());
+			BigDecimal subTotal = ValidationUtils.redondear(BigDecimal.valueOf(totalUnidades).multiply(this.inventarioDTO.getValorUnidadEntrada()), 4);
 			this.inventarioDTO.setValorTotalEntrada(subTotal);		
 		}
 	}

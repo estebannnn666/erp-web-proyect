@@ -30,6 +30,7 @@ import org.primefaces.event.SelectEvent;
 import ec.com.erp.cliente.common.constantes.ERPConstantes;
 import ec.com.erp.cliente.common.exception.ERPException;
 import ec.com.erp.cliente.common.factory.ERPFactory;
+import ec.com.erp.cliente.common.utils.ValidationUtils;
 import ec.com.erp.cliente.mdl.dto.ArticuloDTO;
 import ec.com.erp.cliente.mdl.dto.ArticuloImpuestoDTO;
 import ec.com.erp.cliente.mdl.dto.ArticuloUnidadManejoDTO;
@@ -297,16 +298,17 @@ public class PedidosController extends CommonsController implements Serializable
 				if (detallePedidoDTO.getCantidad() != null && detallePedidoDTO.getArticuloDTO().getPrecio() != null && detallePedidoDTO.getCodigoArticuloUnidadManejo() != null) {
 					
 					// Se obtiene existencia actual
-					InventarioDTO inventarioDTOAux = ERPFactory.inventario.getInventarioServicio().findObtenerUltimoInventarioByArticulo(Integer.parseInt(ERPConstantes.ESTADO_ACTIVO_NUMERICO), detallePedidoDTO.getArticuloDTO().getCodigoBarras(), detallePedidoDTO.getCodigoArticuloUnidadManejo());
-					
-					if (detallePedidoDTO.getCantidad().intValue() > inventarioDTOAux.getCantidadExistencia().intValue()) {
+					ArticuloUnidadManejoDTO articuloUnidadManejo = obtenerUnidadManejoPorCodigo(detallePedidoDTO.getCodigoArticuloUnidadManejo(), detallePedidoDTO.getArticuloDTO().getArticuloUnidadManejoDTOCols());
+					InventarioDTO inventarioDTOAux = ERPFactory.inventario.getInventarioServicio().findObtenerUltimoInventarioByArticulo(Integer.parseInt(ERPConstantes.ESTADO_ACTIVO_NUMERICO), detallePedidoDTO.getArticuloDTO().getCodigoBarras());
+					int cantidadIngresada = detallePedidoDTO.getCantidad().intValue() * articuloUnidadManejo.getValorUnidadManejo().intValue();
+					if (cantidadIngresada > inventarioDTOAux.getCantidadExistencia().intValue()) {
 						detallePedidoDTO.setCantidad(detallePedidoDTO.getArticuloDTO().getCantidadStock());
 						this.setShowMessagesBar(Boolean.TRUE);
 						MensajesController.addWarn(null, ERPWebResources.getString("ec.com.erp.etiqueta.label.busqueda.pedidos.mensaje.error.mayor"));
 						return;
 					}
-					ArticuloUnidadManejoDTO articuloUnidadManejo = obtenerUnidadManejoPorCodigo(detallePedidoDTO.getCodigoArticuloUnidadManejo(), detallePedidoDTO.getArticuloDTO().getArticuloUnidadManejoDTOCols());
-					BigDecimal subTotal = BigDecimal.valueOf(Double.valueOf(""+(detallePedidoDTO.getCantidad().intValue()*articuloUnidadManejo.getValorUnidadManejo().intValue()))).multiply(detallePedidoDTO.getArticuloDTO().getPrecio());
+					
+					BigDecimal subTotal = ValidationUtils.redondear(BigDecimal.valueOf(Double.valueOf(""+cantidadIngresada)).multiply(detallePedidoDTO.getArticuloDTO().getPrecio()), 4);
 					detallePedidoDTO.setSubTotal(subTotal);
 					detallePedidoDTO.setArticuloUnidadManejoDTO(articuloUnidadManejo);
 					this.calcularTotal();
@@ -335,16 +337,16 @@ public class PedidosController extends CommonsController implements Serializable
  				ArticuloUnidadManejoDTO articuloUnidadManejo = this.obtenerUnidadManejoPorDefecto(detallePedidoDTOTemp.getArticuloDTO().getArticuloUnidadManejoDTOCols());
 				BigDecimal subTotal = BigDecimal.ZERO;
 				if(this.clienteDTO.getCodigoValorTipoCompra() != null && this.clienteDTO.getCodigoValorTipoCompra().equals(ERPConstantes.CODIGO_CATALOGO_VALOR_CLIENTE_MINORISTA)) {
-					subTotal = BigDecimal.valueOf(Double.valueOf(""+(detallePedidoDTOTemp.getCantidad().intValue()*articuloUnidadManejo.getValorUnidadManejo().intValue()))).multiply(detallePedidoDTOTemp.getArticuloDTO().getPrecioMinorista());
+					subTotal = ValidationUtils.redondear(BigDecimal.valueOf(Double.valueOf(""+(detallePedidoDTOTemp.getCantidad().intValue()*articuloUnidadManejo.getValorUnidadManejo().intValue()))).multiply(detallePedidoDTOTemp.getArticuloDTO().getPrecioMinorista()), 4);
 				}else {
-					subTotal = BigDecimal.valueOf(Double.valueOf(""+(detallePedidoDTOTemp.getCantidad().intValue()*articuloUnidadManejo.getValorUnidadManejo().intValue()))).multiply(detallePedidoDTOTemp.getArticuloDTO().getPrecio());
+					subTotal = ValidationUtils.redondear(BigDecimal.valueOf(Double.valueOf(""+(detallePedidoDTOTemp.getCantidad().intValue()*articuloUnidadManejo.getValorUnidadManejo().intValue()))).multiply(detallePedidoDTOTemp.getArticuloDTO().getPrecio()), 4);
 				}
 				detallePedidoDTOTemp.setSubTotal(subTotal);
 				detallePedidoDTOTemp.setArticuloUnidadManejoDTO(articuloUnidadManejo);
 				detallePedidoDTOTemp.setCodigoArticuloUnidadManejo(articuloUnidadManejo.getId().getCodigoArticuloUnidadManejo());
 				detallePedidoDTOTemp.setCodigoArticulo(detallePedidoDTOTemp.getArticuloDTO().getId().getCodigoArticulo());
 				// Se obtiene existencia actual
-				InventarioDTO inventarioDTOAux = ERPFactory.inventario.getInventarioServicio().findObtenerUltimoInventarioByArticulo(Integer.parseInt(ERPConstantes.ESTADO_ACTIVO_NUMERICO), detallePedidoDTOTemp.getArticuloDTO().getCodigoBarras(), detallePedidoDTOTemp.getCodigoArticuloUnidadManejo());
+				InventarioDTO inventarioDTOAux = ERPFactory.inventario.getInventarioServicio().findObtenerUltimoInventarioByArticulo(Integer.parseInt(ERPConstantes.ESTADO_ACTIVO_NUMERICO), detallePedidoDTOTemp.getArticuloDTO().getCodigoBarras());
 				if(inventarioDTOAux == null) {
 					detallePedidoDTOTemp.getArticuloDTO().setCantidadStock(0);
 				}else {
@@ -369,12 +371,12 @@ public class PedidosController extends CommonsController implements Serializable
 			if(detallePedidoDTOTemp.getId().getCodigoCompania().intValue() == numeroDetalle.intValue()) {
 				if(detallePedidoDTOTemp.getCantidad() != null && detallePedidoDTOTemp.getArticuloDTO().getPrecio() != null && detallePedidoDTOTemp.getCodigoArticuloUnidadManejo() != null) {
 					ArticuloUnidadManejoDTO articuloUnidadManejo = obtenerUnidadManejoPorCodigo(codigoUnidadManejo, detallePedidoDTOTemp.getArticuloDTO().getArticuloUnidadManejoDTOCols());
-					BigDecimal subTotal = BigDecimal.valueOf(Double.valueOf(""+(detallePedidoDTOTemp.getCantidad().intValue()*articuloUnidadManejo.getValorUnidadManejo().intValue()))).multiply(detallePedidoDTOTemp.getArticuloDTO().getPrecio());
+					BigDecimal subTotal = ValidationUtils.redondear(BigDecimal.valueOf(Double.valueOf(""+(detallePedidoDTOTemp.getCantidad().intValue()*articuloUnidadManejo.getValorUnidadManejo().intValue()))).multiply(detallePedidoDTOTemp.getArticuloDTO().getPrecio()),4);
 					detallePedidoDTOTemp.setArticuloUnidadManejoDTO(articuloUnidadManejo);
 					detallePedidoDTOTemp.setCodigoArticuloUnidadManejo(articuloUnidadManejo.getId().getCodigoArticuloUnidadManejo());
 					detallePedidoDTOTemp.setSubTotal(subTotal);
 					// Se obtiene existencia actual
-					InventarioDTO inventarioDTOAux = ERPFactory.inventario.getInventarioServicio().findObtenerUltimoInventarioByArticulo(Integer.parseInt(ERPConstantes.ESTADO_ACTIVO_NUMERICO), detallePedidoDTOTemp.getArticuloDTO().getCodigoBarras(), detallePedidoDTOTemp.getCodigoArticuloUnidadManejo());
+					InventarioDTO inventarioDTOAux = ERPFactory.inventario.getInventarioServicio().findObtenerUltimoInventarioByArticulo(Integer.parseInt(ERPConstantes.ESTADO_ACTIVO_NUMERICO), detallePedidoDTOTemp.getArticuloDTO().getCodigoBarras());
 					if(inventarioDTOAux == null) {
 						detallePedidoDTOTemp.getArticuloDTO().setCantidadStock(0);
 					}else {
@@ -909,21 +911,21 @@ public class PedidosController extends CommonsController implements Serializable
 		BigDecimal totalPedido = BigDecimal.ZERO;
 		for (DetallePedidoDTO detallePedidoDTO : detallePedidoDTOCols) {
 			if (detallePedidoDTO.getSubTotal() != null) {
-				subTotal = subTotal.add(detallePedidoDTO.getSubTotal());
+				subTotal = ValidationUtils.redondear(subTotal.add(detallePedidoDTO.getSubTotal()), 4);
 			}
 			if (detallePedidoDTO.getArticuloDTO().getTieneImpuesto()) {
 				totalConImpuesto = totalConImpuesto.add(detallePedidoDTO.getSubTotal());
 				for (ArticuloImpuestoDTO impuesto : detallePedidoDTO.getArticuloDTO().getArticuloImpuestoDTOCols()) {
-					totalIva = totalIva.add(BigDecimal.valueOf((subTotal.doubleValue()
-							* impuesto.getImpuestoDTO().getValorImpuesto().doubleValue()) / Double.valueOf(100)));
+					totalIva = ValidationUtils.redondear(totalIva.add(BigDecimal.valueOf((subTotal.doubleValue()
+							* impuesto.getImpuestoDTO().getValorImpuesto().doubleValue()) / Double.valueOf(100))),4);
 				}
 			}else {
 				if (detallePedidoDTO.getSubTotal() != null) {
-					totalSinImpuesto = totalSinImpuesto.add(detallePedidoDTO.getSubTotal());
+					totalSinImpuesto = ValidationUtils.redondear(totalSinImpuesto.add(detallePedidoDTO.getSubTotal()),4);
 				}
 			}
 		}
-		totalPedido = subTotal.add(totalIva);
+		totalPedido = ValidationUtils.redondear(subTotal.add(totalIva), 4);
 		this.pedidoDTO.setSubTotal(subTotal);
 		this.pedidoDTO.setTotalSinImpuestos(totalSinImpuesto);
 		this.pedidoDTO.setTotalImpuestos(totalConImpuesto);

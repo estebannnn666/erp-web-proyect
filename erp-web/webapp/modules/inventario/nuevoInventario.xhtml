@@ -67,7 +67,7 @@
 					<h:outputText value="" />
 			 		<h:outputText value="" />
 			 		
-			 		<h:outputText class="styleNegritas" value="#{msg_erpweb['ec.com.erp.etiqueta.inventario.label.header.cantidad']}: *" />
+			 		<h:outputText class="styleNegritas" value="Cantidad: *" />
 			 		<h:inputText class="styleUpperCase" style="background-color:#f9f9d5; background-image: none; width:260px" value="#{inventarioController.inventarioDTO.cantidadEntrada}" id="cantidadMov" maxlength="9" onkeypress="if (event.keyCode == 13) return false; return validarEnteros(event);">
 			 			<a4j:ajax event="keyup" execute="@this" status="no" listener="#{inventarioController.calcularTotalMovimientoKeyUp}" render="precioTotMov" oncomplete="fijarFocoCantidad('cantidadMov');"></a4j:ajax>
 			 		</h:inputText>
@@ -76,14 +76,14 @@
 			 		
 			 		<h:outputText class="styleNegritas" value="#{msg_erpweb['ec.com.erp.etiqueta.inventario.label.header.valorunidad']}: *" />
 			 		<h:inputText class="styleUpperCase" style="background-color:#f9f9d5; background-image: none; width:260px" value="#{inventarioController.inventarioDTO.valorUnidadEntrada}" id="precioUniMov" maxlength="12" onkeypress="return validarDecimal(event);" disabled="true">
-			 			<f:convertNumber pattern="0.00"/>
+			 			<f:convertNumber pattern="0.0000"/>
 			 		</h:inputText>
 			 		<h:outputText value="" />
 			 		<h:outputText value="" />
 			 		
 			 		<h:outputText class="styleNegritas" value="#{msg_erpweb['ec.com.erp.etiqueta.inventario.label.header.valortotal']}: *" />
 			 		<h:inputText class="styleUpperCase" style="background-color:#f9f9d5; background-image: none; width:260px" value="#{inventarioController.inventarioDTO.valorTotalEntrada}" id="precioTotMov" maxlength="12" onkeypress="return validarDecimal(event);" disabled="true">
-			 			<f:convertNumber pattern="0.00"/>
+			 			<f:convertNumber pattern="0.0000"/>
 			 		</h:inputText>
 			 		<h:outputText value="" />
 			 		<h:outputText value="" />
@@ -144,7 +144,7 @@
 			<h:panelGroup id="filtrosArticulo" layout="block" styleClass="listaReporte">
 				<h:panelGrid columns="3" width="70%" cellpadding="0" cellspacing="2">
 					<h:panelGrid width="47%" columns="2" columnClasses="columnaIzquierda, columnaDerecha">
-			    	   	<rich:inplaceInput id="numeroDocumento" value="#{inventarioController.codigoBarrasBusqueda}" styleClass="styleInputPlace" defaultLabel="#{msg_erpweb['ec.com.erp.etiqueta.buscar.documento.cliente']}" onkeypress="return validarEnteros(event);">
+			    	   	<rich:inplaceInput id="numeroDocumento" value="#{inventarioController.codigoBarrasBusqueda}" styleClass="styleInputPlace" defaultLabel="#{msg_erpweb['ec.com.erp.etiqueta.header.tabla.codigo.barras']}" onkeypress="return validarEnteros(event);">
 			    	   		<a4j:ajax event="keyup" execute="filtrosArticulo" listener="#{inventarioController.busquedaArticulosEnter}" onbeforesubmit="if (event.keyCode != 13)  return false;" render="pnlListaArticulos tableArticulos pnlMensajes"></a4j:ajax>
 			    	   	</rich:inplaceInput>
 			    	   	<h:panelGroup styleClass="styleClean">
@@ -153,7 +153,7 @@
 					</h:panelGrid>
 			    	
 			    	<h:panelGrid width="47%" columns="2" columnClasses="columnaIzquierda, columnaDerecha">
-						<rich:inplaceInput id="nombreTransportista" value="#{inventarioController.nombreArticuloBusqueda}" styleClass="styleInputPlace" defaultLabel="#{msg_erpweb['ec.com.erp.etiqueta.buscar.nombre.vendedor']}">
+						<rich:inplaceInput id="nombreTransportista" value="#{inventarioController.nombreArticuloBusqueda}" styleClass="styleInputPlace" defaultLabel="#{msg_erpweb['ec.com.erp.etiqueta.header.tabla.descripcion.articulo']}">
 							<a4j:ajax event="keyup" execute="filtrosArticulo" listener="#{inventarioController.busquedaArticulosEnter}" onbeforesubmit="if (event.keyCode != 13)  return false;" render="pnlListaArticulos tableArticulos pnlMensajes"></a4j:ajax>
 						</rich:inplaceInput>
 			    	   	<h:panelGroup styleClass="styleClean">

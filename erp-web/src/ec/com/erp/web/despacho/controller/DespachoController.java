@@ -426,8 +426,9 @@ public class DespachoController extends CommonsController implements Serializabl
         		ArticuloUnidadManejoDTO articuloUnidadManejo = this.obtenerUnidadManejoPorDefecto(detallePedidoDTOTemp.getArticuloDTO().getArticuloUnidadManejoDTOCols());
         		detallePedidoDTOTemp.setCodigoArticuloUnidadManejo(articuloUnidadManejo.getId().getCodigoArticuloUnidadManejo());
         		// Se obtiene existencia actual
-				InventarioDTO inventarioDTOAux = ERPFactory.inventario.getInventarioServicio().findObtenerUltimoInventarioByArticulo(Integer.parseInt(ERPConstantes.ESTADO_ACTIVO_NUMERICO), detallePedidoDTOTemp.getArticuloDTO().getCodigoBarras(), articuloUnidadManejo.getId().getCodigoArticuloUnidadManejo());
-				if (detallePedidoDTOTemp.getCantidad().intValue() > inventarioDTOAux.getCantidadExistencia().intValue()) {
+        		int cantidadIngresada = detallePedidoDTOTemp.getCantidad().intValue() * articuloUnidadManejo.getValorUnidadManejo().intValue();
+				InventarioDTO inventarioDTOAux = ERPFactory.inventario.getInventarioServicio().findObtenerUltimoInventarioByArticulo(Integer.parseInt(ERPConstantes.ESTADO_ACTIVO_NUMERICO), detallePedidoDTOTemp.getArticuloDTO().getCodigoBarras());
+				if (cantidadIngresada > inventarioDTOAux.getCantidadExistencia().intValue()) {
 					this.setShowMessagesBar(Boolean.TRUE);
 					MensajesController.addWarn(null, ERPWebResources.getString("ec.com.erp.etiqueta.label.busqueda.pedidos.mensaje.error.mayor"));
 					return;
@@ -454,8 +455,9 @@ public class DespachoController extends CommonsController implements Serializabl
 				if(codigoUnidadManejo != null && guiaDespachoExtrasDTOTemp.getCantidad() != null && guiaDespachoExtrasDTOTemp.getCodigoArticuloUnidadManejo() != null) {
 					ArticuloUnidadManejoDTO articuloUnidadManejo = obtenerUnidadManejoPorCodigo(codigoUnidadManejo, guiaDespachoExtrasDTOTemp.getArticuloDTO().getArticuloUnidadManejoDTOCols());
 					// Se obtiene existencia actual
-					InventarioDTO inventarioDTOAux = ERPFactory.inventario.getInventarioServicio().findObtenerUltimoInventarioByArticulo(Integer.parseInt(ERPConstantes.ESTADO_ACTIVO_NUMERICO), guiaDespachoExtrasDTOTemp.getArticuloDTO().getCodigoBarras(), articuloUnidadManejo.getId().getCodigoArticuloUnidadManejo());
-					if (guiaDespachoExtrasDTOTemp.getCantidad().intValue() > inventarioDTOAux.getCantidadExistencia().intValue()) {
+					int cantidadIngresada = guiaDespachoExtrasDTOTemp.getCantidad().intValue() * articuloUnidadManejo.getValorUnidadManejo().intValue();
+					InventarioDTO inventarioDTOAux = ERPFactory.inventario.getInventarioServicio().findObtenerUltimoInventarioByArticulo(Integer.parseInt(ERPConstantes.ESTADO_ACTIVO_NUMERICO), guiaDespachoExtrasDTOTemp.getArticuloDTO().getCodigoBarras());
+					if (cantidadIngresada > inventarioDTOAux.getCantidadExistencia().intValue()) {
 						this.setShowMessagesBar(Boolean.TRUE);
 						MensajesController.addWarn(null, ERPWebResources.getString("ec.com.erp.etiqueta.label.busqueda.pedidos.mensaje.error.mayor"));
 						return;
@@ -474,9 +476,9 @@ public class DespachoController extends CommonsController implements Serializabl
 			if (guiaDespachoExtrasDTOTemp.getId().getCodigoCompania().intValue() == numeroDetalle.intValue()) {
 				if (guiaDespachoExtrasDTOTemp.getCantidad() != null && guiaDespachoExtrasDTOTemp.getCodigoArticuloUnidadManejo() != null) {
 					// Se obtiene existencia actual
-					InventarioDTO inventarioDTOAux = ERPFactory.inventario.getInventarioServicio().findObtenerUltimoInventarioByArticulo(Integer.parseInt(ERPConstantes.ESTADO_ACTIVO_NUMERICO), guiaDespachoExtrasDTOTemp.getArticuloDTO().getCodigoBarras(), guiaDespachoExtrasDTOTemp.getCodigoArticuloUnidadManejo());
-					
-					if (guiaDespachoExtrasDTOTemp.getCantidad().intValue() > inventarioDTOAux.getCantidadExistencia().intValue()) {
+					InventarioDTO inventarioDTOAux = ERPFactory.inventario.getInventarioServicio().findObtenerUltimoInventarioByArticulo(Integer.parseInt(ERPConstantes.ESTADO_ACTIVO_NUMERICO), guiaDespachoExtrasDTOTemp.getArticuloDTO().getCodigoBarras());
+					int cantidadIngresada = guiaDespachoExtrasDTOTemp.getCantidad().intValue() * guiaDespachoExtrasDTOTemp.getArticuloUnidadManejoDTO().getValorUnidadManejo().intValue();
+					if (cantidadIngresada > inventarioDTOAux.getCantidadExistencia().intValue()) {
 						this.setShowMessagesBar(Boolean.TRUE);
 						MensajesController.addWarn(null, ERPWebResources.getString("ec.com.erp.etiqueta.label.busqueda.pedidos.mensaje.error.mayor"));
 						return;
