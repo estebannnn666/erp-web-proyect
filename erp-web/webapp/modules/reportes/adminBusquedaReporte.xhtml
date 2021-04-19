@@ -66,7 +66,9 @@
 	            </rich:column> 	
 	            <rich:column>
 	            	<f:facet name="header"><h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.inventario.label.header.fecha']}"/></f:facet>
-	                <h:outputText value="#{inventario.fechaMovimiento}" />
+	                <h:outputText value="#{inventario.fechaMovimiento}">
+	                	<f:convertDateTime pattern="yyyy-MM-dd HH:mm" />
+	                </h:outputText>
 	            </rich:column>
 		        <rich:column>
 	            	<f:facet name="header"><h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.header.tabla.codigo.barras']}"/></f:facet>
@@ -82,16 +84,18 @@
 	            </rich:column>
 	            <rich:column>
 	            	<f:facet name="header"><h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.inventario.label.header.unidadmanejo']}"/></f:facet>
-	                <h:outputText value="#{inventario.articuloUnidadManejoDTO.tipoUnidadManejoCatalogoValorDTO.nombreCatalogoValor.concat('x').concat(inventario.articuloUnidadManejoDTO.valorUnidadManejo)}" />
+	                <h:outputText value="#{inventario.articuloUnidadManejoDTO.tipoUnidadManejoCatalogoValorDTO.nombreCatalogoValor eq 'UNIDAD' ? 'UNIDADES' : inventario.articuloUnidadManejoDTO.tipoUnidadManejoCatalogoValorDTO.nombreCatalogoValor.concat(' X ').concat(inventario.articuloUnidadManejoDTO.valorUnidadManejo)}" />
 	            </rich:column>		           
 	            <rich:column style="text-align: right; padding-right: 5px">
 	            	<f:facet name="header"><h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.inventario.label.header.cantidad']}"/></f:facet>
-	                <h:outputText value="#{inventario.cantidadExistencia}" />
+	                <h:outputText value="#{inventario.cantidadExistencia / inventario.articuloUnidadManejoDTO.valorUnidadManejo}">
+	                	<f:convertNumber pattern="0"/>
+	                </h:outputText>
 	            </rich:column>
 	            <rich:column style="text-align: right; padding-right: 5px">
 	            	<f:facet name="header"><h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.inventario.label.header.valorunidad']}"/></f:facet>
 	                <h:outputText value="#{inventario.valorUnidadExistencia}">
-	                	<f:convertNumber pattern="0.00"/>
+	                	<f:convertNumber pattern="0.0000"/>
 	                </h:outputText>
 	            </rich:column>
 	            <rich:column style="text-align: right; padding-right: 5px">

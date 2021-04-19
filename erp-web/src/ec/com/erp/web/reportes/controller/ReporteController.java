@@ -4,6 +4,7 @@ package ec.com.erp.web.reportes.controller;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
@@ -18,6 +19,7 @@ import javax.faces.event.ActionEvent;
 import javax.faces.event.AjaxBehaviorEvent;
 
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang3.SerializationUtils;
 
 import ec.com.erp.cliente.common.constantes.ERPConstantes;
 import ec.com.erp.cliente.common.exception.ERPException;
@@ -81,6 +83,7 @@ public class ReporteController extends CommonsController implements Serializable
 				this.totalInventario = this.totalInventario.add(inventario.getValorTotalExistencia());
 				this.totalStock = this.totalStock + inventario.getCantidadExistencia();
 			});
+			this.obtenerUnidadesManejo();
 		}
 	}
 		
@@ -98,6 +101,22 @@ public class ReporteController extends CommonsController implements Serializable
 	public void clearDataManager(ActionEvent event) {
 		super.clearDataManager(event);
 	}
+	
+	public void obtenerUnidadesManejo() {
+		Collection<InventarioDTO> invetarioAux = new ArrayList<>();
+		if(CollectionUtils.isNotEmpty(this.inventarioDTOCols)) {
+			this.inventarioDTOCols.stream().forEach(inventario -> {
+				inventario.getArticuloDTO().getArticuloUnidadManejoDTOCols().stream().forEach(unidadManejo ->{
+					InventarioDTO clone = SerializationUtils.clone(inventario);
+					clone.setArticuloUnidadManejoDTO(unidadManejo);
+					invetarioAux.add(clone);
+				});
+			});
+		}
+		this.inventarioDTOCols = new ArrayList<>();
+		this.inventarioDTOCols.addAll(invetarioAux);
+	}
+	
 
 	/**
 	 * Metodo para buscar inventario
@@ -131,6 +150,7 @@ public class ReporteController extends CommonsController implements Serializable
 			this.totalInventario = BigDecimal.ZERO;
 			this.totalStock = 0;
 			this.inventarioDTOCols = ERPFactory.inventario.getInventarioServicio().findObtenerListaExistenciasByArticuloFechas(Integer.parseInt(ERPConstantes.ESTADO_ACTIVO_NUMERICO), codigoBarras, new Timestamp(fechaInicio.getTime().getTime()), new Timestamp(fechaFin.getTime().getTime()));
+			this.obtenerUnidadesManejo();
 			if(CollectionUtils.isEmpty(this.inventarioDTOCols)){
 				this.setShowMessagesBar(Boolean.TRUE);
 				MensajesController.addInfo(null, ERPWebResources.getString("ec.com.erp.etiqueta.mensaje.lista.resultado"));
