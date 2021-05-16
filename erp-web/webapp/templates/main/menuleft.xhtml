@@ -29,7 +29,7 @@
 			</h:panelGroup>
 			<h:panelGroup rendered="#{!loginController.activarInicio}">
 				<li class="style-menu-select nivel1 menu-no-seleccionado">	
-					<a4j:commandLink styleClass="guardarA" action="#{loginController.redirectToWelcome}">
+					<a4j:commandLink styleClass="guardarA" execute="@this" status="true" action="#{loginController.redirectToWelcome}">
 						<table> 
 							<tr>
 								<td width="5" height="30" style="background-color: #27AE61"></td>

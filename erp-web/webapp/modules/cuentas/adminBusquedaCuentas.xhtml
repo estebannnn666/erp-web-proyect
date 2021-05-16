@@ -144,7 +144,8 @@
 	            </rich:column>
 	            <rich:column styleClass="columna5">
 	                <f:facet name="header">Pagos</f:facet>
-	                <a4j:commandLink id="botonPago" title="Ver detalle de factura" render="popUpPagos pnlListaDetallePagos" execute="@this" actionListener="#{cuentasController.simularEvento}" oncomplete="cargarPagos();">
+	                <h:graphicImage title="#{msg_erpweb['ec.com.erp.etiqueta.mensaje.permiso.denegado.ejecutar.accion']}" rendered="#{cuentasController.codigoVendedor != null}" name="btnBloqueo.png" library="images" style="border:none;border-color:white;" height="16" width="16"/>
+	                <a4j:commandLink id="botonPago" title="Ver detalle de pagos" render="popUpPagos pnlListaDetallePagos" rendered="#{cuentasController.codigoVendedor == null}" execute="@this" actionListener="#{cuentasController.simularEvento}" oncomplete="cargarPagos();">
 						<h:graphicImage title="Ingresar nuevo pago" name="pagos.png" library="images" style="border:none;border-color:white;" height="24" width="24" rendered="#{!cuenta.pagado}"/>
 						<h:graphicImage title="Ver detalle de pagos" name="btnDetailPay.png" library="images" style="border:none;border-color:white;" height="24" width="24" rendered="#{cuenta.pagado}"/>
 						<f:setPropertyActionListener value="#{cuenta}" target="#{cuentasController.facturaCabeceraDTO}" />											

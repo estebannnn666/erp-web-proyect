@@ -152,9 +152,14 @@ public class CuentasController extends CommonsController implements Serializable
 	private String nombreClienteBusqueda;
 	private String nombreVendedor;
 	private Collection<String> tiposDocumentos;
+	private Long codigoVendedor;
 
 	@PostConstruct
 	public void postConstruct() {
+		if(this.loginController.getUsuariosDTO().getPerfilDTO().getCodigoValorTipoPerfil().equals(ERPConstantes.CODIGO_CATALOGO_VALOR_TIPO_PERFIL_VENDEDORES)) {
+			this.codigoVendedor = loginController.getUsuariosDTO().getCodigoVendedor();
+		}
+		
 		this.tipoRuc = ERPConstantes.ESTADO_INACTIVO_NUMERICO;
 		this.tamanioPopUp = 510;
 		this.totalPagado = BigDecimal.ZERO;
@@ -225,13 +230,13 @@ public class CuentasController extends CommonsController implements Serializable
 			tipoDocumento = ERPConstantes.CODIGO_CATALOGO_VALOR_DOCUMENTO_VENTAS;
 			tiposDocumentos.add(ERPConstantes.CODIGO_CATALOGO_VALOR_DOCUMENTO_VENTAS);
 			tiposDocumentos.add(ERPConstantes.CODIGO_CATALOGO_VALOR_DOCUMENTO_NOTA_VENTA);
-			this.facturaCabeceraDTOCols = ERPFactory.facturas.getFacturaCabeceraServicio().findObtenerListaFacturas(Integer.parseInt(ERPConstantes.ESTADO_ACTIVO_NUMERICO), numeroFactura, null, null, docClienteProveedor, nombClienteProveedor, pagado, tiposDocumentos);
+			this.facturaCabeceraDTOCols = ERPFactory.facturas.getFacturaCabeceraServicio().findObtenerListaFacturas(Integer.parseInt(ERPConstantes.ESTADO_ACTIVO_NUMERICO), numeroFactura, null, null, docClienteProveedor, nombClienteProveedor, pagado, tiposDocumentos, this.codigoVendedor);
 		}
 		
 		if(FacesContext.getCurrentInstance().getViewRoot().getViewId().equals("/modules/compras/adminBusquedaCompras.xhtml")) {
 			tipoDocumento = ERPConstantes.CODIGO_CATALOGO_VALOR_DOCUMENTO_COMPRAS;
 			tiposDocumentos.add(ERPConstantes.CODIGO_CATALOGO_VALOR_DOCUMENTO_COMPRAS);
-			this.facturaCabeceraDTOCols = ERPFactory.facturas.getFacturaCabeceraServicio().findObtenerListaFacturas(Integer.parseInt(ERPConstantes.ESTADO_ACTIVO_NUMERICO), numeroFactura, null, null, docClienteProveedor, nombClienteProveedor, pagado, tiposDocumentos);
+			this.facturaCabeceraDTOCols = ERPFactory.facturas.getFacturaCabeceraServicio().findObtenerListaFacturas(Integer.parseInt(ERPConstantes.ESTADO_ACTIVO_NUMERICO), numeroFactura, null, null, docClienteProveedor, nombClienteProveedor, pagado, tiposDocumentos, null);
 		}
 		
 		if(FacesContext.getCurrentInstance().getViewRoot().getViewId().equals("/modules/cuentas/adminBusquedaCuentas.xhtml")) {
@@ -239,14 +244,14 @@ public class CuentasController extends CommonsController implements Serializable
 			tiposDocumentos.add(ERPConstantes.CODIGO_CATALOGO_VALOR_DOCUMENTO_VENTAS);
 			tiposDocumentos.add(ERPConstantes.CODIGO_CATALOGO_VALOR_DOCUMENTO_NOTA_VENTA);
 			pagado = Boolean.FALSE;
-			this.facturaCabeceraDTOCols = ERPFactory.facturas.getFacturaCabeceraServicio().findObtenerListaFacturas(Integer.parseInt(ERPConstantes.ESTADO_ACTIVO_NUMERICO), numeroFactura, null, null, docClienteProveedor, nombClienteProveedor, pagado, tiposDocumentos);
+			this.facturaCabeceraDTOCols = ERPFactory.facturas.getFacturaCabeceraServicio().findObtenerListaFacturas(Integer.parseInt(ERPConstantes.ESTADO_ACTIVO_NUMERICO), numeroFactura, null, null, docClienteProveedor, nombClienteProveedor, pagado, tiposDocumentos, this.codigoVendedor);
 		}
 		
 		if(FacesContext.getCurrentInstance().getViewRoot().getViewId().equals("/modules/cuentas/adminBusquedaCuentasPagar.xhtml")) {
 			tipoDocumento = ERPConstantes.CODIGO_CATALOGO_VALOR_DOCUMENTO_COMPRAS;
 			tiposDocumentos.add(ERPConstantes.CODIGO_CATALOGO_VALOR_DOCUMENTO_COMPRAS);
 			pagado = Boolean.FALSE;
-			this.facturaCabeceraDTOCols = ERPFactory.facturas.getFacturaCabeceraServicio().findObtenerListaFacturas(Integer.parseInt(ERPConstantes.ESTADO_ACTIVO_NUMERICO), numeroFactura, null, null, docClienteProveedor, nombClienteProveedor, pagado, tiposDocumentos);
+			this.facturaCabeceraDTOCols = ERPFactory.facturas.getFacturaCabeceraServicio().findObtenerListaFacturas(Integer.parseInt(ERPConstantes.ESTADO_ACTIVO_NUMERICO), numeroFactura, null, null, docClienteProveedor, nombClienteProveedor, pagado, tiposDocumentos, null);
 		}
 		if(CollectionUtils.isNotEmpty(this.facturaCabeceraDTOCols)) {
 			this.facturaCabeceraDTOCols.stream().forEach(factura ->{
@@ -281,7 +286,7 @@ public class CuentasController extends CommonsController implements Serializable
 	}
 	
 	public void consultarFacturas(ActionEvent e) {
-		this.facturaCabeceraDTOCols = ERPFactory.facturas.getFacturaCabeceraServicio().findObtenerListaFacturas(Integer.parseInt(ERPConstantes.ESTADO_ACTIVO_NUMERICO), numeroFactura, null, null, docClienteProveedor, nombClienteProveedor, pagado, tiposDocumentos);
+		this.facturaCabeceraDTOCols = ERPFactory.facturas.getFacturaCabeceraServicio().findObtenerListaFacturas(Integer.parseInt(ERPConstantes.ESTADO_ACTIVO_NUMERICO), numeroFactura, null, null, docClienteProveedor, nombClienteProveedor, pagado, tiposDocumentos, this.codigoVendedor);
 		if(CollectionUtils.isNotEmpty(this.facturaCabeceraDTOCols)) {
 			this.totalCuenta = BigDecimal.ZERO;
 			this.totalPagos = BigDecimal.ZERO;
@@ -305,7 +310,7 @@ public class CuentasController extends CommonsController implements Serializable
 		try {
 			System.out.println("Ingreso a realizar proceson con fire base");
 			ERPFactory.firebase.getFireBaseServicio().transDescargarFacturasFireBase();		
-			this.facturaCabeceraDTOCols = ERPFactory.facturas.getFacturaCabeceraServicio().findObtenerListaFacturas(Integer.parseInt(ERPConstantes.ESTADO_ACTIVO_NUMERICO), numeroFactura, null, null, docClienteProveedor, nombClienteProveedor, pagado, tiposDocumentos);
+			this.facturaCabeceraDTOCols = ERPFactory.facturas.getFacturaCabeceraServicio().findObtenerListaFacturas(Integer.parseInt(ERPConstantes.ESTADO_ACTIVO_NUMERICO), numeroFactura, null, null, docClienteProveedor, nombClienteProveedor, pagado, tiposDocumentos, null);
 			this.setShowMessagesBar(Boolean.TRUE);
 			MensajesController.addInfo(null, "Se ha terminado de descargar la informacion de facturas de los dispositivos moviles");
 			System.out.println("Finalizo proceso con fire base");
@@ -660,7 +665,7 @@ public class CuentasController extends CommonsController implements Serializable
 				this.pagado = null; 
 			}
 			
-			this.facturaCabeceraDTOCols = ERPFactory.facturas.getFacturaCabeceraServicio().findObtenerListaFacturas(Integer.parseInt(ERPConstantes.ESTADO_ACTIVO_NUMERICO), numeroFactura, new Timestamp(fechaInicio.getTime().getTime()), new Timestamp(fechaFin.getTime().getTime()), docClienteProveedor, nombClienteProveedor, pagado, tiposDocumentos);
+			this.facturaCabeceraDTOCols = ERPFactory.facturas.getFacturaCabeceraServicio().findObtenerListaFacturas(Integer.parseInt(ERPConstantes.ESTADO_ACTIVO_NUMERICO), numeroFactura, new Timestamp(fechaInicio.getTime().getTime()), new Timestamp(fechaFin.getTime().getTime()), docClienteProveedor, nombClienteProveedor, pagado, tiposDocumentos, this.codigoVendedor);
 			if(CollectionUtils.isEmpty(this.facturaCabeceraDTOCols)){
 				this.setShowMessagesBar(Boolean.TRUE);
 				FacesMessage msg = new FacesMessage("No se encontraron resultados para la b\u00FAsqueda realizada.", "ERROR MSG");
@@ -2304,5 +2309,13 @@ public class CuentasController extends CommonsController implements Serializable
 
 	public void setClienteDTO(ClienteDTO clienteDTO) {
 		this.clienteDTO = clienteDTO;
+	}
+
+	public Long getCodigoVendedor() {
+		return codigoVendedor;
+	}
+
+	public void setCodigoVendedor(Long codigoVendedor) {
+		this.codigoVendedor = codigoVendedor;
 	}
 }

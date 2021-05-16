@@ -169,7 +169,8 @@
 	            </rich:column-->
 	            <rich:column styleClass="columna5">
 	                <f:facet name="header">Pagos</f:facet>
-	                <a4j:commandLink id="botonPago" title="Ver detalle de factura" render="popUpPagos pnlListaDetallePagos" execute="@this" actionListener="#{cuentasController.simularEvento}" oncomplete="cargarPagos();">
+	                <h:graphicImage title="#{msg_erpweb['ec.com.erp.etiqueta.mensaje.permiso.denegado.ejecutar.accion']}" rendered="#{cuentasController.codigoVendedor != null}" name="btnBloqueo.png" library="images" style="border:none;border-color:white;" height="16" width="16"/>
+	                <a4j:commandLink id="botonPago" title="Ver detalle de factura" rendered="#{cuentasController.codigoVendedor == null}" render="popUpPagos pnlListaDetallePagos" execute="@this" actionListener="#{cuentasController.simularEvento}" oncomplete="cargarPagos();">
 						<h:graphicImage title="Ingresar nuevo pago" name="pagos.png" library="images" style="border:none;border-color:white;" height="24" width="24" rendered="#{!cuenta.pagado}"/>
 						<h:graphicImage title="Ver detalle de pagos" name="btnDetailPay.png" library="images" style="border:none;border-color:white;" height="24" width="24" rendered="#{cuenta.pagado}"/>
 						<f:setPropertyActionListener value="#{cuenta}" target="#{cuentasController.facturaCabeceraDTO}" />											
@@ -177,8 +178,8 @@
 	            </rich:column>
 	            <rich:column styleClass="columna5">
 	                <f:facet name="header">Cancelar</f:facet>
-	                <h:graphicImage title="La factura ya no se puede cancelar porque se encuentra pagada" rendered="#{cuenta.pagado or cuenta.pagosFacturaDTOCols != null}" name="btnBloqueo.png" library="images" style="border:none;border-color:white;" height="16" width="16"/>
-	                <a4j:commandLink id="botonEditar" rendered="#{!cuenta.pagado and cuenta.pagosFacturaDTOCols == null}" title="Cancelar factura" render="pnlGridVentas, pnlGridDetalleFactura" actionListener="#{cuentasController.cargarFacturaDetalle}"	execute="@this" oncomplete="#{rich:component('popUpConfirmar')}.show();"> 
+	                <h:graphicImage title="La factura ya no se puede cancelar porque se encuentra pagada o porque no tiene permiso" rendered="#{cuenta.pagado or cuenta.pagosFacturaDTOCols != null or cuentasController.codigoVendedor != null}" name="btnBloqueo.png" library="images" style="border:none;border-color:white;" height="16" width="16"/>
+	                <a4j:commandLink id="botonEditar" rendered="#{!cuenta.pagado and cuenta.pagosFacturaDTOCols == null and cuentasController.codigoVendedor == null}" title="Cancelar factura" render="pnlGridVentas, pnlGridDetalleFactura" actionListener="#{cuentasController.cargarFacturaDetalle}"	execute="@this" oncomplete="#{rich:component('popUpConfirmar')}.show();"> 
 						<h:graphicImage name="btnCancelar.png" library="images" style="border:none;border-color:white;" height="16" width="16"/> 
 						<f:setPropertyActionListener value="#{cuenta}" target="#{cuentasController.facturaCabeceraDTO}" />											
 					</a4j:commandLink>	
