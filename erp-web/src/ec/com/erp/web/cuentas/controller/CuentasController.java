@@ -434,7 +434,7 @@ public class CuentasController extends CommonsController implements Serializable
 			if(facturaDetalleDTOTemp.getCantidad() != null && facturaDetalleDTOTemp.getArticuloDTO() != null && facturaDetalleDTOTemp.getArticuloDTO().getCosto() != null && (facturaDetalleDTOTemp.getCodigoArticulo() == null || facturaDetalleDTOTemp.getCodigoArticulo() != facturaDetalleDTOTemp.getArticuloDTO().getId().getCodigoArticulo()) && CollectionUtils.isNotEmpty(facturaDetalleDTOTemp.getArticuloDTO().getArticuloUnidadManejoDTOCols())) {
 				ArticuloUnidadManejoDTO articuloUnidadManejo = this.obtenerUnidadManejoPorDefecto(facturaDetalleDTOTemp.getArticuloDTO().getArticuloUnidadManejoDTOCols());
 				facturaDetalleDTOTemp.setCodigoArticuloUnidadManejo(articuloUnidadManejo.getId().getCodigoArticuloUnidadManejo());
-				BigDecimal subTotal = BigDecimal.valueOf(Double.valueOf(""+(facturaDetalleDTOTemp.getCantidad().intValue() * articuloUnidadManejo.getValorUnidadManejo().intValue()))).multiply(facturaDetalleDTOTemp.getArticuloDTO().getPrecio());
+				BigDecimal subTotal = ValidationUtils.redondear(BigDecimal.valueOf(Double.valueOf(""+(facturaDetalleDTOTemp.getCantidad().intValue() * articuloUnidadManejo.getValorUnidadManejo().intValue()))).multiply(facturaDetalleDTOTemp.getArticuloDTO().getPrecio()), 4);
 				facturaDetalleDTOTemp.setSubTotal(subTotal);
 				facturaDetalleDTOTemp.setCodigoArticulo(facturaDetalleDTOTemp.getArticuloDTO().getId().getCodigoArticulo());
 				facturaDetalleDTOTemp.setValorUnidad(facturaDetalleDTOTemp.getArticuloDTO().getCosto());
@@ -475,7 +475,7 @@ public class CuentasController extends CommonsController implements Serializable
 			if(facturaDetalleDTOTemp.getId().getCodigoCompania().intValue() == numeroDetalle.intValue()) {
 				if(facturaDetalleDTOTemp.getCantidad() != null && facturaDetalleDTOTemp.getValorUnidad() != null && facturaDetalleDTOTemp.getCodigoArticuloUnidadManejo() != null) {
 					ArticuloUnidadManejoDTO articuloUnidadManejo = obtenerUnidadManejoPorCodigo(codigoUnidadManejo, facturaDetalleDTOTemp.getArticuloDTO().getArticuloUnidadManejoDTOCols());
-					BigDecimal subTotal = BigDecimal.valueOf(Double.valueOf(""+(facturaDetalleDTOTemp.getCantidad().intValue()*articuloUnidadManejo.getValorUnidadManejo().intValue()))).multiply(facturaDetalleDTOTemp.getValorUnidad());
+					BigDecimal subTotal = ValidationUtils.redondear(BigDecimal.valueOf(Double.valueOf(""+(facturaDetalleDTOTemp.getCantidad().intValue()*articuloUnidadManejo.getValorUnidadManejo().intValue()))).multiply(facturaDetalleDTOTemp.getValorUnidad()), 4);
 					facturaDetalleDTOTemp.setSubTotal(subTotal);
 					facturaDetalleDTOTemp.setArticuloUnidadManejoDTO(articuloUnidadManejo);
 					this.calcularTotalFactura();
@@ -495,8 +495,8 @@ public class CuentasController extends CommonsController implements Serializable
 				ERPFactory.transaccion.getTransaccionServicio().transGuardarPago(ERPConstantes.CODIGO_CATALOGO_VALOR_TRANSACCION_GASTO, this.pagosFacturaDTO);
 				this.pagosFacturaDTOCols.add(this.pagosFacturaDTO);
 				this.setShowMessagesBar(Boolean.TRUE);
-				this.totalPagado = this.totalPagado.add(this.pagosFacturaDTO.getValorPago());
-				this.totalPendiente = this.totalPendiente.subtract(this.pagosFacturaDTO.getValorPago());
+				this.totalPagado = ValidationUtils.redondear(this.totalPagado.add(this.pagosFacturaDTO.getValorPago()), 4);
+				this.totalPendiente = ValidationUtils.redondear(this.totalPendiente.subtract(this.pagosFacturaDTO.getValorPago()), 4);
 				this.pagosFacturaDTO = new PagosFacturaDTO();
 				this.pagosFacturaDTO.setFechaPago(new Date());
 				if(this.totalPendiente.intValue() <= 0) {
@@ -530,8 +530,8 @@ public class CuentasController extends CommonsController implements Serializable
 				ERPFactory.transaccion.getTransaccionServicio().transGuardarPago(ERPConstantes.CODIGO_CATALOGO_VALOR_TRANSACCION_INGRESO, this.pagosFacturaDTO);
 				this.pagosFacturaDTOCols.add(this.pagosFacturaDTO);
 				this.setShowMessagesBar(Boolean.TRUE);
-				this.totalPagado = this.totalPagado.add(this.pagosFacturaDTO.getValorPago());
-				this.totalPendiente = this.totalPendiente.subtract(this.pagosFacturaDTO.getValorPago());
+				this.totalPagado = ValidationUtils.redondear(this.totalPagado.add(this.pagosFacturaDTO.getValorPago()), 4);
+				this.totalPendiente = ValidationUtils.redondear(this.totalPendiente.subtract(this.pagosFacturaDTO.getValorPago()), 4);
 				this.pagosFacturaDTO = new PagosFacturaDTO();
 				this.pagosFacturaDTO.setFechaPago(new Date());
 				if(this.totalPendiente.intValue() <= 0) {
@@ -734,22 +734,26 @@ public class CuentasController extends CommonsController implements Serializable
 			}
 		} catch (ERPException e1) {
 			this.facturaCabeceraDTO.getId().setCodigoFactura(null);
-			this.facturaDetalleDTOCols.stream().forEach(detalle ->{
-				detalle.getId().setCodigoDetalleFactura(null);
-			});
-			
+			this.facturaDetalleDTOCols.stream().forEach(detalle -> detalle.getId().setCodigoDetalleFactura(null));
+			this.ordenarDetalles();
 			this.setShowMessagesBar(Boolean.TRUE);
 			MensajesController.addError(null, e1.getMessage());
 		} catch (Exception e2) {
 			this.facturaCabeceraDTO.getId().setCodigoFactura(null);
-			this.facturaDetalleDTOCols.stream().forEach(detalle ->{
-				detalle.getId().setCodigoDetalleFactura(null);
-			});
+			this.facturaDetalleDTOCols.stream().forEach(detalle -> detalle.getId().setCodigoDetalleFactura(null));
+			this.ordenarDetalles();
 			this.setShowMessagesBar(Boolean.TRUE);
 			MensajesController.addError(null, e2.getMessage());
 		}
 	}
 	
+	public void ordenarDetalles() {
+		int contador = 1;
+		for(FacturaDetalleDTO detalleAux : this.facturaDetalleDTOCols) {
+			detalleAux.getId().setCodigoCompania(contador);
+			contador++;
+		}
+	}
 	
 	/**
 	 * Metodo para cancelar factura ventas
@@ -992,33 +996,33 @@ public class CuentasController extends CommonsController implements Serializable
 		BigDecimal totalDescuentos = BigDecimal.ZERO;
 		for (FacturaDetalleDTO facturaDetalleDTO : facturaDetalleDTOCols) {
 			if(facturaDetalleDTO.getSubTotal() != null) {
-				subTotal = subTotal.add(facturaDetalleDTO.getSubTotal());
+				subTotal = ValidationUtils.redondear(subTotal.add(facturaDetalleDTO.getSubTotal()), 4);
 			}
 			if(facturaDetalleDTO.getArticuloDTO() != null && facturaDetalleDTO.getArticuloDTO().getTieneImpuesto()){
-				totalConImpuesto = totalConImpuesto.add(facturaDetalleDTO.getSubTotal());
+				totalConImpuesto = ValidationUtils.redondear(totalConImpuesto.add(facturaDetalleDTO.getSubTotal()), 4);
 				for(ArticuloImpuestoDTO impuesto : facturaDetalleDTO.getArticuloDTO().getArticuloImpuestoDTOCols()){
-					totalIva = totalIva.add(BigDecimal.valueOf((facturaDetalleDTO.getSubTotal().doubleValue() * impuesto.getImpuestoDTO().getValorImpuesto().doubleValue())/ Double.valueOf(100)));
+					totalIva = ValidationUtils.redondear(totalIva.add(BigDecimal.valueOf((facturaDetalleDTO.getSubTotal().doubleValue() * impuesto.getImpuestoDTO().getValorImpuesto().doubleValue())/ Double.valueOf(100))), 4);
 				}
 			}else {
 				if(facturaDetalleDTO.getSubTotal() != null) {
-					totalSinImpuesto = totalSinImpuesto.add(facturaDetalleDTO.getSubTotal());
+					totalSinImpuesto = ValidationUtils.redondear(totalSinImpuesto.add(facturaDetalleDTO.getSubTotal()), 4);
 				}
 			}
 			if(this.cuentasDataManager.getTipoFactura().equals(ERPConstantes.CODIGO_CATALOGO_VALOR_DOCUMENTO_COMPRAS)) {
 				if(facturaDetalleDTO.getCantidad() != null && facturaDetalleDTO.getValorUnidad() != null && facturaDetalleDTO.getArticuloDTO() != null && facturaDetalleDTO.getArticuloDTO().getCosto() != null && facturaDetalleDTO.getValorUnidad().doubleValue() < facturaDetalleDTO.getArticuloDTO().getCosto().doubleValue()) {
-					totalDescuentos = totalDescuentos.add(BigDecimal.valueOf(facturaDetalleDTO.getArticuloDTO().getCosto().subtract(facturaDetalleDTO.getValorUnidad()).doubleValue()*facturaDetalleDTO.getCantidad()));
+					totalDescuentos = ValidationUtils.redondear(totalDescuentos.add(BigDecimal.valueOf(facturaDetalleDTO.getArticuloDTO().getCosto().subtract(facturaDetalleDTO.getValorUnidad()).doubleValue()*facturaDetalleDTO.getCantidad())), 4);
 				}
 			}else {
 				if(facturaDetalleDTO.getCantidad() != null && facturaDetalleDTO.getValorUnidad() != null && facturaDetalleDTO.getArticuloDTO() != null && facturaDetalleDTO.getArticuloDTO().getPrecio() != null && facturaDetalleDTO.getValorUnidad().doubleValue() < facturaDetalleDTO.getArticuloDTO().getPrecio().doubleValue()) {
 					if(this.clienteDTO.getCodigoValorTipoCompra() != null && this.clienteDTO.getCodigoValorTipoCompra().equals(ERPConstantes.CODIGO_CATALOGO_VALOR_CLIENTE_MINORISTA)) {
-						totalDescuentos = totalDescuentos.add(BigDecimal.valueOf(facturaDetalleDTO.getArticuloDTO().getPrecioMinorista().subtract(facturaDetalleDTO.getValorUnidad()).doubleValue()*facturaDetalleDTO.getCantidad()));
+						totalDescuentos = ValidationUtils.redondear(totalDescuentos.add(BigDecimal.valueOf(facturaDetalleDTO.getArticuloDTO().getPrecioMinorista().subtract(facturaDetalleDTO.getValorUnidad()).doubleValue()*facturaDetalleDTO.getCantidad())), 4);
 					}else {
-						totalDescuentos = totalDescuentos.add(BigDecimal.valueOf(facturaDetalleDTO.getArticuloDTO().getPrecio().subtract(facturaDetalleDTO.getValorUnidad()).doubleValue()*facturaDetalleDTO.getCantidad()));
+						totalDescuentos = ValidationUtils.redondear(totalDescuentos.add(BigDecimal.valueOf(facturaDetalleDTO.getArticuloDTO().getPrecio().subtract(facturaDetalleDTO.getValorUnidad()).doubleValue()*facturaDetalleDTO.getCantidad())), 4);
 					}
 				}
 			}
 		}
-		totalFactura = subTotal.add(totalIva);
+		totalFactura = ValidationUtils.redondear(subTotal.add(totalIva),4);
 		this.facturaCabeceraDTO.setDescuento(totalDescuentos);
 		this.facturaCabeceraDTO.setTotalSinImpuestos(totalSinImpuesto);
 		this.facturaCabeceraDTO.setTotalImpuestos(totalConImpuesto);
@@ -1040,7 +1044,7 @@ public class CuentasController extends CommonsController implements Serializable
 			if(facturaDetalleDTOTemp.getId().getCodigoCompania().intValue() == numeroDetalle.intValue()) {
 				if(facturaDetalleDTOTemp.getCantidad() != null && facturaDetalleDTOTemp.getValorUnidad() != null && facturaDetalleDTOTemp.getCodigoArticuloUnidadManejo() != null) {
 					ArticuloUnidadManejoDTO articuloUnidadManejo = obtenerUnidadManejoPorCodigo(facturaDetalleDTOTemp.getCodigoArticuloUnidadManejo(), facturaDetalleDTOTemp.getArticuloDTO().getArticuloUnidadManejoDTOCols());
-					BigDecimal subTotal = BigDecimal.valueOf(Double.valueOf(""+(facturaDetalleDTOTemp.getCantidad().intValue()*articuloUnidadManejo.getValorUnidadManejo().intValue()))).multiply(facturaDetalleDTOTemp.getValorUnidad());
+					BigDecimal subTotal = ValidationUtils.redondear(BigDecimal.valueOf(Double.valueOf(""+(facturaDetalleDTOTemp.getCantidad().intValue()*articuloUnidadManejo.getValorUnidadManejo().intValue()))).multiply(facturaDetalleDTOTemp.getValorUnidad()), 4);
 					facturaDetalleDTOTemp.setSubTotal(subTotal);
 					facturaDetalleDTOTemp.setArticuloUnidadManejoDTO(articuloUnidadManejo);
 					this.calcularTotalFactura();
@@ -1107,7 +1111,7 @@ public class CuentasController extends CommonsController implements Serializable
 					}else {
 						facturaDetalleDTOTemp.setValorUnidad(facturaDetalleDTOTemp.getArticuloDTO().getPrecio());
 					}
-					BigDecimal subTotal = BigDecimal.valueOf(Double.valueOf(""+(facturaDetalleDTOTemp.getCantidad().intValue()*articuloUnidadManejo.getValorUnidadManejo().intValue()))).multiply(facturaDetalleDTOTemp.getValorUnidad());
+					BigDecimal subTotal = ValidationUtils.redondear(BigDecimal.valueOf(Double.valueOf(""+(facturaDetalleDTOTemp.getCantidad().intValue()*articuloUnidadManejo.getValorUnidadManejo().intValue()))).multiply(facturaDetalleDTOTemp.getValorUnidad()), 4);
 					facturaDetalleDTOTemp.setSubTotal(subTotal);
 					this.calcularTotalFactura();
 				}
@@ -1160,7 +1164,7 @@ public class CuentasController extends CommonsController implements Serializable
 				if(facturaDetalleDTOTemp.getCantidad() != null && facturaDetalleDTOTemp.getValorUnidad() != null && CollectionUtils.isNotEmpty(facturaDetalleDTOTemp.getArticuloDTO().getArticuloUnidadManejoDTOCols())) {
  					ArticuloUnidadManejoDTO articuloUnidadManejo = this.obtenerUnidadManejoPorDefecto(facturaDetalleDTOTemp.getArticuloDTO().getArticuloUnidadManejoDTOCols());
 					facturaDetalleDTOTemp.setCodigoArticuloUnidadManejo(articuloUnidadManejo.getId().getCodigoArticuloUnidadManejo());
-					BigDecimal subTotal = BigDecimal.valueOf(Double.valueOf(""+(facturaDetalleDTOTemp.getCantidad().intValue()*articuloUnidadManejo.getValorUnidadManejo().intValue()))).multiply(facturaDetalleDTOTemp.getValorUnidad());
+					BigDecimal subTotal = ValidationUtils.redondear(BigDecimal.valueOf(Double.valueOf(""+(facturaDetalleDTOTemp.getCantidad().intValue()*articuloUnidadManejo.getValorUnidadManejo().intValue()))).multiply(facturaDetalleDTOTemp.getValorUnidad()), 4);
 					facturaDetalleDTOTemp.setSubTotal(subTotal);
 					this.calcularTotalFactura();
 				}
@@ -1195,7 +1199,7 @@ public class CuentasController extends CommonsController implements Serializable
 	 */
 	public void calcularSubTotalFacturaKeyUp(AjaxBehaviorEvent e) {
 		if(this.facturaDetalleDTO.getCantidad() != null && this.facturaDetalleDTO.getValorUnidad() != null) {
-			BigDecimal subTotal = BigDecimal.valueOf(Double.valueOf(""+facturaDetalleDTO.getCantidad())).multiply(facturaDetalleDTO.getValorUnidad());
+			BigDecimal subTotal = ValidationUtils.redondear(BigDecimal.valueOf(Double.valueOf(""+facturaDetalleDTO.getCantidad())).multiply(facturaDetalleDTO.getValorUnidad()), 4);
 			this.facturaDetalleDTO.setSubTotal(subTotal);			
 		}
 	}
@@ -1334,7 +1338,7 @@ public class CuentasController extends CommonsController implements Serializable
 					}else {
 						detalleFact.setValorUnidad(detalleFact.getArticuloDTO().getPrecio());
 					}
-					BigDecimal subTotal = BigDecimal.valueOf(Double.valueOf(""+(detalleFact.getCantidad().intValue() * articuloUnidadManejo.getValorUnidadManejo().intValue()))).multiply(detalleFact.getValorUnidad());
+					BigDecimal subTotal = ValidationUtils.redondear(BigDecimal.valueOf(Double.valueOf(""+(detalleFact.getCantidad().intValue() * articuloUnidadManejo.getValorUnidadManejo().intValue()))).multiply(detalleFact.getValorUnidad()), 4);
 					detalleFact.setSubTotal(subTotal);
 				}
 			});
@@ -1396,7 +1400,7 @@ public class CuentasController extends CommonsController implements Serializable
 							}else {
 								detalleFact.setValorUnidad(detalleFact.getArticuloDTO().getPrecio());
 							}
-							BigDecimal subTotal = BigDecimal.valueOf(Double.valueOf(""+(detalleFact.getCantidad().intValue() * articuloUnidadManejo.getValorUnidadManejo().intValue()))).multiply(detalleFact.getValorUnidad());
+							BigDecimal subTotal = ValidationUtils.redondear(BigDecimal.valueOf(Double.valueOf(""+(detalleFact.getCantidad().intValue() * articuloUnidadManejo.getValorUnidadManejo().intValue()))).multiply(detalleFact.getValorUnidad()), 4);
 							detalleFact.setSubTotal(subTotal);
 						}
 					});

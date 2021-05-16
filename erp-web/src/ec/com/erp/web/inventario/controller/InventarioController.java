@@ -27,6 +27,7 @@ import org.apache.commons.lang3.StringUtils;
 import ec.com.erp.cliente.common.constantes.ERPConstantes;
 import ec.com.erp.cliente.common.exception.ERPException;
 import ec.com.erp.cliente.common.factory.ERPFactory;
+import ec.com.erp.cliente.common.utils.ValidationUtils;
 import ec.com.erp.cliente.mdl.dto.ArticuloDTO;
 import ec.com.erp.cliente.mdl.dto.ArticuloUnidadManejoDTO;
 import ec.com.erp.cliente.mdl.dto.InventarioDTO;
@@ -73,6 +74,8 @@ public class InventarioController extends CommonsController implements Serializa
 	private Boolean existeInventario;
 	private String codigoBarrasBusqueda;
 	private String nombreArticuloBusqueda;
+	private Collection<ArticuloUnidadManejoDTO> unidadesManejoCols;
+	private Integer codigoArticuloUnidadManejo;
 
 	@PostConstruct
 	public void postConstruct() {
@@ -91,6 +94,7 @@ public class InventarioController extends CommonsController implements Serializa
 		this.inventarioDTO = new InventarioDTO();
 		this.articuloDTO = new ArticuloDTO();
 		this.articuloDTOCols =  new ArrayList<ArticuloDTO>();
+		this.unidadesManejoCols = new ArrayList<>();
 
 		this.page = 0;
 		if(inventarioDataManager.getInventarioDTOEditar() != null && inventarioDataManager.getInventarioDTOEditar().getId().getCodigoInventario() != null)
@@ -127,7 +131,9 @@ public class InventarioController extends CommonsController implements Serializa
 	 * @param e
 	 */
 	public void busquedaInventarioEnter(AjaxBehaviorEvent e){
-		this.buscarInventario();
+//		this.buscarInventario();
+		this.unidadesManejoCols = ERPFactory.articulos.getArticuloServicio().findObtenerListaUnidadManejoByCodigoBarras(Integer.parseInt(ERPConstantes.ESTADO_ACTIVO_NUMERICO), codigoBarras);
+		this.setShowMessagesBar(Boolean.FALSE);
 	}
 	
 	/**
@@ -137,21 +143,26 @@ public class InventarioController extends CommonsController implements Serializa
 	public void buscarInventario(){
 		try {
 			if(StringUtils.isNotEmpty(codigoBarras)) {
-				Calendar fechaInicio = Calendar.getInstance();
-				Calendar fechaFin = Calendar.getInstance();
-				fechaInicio.setTime(fechaInicioBusqueda);
-				fechaFin.setTime(fechaFinBusqueda);
-				UtilitarioWeb.cleanDate(fechaInicio);
-				UtilitarioWeb.cleanDate(fechaFin);
-				fechaFin.add(Calendar.DATE, 1);
-				
-				this.inventarioDTOCols = ERPFactory.inventario.getInventarioServicio().findObtenerListaInventarioByArticuloFechas(Integer.parseInt(ERPConstantes.ESTADO_ACTIVO_NUMERICO), codigoBarras, new Timestamp(fechaInicio.getTime().getTime()), new Timestamp(fechaFin.getTime().getTime()));
-				if(CollectionUtils.isEmpty(this.inventarioDTOCols)){
+				if(this.codigoArticuloUnidadManejo == null) {
 					this.setShowMessagesBar(Boolean.TRUE);
-					MensajesController.addInfo(null, ERPWebResources.getString("ec.com.erp.etiqueta.mensaje.lista.resultado"));
-				}
-				else {
-					this.setArticuloDTO(this.inventarioDTOCols.iterator().next().getArticuloDTO());
+					MensajesController.addError(null, ERPWebResources.getString("ec.com.erp.etiqueta.inventario.mensaje.codigo.unidad.manejo"));
+				}else {
+					this.setShowMessagesBar(Boolean.FALSE);
+					Calendar fechaInicio = Calendar.getInstance();
+					Calendar fechaFin = Calendar.getInstance();
+					fechaInicio.setTime(fechaInicioBusqueda);
+					fechaFin.setTime(fechaFinBusqueda);
+					UtilitarioWeb.cleanDate(fechaInicio);
+					UtilitarioWeb.cleanDate(fechaFin);
+					fechaFin.add(Calendar.DATE, 1);
+					this.inventarioDTOCols = ERPFactory.inventario.getInventarioServicio().findObtenerListaInventarioByArticuloFechas(Integer.parseInt(ERPConstantes.ESTADO_ACTIVO_NUMERICO), codigoArticuloUnidadManejo, codigoBarras, new Timestamp(fechaInicio.getTime().getTime()), new Timestamp(fechaFin.getTime().getTime()));
+					if(CollectionUtils.isEmpty(this.inventarioDTOCols)){
+						this.setShowMessagesBar(Boolean.TRUE);
+						MensajesController.addInfo(null, ERPWebResources.getString("ec.com.erp.etiqueta.mensaje.lista.resultado"));
+					}
+					else {
+						this.setArticuloDTO(this.inventarioDTOCols.iterator().next().getArticuloDTO());
+					}
 				}
 			}else{
 				this.setShowMessagesBar(Boolean.TRUE);
@@ -454,11 +465,11 @@ public class InventarioController extends CommonsController implements Serializa
 		Collection<ArticuloDTO> articuloDTOCols = ERPFactory.articulos.getArticuloServicio().findObtenerListaArticulos(Integer.parseInt(ERPConstantes.ESTADO_ACTIVO_NUMERICO), codigoBarrasNuevo, null);
 		if(CollectionUtils.isNotEmpty(articuloDTOCols)) {
 			ArticuloDTO articuloTem = articuloDTOCols.iterator().next();
-			if(this.tipoMovimiento.equals(ERPConstantes.ESTADO_INACTIVO_NUMERICO)) {
-				this.inventarioDTO.setValorUnidadEntrada(articuloTem.getPrecio());
-			}else {
-				this.inventarioDTO.setValorUnidadEntrada(articuloTem.getCosto());
-			}
+//			if(this.tipoMovimiento.equals(ERPConstantes.ESTADO_INACTIVO_NUMERICO)) {
+//				this.inventarioDTO.setValorUnidadEntrada(articuloTem.getPrecio());
+//			}else {
+			this.inventarioDTO.setValorUnidadEntrada(articuloTem.getCosto());
+//			}
 			this.inventarioDTO.setCodigoArticulo(articuloTem.getId().getCodigoArticulo());
 			this.inventarioDTO.setCantidadEntrada(null);
 			this.inventarioDTO.setValorTotalEntrada(null);
@@ -513,7 +524,7 @@ public class InventarioController extends CommonsController implements Serializa
 	public void calcularTotalMovimientoKeyUp(AjaxBehaviorEvent e) {
 		if(this.inventarioDTO.getCantidadEntrada() != null && this.inventarioDTO.getValorUnidadEntrada() != null && this.inventarioDTO.getCodigoArticuloUnidadManejo() != null) {
 			Double totalUnidades = Double.valueOf(this.inventarioDTO.getCantidadEntrada().intValue() * this.inventarioDTO.getArticuloUnidadManejoDTO().getValorUnidadManejo().intValue());
-			BigDecimal subTotal = BigDecimal.valueOf(totalUnidades).multiply(this.inventarioDTO.getValorUnidadEntrada());
+			BigDecimal subTotal = ValidationUtils.redondear(BigDecimal.valueOf(totalUnidades).multiply(this.inventarioDTO.getValorUnidadEntrada()), 4);
 			this.inventarioDTO.setValorTotalEntrada(subTotal);		
 		}
 	}
@@ -666,5 +677,20 @@ public class InventarioController extends CommonsController implements Serializa
 	public void setNombreArticuloBusqueda(String nombreArticuloBusqueda) {
 		this.nombreArticuloBusqueda = nombreArticuloBusqueda;
 	}
-	
+
+	public Collection<ArticuloUnidadManejoDTO> getUnidadesManejoCols() {
+		return unidadesManejoCols;
+	}
+
+	public void setUnidadesManejoCols(Collection<ArticuloUnidadManejoDTO> unidadesManejoCols) {
+		this.unidadesManejoCols = unidadesManejoCols;
+	}
+
+	public Integer getCodigoArticuloUnidadManejo() {
+		return codigoArticuloUnidadManejo;
+	}
+
+	public void setCodigoArticuloUnidadManejo(Integer codigoArticuloUnidadManejo) {
+		this.codigoArticuloUnidadManejo = codigoArticuloUnidadManejo;
+	}
 }

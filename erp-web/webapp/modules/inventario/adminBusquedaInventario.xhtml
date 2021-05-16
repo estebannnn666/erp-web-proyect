@@ -32,17 +32,24 @@
 			</f:facet>		
 		
 			<h:panelGroup id="listaReporte" layout="block" styleClass="listaReporte">
-				<h:panelGrid columns="3" width="70%" cellpadding="0" cellspacing="2">
-					<h:panelGrid width="47%" columns="2" columnClasses="columnaIzquierda, columnaDerecha">
+				<h:panelGrid columns="4" width="100%" cellpadding="0" cellspacing="2">
+					<h:panelGrid width="35%" columns="2" columnClasses="columnaIzquierda, columnaDerecha">
 			    	   	<rich:inplaceInput id="codigoBarras" value="#{inventarioController.codigoBarras}" styleClass="styleInputPlace" defaultLabel="#{msg_erpweb['ec.com.erp.etiqueta.busqueda.por.codigo.barras']}" onkeypress="return validarEnteros(event);">
-			    	   		<a4j:ajax event="keyup" execute="listaReporte" listener="#{inventarioController.busquedaInventarioEnter}" onbeforesubmit="if (event.keyCode != 13)  return false;" render="listaInventario tableInventario pnlMensajes"></a4j:ajax>
+			    	   		<a4j:ajax event="keyup" execute="listaReporte" listener="#{inventarioController.busquedaInventarioEnter}" onbeforesubmit="if (event.keyCode != 13)  return false;" render="listaInventario tableInventario pnlMensajes unidadManejo"></a4j:ajax>
 			    	   	</rich:inplaceInput>
 			    	   	<h:panelGroup styleClass="styleClean">
 							<a4j:commandLink styleClass="guardarA" execute="@this" render="codigoBarras pnlMensajes" actionListener="#{inventarioController.borrarBusquedaCodigoBarras}"/>
 						</h:panelGroup>
 					</h:panelGrid>
-			    	
-			    	<h:panelGrid width="47%" columns="4" columnClasses="columnaIzquierda, columnaDerecha">
+					<h:panelGrid width="100%" columns="2" columnClasses="columnaTableUnidad1,columnaTableUnidad2">
+				    	<h:outputText class="styleNegritas" value="#{msg_erpweb['ec.com.erp.etiqueta.header.datos.unidad.manejo']}: *" />
+		                <h:selectOneMenu id="unidadManejo" tabindex="1" value="#{inventarioController.codigoArticuloUnidadManejo}" style="background-image: none; width: 165px; height: 24px;" onkeypress="if (event.keyCode == 13) return false;">
+							<f:selectItem itemLabel="SELECCIONE"/>
+							<f:selectItems value="#{inventarioController.unidadesManejoCols}" var="unidad" itemValue = "#{unidad.id.codigoArticuloUnidadManejo}" itemLabel = "#{unidad.tipoUnidadManejoCatalogoValorDTO.nombreCatalogoValor eq 'UNIDAD' ? 'UNIDADES' : unidad.tipoUnidadManejoCatalogoValorDTO.nombreCatalogoValor.concat(' X ').concat(unidad.valorUnidadManejo)}" />
+							<f:ajax event="change" render="pnlMensajes" execute="@this"></f:ajax> 
+						</h:selectOneMenu>
+					</h:panelGrid>
+			    	<h:panelGrid width="35%" columns="4" columnClasses="columnaIzquierda, columnaDerecha">
 			    	   	<!-- <h:outputText style="width: 50px;" value="Fecha inicio:"></h:outputText> -->
 			    	   	<rich:calendar inputStyle="width: 100px; height: 20px;" value="#{inventarioController.fechaInicioBusqueda}" datePattern="yyyy-MM-dd"></rich:calendar>
 			    	   	<!-- <h:outputText style="width: 50px;" value="Fecha fin"></h:outputText> -->
@@ -65,8 +72,8 @@
 			 		<h:outputText class="styleNegritas" value="#{msg_erpweb['ec.com.erp.etiqueta.header.tabla.descripcion.articulo']}:" />
 			 		<h:outputText class="styleUpperCase" style="width:260px" value="#{inventarioController.articuloDTO.nombreArticulo}" />
 			 		
-			 		<h:outputText class="styleNegritas" value="#{msg_erpweb['ec.com.erp.etiqueta.header.tabla.articulo.peso']}: " />
-			 		<h:outputText class="styleUpperCase" style="width:260px" value="#{inventarioController.articuloDTO.peso}"/>
+			 		<h:outputText class="styleNegritas" value="#{msg_erpweb['ec.com.erp.etiqueta.header.tabla.articulo.precio.min']}: " />
+			 		<h:outputText class="styleUpperCase" style="width:260px" value="#{inventarioController.articuloDTO.precioMinorista}"/>
 			 		<h:outputText value=""/>
 			 		<h:outputText class="styleNegritas" value="#{msg_erpweb['ec.com.erp.etiqueta.header.tabla.articulo.precio']}:" />
 			 		<h:outputText class="styleUpperCase" style="width:260px" value="#{inventarioController.articuloDTO.precio}" />
@@ -131,7 +138,9 @@
 		            </rich:columnGroup>
 		        </f:facet>
 	            <rich:column>
-	                <h:outputText value="#{inventario.fechaMovimiento}" />
+	                <h:outputText value="#{inventario.fechaMovimiento}">
+	                	<f:convertDateTime pattern="yyyy-MM-dd HH:mm" />
+	                </h:outputText>
 	            </rich:column>
 	            <rich:column>	                
 	                <rich:panel id="movim#{it}" styleClass="tooltip-text" bodyClass="rich-laguna-panel-no-header" style="border: none !important">  
@@ -146,7 +155,7 @@
 					</rich:panel>
 	            </rich:column>
 	             <rich:column>
-	                <h:outputText value="#{inventario.articuloUnidadManejoDTO.tipoUnidadManejoCatalogoValorDTO.nombreCatalogoValor.concat('x').concat(inventario.articuloUnidadManejoDTO.valorUnidadManejo)}" />
+	                <h:outputText value="#{inventario.articuloUnidadManejoDTO.tipoUnidadManejoCatalogoValorDTO.nombreCatalogoValor eq 'UNIDAD' ? 'UNIDADES' : inventario.articuloUnidadManejoDTO.tipoUnidadManejoCatalogoValorDTO.nombreCatalogoValor.concat('x').concat(inventario.articuloUnidadManejoDTO.valorUnidadManejo)}" />
 	            </rich:column>
 	            <rich:column style="text-align: right; padding-right: 5px">
 	                <h:outputText value="#{inventario.cantidadEntrada == null ? '-' : inventario.cantidadEntrada}" />
@@ -237,6 +246,12 @@
 			}
 			.columnaTable5{
 				width: 25% !important;
+			}
+			.columnaTableUnidad1{
+				width: 35% !important;
+			}
+			.columnaTableUnidad2{
+				width: 65% !important;
 			}
 			.tooltip-text {     
 			  	cursor: arrow;    

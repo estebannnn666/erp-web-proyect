@@ -365,7 +365,7 @@
 			            </rich:column>
 			           	<rich:column style="text-align: left; padding-left: 5px">
 			                <f:facet name="header"><h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.label.nuevo.pedidos.detalle.unidad.manejo']}"/></f:facet>
-		                	<h:outputText value="#{detalle.articuloUnidadManejoDTO.tipoUnidadManejoCatalogoValorDTO.nombreCatalogoValor} x #{detalle.articuloUnidadManejoDTO.valorUnidadManejo}">
+		                	<h:outputText value="#{detalle.articuloUnidadManejoDTO.tipoUnidadManejoCatalogoValorDTO.nombreCatalogoValor eq 'UNIDAD' ? 'UNIDADES' : detalle.articuloUnidadManejoDTO.tipoUnidadManejoCatalogoValorDTO.nombreCatalogoValor.concat(' X ').concat(detalle.articuloUnidadManejoDTO.valorUnidadManejo)}">
 		                	</h:outputText>
 			            </rich:column>
 			            <rich:column style="text-align: right; padding-right: 5px">

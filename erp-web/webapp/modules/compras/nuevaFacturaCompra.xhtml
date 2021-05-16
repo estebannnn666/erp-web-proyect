@@ -118,7 +118,7 @@
 				                	</a4j:ajax>
 				                </h:inputText>
 				            </rich:column>				            
-				            <rich:column styleClass="autoStyle" style="width:20%;;">
+				            <rich:column styleClass="autoStyle" style="width:20%;">
 				                <f:facet name="header"><h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.label.lista.cabecera.guia.descripcion.producto']}"/></f:facet>
 				                <p:autoComplete id="themeCustom" value="#{detalle.descripcion}" completeMethod="#{cuentasController.completeNombreArticulo}" onkeypress="if (event.keyCode == 13) return false;">
             						<p:ajax event="itemSelect"  listener="#{cuentasController.onItemSelectCompra}" update=":frmNuevoCompra:panelDetallePedido :pnlMensajes"/>
@@ -128,7 +128,7 @@
 				                <f:facet name="header"><h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.label.nuevo.pedidos.detalle.unidad.manejo']}"/></f:facet>
 				                <h:selectOneMenu tabindex="1" value="#{detalle.codigoArticuloUnidadManejo}" style="width: 235px" valueChangeListener="#{cuentasController.seleccionarUnidadManejo}" onkeypress="if (event.keyCode == 13) return false;">
 									<f:selectItem itemLabel="SELECCIONE"/>
-									<f:selectItems value="#{detalle.articuloDTO.articuloUnidadManejoDTOCols}" var="uniMan" itemValue = "#{uniMan.id.codigoArticuloUnidadManejo}" itemLabel = "#{uniMan.tipoUnidadManejoCatalogoValorDTO.nombreCatalogoValor} X #{uniMan.valorUnidadManejo}" /> 
+									<f:selectItems value="#{detalle.articuloDTO.articuloUnidadManejoDTOCols}" var="uniMan" itemValue = "#{uniMan.id.codigoArticuloUnidadManejo}" itemLabel = "#{uniMan.tipoUnidadManejoCatalogoValorDTO.nombreCatalogoValor eq 'UNIDAD' ? 'UNIDADES' : uniMan.tipoUnidadManejoCatalogoValorDTO.nombreCatalogoValor.concat(' X ').concat(uniMan.valorUnidadManejo)}" /> 
 									<f:ajax event="change" render="pnlGridDetalleFactura tableDetallePedido pnlMensajes" execute="@this"></f:ajax>
 								</h:selectOneMenu>
 				            </rich:column>
