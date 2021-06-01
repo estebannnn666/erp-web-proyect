@@ -1,11 +1,6 @@
 
 package ec.com.erp.web.articulo.controller;
 
-import java.awt.print.PrinterException;
-import java.awt.print.PrinterJob;
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -22,8 +17,6 @@ import javax.faces.event.ValueChangeEvent;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.pdfbox.pdmodel.PDDocument;
-import org.apache.pdfbox.printing.PDFPageable;
 import org.richfaces.event.FileUploadEvent;
 import org.richfaces.model.UploadedFile;
 
@@ -41,6 +34,7 @@ import ec.com.erp.web.commons.controller.MensajesController;
 import ec.com.erp.web.commons.datamanager.CommonDataManager;
 import ec.com.erp.web.commons.login.controller.LoginController;
 import ec.com.erp.web.commons.utils.ERPWebResources;
+import ec.com.erp.web.commons.utils.UtilitarioWeb;
 
 /**
  * Controlador para administracion de articulos
@@ -156,8 +150,7 @@ public class ArticulosController extends CommonsController implements Serializab
 		try {
 			Collection<ArticuloDTO> articulosCatalogo = ERPFactory.articulos.getArticuloServicio().findObtenerArticulosCatalogos(Integer.parseInt(ERPConstantes.ESTADO_ACTIVO_NUMERICO), codigoBarrasBusqueda,nombreArticuloBusqueda);
 			byte[] contenido = ERPFactory.articulos.getArticuloServicio().findObtenerReporteCatalogo(articulosCatalogo);
-//			UtilitarioWeb.mostrarPDF(contenido);
-			imprimir(contenido);
+			UtilitarioWeb.mostrarPDF(contenido);
 		} catch (Exception e) {
 			this.setShowMessagesBar(Boolean.TRUE);
 			MensajesController.addError(null, "Error al imprimir");
@@ -165,17 +158,7 @@ public class ArticulosController extends CommonsController implements Serializab
 		return null;
 	}
 	
-	public void imprimir(byte[] contenido) throws IOException, PrinterException{
-	    // Indicamos el nombre del archivo Pdf que deseamos imprimir
-//	    File Archivo = new File("C:/Users/usuario/Desktop/2003FV211174.pdf");
-	    InputStream targetStream = new ByteArrayInputStream(contenido);
-	    PDDocument document = PDDocument.load(targetStream);
-	    PrinterJob job = PrinterJob.getPrinterJob();
-	    if (job.printDialog() == true) {
-	        job.setPageable(new PDFPageable(document));
-	        job.print();
-	    }
-	}
+	
 	
 	/**
 	 * Metodo para buscar articulos

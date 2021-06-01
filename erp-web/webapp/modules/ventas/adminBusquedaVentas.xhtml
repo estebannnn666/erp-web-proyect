@@ -160,13 +160,13 @@
 						<f:setPropertyActionListener value="#{cuenta}" target="#{cuentasController.facturaCabeceraDTO}" />											
 					</a4j:commandLink>	
 	            </rich:column>
-	            <!-- rich:column styleClass="columna5">
+	            <rich:column styleClass="columna5">
 	                <f:facet name="header">Ver PDF</f:facet>
 					<a4j:commandLink id="botonImprimir" title="Ver factura en pdf para imprimir" render="pnlMensajes" oncomplete="imprimirFactura()" execute="@this" actionListener="#{cuentasController.cargarFacturaDetalle}">
 						<h:graphicImage name="print_pdf.png" library="images" style="border:none;border-color:white;" height="24" width="24"/>
 						<f:setPropertyActionListener value="#{cuenta}" target="#{cuentasController.facturaCabeceraDTO}" />											
 					</a4j:commandLink>
-	            </rich:column-->
+	            </rich:column>
 	            <rich:column styleClass="columna5">
 	                <f:facet name="header">Pagos</f:facet>
 	                <h:graphicImage title="#{msg_erpweb['ec.com.erp.etiqueta.mensaje.permiso.denegado.ejecutar.accion']}" rendered="#{cuentasController.codigoVendedor != null}" name="btnBloqueo.png" library="images" style="border:none;border-color:white;" height="16" width="16"/>

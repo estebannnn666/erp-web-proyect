@@ -1,7 +1,11 @@
 
 package ec.com.erp.web.cuentas.controller;
 
+import java.awt.print.PrinterException;
+import java.awt.print.PrinterJob;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.Serializable;
 import java.math.BigDecimal;
@@ -58,6 +62,8 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.Predicate;
 import org.apache.commons.collections.PredicateUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.printing.PDFPageable;
 import org.primefaces.event.SelectEvent;
 import org.w3c.dom.Document;
 
@@ -1652,6 +1658,27 @@ public class CuentasController extends CommonsController implements Serializable
 		return null;
 	}
 	
+	public void imprimirFormatoNotaVenta(byte[] contenido) throws IOException, PrinterException{
+	    // Indicamos el nombre del archivo Pdf que deseamos imprimir
+	    InputStream targetStream = new ByteArrayInputStream(contenido);
+	    PDDocument document = PDDocument.load(targetStream);
+	    PrinterJob job = PrinterJob.getPrinterJob();
+	    //if (job.printDialog() == true) {
+	        job.setPageable(new PDFPageable(document));
+	        job.print();
+	    //}
+	}
+	
+	public void impresionComprobante() {
+		try{
+			byte[] contenido = ERPFactory.facturas.getFacturaCabeceraServicio().findObtenerNotaVenta(facturaCabeceraDTO);
+			imprimirFormatoNotaVenta(contenido);
+		} catch (Exception e) {
+			this.setShowMessagesBar(Boolean.TRUE);
+			MensajesController.addError(null, "Error al imprimir");
+		}
+	}
+	
 	public void imprimirFacturaImpresora(ActionEvent e){
 		try {
 			boolean ban = true;
@@ -1670,7 +1697,8 @@ public class CuentasController extends CommonsController implements Serializable
 			String fechaFormateada =  formatoFecha.format(this.facturaCabeceraDTO.getFechaDocumento());
 			StringBuilder texto = new StringBuilder();
 			if(this.tipoRuc.equals("3")) {
-				this.imprimirNotaVenta(texto, fechaFormateada, formatoDecimales);
+//				this.imprimirNotaVenta(texto, fechaFormateada, formatoDecimales);
+				impresionComprobante();
 			}else {
 				texto.append("\n");
 				texto.append("\n");
@@ -1729,23 +1757,24 @@ public class CuentasController extends CommonsController implements Serializable
 				texto.append("\n");
 				texto.append("\n");
 				texto.append("\n");
-			}
 			
-			DocFlavor flavor = DocFlavor.BYTE_ARRAY.AUTOSENSE;
-			PrintRequestAttributeSet aset = new HashPrintRequestAttributeSet();
-	        aset.add(MediaSizeName.ISO_A5);
-	        aset.add(new Copies(1));
-	        aset.add(Sides.ONE_SIDED);
-	        aset.add(Finishings.STAPLE);
-	        PrintService printService = PrintServiceLookup.lookupDefaultPrintService();
-	        
-			DocPrintJob docPrintJob = printService.createPrintJob();
-			Doc doc = new SimpleDoc(texto.toString().getBytes(), flavor, null);
-			docPrintJob.print(doc, aset);
-			this.clearNuevaCuentaFacturaVentas(e);
-			this.setShowMessagesBar(Boolean.TRUE);
-			MensajesController.addInfo(null, ERPWebResources.getString("ec.com.erp.etiqueta.pantall.despacho.mensaje.impresion.correcta"));
-			this.clearNuevaCuentaFacturaVentas(e);
+			
+				DocFlavor flavor = DocFlavor.BYTE_ARRAY.AUTOSENSE;
+				PrintRequestAttributeSet aset = new HashPrintRequestAttributeSet();
+		        aset.add(MediaSizeName.ISO_A5);
+		        aset.add(new Copies(1));
+		        aset.add(Sides.ONE_SIDED);
+		        aset.add(Finishings.STAPLE);
+		        PrintService printService = PrintServiceLookup.lookupDefaultPrintService();
+		        
+				DocPrintJob docPrintJob = printService.createPrintJob();
+				Doc doc = new SimpleDoc(texto.toString().getBytes(), flavor, null);
+				docPrintJob.print(doc, aset);
+				this.clearNuevaCuentaFacturaVentas(e);
+				this.setShowMessagesBar(Boolean.TRUE);
+				MensajesController.addInfo(null, ERPWebResources.getString("ec.com.erp.etiqueta.pantall.despacho.mensaje.impresion.correcta"));
+				this.clearNuevaCuentaFacturaVentas(e);
+			}
 		} catch (PrintException execption) {
 			this.setShowMessagesBar(Boolean.TRUE);
 			MensajesController.addError(null, "Error al imprimir");
@@ -1817,8 +1846,9 @@ public class CuentasController extends CommonsController implements Serializable
 				// Plantilla rpincipal que permite la conversion de xsl a pdf
 				htmltoPDF = new HtmlPdf(ERPConstantes.PLANTILLA_XSL_FOPRINCIPAL);
 				HashMap<String , String> parametros = new HashMap<String, String>();
-				byte contenido[] = htmltoPDF.convertir(ERPFactory.facturas.getFacturaCabeceraServicio().finObtenerXMLImprimirFacturaVenta(facturaCabeceraDTO).replace("<?xml version=\"1.0\" encoding=\"UTF-8\"?>", ""), "", "",	parametros,	null);
-				UtilitarioWeb.mostrarPDF(contenido);	
+//				byte contenido[] = htmltoPDF.convertir(ERPFactory.facturas.getFacturaCabeceraServicio().finObtenerXMLImprimirFacturaVenta(facturaCabeceraDTO).replace("<?xml version=\"1.0\" encoding=\"UTF-8\"?>", ""), "", "",	parametros,	null);
+				byte[] contenido = ERPFactory.facturas.getFacturaCabeceraServicio().findObtenerNotaVenta(facturaCabeceraDTO);
+				UtilitarioWeb.mostrarPDF(contenido);
 			}
 		} catch (Exception e) {
 			this.setShowMessagesBar(Boolean.TRUE);
