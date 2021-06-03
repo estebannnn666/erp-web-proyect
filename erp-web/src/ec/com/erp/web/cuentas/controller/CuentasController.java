@@ -1,6 +1,9 @@
 
 package ec.com.erp.web.cuentas.controller;
 
+import java.awt.print.Book;
+import java.awt.print.PageFormat;
+import java.awt.print.Paper;
 import java.awt.print.PrinterException;
 import java.awt.print.PrinterJob;
 import java.io.ByteArrayInputStream;
@@ -64,6 +67,7 @@ import org.apache.commons.collections.PredicateUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.printing.PDFPageable;
+import org.apache.pdfbox.printing.PDFPrintable;
 import org.primefaces.event.SelectEvent;
 import org.w3c.dom.Document;
 
@@ -1663,10 +1667,20 @@ public class CuentasController extends CommonsController implements Serializable
 	    InputStream targetStream = new ByteArrayInputStream(contenido);
 	    PDDocument document = PDDocument.load(targetStream);
 	    PrinterJob job = PrinterJob.getPrinterJob();
-	    //if (job.printDialog() == true) {
-	        job.setPageable(new PDFPageable(document));
-	        job.print();
-	    //}
+        job.setPageable(new PDFPageable(document));
+        Paper paper = new Paper();
+        paper.setSize(170.0, 700.0);
+        paper.setImageableArea(-18.0, -20.0, 500.0, 700.0);
+        
+        PageFormat pageFormat = new PageFormat();
+        pageFormat.setPaper(paper);
+        
+        Book book = new Book();
+        book.append(new PDFPrintable(document), pageFormat);
+        
+        job.setPageable(book);
+        
+        job.print();
 	}
 	
 	public void impresionComprobante() {
@@ -1840,12 +1854,12 @@ public class CuentasController extends CommonsController implements Serializable
 	 * Metodo para imprimir lista de facturas
 	 */
 	public void imprimirFactura() {
-		HtmlPdf htmltoPDF;
+//		HtmlPdf htmltoPDF;
 		try {
 			if(this.validarInformacionRequerida()) {
 				// Plantilla rpincipal que permite la conversion de xsl a pdf
-				htmltoPDF = new HtmlPdf(ERPConstantes.PLANTILLA_XSL_FOPRINCIPAL);
-				HashMap<String , String> parametros = new HashMap<String, String>();
+//				htmltoPDF = new HtmlPdf(ERPConstantes.PLANTILLA_XSL_FOPRINCIPAL);
+//				HashMap<String , String> parametros = new HashMap<String, String>();
 //				byte contenido[] = htmltoPDF.convertir(ERPFactory.facturas.getFacturaCabeceraServicio().finObtenerXMLImprimirFacturaVenta(facturaCabeceraDTO).replace("<?xml version=\"1.0\" encoding=\"UTF-8\"?>", ""), "", "",	parametros,	null);
 				byte[] contenido = ERPFactory.facturas.getFacturaCabeceraServicio().findObtenerNotaVenta(facturaCabeceraDTO);
 				UtilitarioWeb.mostrarPDF(contenido);
