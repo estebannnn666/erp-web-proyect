@@ -1700,11 +1700,7 @@ public class CuentasController extends CommonsController implements Serializable
 //				this.imprimirNotaVenta(texto, fechaFormateada, formatoDecimales);
 				impresionComprobante();
 			}else {
-				
-				if(this.tipoRuc.equals(ERPConstantes.ESTADO_ACTIVO_NUMERICO)) {
-					texto.append("\n");
-					texto.append("\n");
-				}
+				texto.append("\n");
 				texto.append("\n");
 				texto.append("\n");
 				texto.append("\n");
@@ -1717,9 +1713,7 @@ public class CuentasController extends CommonsController implements Serializable
 				texto.append("\n");
 				texto.append("            "+this.facturaCabeceraDTO.getNombreClienteProveedor());
 				texto.append("\n");
-				if(this.tipoRuc.equals(ERPConstantes.ESTADO_INACTIVO_NUMERICO)) {
-					texto.append("\n");
-				}
+				texto.append("\n");
 				texto.append("            "+UtilitarioWeb.completarEspaciosCadena(13, this.facturaCabeceraDTO.getRucDocumento())+"            "+fechaFormateada);
 				texto.append("\n");
 				texto.append("\n");
