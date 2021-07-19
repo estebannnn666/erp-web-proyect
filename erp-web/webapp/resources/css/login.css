@@ -397,6 +397,7 @@ body {
 	float: right;
 	width: 81.5%;
 	overflow-y: auto;
+    overflow-x: hidden;
 }
 
 #contenedorMenuPrincipal{
@@ -421,9 +422,9 @@ body {
 	width: 65%
 }
 
-::-webkit-scrollbar {
+/*::-webkit-scrollbar {
     width: 0px !important;
-}
+}*/
 
 .styleDivMenuSecundario{
 	height: 70vh;
@@ -628,9 +629,9 @@ body {
     font-weight: bold;
 }
 
-::-webkit-scrollbar {
+/*::-webkit-scrollbar {
       width: 15px;
-}
+}*/
 
 .styleLegend{
 	color: deepskyblue !important;

@@ -4,7 +4,7 @@
 	xmlns:h="http://java.sun.com/jsf/html"
 	xmlns:a4j="http://richfaces.org/a4j"
 	xmlns:rich="http://richfaces.org/rich"
-	template="/templates/pages/pageLayout2.xhtml">
+	template="/templates/pages/pageLayout4.xhtml">
 	
 	<ui:param name="idForm" value="frmAdminCuentas" />
 	<ui:param name="form" value="#{cuentasController.form}" />	
@@ -24,7 +24,7 @@
 	</ui:define>
 	
 	<ui:define name="contentCenter">
-		<rich:panel id="panel-content-left" styleClass="panel-content-left" style="width:100% !important;">
+		<rich:panel id="panel-content-left" styleClass="panel-content-left" style="width:99.7% !important;">
 			<f:facet name="header">			
 				<h:panelGrid columns="2" width="99.9%" columnClasses="align-left, align-right" cellpadding="0" cellspacing="0">
 					<h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.criterios.busqueda']}" style="white-space:nowrap" />
@@ -73,15 +73,20 @@
 			</h:panelGroup>	
 		</rich:panel>
 	
-		<rich:panel id="panelCuentasTabla" header="Lista de documentos" styleClass="panelPedidos" style="width:100%; height: 84.3%">	
+		<rich:panel id="panelCuentasTabla" header="Lista de documentos" styleClass="panelPedidos" style="width:99.7%; height: 81.5%">	
 			<h:panelGrid id="tablaVaciaPedidos" columns="1" rendered="#{empty cuentasController.facturaCabeceraDTOCols}" style="width:100%; text-align: center; padding-top: 230px">
 				<h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.mensaje.lista.vacio']}"/>
 			</h:panelGrid>	
 			<rich:panel style="text-align:center; border-left: none; border-right:none;" rendered="#{not empty cuentasController.facturaCabeceraDTOCols}">
 				<rich:dataScroller page="#{cuentasController.page}" fastStep="3" for="tableCuentas" maxPages="5" rendered="#{not empty cuentasController.facturaCabeceraDTOCols}" renderIfSinglePage="false"/>
 			</rich:panel>
-			 <rich:dataTable style="width:100%" value="#{cuentasController.facturaCabeceraDTOCols}" rendered="#{not empty cuentasController.facturaCabeceraDTOCols}" var="cuenta" iterationStatusVar="it" id="tableCuentas" rows="14">
-	            <rich:column>
+			 <rich:extendedDataTable style="width:99.5%" value="#{cuentasController.facturaCabeceraDTOCols}" 
+			 	selectionMode="none" showColumnControl="false" crendered="#{not empty cuentasController.facturaCabeceraDTOCols}" 
+			 	var="cuenta" frozenColumns="5" iterationStatusVar="it" id="tableCuentas" rows="10">
+	             <f:facet name="header">
+	             	<h:outputText value="Facturas de venta" />
+	             </f:facet>
+	            <rich:column width="40px">
 	                <f:facet name="header">Nro.</f:facet>
 	                #{it.index+1}
 	            </rich:column>
@@ -89,21 +94,21 @@
 	                <f:facet name="header"><h:outputText title="#{msg_erpweb['ec.com.erp.etiqueta.label.lista.cabecera.factura.referencia.documento']}" value="#{msg_erpweb['ec.com.erp.etiqueta.label.lista.cabecera.factura.refedoc.abreviado']}"/></f:facet>
 	                <h:outputText value="#{cuenta.codigoReferenciaFactura}" />
 	            </rich:column-->
-	            <rich:column style="width: 90px">
+	            <rich:column width="100px">
 	                <f:facet name="header"><h:outputText value="Nro. Documento"/></f:facet>
 	                <h:outputText value="#{cuenta.numeroDocumento}" />
 	            </rich:column>
-	            <rich:column style="width: 80px; text-align: center;">
+	            <rich:column width="91px" style="text-align: center;">
 	                <f:facet name="header"><h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.label.lista.cabecera.factura.fecha']}"/></f:facet>
 	                <h:outputText value="#{cuenta.fechaDocumento}">
 	                	<f:convertDateTime pattern="yyyy-MM-dd"/>
 	                </h:outputText>
 	            </rich:column>
-	            <rich:column style="width: 100px;">
+	            <rich:column width="90px">
 	                <f:facet name="header"><h:outputText value="Ruc / Doc." title="#{msg_erpweb['ec.com.erp.etiqueta.label.lista.cabecera.factura.ruc.documento']}"/></f:facet>
 	                <h:outputText value="#{cuenta.rucDocumento}" />
 	            </rich:column>
-	            <rich:column>
+	            <rich:column width="160px">
 	                <f:facet name="header"><h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.label.lista.cabecera.factura.razonSocial']}"/></f:facet>
 	                <rich:panel id="cliente#{it}" styleClass="tooltip-text" bodyClass="rich-laguna-panel-no-header" style="border: none !important">  
 		        		<h:outputText value="#{cuenta.nombreClienteProveedor.length() > 20 ? cuenta.nombreClienteProveedor.substring(0,20).concat('...') : cuenta.nombreClienteProveedor}" /> 
@@ -116,7 +121,7 @@
 						</rich:tooltip>       
 					</rich:panel>
 	            </rich:column>
-	            <rich:column>
+	            <rich:column width="140px">
 	                <f:facet name="header"><h:outputText value="Vendedor"/></f:facet>
 	                <h:outputText value="#{cuenta.vendedorDTO != null ? cuenta.vendedorDTO.personaDTO.primerNombre : 'N/D'} #{cuenta.vendedorDTO != null ? cuenta.vendedorDTO.personaDTO.primerApellido : ''}" />
 	            </rich:column>
@@ -124,59 +129,89 @@
 	                <f:facet name="header"><h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.label.lista.cabecera.factura.telefono']}"/></f:facet>
 	                <h:outputText value="#{cuenta.telefono}" />
 	            </rich:column-->
-	            <rich:column style="width: 60px; text-align: right; padding-right: 3px;">
+	            <rich:column width="70px" style="text-align: right;">
+	                <f:facet name="header"><h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.label.nuevo.pedidos.detalle.subtotal']}" title="#{msg_erpweb['ec.com.erp.etiqueta.label.nuevo.pedidos.detalle.subtotal']}"/></f:facet>
+	                <h:outputText value="#{cuenta.subTotal}" >
+	                	<f:convertNumber pattern="0.00"/>
+	                </h:outputText>
+	            </rich:column>
+	            <rich:column width="70px" style="text-align: right;">
+	                <f:facet name="header"><h:outputText value="Descuento" title="Descuento"/></f:facet>
+	                <h:outputText value="#{cuenta.descuento}" >
+	                	<f:convertNumber pattern="0.00"/>
+	                </h:outputText>
+	            </rich:column>
+	            <rich:column width="70px" style="text-align: right;">
+	                <f:facet name="header"><h:outputText value="Tarifa 0%" title="Tarifa 0%"/></f:facet>
+	                <h:outputText value="#{cuenta.totalSinImpuestos}" >
+	                	<f:convertNumber pattern="0.00"/>
+	                </h:outputText>
+	            </rich:column>
+	            <rich:column width="70px" style="text-align: right;">
+	                <f:facet name="header"><h:outputText value="Tarifa 12%" title="Tarifa 12%"/></f:facet>
+	                <h:outputText value="#{cuenta.totalImpuestos}" >
+	                	<f:convertNumber pattern="0.00"/>
+	                </h:outputText>
+	            </rich:column>
+	            <rich:column width="70px" style="text-align: right;">
+	                <f:facet name="header"><h:outputText value="Iva 12%" title="Iva 12%"/></f:facet>
+	                <h:outputText value="#{cuenta.totalIva}" >
+	                	<f:convertNumber pattern="0.00"/>
+	                </h:outputText>
+	            </rich:column>
+	            <rich:column width="70px" style="text-align: right;">
 	                <f:facet name="header"><h:outputText value="Total" title="#{msg_erpweb['ec.com.erp.etiqueta.label.lista.cabecera.factura.total.factura']}"/></f:facet>
 	                <h:outputText value="#{cuenta.totalCuenta}" >
 	                	<f:convertNumber pattern="0.00"/>
 	                </h:outputText>
 	            </rich:column>
-	             <rich:column style="width: 70px; text-align: right; padding-right: 3px;">
+	             <rich:column  width="75px" style="text-align: right;">
 	                <f:facet name="header"><h:outputText value="Total pagos" title="#{msg_erpweb['ec.com.erp.etiqueta.label.lista.cabecera.factura.total.factura']}"/></f:facet>
 	                <h:outputText value="#{cuenta.totalPagos}" >
 	                	<f:convertNumber pattern="0.00"/>
 	                </h:outputText>
 	            </rich:column>
-	            <rich:column style="width: 60px; text-align: right; padding-right: 3px;">
+	            <rich:column  width="70px" style="text-align: right;">
 	                <f:facet name="header"><h:outputText value="Saldo" title="#{msg_erpweb['ec.com.erp.etiqueta.label.lista.cabecera.factura.total.factura']}"/></f:facet>
 	                <h:outputText value="#{cuenta.totalCuenta - cuenta.totalPagos}" >
 	                	<f:convertNumber pattern="0.00"/>
 	                </h:outputText>
 	            </rich:column>
-	            <rich:column style="width: 40px; text-align: center;">
+	            <rich:column width="60px" style="text-align: center;">
 	                <f:facet name="header"><h:outputText value="Cobrada" title="#{msg_erpweb['ec.com.erp.etiqueta.label.lista.cabecera.factura.pagada']}"/></f:facet>
 	                <h:outputText value="#{cuenta.pagado ? 'SI' : 'NO'}" />
 	            </rich:column>
-	            <rich:column styleClass="columna5">
+	            <rich:column width="50px" styleClass="columna5">
 	                <f:facet name="header">Detalle</f:facet>
 	                <a4j:commandLink id="botonDetalle" title="Ver detalle de factura" render="popUpDetalle pnlListaDetalleFactura" actionListener="#{cuentasController.simularEvento}" execute="@this" oncomplete="#{rich:component('popUpDetalle')}.show();">
 						<h:graphicImage name="btnDetalle.png" library="images" style="border:none;border-color:white;" height="16" width="16"/>
 						<f:setPropertyActionListener value="#{cuenta}" target="#{cuentasController.facturaCabeceraDTO}" />											
 					</a4j:commandLink>
 	            </rich:column>
-	            <rich:column styleClass="columna5">
+	            <rich:column width="60px" styleClass="columna5">
 	                <f:facet name="header">Imprimir</f:facet>
 					<a4j:commandLink id="botonImpresion" render="mpOpcionesImpresion tipoFactura pnlMensajes" oncomplete="#{rich:component('mpOpcionesImpresion')}.show();" execute="@this" actionListener="#{cuentasController.simularEvento}">
-						<h:graphicImage name="btnImprimir.png" library="images" style="border:none;border-color:white;" height="20" width="20"/>
+						<h:graphicImage name="btnImprimir.png" library="images" style="border:none;border-color:white;" height="16" width="16"/>
 						<f:setPropertyActionListener value="#{cuenta}" target="#{cuentasController.facturaCabeceraDTO}" />											
 					</a4j:commandLink>	
 	            </rich:column>
-	            <rich:column styleClass="columna5">
+	            <rich:column width="60px" styleClass="columna5">
 	                <f:facet name="header">Ver PDF</f:facet>
 					<a4j:commandLink id="botonImprimir" title="Ver factura en pdf para imprimir" render="pnlMensajes" oncomplete="imprimirFactura()" execute="@this" actionListener="#{cuentasController.cargarFacturaDetalle}">
-						<h:graphicImage name="print_pdf.png" library="images" style="border:none;border-color:white;" height="24" width="24"/>
+						<h:graphicImage name="print_pdf.png" library="images" style="border:none;border-color:white;" height="16" width="16"/>
 						<f:setPropertyActionListener value="#{cuenta}" target="#{cuentasController.facturaCabeceraDTO}" />											
 					</a4j:commandLink>
 	            </rich:column>
-	            <rich:column styleClass="columna5">
+	            <rich:column width="50px" styleClass="columna5">
 	                <f:facet name="header">Pagos</f:facet>
 	                <h:graphicImage title="#{msg_erpweb['ec.com.erp.etiqueta.mensaje.permiso.denegado.ejecutar.accion']}" rendered="#{cuentasController.codigoVendedor != null}" name="btnBloqueo.png" library="images" style="border:none;border-color:white;" height="16" width="16"/>
 	                <a4j:commandLink id="botonPago" title="Ver detalle de factura" rendered="#{cuentasController.codigoVendedor == null}" render="popUpPagos pnlListaDetallePagos" execute="@this" actionListener="#{cuentasController.simularEvento}" oncomplete="cargarPagos();">
-						<h:graphicImage title="Ingresar nuevo pago" name="pagos.png" library="images" style="border:none;border-color:white;" height="24" width="24" rendered="#{!cuenta.pagado}"/>
-						<h:graphicImage title="Ver detalle de pagos" name="btnDetailPay.png" library="images" style="border:none;border-color:white;" height="24" width="24" rendered="#{cuenta.pagado}"/>
+						<h:graphicImage title="Ingresar nuevo pago" name="pagos.png" library="images" style="border:none;border-color:white;" height="16" width="16" rendered="#{!cuenta.pagado}"/>
+						<h:graphicImage title="Ver detalle de pagos" name="btnDetailPay.png" library="images" style="border:none;border-color:white;" height="16" width="16" rendered="#{cuenta.pagado}"/>
 						<f:setPropertyActionListener value="#{cuenta}" target="#{cuentasController.facturaCabeceraDTO}" />											
 					</a4j:commandLink>
 	            </rich:column>
-	            <rich:column styleClass="columna5">
+	            <rich:column width="60px" styleClass="columna5">
 	                <f:facet name="header">Cancelar</f:facet>
 	                <h:graphicImage title="La factura ya no se puede cancelar porque se encuentra pagada o porque no tiene permiso" rendered="#{cuenta.pagado or cuenta.pagosFacturaDTOCols != null or cuentasController.codigoVendedor != null}" name="btnBloqueo.png" library="images" style="border:none;border-color:white;" height="16" width="16"/>
 	                <a4j:commandLink id="botonEditar" rendered="#{!cuenta.pagado and cuenta.pagosFacturaDTOCols == null and cuentasController.codigoVendedor == null}" title="Cancelar factura" render="pnlGridVentas, pnlGridDetalleFactura" actionListener="#{cuentasController.cargarFacturaDetalle}"	execute="@this" oncomplete="#{rich:component('popUpConfirmar')}.show();"> 
@@ -185,7 +220,36 @@
 					</a4j:commandLink>	
 	            </rich:column>
 	            <f:facet name="footer">
-	            	<rich:columnGroup>
+	            	<table style="width: 100%;">
+	            		<tr>
+	            			<td style="width: 50%;"></td>
+	            			<th style="width: 50px; text-align: right; color: blue;">
+	            				Total ventas:
+	            			</th>
+	            			<td style="width: 50px; text-align: right; ">
+	            				<h:outputText value="#{cuentasController.totalCuenta}">
+		                    		<f:convertNumber pattern="0.00"/>
+		                    	</h:outputText>
+	            			</td>
+	            			<th style="width: 50px; text-align: right; color: blue;">
+	            				Total pagos:
+	            			</th>
+	            			<td style="width: 50px; text-align: right; ">
+	            				<h:outputText value="#{cuentasController.totalPagos}">
+			                    	<f:convertNumber pattern="0.00"/>
+			                    </h:outputText>
+	            			</td>
+	            			<th style="width: 50px; text-align: right; color: blue;">
+	            				Total saldos:
+	            			</th>
+	            			<td style="width: 50px; text-align: right; ">
+	            				<h:outputText value="#{cuentasController.totalCuenta - cuentasController.totalPagos}">
+			                    	<f:convertNumber pattern="0.00"/>
+			                    </h:outputText>
+	            			</td>
+	            		</tr>
+	            	</table>
+	            	<!--  <rich:columnGroup>
 		                <rich:column colspan="6" style="text-align: right; paddin-right: 10px">Total de cobros:</rich:column>
 		                <rich:column style="text-align: right; paddin-right: 10px">
 		                    <h:outputText value="#{cuentasController.totalCuenta}">
@@ -212,9 +276,9 @@
 		                </rich:column>
 		                <rich:column>
 		                </rich:column>
-		            </rich:columnGroup>
+		            </rich:columnGroup>-->
 	            </f:facet> 
-	        </rich:dataTable>
+	        </rich:extendedDataTable>
         </rich:panel>
         
         <a4j:jsFunction name="cargarPagos" actionListener="#{cuentasController.cargarDatosPago}" execute="pnlGridAgregarDetalle" render="popUpPagos pnlListaDetallePagos" oncomplete="#{rich:component('popUpPagos')}.show();"></a4j:jsFunction>
@@ -566,7 +630,11 @@
 			.estiloTextArea{
 				width:350px !important;
 				height: 25px !important;
-			}		
+			}	
+			.rf-edt-c {
+    			height: 23.5px !important;
+    			padding-top: 3px;
+    		}
 		</h:outputStylesheet>
 		<h:commandLink id="linkprintFacture" styleClass="linkprintFacture" action="#{cuentasController.imprimirFactura}" target="_BLANK">
 		</h:commandLink>
