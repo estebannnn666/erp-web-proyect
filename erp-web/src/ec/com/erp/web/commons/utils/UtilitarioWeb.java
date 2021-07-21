@@ -1,6 +1,5 @@
 package ec.com.erp.web.commons.utils;
 
-import java.awt.Desktop;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -34,6 +33,8 @@ import javax.servlet.http.HttpSession;
 
 import org.jsoup.Jsoup;
 import org.xhtmlrenderer.pdf.ITextRenderer;
+
+import com.lowagie.text.DocumentException;
 
 import ec.com.erp.cliente.mdl.dto.FacturaCabeceraDTO;
 import ec.com.erp.cliente.mdl.dto.FacturaDetalleDTO;
@@ -107,7 +108,7 @@ public class UtilitarioWeb {
         return document.html();
     }
 
-    public static byte[] xhtmlToPdf(String xhtml, String outFileName) throws IOException {
+    public static byte[] xhtmlToPdf(String xhtml, String outFileName) throws IOException, DocumentException {
         File output = new File(outFileName);
         ITextRenderer iTextRenderer = new ITextRenderer();
         iTextRenderer.setDocumentFromString(xhtml);
@@ -223,7 +224,7 @@ public class UtilitarioWeb {
 		}  
 	}
 	
-	public static void main(String arg[]) throws IOException {
+	public static void main(String arg[]) throws IOException, DocumentException {
 //		System.out.println(""+completarEspaciosCadena(13, "1002066404001345465"));
 //		File fileToPrint = new File("C:/archivo.pdf");
 //		try {

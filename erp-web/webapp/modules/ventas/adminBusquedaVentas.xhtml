@@ -81,7 +81,7 @@
 				<rich:dataScroller page="#{cuentasController.page}" fastStep="3" for="tableCuentas" maxPages="5" rendered="#{not empty cuentasController.facturaCabeceraDTOCols}" renderIfSinglePage="false"/>
 			</rich:panel>
 			 <rich:extendedDataTable style="width:99.5%" value="#{cuentasController.facturaCabeceraDTOCols}" 
-			 	selectionMode="none" showColumnControl="false" crendered="#{not empty cuentasController.facturaCabeceraDTOCols}" 
+			 	selectionMode="none" showColumnControl="false" rendered="#{not empty cuentasController.facturaCabeceraDTOCols}" 
 			 	var="cuenta" frozenColumns="5" iterationStatusVar="it" id="tableCuentas" rows="10">
 	             <f:facet name="header">
 	             	<h:outputText value="Facturas de venta" />

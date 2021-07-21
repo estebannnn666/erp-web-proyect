@@ -6,12 +6,8 @@ import java.awt.print.PrinterJob;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.io.Serializable;
 import java.math.BigDecimal;
-import java.net.HttpURLConnection;
-import java.net.Proxy;
-import java.net.URL;
 import java.sql.Timestamp;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
@@ -46,16 +42,6 @@ import javax.print.attribute.standard.Copies;
 import javax.print.attribute.standard.Finishings;
 import javax.print.attribute.standard.MediaSizeName;
 import javax.print.attribute.standard.Sides;
-//import javax.print.Doc;
-//import javax.print.DocFlavor;
-//import javax.print.DocPrintJob;
-//import javax.print.PrintException;
-//import javax.print.PrintService;
-//import javax.print.PrintServiceLookup;
-//import javax.print.SimpleDoc;
-import javax.xml.xpath.XPath;
-import javax.xml.xpath.XPathExpressionException;
-import javax.xml.xpath.XPathFactory;
 
 import org.apache.commons.beanutils.BeanPredicate;
 import org.apache.commons.collections.CollectionUtils;
@@ -65,7 +51,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.printing.PDFPageable;
 import org.primefaces.event.SelectEvent;
-import org.w3c.dom.Document;
 
 import ec.com.erp.cliente.common.constantes.ERPConstantes;
 import ec.com.erp.cliente.common.exception.ERPException;
@@ -83,6 +68,7 @@ import ec.com.erp.cliente.mdl.dto.ProveedorDTO;
 import ec.com.erp.cliente.mdl.dto.SecuenciaDTO;
 import ec.com.erp.cliente.mdl.dto.VendedorDTO;
 import ec.com.erp.cliente.mdl.dto.id.FacturaCabeceraID;
+import ec.com.erp.facturacion.electronica.ws.FacturaElectronocaUtil;
 import ec.com.erp.utilitario.commons.util.HtmlPdf;
 import ec.com.erp.web.commons.controller.CommonsController;
 import ec.com.erp.web.commons.controller.MensajesController;
@@ -90,7 +76,6 @@ import ec.com.erp.web.commons.datamanager.CommonDataManager;
 import ec.com.erp.web.commons.login.controller.LoginController;
 import ec.com.erp.web.commons.utils.ERPWebResources;
 import ec.com.erp.web.commons.utils.UtilitarioWeb;
-import ec.com.erp.web.commons.utils.XML_Utilidades;
 import ec.com.erp.web.cuentas.datamanager.CuentasDataManager;
 import ec.com.erp.web.pedidos.controller.ArticuloService;
 
@@ -734,7 +719,7 @@ public class CuentasController extends CommonsController implements Serializable
 				});
 				
 				this.facturaCabeceraDTO.setFacturaDetalleDTOCols(facturaDetalleDTOCols);
-				ERPFactory.facturas.getFacturaCabeceraServicio().transGuardarActualizarFacturaCabecera(this.facturaCabeceraDTO);
+				ERPFactory.facturas.getFacturaCabeceraServicio().transGuardarActualizarFacturaCabecera(this.facturaCabeceraDTO.getTipoRuc(), this.facturaCabeceraDTO);
 				this.setShowMessagesBar(Boolean.TRUE);
 				this.setDocumentoCreado(Boolean.TRUE);
 		        MensajesController.addInfo(null, ERPWebResources.getString("ec.com.erp.etiqueta.label.lista.cabecera.factura.mensaje.guardado"));
@@ -1840,14 +1825,15 @@ public class CuentasController extends CommonsController implements Serializable
 	 * Metodo para imprimir lista de facturas
 	 */
 	public void imprimirFactura() {
-		HtmlPdf htmltoPDF;
+		//HtmlPdf htmltoPDF;
 		try {
 			if(this.validarInformacionRequerida()) {
 				// Plantilla rpincipal que permite la conversion de xsl a pdf
-				htmltoPDF = new HtmlPdf(ERPConstantes.PLANTILLA_XSL_FOPRINCIPAL);
-				HashMap<String , String> parametros = new HashMap<String, String>();
+				//htmltoPDF = new HtmlPdf(ERPConstantes.PLANTILLA_XSL_FOPRINCIPAL);
+				//HashMap<String , String> parametros = new HashMap<String, String>();
 //				byte contenido[] = htmltoPDF.convertir(ERPFactory.facturas.getFacturaCabeceraServicio().finObtenerXMLImprimirFacturaVenta(facturaCabeceraDTO).replace("<?xml version=\"1.0\" encoding=\"UTF-8\"?>", ""), "", "",	parametros,	null);
-				byte[] contenido = ERPFactory.facturas.getFacturaCabeceraServicio().findObtenerNotaVenta(facturaCabeceraDTO);
+//				byte[] contenido = ERPFactory.facturas.getFacturaCabeceraServicio().findObtenerNotaVenta(facturaCabeceraDTO);
+				byte[] contenido = FacturaElectronocaUtil.getReporte(null);
 				UtilitarioWeb.mostrarPDF(contenido);
 			}
 		} catch (Exception e) {
@@ -1873,132 +1859,6 @@ public class CuentasController extends CommonsController implements Serializable
 			}
 			return null;
 		}
-	}
-	
-	public String formatSendPost(String codAcceso){
-		String xml = "<soapenv:Envelope xmlns:soapenv='http://schemas.xmlsoap.org/soap/envelope/' xmlns:ec='http://ec.gob.sr"+
-			"<soapenv:Header/>"+
-				"<soapenv:Body>"+
-					"<ec:autorizacionComprobante>"+
-						"<claveAccesoComprobante>"+codAcceso+"</claveAccesoComprobante>"+
-					"</ec:autorizacionComprobante>"+
-				"</soapenv:Body>"+
-			"</soapenv:Envelope>";
-		return xml;
-	}
-	
-	public String formatSendPostValidar(String bytesEncodeBase64){
-		String xml = "<soapenv:Envelope	xmlns:soapenv='http://schemas.xmlsoap.org/soap/envelope/' xmlns:ec='http://ec.gob.sri.ws.recepcion'>"+
-				"<soapenv:Header/>"+
-					"<soapenv:Body>"+
-						"<ec:validarComprobante>"+
-							"<xml>"+bytesEncodeBase64+"</xml>"+
-						"</ec:validarComprobante>"+
-					"</soapenv:Body>"+
-				"</soapenv:Envelope>";
-		return xml;
-	}
-	
-	public void getAutorizacion(Document doc) throws XPathExpressionException{
-		String pathLevelAutorizacon = "//RespuestaAutorizacionComprobante/autorizaciones/autorizacion[last()]/";
-		String pathLevelMensajes = "//RespuestaAutorizacionComprobante/autorizaciones/autorizacion/mensajes[last()]/mensaje/";
-		String estado = getLastNode(pathLevelAutorizacon, "estado", doc);         
-		if(estado.equals("AUTORIZADO")){
-			System.out.println("Estado: " + getLastNode(pathLevelAutorizacon,"estado", doc)+"\n"+"NÂ° Auto: " + 
-					getLastNode(pathLevelAutorizacon,"numeroAutorizacion", doc)+"\n"+"Fecha Auto: " + 
-					getLastNode(pathLevelAutorizacon,"fechaAutorizacion", doc)+"\n"+"Ambiente: " + 
-					getLastNode(pathLevelAutorizacon,"ambiente", doc));
-		}else if(estado.equals("NO AUTORIZADO")){
-			System.out.println("Estado: " + getLastNode(pathLevelAutorizacon,"estado", doc)+"\n"+"Fecha Auto: " + 
-					getLastNode(pathLevelAutorizacon,"fechaAutorizacion", doc)+"\n"+"Ambiente: " + 
-					getLastNode(pathLevelAutorizacon,"ambiente", doc)+"\n"+"Identificador: " + 
-					getLastNode(pathLevelMensajes,"identificador", doc)+"\n"+"Mensaje: " + 
-					getLastNode(pathLevelMensajes,"mensaje", doc)+"\n"+"Tipo: " + 
-					getLastNode(pathLevelMensajes,"tipo", doc));
-		}
-	}
-	
-	 
-	public boolean getRequestSoap(String urlWebServices, String method, String host, String getEncodeXML, Proxy proxy) throws IOException{
-		try {
-			URL URL = new URL(urlWebServices);
-			HttpURLConnection con = (HttpURLConnection) URL.openConnection(proxy);
-			con.setDoOutput(true);
-			con.setRequestMethod(method);
-			con.setRequestProperty("Contentâ€�type", "text/xml; charset=utfâ€�8");
-			con.setRequestProperty("SOAPAction", "");
-			con.setRequestProperty("Host", host);       
-			OutputStream reqStreamOut = con.getOutputStream();
-			reqStreamOut.write(getEncodeXML.getBytes());                                      
-			System.out.println(con.getErrorStream());
-			java.io.BufferedReader rd = new java.io.BufferedReader(new java.io.InputStreamReader(con.getInputStream(), "UTF8"));
-			String line = "";
-			StringBuilder sb = new StringBuilder();
-			while ((line = rd.readLine()) != null){
-				sb.append(line);
-			}
-			//System.out.println(sb.toString());
-			Document doc = (Document) XML_Utilidades.convertStringToDocument(sb.toString());
-			getAutorizacion(doc);
-			con.disconnect();
-			return true;
-		}catch (Exception ex) {
-			System.out.println(ex.getMessage());
-		}
-		return false;
-	}
-	
-	public String getLastNode(String pathLevelXML, String nodo, Document doc) throws XPathExpressionException{
-		//Ejemplo:
-		//RespuestaAutorizacionComprobante/autorizaciones/autorizacion[last()]/estado
-		String pathFull = pathLevelXML + nodo;
-		XPath xpath = XPathFactory.newInstance().newXPath();
-		return xpath.evaluate(pathFull, doc);
-	}
-	
-	public boolean sendPostSoap(String urlWebServices, String method, String host, String getEncodeXML, Proxy proxy){
-		try {
-			URL oURL = new URL(urlWebServices);
-			HttpURLConnection con = (HttpURLConnection) oURL.openConnection(proxy);
-			con.setDoOutput(true);
-			con.setRequestMethod(method);
-			con.setRequestProperty("Content-type", "text/xml; charset=utf-8");
-			con.setRequestProperty("SOAPAction", "");
-			con.setRequestProperty("Host", host);
-			OutputStream reqStreamOut = con.getOutputStream();
-			reqStreamOut.write(getEncodeXML.getBytes());
-			java.io.BufferedReader rd = new java.io.BufferedReader(new
-			java.io.InputStreamReader(con.getInputStream(), "UTF8"));
-			String line = "";
-			StringBuilder sb = new StringBuilder();
-			while ((line = rd.readLine()) != null){
-				sb.append(line);
-			}
-			getEstadoPostSoap(XML_Utilidades.convertStringToDocument(sb.toString()), "RespuestaRecepcionComprobante", "estado");//estÃ¡ extrae la data de los nodos en un archivo XML
-			con.disconnect();
-			return true;
-			
-		}catch (Exception ex) {
-			System.out.println(ex.getMessage());
-		}
-		return false;
-	}
-	
-	public boolean getEstadoPostSoap(Document doc, String nodoRaiz, String nodoElemento){
-		String estado = XML_Utilidades.getNodes(nodoRaiz, nodoElemento, doc);
-		boolean respuesta = Boolean.FALSE;
-		if(estado.equals("DEVUELTA")){
-			System.out.println("Clave de Accceso: " + XML_Utilidades.getNodes("comprobante","claveAcceso", doc));
-			System.out.println("Identificador Error: " + XML_Utilidades.getNodes("mensaje","identificador", doc));
-			System.out.println("DescripciÃ³n Error: " + XML_Utilidades.getNodes("mensaje","mensaje",	doc));
-			System.out.println("DescripciÃ³n Adicional Error: " + XML_Utilidades.getNodes("mensaje","informacionAdicional", doc));
-			System.out.println("Tipo mensaje: " + XML_Utilidades.getNodes("mensaje","tipo", doc));
-			respuesta = Boolean.FALSE;
-		}else if(estado.equals("RECIBIDA")){
-			System.out.println("RECIBIDA");
-			respuesta = Boolean.TRUE;
-		}
-		return respuesta;
 	}
 	
 	public void setCuentasDataManager(CuentasDataManager cuentasDataManager) {
