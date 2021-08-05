@@ -69,6 +69,7 @@ import ec.com.erp.cliente.mdl.dto.SecuenciaDTO;
 import ec.com.erp.cliente.mdl.dto.VendedorDTO;
 import ec.com.erp.cliente.mdl.dto.id.FacturaCabeceraID;
 import ec.com.erp.facturacion.electronica.ws.FacturaElectronocaUtil;
+import ec.com.erp.facturacion.electronica.ws.NotaVentaUtil;
 import ec.com.erp.utilitario.commons.util.HtmlPdf;
 import ec.com.erp.web.commons.controller.CommonsController;
 import ec.com.erp.web.commons.controller.MensajesController;
@@ -337,9 +338,9 @@ public class CuentasController extends CommonsController implements Serializable
 	public void seleccionarTipoRuc(ValueChangeEvent e) {
 		String tipoRuc = (String)e.getNewValue();
 		if(tipoRuc.equals(ERPConstantes.TIPO_RUC_DOS)) {
-			SecuenciaDTO secuenciaPedido = ERPFactory.secuencias.getSecuenciaServicio().findObtenerSecuenciaByNombre(FacturaCabeceraID.NOMBRE_SECUENCIA_FACTURA_RUC_UNO);
-			String numeroFactura = ValidationUtils.obtenerSecuencialFactura(5, String.valueOf(secuenciaPedido.getValorSecuencia()));
-			this.facturaCabeceraDTO.setNumeroDocumento(numeroFactura);
+//			SecuenciaDTO secuenciaPedido = ERPFactory.secuencias.getSecuenciaServicio().findObtenerSecuenciaByNombre(FacturaCabeceraID.NOMBRE_SECUENCIA_FACTURA_RUC_UNO);
+//			String numeroFactura = ValidationUtils.obtenerSecuencialFactura(5, String.valueOf(secuenciaPedido.getValorSecuencia()));
+//			this.facturaCabeceraDTO.setNumeroDocumento(numeroFactura);
 			this.tipoRuc = "1";
 		}else {
 			this.facturaCabeceraDTO.setNumeroDocumento("");
@@ -796,7 +797,7 @@ public class CuentasController extends CommonsController implements Serializable
 	 */
 	private Boolean validarInformacionRequerida() {
 		Boolean valido = Boolean.TRUE;
-		if(StringUtils.isEmpty(this.facturaCabeceraDTO.getNumeroDocumento())) {
+		if(this.facturaCabeceraDTO.getCodigoValorTipoDocumento().equals(ERPConstantes.CODIGO_CATALOGO_VALOR_DOCUMENTO_NOTA_VENTA) && StringUtils.isEmpty(this.facturaCabeceraDTO.getNumeroDocumento())) {
 			valido = Boolean.FALSE;
 			MensajesController.addError(null, ERPWebResources.getString("ec.com.erp.etiqueta.mensaje.campo.requerido.numero.factura"));
 		}
@@ -1007,13 +1008,17 @@ public class CuentasController extends CommonsController implements Serializable
 			if(this.cuentasDataManager.getTipoFactura().equals(ERPConstantes.CODIGO_CATALOGO_VALOR_DOCUMENTO_COMPRAS)) {
 				if(facturaDetalleDTO.getCantidad() != null && facturaDetalleDTO.getValorUnidad() != null && facturaDetalleDTO.getArticuloDTO() != null && facturaDetalleDTO.getArticuloDTO().getCosto() != null && facturaDetalleDTO.getValorUnidad().doubleValue() < facturaDetalleDTO.getArticuloDTO().getCosto().doubleValue()) {
 					totalDescuentos = ValidationUtils.redondear(totalDescuentos.add(BigDecimal.valueOf(facturaDetalleDTO.getArticuloDTO().getCosto().subtract(facturaDetalleDTO.getValorUnidad()).doubleValue()*facturaDetalleDTO.getCantidad())), 4);
+					facturaDetalleDTO.setDescuento(ValidationUtils.redondear(BigDecimal.valueOf(facturaDetalleDTO.getArticuloDTO().getCosto().subtract(facturaDetalleDTO.getValorUnidad()).doubleValue()*facturaDetalleDTO.getCantidad()), 4));
 				}
 			}else {
-				if(facturaDetalleDTO.getCantidad() != null && facturaDetalleDTO.getValorUnidad() != null && facturaDetalleDTO.getArticuloDTO() != null && facturaDetalleDTO.getArticuloDTO().getPrecio() != null && facturaDetalleDTO.getValorUnidad().doubleValue() < facturaDetalleDTO.getArticuloDTO().getPrecio().doubleValue()) {
-					if(this.clienteDTO.getCodigoValorTipoCompra() != null && this.clienteDTO.getCodigoValorTipoCompra().equals(ERPConstantes.CODIGO_CATALOGO_VALOR_CLIENTE_MINORISTA)) {
+				if(facturaDetalleDTO.getCantidad() != null && facturaDetalleDTO.getValorUnidad() != null && facturaDetalleDTO.getArticuloDTO() != null && facturaDetalleDTO.getArticuloDTO().getPrecio() != null && facturaDetalleDTO.getArticuloDTO().getPrecioMinorista() != null) {
+					if(this.clienteDTO.getCodigoValorTipoCompra() != null && this.clienteDTO.getCodigoValorTipoCompra().equals(ERPConstantes.CODIGO_CATALOGO_VALOR_CLIENTE_MINORISTA)  && facturaDetalleDTO.getValorUnidad().doubleValue() < facturaDetalleDTO.getArticuloDTO().getPrecioMinorista().doubleValue()) {
 						totalDescuentos = ValidationUtils.redondear(totalDescuentos.add(BigDecimal.valueOf(facturaDetalleDTO.getArticuloDTO().getPrecioMinorista().subtract(facturaDetalleDTO.getValorUnidad()).doubleValue()*facturaDetalleDTO.getCantidad())), 4);
-					}else {
+						facturaDetalleDTO.setDescuento(ValidationUtils.redondear(BigDecimal.valueOf(facturaDetalleDTO.getArticuloDTO().getPrecioMinorista().subtract(facturaDetalleDTO.getValorUnidad()).doubleValue()*facturaDetalleDTO.getCantidad()), 4));
+					}
+					if(this.clienteDTO.getCodigoValorTipoCompra() != null && this.clienteDTO.getCodigoValorTipoCompra().equals(ERPConstantes.CODIGO_CATALOGO_VALOR_CLIENTE_MAYORISTA)  && facturaDetalleDTO.getValorUnidad().doubleValue() < facturaDetalleDTO.getArticuloDTO().getPrecio().doubleValue()) {
 						totalDescuentos = ValidationUtils.redondear(totalDescuentos.add(BigDecimal.valueOf(facturaDetalleDTO.getArticuloDTO().getPrecio().subtract(facturaDetalleDTO.getValorUnidad()).doubleValue()*facturaDetalleDTO.getCantidad())), 4);
+						facturaDetalleDTO.setDescuento(ValidationUtils.redondear(BigDecimal.valueOf(facturaDetalleDTO.getArticuloDTO().getPrecio().subtract(facturaDetalleDTO.getValorUnidad()).doubleValue()*facturaDetalleDTO.getCantidad()), 4));
 					}
 				}
 			}
@@ -1833,7 +1838,9 @@ public class CuentasController extends CommonsController implements Serializable
 				//HashMap<String , String> parametros = new HashMap<String, String>();
 //				byte contenido[] = htmltoPDF.convertir(ERPFactory.facturas.getFacturaCabeceraServicio().finObtenerXMLImprimirFacturaVenta(facturaCabeceraDTO).replace("<?xml version=\"1.0\" encoding=\"UTF-8\"?>", ""), "", "",	parametros,	null);
 //				byte[] contenido = ERPFactory.facturas.getFacturaCabeceraServicio().findObtenerNotaVenta(facturaCabeceraDTO);
-				byte[] contenido = FacturaElectronocaUtil.getReporte(null);
+//				byte[] xmlDocument = ERPFactory.facturas.getFacturaCabeceraServicio().findObtenerXmlDocumentoFactura(ERPConstantes.CODIGO_COMPANIA, this.facturaCabeceraDTO.getId().getCodigoFactura());
+//				byte[] contenido = FacturaElectronocaUtil.getReporte(xmlDocument);
+				byte[] contenido = NotaVentaUtil.generarNotaVenta(facturaCabeceraDTO);
 				UtilitarioWeb.mostrarPDF(contenido);
 			}
 		} catch (Exception e) {

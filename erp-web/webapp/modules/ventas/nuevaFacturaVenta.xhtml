@@ -32,8 +32,8 @@
 					   	<a4j:ajax event="click" execute="@this" render="pnlGridVentas"></a4j:ajax>
 					</h:selectOneRadio>
 					<h:outputText value="" />
-					<h:outputText class="styleNegritas" value="Tipo de RUC: *" />
-					<h:selectOneRadio value="#{cuentasController.facturaCabeceraDTO.tipoRuc}" valueChangeListener="#{cuentasController.seleccionarTipoRuc}">
+					<h:outputText rendered="#{cuentasController.facturaCabeceraDTO.codigoValorTipoDocumento eq 'VEN'}" class="styleNegritas" value="Tipo de RUC: *" />
+					<h:selectOneRadio rendered="#{cuentasController.facturaCabeceraDTO.codigoValorTipoDocumento eq 'VEN'}" value="#{cuentasController.facturaCabeceraDTO.tipoRuc}" valueChangeListener="#{cuentasController.seleccionarTipoRuc}">
 					   	<f:selectItem itemValue="FA1" itemLabel="RUC: 1001594132001" />
 					   	<f:selectItem itemValue="FA2" itemLabel="RUC: 1003635263001" />
 					   	<a4j:ajax event="click" execute="@this" render="pnlGridVentas"></a4j:ajax>
@@ -45,14 +45,16 @@
 				<h:panelGrid id="pnlGridVentas" columns="11" cellspacing="0" cellpadding="2">
 					<h:outputText class="styleNegritas" value="#{msg_erpweb['ec.com.erp.etiqueta.label.lista.cabecera.factura.referencia.factura']}: *" />
 					<h:inputText style="width:150px" value="#{cuentasController.facturaCabeceraDTO.codigoReferenciaFactura}" id="refDocumentoFac" disabled="true"/>
-					<h:outputText value="" />
-					<div style="width: 30px"></div>
-					<h:outputText class="styleNegritas" value="#{msg_erpweb['ec.com.erp.etiqueta.label.lista.cabecera.factura.numero.factura']}: *" />
-					<h:inputText style="width:150px" disabled="#{cuentasController.facturaCabeceraDTO.tipoRuc == 'FA2'}" value="#{cuentasController.facturaCabeceraDTO.numeroDocumento}" id="nroDocumentoFac" maxlength="13" onkeypress="if (event.keyCode == 13) return false;"/>
-					<h:outputText value="" />
+					<h:outputText value=""/>
 					<div style="width: 30px"></div>
 					<h:outputText class="styleNegritas" value="#{msg_erpweb['ec.com.erp.etiqueta.label.lista.cabecera.factura.fecha']}: *" />
 					<rich:calendar value="#{cuentasController.facturaCabeceraDTO.fechaDocumento}" datePattern="yyyy-MM-dd"></rich:calendar>
+					<h:outputText value="" />
+					<div style="width: 30px"></div>
+					<h:outputText class="styleNegritas" rendered="#{cuentasController.facturaCabeceraDTO.codigoValorTipoDocumento eq 'NTV'}" value="#{msg_erpweb['ec.com.erp.etiqueta.label.lista.cabecera.factura.numero.factura']}: *" />
+					<h:inputText style="width:150px" rendered="#{cuentasController.facturaCabeceraDTO.codigoValorTipoDocumento eq 'NTV'}" value="#{cuentasController.facturaCabeceraDTO.numeroDocumento}" id="nroDocumentoFac" maxlength="13" onkeypress="if (event.keyCode == 13) return false;"/>
+					<h:outputText rendered="#{cuentasController.facturaCabeceraDTO.codigoValorTipoDocumento eq 'VEN'}" value="" />
+					<h:outputText rendered="#{cuentasController.facturaCabeceraDTO.codigoValorTipoDocumento eq 'VEN'}" value="" />
 					<h:outputText value="" />
 					
 					<h:outputText class="styleNegritas" value="#{msg_erpweb['ec.com.erp.etiqueta.label.lista.cabecera.factura.ruc.documento']}: *" />
@@ -687,6 +689,10 @@
 		<h:outputStylesheet>
 			textarea[disabled], input[type="text"][disabled], input[type="password"][disabled], select[disabled] {
 			    color: #000000 !important; 
+			}
+			
+			.rf-cal-inp{
+				width: 150px;
 			}
 			
 			.estiloColumnaDetalle{
