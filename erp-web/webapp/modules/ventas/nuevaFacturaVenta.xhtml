@@ -493,7 +493,7 @@
 			</h:panelGrid>
 		</rich:popupPanel>
 		
-		
+		<a4j:jsFunction name="imprimirDocumento" actionListener="#{cuentasController.imprimirFacturaImpresora}" execute="@this" render="pnlGridVentas, pnlGridDetalleFactura, pnlMensajes"></a4j:jsFunction>
 		<a4j:jsFunction name="refrescarPantallaPopUp" action="#{cuentasController.calcularValoresArticulo}" execute="pnlGridAgregarDetalle" render="pnlGridAgregarDetalle"></a4j:jsFunction>
 		
 		<!-- Popup para confirmar que se guardo el documento -->
@@ -518,7 +518,7 @@
 			<!-- Botones de PopUp -->
 			<h:panelGrid style="margin:auto; padding-top: 5px;" columns="3" cellpadding="0" cellspacing="0">
 				<h:panelGroup layout="block" styleClass="botonD" style="margin-top:5px;margin-right:20px;">
-					<a4j:commandLink styleClass="aceptarD" render="pnlMensajes mpOpcionesImpresion" oncomplete="#{rich:component('mpOpcionesImpresion')}.show(); #{rich:component('mpConfirmacion')}.hide(); return false;" execute="@this" actionListener="#{cuentasController.simularEvento}">
+					<a4j:commandLink styleClass="aceptarD" render="pnlMensajes mpOpcionesImpresion" oncomplete="imprimirDocumento(); #{rich:component('mpConfirmacion')}.hide(); return false;" execute="@this" actionListener="#{cuentasController.simularEvento}">
 						<h:panelGrid columns="2" cellpadding="3" cellspacing="0">
 							<h:graphicImage name="btnImprimir.png" library="images" style="border:none;border-color:white;" height="16" width="16"/>
 							<h:outputText value="Imprimir" />
@@ -546,45 +546,7 @@
 			</h:panelGrid>
 		</rich:popupPanel>
 		
-		<!-- Popup para confirmar que se guardo el documento -->
-		<rich:popupPanel id="mpOpcionesImpresion" header="Seleccione el facturero" width="350" height="170" modal="true" domElementAttachment="form">
-			<f:facet name="controls">
-				<h:outputLink value="#"	onclick="#{rich:component('mpOpcionesImpresion')}.hide();">
-					<h:graphicImage library="images" name="close.png" style="border:0px"/>
-				</h:outputLink>
-			</f:facet>
-			
-			<rich:panel style="height: 94%">
-				<h:panelGrid id="tipoFactura" columns="1">
-					<h:selectOneRadio value = "#{cuentasController.tipoRuc}" layout="pageDirection"> 
-					   <f:selectItem itemValue = "0" itemLabel = "Factura con RUC: 1001594132001" />
-					   <f:selectItem itemValue = "1" itemLabel = "Factura con RUC: 1003635263001" /> 
-					   <f:selectItem itemValue = "3" itemLabel = "Nota de venta" /> 
-					</h:selectOneRadio>   
-				</h:panelGrid>
-		    </rich:panel>
-			
-			<!-- Botones de PopUp -->
-			<h:panelGrid style="margin:auto; padding-top: 5px;" columns="3" cellpadding="0" cellspacing="0">
-				<h:panelGroup layout="block" styleClass="botonD" style="margin-top:5px;margin-right:20px;">
-					<a4j:commandLink styleClass="aceptarD" render="pnlGridVentas, pnlGridDetalleFactura, pnlMensajes" actionListener="#{cuentasController.imprimirFacturaImpresora}" oncomplete="#{rich:component('mpOpcionesImpresion')}.hide(); return false;" execute="tipoFactura">
-						<h:panelGrid columns="2" cellpadding="3" cellspacing="0">
-							<h:graphicImage name="btnImprimir.png" library="images" style="border:none;border-color:white;" height="16" width="16"/>
-							<h:outputText value="Imprimir" />
-						</h:panelGrid>
-					</a4j:commandLink>
-				</h:panelGroup>
-			
-				<h:panelGroup layout="block" styleClass="botonD" style="margin-top:5px;">
-					<a4j:commandLink  styleClass="cancelarD" action="#{cuentasController.regresarBusquedaFacturasVentas}" oncomplete="#{rich:component('mpOpcionesImpresion')}.hide(); return false;" immediate="true">
-						<h:panelGrid columns="2" cellpadding="3" cellspacing="0">
-							<h:graphicImage name="btnCancel.png" library="images" style="border:none;border-color:white;" height="16" width="16"/>
-							<h:outputText value="Cerrar" />
-						</h:panelGrid>
-					</a4j:commandLink>
-				</h:panelGroup>
-			</h:panelGrid>
-		</rich:popupPanel>
+		
 	
 		<script type="text/javascript">
 			/*<![CDATA[*/			

@@ -520,6 +520,11 @@ body {
     width: 45px;
 }
 
+.botonComun a.botonGuardarSri {
+    background-image: url("#{resource['images/facturacion.png']}");
+    width: 45px;
+}
+
 .botonComun a.botonBuscar {
     background-image: url("#{resource['images/btnBuscar.png']}");
     width: 45px;

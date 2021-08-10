@@ -94,7 +94,7 @@
 	                <f:facet name="header"><h:outputText title="#{msg_erpweb['ec.com.erp.etiqueta.label.lista.cabecera.factura.referencia.documento']}" value="#{msg_erpweb['ec.com.erp.etiqueta.label.lista.cabecera.factura.refedoc.abreviado']}"/></f:facet>
 	                <h:outputText value="#{cuenta.codigoReferenciaFactura}" />
 	            </rich:column-->
-	            <rich:column width="100px">
+	            <rich:column width="110px">
 	                <f:facet name="header"><h:outputText value="Nro. Documento"/></f:facet>
 	                <h:outputText value="#{cuenta.numeroDocumento}" />
 	            </rich:column>
@@ -560,7 +560,7 @@
 		</rich:popupPanel>
 		
 		<!-- Popup para confirmar que se guardo el documento -->
-		<rich:popupPanel id="mpOpcionesImpresion" header="Seleccione el facturero" width="350" height="170" modal="true" domElementAttachment="form">
+		<rich:popupPanel id="mpOpcionesImpresion" header="Imprimir documento" width="350" height="145" modal="true" domElementAttachment="form">
 			<f:facet name="controls">
 				<h:outputLink value="#"	onclick="#{rich:component('mpOpcionesImpresion')}.hide();">
 					<h:graphicImage library="images" name="close.png" style="border:0px"/>
@@ -568,12 +568,9 @@
 			</f:facet>
 			
 			<rich:panel style="height: 94%">
-				<h:panelGrid id="tipoFactura" columns="1">
-					<h:selectOneRadio value = "#{cuentasController.tipoRuc}" layout="pageDirection"> 
-					   <f:selectItem itemValue = "0" itemLabel = "Factura con RUC: 1001594132001" />
-					   <f:selectItem itemValue = "1" itemLabel = "Factura con RUC: 1003635263001" /> 
-					   <f:selectItem itemValue = "3" itemLabel = "Nota de venta" /> 
-					</h:selectOneRadio>   
+				<h:panelGrid id="tipoFactura" columns="2">
+					<h:graphicImage name="info.png" library="images" style="border:none;border-color:white; padding-right:10px" height="32" width="32"/>
+					<h:outputText value="Para imprimir el documento presione sobre el botón imprimir caso contrario presione cancelar" />
 				</h:panelGrid>
 		    </rich:panel>
 			
