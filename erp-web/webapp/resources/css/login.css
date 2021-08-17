@@ -903,6 +903,33 @@ body {
 	text-transform: uppercase !important;
 }
 
+.styleInputPlaceVentas{
+	border: 1px solid #bed6f8;
+    height: 20px;
+    width: 120px;
+    padding-top: 3px;
+    font-size: 14px;
+    background-color: #f1f6fe;
+}
+
+.styleInputPlaceVentas .rf-ii-chng{
+	height: 20px !important;
+	border: 1px solid #bed6f8;
+    height: 20px;
+    width: 120px;
+    padding-top: 3px;
+    font-size: 14px;
+    background-color: #f1f6fe;
+    text-transform: uppercase !important;
+}
+
+
+.styleInputPlaceVentas .rf-ii-fld{
+	height: 23px !important;
+	background-color: #f1f6fe;
+	text-transform: uppercase !important;
+}
+
 
 .styleClean a:hover {
 	background-image: url("#{resource['images/limpiar.png']}");

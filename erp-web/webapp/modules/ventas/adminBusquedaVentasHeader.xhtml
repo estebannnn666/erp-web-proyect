@@ -26,6 +26,12 @@
 			</h:panelGroup>
 		</rich:toolbarGroup>
 		
+		<rich:toolbarGroup>
+			<h:panelGroup layout="block" styleClass="botonComun">
+				<a4j:commandLink value="Actualizar" execute="@this" render="pnlMensajes panelCuentasTabla" styleClass="botonUpload" actionListener="#{cuentasController.actualizarFacturasFireBase}"/>
+			</h:panelGroup>
+		</rich:toolbarGroup>
+		
 		<rich:toolbarGroup>	
 			<h:panelGroup layout="block" styleClass="botonComun">
 				<a4j:commandLink value="#{msg_erpweb['ec.com.erp.etiqueta.boton.menu']}" styleClass="botonPanel" action="#{cuentasController.regresarMenuPrincipal}"/>

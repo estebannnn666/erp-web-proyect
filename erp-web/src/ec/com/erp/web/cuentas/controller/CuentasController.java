@@ -128,6 +128,7 @@ public class CuentasController extends CommonsController implements Serializable
 	private String nombreVendedorBusqueda;
 	private String documentoClienteBusqueda;
 	private String nombreClienteBusqueda;
+	private String documentoVendedorBusqueda;
 	private String nombreVendedor;
 	private Collection<String> tiposDocumentos;
 	private Long codigoVendedor;
@@ -298,6 +299,26 @@ public class CuentasController extends CommonsController implements Serializable
 		} catch (Exception e2) {
 			this.setShowMessagesBar(Boolean.TRUE);
 			MensajesController.addError(null, "Error al descargar facturas de dispositivos moviles, "+e2.getMessage());
+		}
+	}
+	
+	/**
+	 * Metodo para descargar facturas de fire base
+	 * @param e
+	 */
+	public void actualizarFacturasFireBase(ActionEvent e){
+		try {
+			System.out.println("Ingreso a actualizar facturas con fire base");
+			ERPFactory.firebase.getFireBaseServicio().findActualizarPagoFacturas();	
+			this.setShowMessagesBar(Boolean.TRUE);
+			MensajesController.addInfo(null, "Se ha terminado de actualizar la informacion de facturas de los dispositivos moviles");
+			System.out.println("Finalizo proceso con fire base");
+		} catch (ERPException e1) {
+			this.setShowMessagesBar(Boolean.TRUE);
+			MensajesController.addError(null, "Error al actualizar facturas en dispositivos moviles, "+e1.getMessage() );
+		} catch (Exception e2) {
+			this.setShowMessagesBar(Boolean.TRUE);
+			MensajesController.addError(null, "Error al actualizar facturas en dispositivos moviles, "+e2.getMessage());
 		}
 	}
 	
@@ -621,6 +642,17 @@ public class CuentasController extends CommonsController implements Serializable
 	 */
 	public void buscarFacturas(String tipoFactura){
 		try {
+			Long codigoVendedorBuscado = this.codigoVendedor;
+			if(this.codigoVendedor == null && StringUtils.isNotBlank(documentoVendedorBusqueda)){
+				this.vendedorDTOCols = ERPFactory.vendedor.getVendedorServicio().findObtenerListaVendedores(Integer.parseInt(ERPConstantes.ESTADO_ACTIVO_NUMERICO), this.documentoVendedorBusqueda, null);
+				if(CollectionUtils.isNotEmpty(this.vendedorDTOCols) && this.vendedorDTOCols.size() == 1){
+					codigoVendedorBuscado = this.vendedorDTOCols.iterator().next().getId().getCodigoVendedor();
+				}else {
+					codigoVendedorBuscado = 0L;
+				}
+			}
+			
+			
 			Calendar fechaInicio = Calendar.getInstance();
 			Calendar fechaFin = Calendar.getInstance();
 			fechaInicio.setTime(fechaFacturaInicio);
@@ -628,7 +660,6 @@ public class CuentasController extends CommonsController implements Serializable
 			UtilitarioWeb.cleanDate(fechaInicio);
 			UtilitarioWeb.cleanDate(fechaFin);
 			fechaFin.add(Calendar.DATE, 1);
-			
 			if(this.pagadoBusqueda != null && this.pagadoBusqueda.length > 0){
 				if(this.pagadoBusqueda.length == 2) {
 					this.pagado = null; 
@@ -643,7 +674,7 @@ public class CuentasController extends CommonsController implements Serializable
 				this.pagado = null; 
 			}
 			
-			this.facturaCabeceraDTOCols = ERPFactory.facturas.getFacturaCabeceraServicio().findObtenerListaFacturas(Integer.parseInt(ERPConstantes.ESTADO_ACTIVO_NUMERICO), numeroFactura, new Timestamp(fechaInicio.getTime().getTime()), new Timestamp(fechaFin.getTime().getTime()), docClienteProveedor, nombClienteProveedor, pagado, tiposDocumentos, this.codigoVendedor);
+			this.facturaCabeceraDTOCols = ERPFactory.facturas.getFacturaCabeceraServicio().findObtenerListaFacturas(Integer.parseInt(ERPConstantes.ESTADO_ACTIVO_NUMERICO), numeroFactura, new Timestamp(fechaInicio.getTime().getTime()), new Timestamp(fechaFin.getTime().getTime()), docClienteProveedor, nombClienteProveedor, pagado, tiposDocumentos, codigoVendedorBuscado);
 			if(CollectionUtils.isEmpty(this.facturaCabeceraDTOCols)){
 				this.setShowMessagesBar(Boolean.TRUE);
 				FacesMessage msg = new FacesMessage("No se encontraron resultados para la b\u00FAsqueda realizada.", "ERROR MSG");
@@ -798,16 +829,47 @@ public class CuentasController extends CommonsController implements Serializable
 	}
 	
 	/**
+	 * Metodo para firmar enviar y autorizar facturas
+	 * @param e
+	 */
+	public void enviarFirmarAutorizar(ActionEvent e){
+		try {
+			byte[] xmlDocument = ERPFactory.facturas.getFacturaCabeceraServicio().findObtenerXmlDocumentoFactura(ERPConstantes.CODIGO_COMPANIA, this.facturaCabeceraDTO.getId().getCodigoFactura());
+			if(xmlDocument == null){
+				ERPFactory.facturas.getFacturaCabeceraServicio().transEnviarFirmarAutorizar(this.facturaCabeceraDTO);
+			    MensajesController.addInfo(null, ERPWebResources.getString("ec.com.erp.etiqueta.mensaje.informacion.factura.electrinoca"));
+			    this.facturaCabeceraDTOCols = ERPFactory.facturas.getFacturaCabeceraServicio().findObtenerListaFacturas(Integer.parseInt(ERPConstantes.ESTADO_ACTIVO_NUMERICO), numeroFactura, null, null, docClienteProveedor, nombClienteProveedor, pagado, tiposDocumentos, this.codigoVendedor);
+			}else{
+		        MensajesController.addError(null, ERPWebResources.getString("ec.com.erp.etiqueta.mensaje.informacion.factura.creada"));
+			}
+			this.setShowMessagesBar(Boolean.TRUE);
+		} catch (ERPException e1) {
+			this.setShowMessagesBar(Boolean.TRUE);
+			MensajesController.addError(null, e1.getMessage());
+		} catch (Exception e2) {
+			this.setShowMessagesBar(Boolean.TRUE);
+			MensajesController.addError(null, e2.getMessage());
+		}
+	}
+	
+	
+	/**
 	 * Metodo para cancelar factura ventas
 	 * @param e
 	 */
 	public void cancelarFacturasVentas(ActionEvent e){
 		try {
-			ERPFactory.facturas.getFacturaCabeceraServicio().transCancelarFacturaInactivar(this.facturaCabeceraDTO);
-			String tipoFactura = ERPConstantes.CODIGO_CATALOGO_VALOR_DOCUMENTO_VENTAS;
-			this.buscarFacturas(tipoFactura);
+			byte[] xmlDocument = ERPFactory.facturas.getFacturaCabeceraServicio().findObtenerXmlDocumentoFactura(ERPConstantes.CODIGO_COMPANIA, this.facturaCabeceraDTO.getId().getCodigoFactura());
+			if(xmlDocument == null){
+				ERPFactory.facturas.getFacturaCabeceraServicio().transCancelarFacturaInactivar(this.facturaCabeceraDTO);
+				String tipoFactura = ERPConstantes.CODIGO_CATALOGO_VALOR_DOCUMENTO_VENTAS;
+				this.buscarFacturas(tipoFactura);
+		        MensajesController.addInfo(null, ERPWebResources.getString("ec.com.erp.etiqueta.mensaje.informacion.cancelacion"));
+			}else{
+		        MensajesController.addError(null, ERPWebResources.getString("ec.com.erp.etiqueta.mensaje.error.cancelacion"));
+			}
+
 			this.setShowMessagesBar(Boolean.TRUE);
-	        MensajesController.addInfo(null, ERPWebResources.getString("ec.com.erp.etiqueta.mensaje.informacion.cancelacion"));
 		} catch (ERPException e1) {
 			this.setShowMessagesBar(Boolean.TRUE);
 			MensajesController.addError(null, e1.getMessage());
@@ -951,6 +1013,7 @@ public class CuentasController extends CommonsController implements Serializable
 		this.documentoClienteBusqueda = null;
 		this.nombreClienteBusqueda = null;
 		this.nombreVendedor = null;
+		this.documentoVendedorBusqueda = null;
 		this.facturaCabeceraDTO = new FacturaCabeceraDTO();
 		this.facturaDetalleDTO = new FacturaDetalleDTO();
 		this.cuentasDataManager.setFacturaCabeceraDTOEditar(new FacturaCabeceraDTO());
@@ -1673,6 +1736,11 @@ public class CuentasController extends CommonsController implements Serializable
 		this.setShowMessagesBar(Boolean.FALSE);
 	}
 	
+	public void borrarBusquedaVendedor(ActionEvent e){
+		this.documentoVendedorBusqueda = "";
+		this.setShowMessagesBar(Boolean.FALSE);
+	}
+	
 	/**
 	 * Metodo para imprimir lista de facturas
 	 */
@@ -1715,6 +1783,8 @@ public class CuentasController extends CommonsController implements Serializable
 	public void imprimirFacturaImpresora(ActionEvent e){
 		try {
 			boolean ban = true;
+			Collection<FacturaDetalleDTO> detallesCompletos = this.facturaCabeceraDTO.getFacturaDetalleDTOCols().stream().filter(detail -> detail.getCodigoArticulo() != null && detail.getId().getCodigoDetalleFactura() != null).collect(Collectors.toList());
+			this.facturaCabeceraDTO.setFacturaDetalleDTOCols(detallesCompletos);
 			for(FacturaDetalleDTO detalle : this.facturaCabeceraDTO.getFacturaDetalleDTOCols()) {
 				if(detalle == null || detalle.getCantidad() == null) {
 					ban = false;
@@ -1758,9 +1828,9 @@ public class CuentasController extends CommonsController implements Serializable
 				//HashMap<String , String> parametros = new HashMap<String, String>();
 //				byte contenido[] = htmltoPDF.convertir(ERPFactory.facturas.getFacturaCabeceraServicio().finObtenerXMLImprimirFacturaVenta(facturaCabeceraDTO).replace("<?xml version=\"1.0\" encoding=\"UTF-8\"?>", ""), "", "",	parametros,	null);
 //				byte[] contenido = ERPFactory.facturas.getFacturaCabeceraServicio().findObtenerNotaVenta(facturaCabeceraDTO);
-				byte[] xmlDocument = ERPFactory.facturas.getFacturaCabeceraServicio().findObtenerXmlDocumentoFactura(ERPConstantes.CODIGO_COMPANIA, this.facturaCabeceraDTO.getId().getCodigoFactura());
-				byte[] contenido = FacturaElectronocaUtil.imprimirFacturaFormato(xmlDocument);
-//				byte[] contenido = NotaVentaUtil.generarNotaVenta(facturaCabeceraDTO);
+//				byte[] xmlDocument = ERPFactory.facturas.getFacturaCabeceraServicio().findObtenerXmlDocumentoFactura(ERPConstantes.CODIGO_COMPANIA, this.facturaCabeceraDTO.getId().getCodigoFactura());
+//				byte[] contenido = FacturaElectronocaUtil.imprimirFacturaFormato(xmlDocument);
+				byte[] contenido = NotaVentaUtil.generarNotaVenta(facturaCabeceraDTO);
 				UtilitarioWeb.mostrarPDF(contenido);
 			}
 		} catch (Exception e) {
@@ -2142,5 +2212,13 @@ public class CuentasController extends CommonsController implements Serializable
 
 	public void setCrearFacturaElectronica(Boolean crearFacturaElectronica) {
 		this.crearFacturaElectronica = crearFacturaElectronica;
+	}
+
+	public String getDocumentoVendedorBusqueda() {
+		return documentoVendedorBusqueda;
+	}
+
+	public void setDocumentoVendedorBusqueda(String documentoVendedorBusqueda) {
+		this.documentoVendedorBusqueda = documentoVendedorBusqueda;
 	}
 }

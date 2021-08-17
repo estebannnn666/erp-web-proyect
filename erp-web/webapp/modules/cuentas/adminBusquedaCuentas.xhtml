@@ -27,14 +27,14 @@
 		<rich:panel id="panel-content-left" styleClass="panel-content-left" style="width:100% !important;">
 			<f:facet name="header">			
 				<h:panelGrid columns="2" width="99.9%" columnClasses="align-left, align-right" cellpadding="0" cellspacing="0">
-					<h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.criterios.busqueda']}" style="white-space:nowrap" />
+					<h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.criterios.busqueda']} por" style="white-space:nowrap" />
 				</h:panelGrid>
 			</f:facet>		
 		
 			<h:panelGroup id="filtrosVentas" layout="block" styleClass="listaReporte">
-				<h:panelGrid columns="6" width="90%" cellpadding="0" cellspacing="2">
-					<h:panelGrid width="47%" columns="2" columnClasses="columnaIzquierda, columnaDerecha">
-			    	   	<rich:inplaceInput id="numeroFacturaBusqueda" value="#{cuentasController.numeroFactura}" styleClass="styleInputPlaceMediano" defaultLabel="#{msg_erpweb['ec.com.erp.etiqueta.label.lista.busqueda.factura.numero.factura']}">
+				<h:panelGrid columns="7" width="90%" cellpadding="0" cellspacing="2">
+					<h:panelGrid width="37%" columns="2" columnClasses="columnaIzquierda, columnaDerecha">
+			    	   	<rich:inplaceInput id="numeroFacturaBusqueda" value="#{cuentasController.numeroFactura}" styleClass="styleInputPlaceVentas" defaultLabel="#{msg_erpweb['ec.com.erp.etiqueta.label.lista.busqueda.factura.numero.factura']}">
 			    	   		<a4j:ajax event="keyup" execute="filtrosVentas" listener="#{cuentasController.busquedaFacturasCuentasCobrarEnter}" onbeforesubmit="if (event.keyCode != 13)  return false;" render="panelCuentasTabla, tableCuentas, pnlMensajes"></a4j:ajax>
 			    	   	</rich:inplaceInput>
 			    	   	<h:panelGroup styleClass="styleClean">
@@ -42,8 +42,8 @@
 						</h:panelGroup>
 					</h:panelGrid>
 			    	
-			    	<h:panelGrid width="47%" columns="2" columnClasses="columnaIzquierda, columnaDerecha">
-			    	   	<rich:inplaceInput id="numDocumento" value="#{cuentasController.docClienteProveedor}" styleClass="styleInputPlaceMediano" defaultLabel="#{msg_erpweb['ec.com.erp.etiqueta.label.busqueda.pedidos.etiqueta.documento.cliente']}">
+			    	<h:panelGrid width="37%" columns="2" columnClasses="columnaIzquierda, columnaDerecha">
+			    	   	<rich:inplaceInput id="numDocumento" value="#{cuentasController.docClienteProveedor}" styleClass="styleInputPlaceVentas" defaultLabel="#{msg_erpweb['ec.com.erp.etiqueta.label.busqueda.pedidos.etiqueta.documento.cliente']}">
 			    	   		<a4j:ajax event="keyup" execute="filtrosVentas" listener="#{cuentasController.busquedaFacturasCuentasCobrarEnter}" onbeforesubmit="if (event.keyCode != 13)  return false;" render="panelCuentasTabla, tableCuentas, pnlMensajes"></a4j:ajax>
 			    	   	</rich:inplaceInput>
 			    	   	<h:panelGroup styleClass="styleClean">
@@ -51,12 +51,20 @@
 						</h:panelGroup>
 					</h:panelGrid>
 					
-					<h:panelGrid width="47%" columns="2" columnClasses="columnaIzquierda, columnaDerecha">
-			    	   	<rich:inplaceInput id="razonSocialBusqueda" value="#{cuentasController.nombClienteProveedor}" styleClass="styleInputPlaceMediano" defaultLabel="#{msg_erpweb['ec.com.erp.etiqueta.label.lista.busqueda.factura.razon.Social']}">
+					<h:panelGrid width="37%" columns="2" columnClasses="columnaIzquierda, columnaDerecha">
+			    	   	<rich:inplaceInput id="razonSocialBusqueda" value="#{cuentasController.nombClienteProveedor}" styleClass="styleInputPlaceVentas" defaultLabel="#{msg_erpweb['ec.com.erp.etiqueta.label.lista.busqueda.factura.razon.Social']}">
 			    	   		<a4j:ajax event="keyup" execute="filtrosVentas" listener="#{cuentasController.busquedaFacturasCuentasCobrarEnter}" onbeforesubmit="if (event.keyCode != 13)  return false;" render="panelCuentasTabla, tableCuentas, pnlMensajes"></a4j:ajax>
 			    	   	</rich:inplaceInput>
 			    	   	<h:panelGroup styleClass="styleClean">
 							<a4j:commandLink styleClass="guardarA" execute="@this" render="razonSocialBusqueda pnlMensajes" actionListener="#{cuentasController.borrarBusquedaClienteProveedor}"/>
+						</h:panelGroup>
+					</h:panelGrid>
+					<h:panelGrid width="37%" columns="2" columnClasses="columnaIzquierda, columnaDerecha" rendered="#{cuentasController.codigoVendedor == null}">
+			    	   	<rich:inplaceInput id="documentoVendedor" value="#{cuentasController.documentoVendedorBusqueda}" styleClass="styleInputPlaceVentas" defaultLabel="Cedula vendedor">
+			    	   		<a4j:ajax event="keyup" execute="filtrosVentas" listener="#{cuentasController.busquedaFacturasVentasEnter}" onbeforesubmit="if (event.keyCode != 13)  return false;" render="panelCuentasTabla, tableCuentas, pnlMensajes"></a4j:ajax>
+			    	   	</rich:inplaceInput>
+			    	   	<h:panelGroup styleClass="styleClean">
+							<a4j:commandLink styleClass="guardarA" execute="@this" render="documentoVendedor pnlMensajes" actionListener="#{cuentasController.borrarBusquedaVendedor}"/>
 						</h:panelGroup>
 					</h:panelGrid>
 					<rich:calendar inputStyle="width: 80px; height: 20px;" value="#{cuentasController.fechaFacturaInicio}" datePattern="yyyy-MM-dd"></rich:calendar>

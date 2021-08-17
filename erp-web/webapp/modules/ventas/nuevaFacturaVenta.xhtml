@@ -29,7 +29,7 @@
 					<h:selectOneRadio value="#{cuentasController.facturaCabeceraDTO.codigoValorTipoDocumento}" valueChangeListener="#{cuentasController.seleccionarTipoDocumento}">
 					   	<f:selectItem itemValue="VEN" itemLabel="FACTURA VENTA" />
 					   	<f:selectItem itemValue="NTV" itemLabel="NOTA DE VENTA" />
-					   	<a4j:ajax event="click" execute="@this" render="pnlGridVentas"></a4j:ajax>
+					   	<a4j:ajax event="click" execute="@this" render="pnlGridVentas pnlGridCliente"></a4j:ajax>
 					</h:selectOneRadio>
 					<h:outputText value="" />
 					<h:outputText rendered="#{cuentasController.facturaCabeceraDTO.codigoValorTipoDocumento eq 'VEN'}" class="styleNegritas" value="Tipo de RUC: *" />

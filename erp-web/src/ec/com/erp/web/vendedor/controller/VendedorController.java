@@ -4,6 +4,7 @@ package ec.com.erp.web.vendedor.controller;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
@@ -27,6 +28,7 @@ import ec.com.erp.cliente.common.factory.ERPFactory;
 import ec.com.erp.cliente.mdl.dto.ContactoDTO;
 import ec.com.erp.cliente.mdl.dto.PersonaDTO;
 import ec.com.erp.cliente.mdl.dto.VendedorDTO;
+import ec.com.erp.cliente.mdl.vo.ReporteVentasFacturasVO;
 import ec.com.erp.cliente.mdl.vo.ReporteVentasVO;
 import ec.com.erp.utilitario.commons.util.HtmlPdf;
 import ec.com.erp.web.commons.controller.CommonsController;
@@ -63,9 +65,11 @@ public class VendedorController extends CommonsController implements Serializabl
 	// Variables
 	private Collection<VendedorDTO> vendedorDTOCols;
 	private Collection<ReporteVentasVO> reporteVentasCols;
+	private Collection<ReporteVentasFacturasVO> reporteVentasFacturaCols;
 	private String numeroDocumentoBusqueda;
 	private String nombreVendedorBusqueda;
 	private Integer page;
+	private Integer currentPage;
 	private Boolean vendedorCreado;
 	private BigDecimal totalVentas;
 	private BigDecimal totalComision;
@@ -83,6 +87,16 @@ public class VendedorController extends CommonsController implements Serializabl
 	private String nombreCliente;
 	private Date fechaInicio;
 	private Date fechaFin;
+	private String tipoReporte;
+	private Long codigoVendedor;
+	private Boolean pagado;
+	private String[] pagadoBusqueda;
+	private BigDecimal totalSubTotal;
+	private BigDecimal totalSinImpuesto;
+	private BigDecimal totalImpuesto;
+	private BigDecimal totalIva;
+	private BigDecimal totalDescuento;
+	private BigDecimal totalTotal;
 
 	@PostConstruct
 	public void postConstruct() {
@@ -92,6 +106,7 @@ public class VendedorController extends CommonsController implements Serializabl
 		this.personaDTO = new PersonaDTO();
 		this.contactoDTO = new ContactoDTO();
 		this.page = 0;
+		this.currentPage = 0;
 		this.totalVentas = BigDecimal.ZERO;
 		this.totalComision = BigDecimal.ZERO;
 		this.totalComisionMenor = BigDecimal.ZERO;
@@ -101,14 +116,21 @@ public class VendedorController extends CommonsController implements Serializabl
 		this.comisionMenor = BigDecimal.ZERO;
 		this.comisionMayor = BigDecimal.ZERO;
 		this.comisionTotal = BigDecimal.ZERO;
+		this.totalSubTotal = BigDecimal.ZERO;
+		this.totalSinImpuesto = BigDecimal.ZERO;
+		this.totalImpuesto = BigDecimal.ZERO;
+		this.totalIva = BigDecimal.ZERO;
+		this.totalDescuento = BigDecimal.ZERO;
+		this.totalTotal = BigDecimal.ZERO;
+		this.reporteVentasCols = new ArrayList<>();
+		this.reporteVentasFacturaCols = new ArrayList<>();
 		if(vendedorDataManager.getVendedorDTOEditar() != null && vendedorDataManager.getVendedorDTOEditar().getId().getCodigoVendedor() != null){
 			this.setVendedorDTO(vendedorDataManager.getVendedorDTOEditar());
 			this.setPersonaDTO(vendedorDataManager.getVendedorDTOEditar().getPersonaDTO());
 			this.setContactoDTO(vendedorDataManager.getVendedorDTOEditar().getPersonaDTO().getContactoPersonaDTO());
 		}
-		if(FacesContext.getCurrentInstance().getViewRoot().getViewId().equals("/modules/vendedores/adminBusquedaVendedor.xhtml")) {
-			this.vendedorDTOCols = ERPFactory.vendedor.getVendedorServicio().findObtenerListaVendedores(Integer.parseInt(ERPConstantes.ESTADO_ACTIVO_NUMERICO), numeroDocumentoBusqueda, nombreVendedorBusqueda);
-		}
+		this.vendedorDTOCols = ERPFactory.vendedor.getVendedorServicio().findObtenerListaVendedores(Integer.parseInt(ERPConstantes.ESTADO_ACTIVO_NUMERICO), numeroDocumentoBusqueda, nombreVendedorBusqueda);
+		
 		if(FacesContext.getCurrentInstance().getViewRoot().getViewId().equals("/modules/vendedores/reporteVentas.xhtml")) {
 			Calendar fechaInferior = Calendar.getInstance();
 			fechaInferior.set(Calendar.DATE, 1);
@@ -116,32 +138,6 @@ public class VendedorController extends CommonsController implements Serializabl
 			Calendar fechaSuperior = Calendar.getInstance();
 			fechaInicio = fechaInferior.getTime();
 			fechaFin = fechaSuperior.getTime();			
-			this.reporteVentasCols = ERPFactory.facturas.getFacturaCabeceraServicio().findObtenerReorteVentas(Integer.parseInt(ERPConstantes.ESTADO_ACTIVO_NUMERICO), documentoCliente, nombreCliente, new Timestamp(fechaInicio.getTime()), new Timestamp(fechaFin.getTime()));
-			if(CollectionUtils.isNotEmpty(reporteVentasCols)) {
-				this.totalVendido = 0L;
-				this.totalVenta = BigDecimal.ZERO;
-				this.comisionTotal = BigDecimal.ZERO; 
-				for(ReporteVentasVO venta : this.reporteVentasCols) {
-					if(venta.getPorcentajeComision() != null && venta.getPorcentajeComisionMayor() != null && venta.getValorVendido() != null) {
-						this.totalVendido = totalVendido + venta.getCantidadVendida();
-						this.totalVenta = totalVenta.add(venta.getValorVendido());
-						this.comisionMenor = BigDecimal.ZERO;
-						this.comisionMayor = BigDecimal.ZERO;
-						venta.setValoComisionMayor(BigDecimal.ZERO);
-						venta.setValoComisionMenor(BigDecimal.ZERO);
-						if(venta.getTipoCliente().equals(ERPConstantes.CODIGO_CATALOGO_VALOR_CLIENTE_MAYORISTA)) {
-							venta.setValoComisionMayor((venta.getPorcentajeComisionMayor().multiply(venta.getValorVendido())).divide(BigDecimal.valueOf(100)));
-							this.comisionMayor = comisionMayor.add(venta.getValoComisionMayor());
-						}else {
-							venta.setValoComisionMenor((venta.getPorcentajeComision().multiply(venta.getValorVendido())).divide(BigDecimal.valueOf(100)));
-							this.comisionMenor = comisionMenor.add(venta.getValoComisionMenor());
-						}
-					}
-					venta.setValoComisionTotal(comisionMayor.add(comisionMenor));
-					this.comisionTotal = this.comisionTotal.add(comisionMayor).add(comisionMenor);
-					
-				};	
-			}
 		}
 	}
 		
@@ -166,7 +162,31 @@ public class VendedorController extends CommonsController implements Serializabl
 	 * @param e
 	 */
 	public void busquedaReporte(ActionEvent e){
-		this.buscarReporte();
+		if(this.tipoReporte != null && this.codigoVendedor != null){
+			if(this.pagadoBusqueda != null && this.pagadoBusqueda.length > 0){
+				if(this.pagadoBusqueda.length == 2) {
+					this.pagado = null; 
+				}else {
+					if(this.pagadoBusqueda[0].equals(ERPConstantes.ESTADO_ACTIVO_NUMERICO)) {
+						this.pagado = Boolean.TRUE;
+					}else {
+						this.pagado = Boolean.FALSE;
+					}
+				}
+			}else {
+				this.pagado = null; 
+			}
+			if(this.tipoReporte.equals("VPA")){
+				this.buscarReporte();
+			}
+			if(this.tipoReporte.equals("VPF")){
+				this.buscarReporteFacturas();
+			}
+		}else{
+			this.setShowMessagesBar(Boolean.TRUE);
+			MensajesController.addError("Error", "El Tipo de reporte y Vendedor son requeridos");
+		}
+		
 	}
 	
 	/**
@@ -184,7 +204,7 @@ public class VendedorController extends CommonsController implements Serializabl
 	public void buscarReporte(){
 		try {
 			this.setShowMessagesBar(Boolean.FALSE);
-			this.reporteVentasCols = ERPFactory.facturas.getFacturaCabeceraServicio().findObtenerReorteVentas(Integer.parseInt(ERPConstantes.ESTADO_ACTIVO_NUMERICO), documentoCliente, nombreCliente, new Timestamp(fechaInicio.getTime()), new Timestamp(fechaFin.getTime()));
+			this.reporteVentasCols = ERPFactory.facturas.getFacturaCabeceraServicio().findObtenerReporteVentas(Integer.parseInt(ERPConstantes.ESTADO_ACTIVO_NUMERICO), this.pagado, this.codigoVendedor, new Timestamp(fechaInicio.getTime()), new Timestamp(fechaFin.getTime()));
 			if(CollectionUtils.isNotEmpty(reporteVentasCols)) {
 				this.totalVendido = 0L;
 				this.totalVenta = BigDecimal.ZERO;
@@ -205,6 +225,45 @@ public class VendedorController extends CommonsController implements Serializabl
 					}
 					venta.setValoComisionTotal(comisionMayor.add(comisionMenor));
 					this.comisionTotal = this.comisionTotal.add(comisionMayor).add(comisionMenor);
+				});
+			}else {
+				this.setShowMessagesBar(Boolean.TRUE);
+				FacesMessage msg = new FacesMessage("No se encontraron resultados para la b\u00FAsqueda realizada.", "ERROR MSG");
+		        msg.setSeverity(FacesMessage.SEVERITY_INFO);
+		        FacesContext.getCurrentInstance().addMessage(null, msg);
+			}
+		} catch (ERPException e1) {
+			this.setShowMessagesBar(Boolean.TRUE);
+			FacesMessage msg = new FacesMessage(e1.getMessage(), "ERROR MSG");
+	        msg.setSeverity(FacesMessage.SEVERITY_ERROR);
+	        FacesContext.getCurrentInstance().addMessage(null, msg);
+		} catch (Exception e2) {
+			this.setShowMessagesBar(Boolean.TRUE);
+			FacesMessage msg = new FacesMessage(e2.getMessage(), "ERROR MSG");
+	        msg.setSeverity(FacesMessage.SEVERITY_ERROR);
+	        FacesContext.getCurrentInstance().addMessage(null, msg);
+		}
+	}
+	
+	/**
+	 * Metodo para buscar vendedores 
+	 * @param e
+	 */
+	public void buscarReporteFacturas(){
+		try {
+			this.setShowMessagesBar(Boolean.FALSE);
+			this.reporteVentasFacturaCols = ERPFactory.facturas.getFacturaCabeceraServicio().findObtenerReporteVentasFactura(Integer.parseInt(ERPConstantes.ESTADO_ACTIVO_NUMERICO), this.pagado, this.codigoVendedor, new Timestamp(fechaInicio.getTime()), new Timestamp(fechaFin.getTime()));
+			if(CollectionUtils.isNotEmpty(reporteVentasFacturaCols)) {
+				this.totalVendido = 0L;
+				this.totalVenta = BigDecimal.ZERO;
+				this.comisionTotal = BigDecimal.ZERO;
+				this.reporteVentasFacturaCols.stream().forEach(venta ->{
+					this.totalSubTotal = this.totalSubTotal.add(venta.getSubTotal());
+					this.totalSinImpuesto = this.totalSinImpuesto.add(venta.getTarifaCero());
+					this.totalImpuesto = this.totalImpuesto.add(venta.getTarifaImpuesto());
+					this.totalIva = this.totalIva.add(venta.getTotalIva());
+					this.totalDescuento = this.totalDescuento.add(venta.getTotalDescuento());
+					this.totalTotal = this.totalTotal.add(venta.getTotalVenta());
 				});
 			}else {
 				this.setShowMessagesBar(Boolean.TRUE);
@@ -620,6 +679,16 @@ public class VendedorController extends CommonsController implements Serializabl
 	public void setPage(Integer page) {
 		this.page = page;
 	}
+	
+	
+
+	public Integer getCurrentPage() {
+		return currentPage;
+	}
+
+	public void setCurrentPage(Integer currentPage) {
+		this.currentPage = currentPage;
+	}
 
 	public LoginController getLoginController() {
 		return loginController;
@@ -780,5 +849,93 @@ public class VendedorController extends CommonsController implements Serializabl
 
 	public void setComisionTotal(BigDecimal comisionTotal) {
 		this.comisionTotal = comisionTotal;
+	}
+
+	public String getTipoReporte() {
+		return tipoReporte;
+	}
+
+	public void setTipoReporte(String tipoReporte) {
+		this.tipoReporte = tipoReporte;
+	}
+
+	public Long getCodigoVendedor() {
+		return codigoVendedor;
+	}
+
+	public void setCodigoVendedor(Long codigoVendedor) {
+		this.codigoVendedor = codigoVendedor;
+	}
+
+	public Boolean getPagado() {
+		return pagado;
+	}
+
+	public void setPagado(Boolean pagado) {
+		this.pagado = pagado;
+	}
+
+	public String[] getPagadoBusqueda() {
+		return pagadoBusqueda;
+	}
+
+	public void setPagadoBusqueda(String[] pagadoBusqueda) {
+		this.pagadoBusqueda = pagadoBusqueda;
+	}
+
+	public Collection<ReporteVentasFacturasVO> getReporteVentasFacturaCols() {
+		return reporteVentasFacturaCols;
+	}
+
+	public void setReporteVentasFacturaCols(Collection<ReporteVentasFacturasVO> reporteVentasFacturaCols) {
+		this.reporteVentasFacturaCols = reporteVentasFacturaCols;
+	}
+
+	public BigDecimal getTotalSubTotal() {
+		return totalSubTotal;
+	}
+
+	public void setTotalSubTotal(BigDecimal totalSubTotal) {
+		this.totalSubTotal = totalSubTotal;
+	}
+
+	public BigDecimal getTotalSinImpuesto() {
+		return totalSinImpuesto;
+	}
+
+	public void setTotalSinImpuesto(BigDecimal totalSinImpuesto) {
+		this.totalSinImpuesto = totalSinImpuesto;
+	}
+
+	public BigDecimal getTotalImpuesto() {
+		return totalImpuesto;
+	}
+
+	public void setTotalImpuesto(BigDecimal totalImpuesto) {
+		this.totalImpuesto = totalImpuesto;
+	}
+
+	public BigDecimal getTotalIva() {
+		return totalIva;
+	}
+
+	public void setTotalIva(BigDecimal totalIva) {
+		this.totalIva = totalIva;
+	}
+
+	public BigDecimal getTotalDescuento() {
+		return totalDescuento;
+	}
+
+	public void setTotalDescuento(BigDecimal totalDescuento) {
+		this.totalDescuento = totalDescuento;
+	}
+
+	public BigDecimal getTotalTotal() {
+		return totalTotal;
+	}
+
+	public void setTotalTotal(BigDecimal totalTotal) {
+		this.totalTotal = totalTotal;
 	}
 }

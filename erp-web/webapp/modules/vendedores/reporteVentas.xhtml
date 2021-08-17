@@ -23,7 +23,7 @@
 	</ui:define>
 	
 	<ui:define name="contentCenter">
-		<rich:panel id="panel-content-left" styleClass="panel-content-left" style="width:100% !important;">
+		<rich:panel id="panel-content-left" styleClass="panel-content-left" style="width:99.7% !important;">
 			<f:facet name="header">			
 				<h:panelGrid columns="2" width="99.9%" columnClasses="align-left, align-right" cellpadding="0" cellspacing="0">
 					<h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.criterios.busqueda']}" style="white-space:nowrap" />
@@ -31,42 +31,50 @@
 			</f:facet>		
 		
 			<h:panelGroup id="filtrosVentas" layout="block" styleClass="listaReporte">
-				<h:panelGrid columns="4" width="75%" cellpadding="0" cellspacing="2">
-					<h:panelGrid width="35%" columns="2" columnClasses="columnaIzquierda, columnaDerecha">
-			    	   	<rich:inplaceInput id="documentoCliente" value="#{vendedorController.documentoCliente}" styleClass="styleInputPlace" defaultLabel="#{msg_erpweb['ec.com.erp.etiqueta.buscar.documento.cliente']}" onkeypress="return validarEnteros(event);">
-			    	   		<a4j:ajax event="keyup" execute="filtrosVentas" listener="#{vendedorController.busquedaReporteEnter}" onbeforesubmit="if (event.keyCode != 13)  return false;" render="listaTransport tableReporteVentas pnlMensajes"></a4j:ajax>
-			    	   	</rich:inplaceInput>
-			    	   	<h:panelGroup styleClass="styleClean">
-							<a4j:commandLink styleClass="guardarA" execute="@this" render="documentoCliente pnlMensajes" actionListener="#{vendedorController.borrarBusquedaDocumentoCliente}"/>
-						</h:panelGroup>
+				<h:panelGrid columns="5" width="100%" cellpadding="0" cellspacing="2" columnClasses="columna1, columna2, columna3, columna4, columna5">
+					<h:panelGrid columns="2" columnClasses="columIzquierda, columDerecha">
+						<h:outputText class="styleNegritas" value="Tipo de reporte: *" />
+		                <h:selectOneMenu tabindex="1" value="#{vendedorController.tipoReporte}" style="background-color:#f9f9d5; background-image: none; width: 165px; height: 24px;">
+							<f:selectItem itemLabel="SELECCIONE"/>
+							<f:selectItem itemLabel="VENTAS POR ARTICULO" itemValue="VPA"/>
+							<f:selectItem itemLabel="VENTAS POR FACTURA" itemValue="VPF"/>
+						</h:selectOneMenu>
 					</h:panelGrid>
-			    	
-			    	<h:panelGrid width="35%" columns="2" columnClasses="columnaIzquierda, columnaDerecha">
-						<rich:inplaceInput id="nombreTransportista" value="#{vendedorController.nombreCliente}" styleClass="styleInputPlace" defaultLabel="#{msg_erpweb['ec.com.erp.etiqueta.buscar.nombre.vendedor']}">
-							<a4j:ajax event="keyup" execute="filtrosVentas" listener="#{vendedorController.busquedaReporteEnter}" onbeforesubmit="if (event.keyCode != 13)  return false;" render="listaTransport tabletransporte pnlMensajes"></a4j:ajax>
-						</rich:inplaceInput>
-			    	   	<h:panelGroup styleClass="styleClean">
-							<a4j:commandLink styleClass="guardarA" execute="@this" render="nombreTransportista pnlMensajes" actionListener="#{vendedorController.borrarBusquedaNombreCliente}"/>
-						</h:panelGroup>
-					</h:panelGrid>
-					
-					<h:panelGrid width="30%" columns="2" columnClasses="columnaIzquierda, columnaDerecha">
+					<h:panelGrid columns="2" columnClasses="columnaIzquierda, columnaDerecha">
+						<h:outputText class="styleNegritas" value="Vendedor: *" />
+		                <h:selectOneMenu tabindex="2" value="#{vendedorController.codigoVendedor}" style="background-color:#f9f9d5; background-image: none; width: 165px; height: 24px;">
+							<f:selectItem itemLabel="SELECCIONE"/>
+							<f:selectItems value="#{vendedorController.vendedorDTOCols}" var="vend" itemValue = "#{vend.id.codigoVendedor}" itemLabel = "#{vend.personaDTO.nombreCompleto}" />
+						</h:selectOneMenu>
+					</h:panelGrid>					
+					<h:panelGrid columns="2" columnClasses="columnaIzquierda, columnaDerecha">
 						<rich:calendar inputStyle="width: 100px; height: 20px;" value="#{vendedorController.fechaInicio}" datePattern="yyyy-MM-dd"></rich:calendar>
 						<rich:calendar inputStyle="width: 100px; height: 20px;" value="#{vendedorController.fechaFin}" datePattern="yyyy-MM-dd"></rich:calendar>
+					</h:panelGrid>
+					<h:panelGrid columns="2">
+						<h:outputText value="Pagado:"/>
+						<h:selectManyCheckbox value="#{vendedorController.pagadoBusqueda}">
+							<f:selectItem itemValue = "1" itemLabel = "Si" /> 
+   							<f:selectItem itemValue = "0" itemLabel = "No" /> 
+						</h:selectManyCheckbox>
 					</h:panelGrid>					
-			    	 <a4j:commandButton id="btnBuscarTransportistas" value="Buscar" styleClass="styleSearch" render="listaTransport tabletransporte pnlMensajes" execute="filtrosVentas" actionListener="#{vendedorController.busquedaReporte}"/>
+			    	<a4j:commandButton id="btnBuscarTransportistas" value="Buscar" styleClass="styleSearch" render="listaTransport pnlMensajes" execute="filtrosVentas" actionListener="#{vendedorController.busquedaReporte}"/>
 				</h:panelGrid>						 
 			</h:panelGroup>	
 		</rich:panel>
 		
-		<rich:panel id="listaTransport" styleClass="panelListaArticulos" header="Lista de vendedores" style="height: 84.3%; width:100% !important;">	
-			<h:panelGrid id="tablaVacia" columns="1" rendered="#{empty vendedorController.reporteVentasCols}" style="width:100%; text-align: center; padding-top: 220px">
+		<rich:panel id="listaTransport" styleClass="panelListaArticulos" header="Reporte de ventas" style="height: 84.3%; width:99.7% !important;">
+			<h:panelGrid columns="1" rendered="#{empty vendedorController.reporteVentasCols and empty vendedorController.reporteVentasFacturaCols}" style="width:100%; text-align: center; padding-top: 220px">
 				<h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.mensaje.lista.vacio']}"/>
 			</h:panelGrid>
-			<rich:panel style="text-align:center; border-left: none; border-right:none; border-bottom:none" rendered="#{not empty vendedorController.reporteVentasCols}">
-				<rich:dataScroller page="#{vendedorController.page}" fastStep="3" for="tableReporteVentas" maxPages="5" rendered="#{not empty vendedorController.reporteVentasCols}" renderIfSinglePage="false"/>
+			
+			<h:panelGrid id="tablaVacia" columns="1" rendered="#{empty vendedorController.reporteVentasCols and vendedorController.tipoReporte eq 'VPA'}" style="width:100%; text-align: center; padding-top: 220px">
+				<h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.mensaje.lista.vacio']}"/>
+			</h:panelGrid>
+			<rich:panel style="text-align:center; border-left: none; border-right:none; border-bottom:none" rendered="#{not empty vendedorController.reporteVentasCols and vendedorController.tipoReporte eq 'VPA'}">
+				<rich:dataScroller page="#{vendedorController.page}" fastStep="3" for="tableReporteVentas" maxPages="5" rendered="#{not empty vendedorController.reporteVentasCols and vendedorController.tipoReporte eq 'VPA'}" renderIfSinglePage="false"/>
 			</rich:panel>			
-			 <rich:dataTable style="width:100%" rendered="#{not empty vendedorController.reporteVentasCols}" value="#{vendedorController.reporteVentasCols}" var="ventas" iterationStatusVar="it" id="tableReporteVentas" rows="14">
+			 <rich:dataTable style="width:100%" rendered="#{not empty vendedorController.reporteVentasCols and vendedorController.tipoReporte eq 'VPA'}" value="#{vendedorController.reporteVentasCols}" var="ventas" iterationStatusVar="it" id="tableReporteVentas" rows="14">
 	            <rich:column>
 	                <f:facet name="header">Nro.</f:facet>
 	                #{it.index+1}
@@ -150,6 +158,134 @@
 		            </rich:columnGroup>
 	            </f:facet> 
 	        </rich:dataTable>
+	        
+	        
+	        
+	        <h:panelGrid id="tablaVaciaFactura" columns="1" rendered="#{empty vendedorController.reporteVentasFacturaCols and vendedorController.tipoReporte eq 'VPF'}" style="width:100%; text-align: center; padding-top: 220px">
+				<h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.mensaje.lista.vacio']}"/>
+			</h:panelGrid>
+	        <rich:panel style="text-align:center; border-left: none; border-right:none; border-bottom:none" rendered="#{not empty vendedorController.reporteVentasFacturaCols and vendedorController.tipoReporte eq 'VPF'}">
+				<rich:dataScroller page="#{vendedorController.currentPage}" fastStep="3" for="tableReporteVentasFactura" maxPages="5" rendered="#{not empty vendedorController.reporteVentasFacturaCols and vendedorController.tipoReporte eq 'VPF'}" renderIfSinglePage="false"/>
+			</rich:panel>			
+			 <rich:dataTable style="width:100%" rendered="#{not empty vendedorController.reporteVentasFacturaCols and vendedorController.tipoReporte eq 'VPF'}" value="#{vendedorController.reporteVentasFacturaCols}" var="factura" iterationStatusVar="it" id="tableReporteVentasFactura" rows="14">
+	            <rich:column>
+	                <f:facet name="header">Nro.</f:facet>
+	                #{it.index+1}
+	            </rich:column>
+	            <rich:column>
+	                <f:facet name="header"><h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.label.lista.cabecera.nombre.vendedor']}"/></f:facet>
+	                <rich:panel id="vendedor#{it}" styleClass="tooltip-text" bodyClass="rich-laguna-panel-no-header" style="border: none !important">  
+		        		<h:outputText value="#{factura.nombreVendedor.length() > 20 ? factura.nombreVendedor.substring(0,20).concat('...') : factura.nombreVendedor}" /> 
+						<rich:tooltip id="ttv#{it}" showDelay="500" styleClass="tooltip" layout="block" rendered="#{factura.nombreVendedor.length() > 20}">                
+							<h:panelGrid>
+								<span style="white-space: nowrap">												
+									<h:outputText value="#{factura.nombreVendedor}" />												
+								</span>
+							</h:panelGrid>
+						</rich:tooltip>       
+					</rich:panel>
+	            </rich:column>
+	            <rich:column>
+	                <f:facet name="header"><h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.label.lista.cabecera.factura.numero.documento']}"/></f:facet>
+	                <h:outputText value="#{factura.numeroDocumento}" />
+	            </rich:column>
+	            <rich:column>
+	                <f:facet name="header"><h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.label.lista.cabecera.factura.ruc.documento']}"/></f:facet>
+	                <h:outputText value="#{factura.rucDocumentoCliente}" />
+	            </rich:column>
+	            <rich:column style="text-align: right; padding-right: 3px;">
+	                <f:facet name="header"><h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.label.lista.cabecera.factura.razonSocial']}"/></f:facet>
+	                <rich:panel id="cliente#{it}" styleClass="tooltip-text" bodyClass="rich-laguna-panel-no-header" style="border: none !important">  
+		        		<h:outputText value="#{factura.razonSocialCliente.length() > 20 ? factura.razonSocialCliente.substring(0,20).concat('...') : factura.razonSocialCliente}" /> 
+						<rich:tooltip id="ttc#{it}" showDelay="500" styleClass="tooltip" layout="block" rendered="#{factura.razonSocialCliente.length() > 20}">                
+							<h:panelGrid>
+								<span style="white-space: nowrap">												
+									<h:outputText value="#{factura.razonSocialCliente}" />												
+								</span>
+							</h:panelGrid>
+						</rich:tooltip>       
+					</rich:panel>
+	            </rich:column>
+	            <rich:column style="text-align: right; padding-right: 3px;">
+	                <f:facet name="header"><h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.header.tabla.tipo.compra']}"/></f:facet>
+	                <h:outputText value="#{factura.tipoCliente eq 'MAY' ? 'MAYORISTA' : 'MINORISTA'}" />
+	            </rich:column>
+	            <rich:column style="text-align: right; padding-right: 3px;">
+	                <f:facet name="header"><h:outputText value="Pagada"/></f:facet>
+	                <h:outputText value="#{factura.pagada ? 'SI':'NO'}" />
+	            </rich:column>
+	            <rich:column style="text-align: right; padding-right: 3px;">
+	                <f:facet name="header"><h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.label.nuevo.pedidos.detalle.subtotal']}"/></f:facet>
+	                <h:outputText value="#{factura.subTotal}">
+	                	<f:convertNumber pattern="0.00"/>
+	                </h:outputText>
+	            </rich:column>
+	            <rich:column style="text-align: center; padding-right: 3px;">
+	                <f:facet name="header"><h:outputText value="Descuento"/></f:facet>
+	                <h:outputText value="#{factura.totalDescuento}">
+	                	<f:convertNumber pattern="0.00"/>
+	                </h:outputText>
+	            </rich:column>
+	            <rich:column style="text-align: right; padding-right: 3px;">
+	                <f:facet name="header"><h:outputText value="Tarifa 0%"/></f:facet>
+	                <h:outputText value="#{factura.tarifaCero}">
+	                	<f:convertNumber pattern="0.00"/>
+	                </h:outputText>
+	            </rich:column>
+	            <rich:column style="text-align: right; padding-right: 3px;">
+	                <f:facet name="header"><h:outputText value="Tarifa 12%"/></f:facet>
+	                <h:outputText value="#{factura.tarifaImpuesto}">
+	                	<f:convertNumber pattern="0.00"/>
+	                </h:outputText>
+	            </rich:column>	         
+	            <rich:column style="text-align: right; padding-right: 3px;">
+	                <f:facet name="header"><h:outputText value="IVA 12%"/></f:facet>
+	                <h:outputText value="#{factura.totalIva}">
+	                	<f:convertNumber pattern="0.00"/>
+	                </h:outputText>
+	            </rich:column>
+	             <rich:column style="text-align: right; padding-right: 3px;">
+	                <f:facet name="header"><h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.label.lista.cabecera.factura.total.factura']}"/></f:facet>
+	                <h:outputText value="#{factura.totalVenta}">
+	                	<f:convertNumber pattern="0.00"/>
+	                </h:outputText>
+	            </rich:column>
+	            <f:facet name="footer">
+	            	<rich:columnGroup>
+		                <rich:column colspan="7" style="text-align: right; paddin-right: 10px">Total:</rich:column>
+		                <rich:column style="text-align: right; paddin-right: 10px">
+		                    <h:outputText value="#{vendedorController.totalSubTotal}">
+		                    	<f:convertNumber pattern="0.00"/>
+		                    </h:outputText>
+		                </rich:column>
+		                <rich:column style="text-align: right; paddin-right: 10px">
+		                    <h:outputText value="#{vendedorController.totalDescuento}">
+		                    	<f:convertNumber pattern="0.00"/>
+		                    </h:outputText>
+		                </rich:column>
+		                <rich:column style="text-align: right; paddin-right: 10px">
+		                    <h:outputText value="#{vendedorController.totalSinImpuesto}">
+		                    	<f:convertNumber pattern="0.00"/>
+		                    </h:outputText>
+		                </rich:column>
+		                <rich:column style="text-align: right; paddin-right: 10px">
+		                    <h:outputText value="#{vendedorController.totalImpuesto}">
+		                    	<f:convertNumber pattern="0.00"/>
+		                    </h:outputText>
+		                </rich:column>
+		                <rich:column style="text-align: right; paddin-right: 10px">
+		                    <h:outputText value="#{vendedorController.totalIva}">
+		                    	<f:convertNumber pattern="0.00"/>
+		                    </h:outputText>
+		                </rich:column>
+		                <rich:column style="text-align: right; paddin-right: 10px">
+		                    <h:outputText value="#{vendedorController.totalTotal}">
+		                    	<f:convertNumber pattern="0.00"/>
+		                    </h:outputText>
+		                </rich:column>		         
+		            </rich:columnGroup>
+	            </f:facet> 
+	        </rich:dataTable>
         </rich:panel>
         
        
@@ -164,6 +300,32 @@
 								
 		/*]]>*/			
 		</script>
+		
+		<h:outputStylesheet>
+			.columIzquierda{
+				width: 40% !important;
+			}
+			
+			.columDerecha{
+				width: 60% !important;
+			}
+			
+			.columna1{
+				width: 28% !important;
+			}
+			.columna2{
+				width: 22% !important;
+			}
+			.columna3{
+				width: 25% !important;
+			}
+			.columna4{
+				width: 15% !important;
+			}
+			.columna5{
+				width: 10% !important;
+			}
+		</h:outputStylesheet>
 		<a4j:commandLink id="linkopensystem" styleClass="linkopensystem" execute="@this" status="no" actionListener="#{vendedorController.refrescarPantalla}">
 		</a4j:commandLink>	
 	</ui:define>
