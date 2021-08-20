@@ -4,10 +4,14 @@ package ec.com.erp.web.reportes.controller;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.sql.Timestamp;
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Map;
 
 import javax.annotation.PostConstruct;
 import javax.faces.bean.ManagedBean;
@@ -23,12 +27,12 @@ import ec.com.erp.cliente.common.constantes.ERPConstantes;
 import ec.com.erp.cliente.common.exception.ERPException;
 import ec.com.erp.cliente.common.factory.ERPFactory;
 import ec.com.erp.cliente.mdl.dto.InventarioDTO;
-import ec.com.erp.utilitario.commons.util.HtmlPdf;
 import ec.com.erp.web.commons.controller.CommonsController;
 import ec.com.erp.web.commons.controller.MensajesController;
 import ec.com.erp.web.commons.datamanager.CommonDataManager;
 import ec.com.erp.web.commons.login.controller.LoginController;
 import ec.com.erp.web.commons.utils.ERPWebResources;
+import ec.com.erp.web.commons.utils.UtilitarioReportesWeb;
 import ec.com.erp.web.commons.utils.UtilitarioWeb;
 import ec.com.erp.web.reportes.datamanager.ReporteDataManager;
 
@@ -196,12 +200,19 @@ public class ReporteController extends CommonsController implements Serializable
 	 * Metodo para imprimir lista de facturas
 	 */
 	public void imprimirReporte() {
-		HtmlPdf htmltoPDF;
 		try {
-			// Plantilla rpincipal que permite la conversion de xsl a pdf
-			htmltoPDF = new HtmlPdf(ERPConstantes.PLANTILLA_XSL_FOPRINCIPAL);
-			HashMap<String , String> parametros = new HashMap<String, String>();
-			byte contenido[] = htmltoPDF.convertir(ERPFactory.inventario.getInventarioServicio().findObtenerXMLReporteExistencias(this.inventarioDTOCols).replace("<?xml version=\"1.0\" encoding=\"UTF-8\"?>", ""), "", "",	parametros,	null);
+			// Convertidor de decimales
+			DecimalFormatSymbols decimalSymbols = DecimalFormatSymbols.getInstance();
+		    decimalSymbols.setDecimalSeparator('.');
+			DecimalFormat formatoDecimales = new DecimalFormat("#.##", decimalSymbols);
+			formatoDecimales.setMinimumFractionDigits(2);
+			SimpleDateFormat formatoFecha = new SimpleDateFormat("YYYY-MM-dd HH:mm:ss");
+			Map<String, Object> params = new HashMap<>();
+			params.put("FECHA_INICIO", formatoFecha.format(fechaInicioBusqueda));
+			params.put("FECHA_FIN", formatoFecha.format(fechaFinBusqueda));
+			params.put("TOTAL_CANTIDAD", ""+this.totalStock);
+			params.put("TOTAL_EXISTENCIA", formatoDecimales.format(this.totalInventario));
+			byte[] contenido = UtilitarioReportesWeb.generarReporteExistencias(this.inventarioDTOCols, params);
 			UtilitarioWeb.mostrarPDF(contenido);				
 		} catch (Exception e) {
 			this.setShowMessagesBar(Boolean.TRUE);

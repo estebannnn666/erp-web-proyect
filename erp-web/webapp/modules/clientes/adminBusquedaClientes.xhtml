@@ -24,7 +24,7 @@
 	</ui:define>
 	
 	<ui:define name="contentCenter">
-		<rich:panel id="panel-content-left" styleClass="panel-content-left" style="width:100% !important;">
+		<rich:panel id="panel-content-left" styleClass="panel-content-left" style="width:99.7% !important;">
 			<f:facet name="header">			
 				<h:panelGrid columns="2" width="99.9%" columnClasses="align-left, align-right" cellpadding="0" cellspacing="0">
 					<h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.criterios.busqueda']}" style="white-space:nowrap" />
@@ -64,7 +64,7 @@
 				</h:panelGrid>						 
 			</h:panelGroup>	
 		</rich:panel>	
-		<rich:panel id="listaClientes" styleClass="panelListaArticulos" header="Lista de clientes" style="height: 84.3%; width:100% !important;">	
+		<rich:panel id="listaClientes" styleClass="panelListaArticulos" header="Lista de clientes" style="height: 84.3%; width:99.7% !important;">	
 			<h:panelGrid id="tablaVacia" columns="1" rendered="#{empty clientesController.clienteDTOCols}" style="width:100%; text-align: center; padding-top: 220px">
 				<h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.mensaje.lista.vacio']}"/>
 			</h:panelGrid>

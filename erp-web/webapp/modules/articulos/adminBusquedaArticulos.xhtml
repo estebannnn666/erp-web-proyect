@@ -24,7 +24,7 @@
 	</ui:define>
 	
 	<ui:define name="contentCenter">
-		<rich:panel id="panel-content-left" styleClass="panel-content-left" style="width:100% !important;">
+		<rich:panel id="panel-content-left" styleClass="panel-content-left" style="width:99.7% !important;">
 			<f:facet name="header">			
 				<h:panelGrid columns="2" width="99.9%" columnClasses="align-left, align-right" cellpadding="0" cellspacing="0">
 					<h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.criterios.busqueda']}" style="white-space:nowrap" />
@@ -54,16 +54,15 @@
 				</h:panelGrid>						 
 			</h:panelGroup>	
 		</rich:panel>
-		
-		<rich:panel id="listaArticulos" styleClass="panelListaArticulos" header="#{msg_erpweb['ec.com.erp.etiqueta.titulo.lista.articulos']}" style="height: 84.3%; width:100% !important;">	
+		<rich:panel id="listaArticulos" styleClass="panelListaArticulos" header="#{msg_erpweb['ec.com.erp.etiqueta.titulo.lista.articulos']}" style="height: 84.3%; width:99.7% !important;">	
 			<h:panelGrid id="tablaVacia" columns="1" rendered="#{empty articulosController.articuloDTOCols}" style="width:100%; text-align: center; padding-top: 220px">
 				<h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.mensaje.lista.vacio']}"/>
 			</h:panelGrid>
 			<rich:panel style="text-align:center; border-left: none; border-right:none; border-bottom:none" rendered="#{not empty articulosController.articuloDTOCols}">
-				<rich:dataScroller page="#{articulosController.page}" fastStep="3" for="tableArticle" maxPages="5" rendered="#{not empty articulosController.articuloDTOCols}" renderIfSinglePage="false"/>
+				<rich:dataScroller page="#{articulosController.page}" fastStep="10" for="tableArticle" maxPages="5" rendered="#{not empty articulosController.articuloDTOCols}" renderIfSinglePage="false"/>
 			</rich:panel>	
 				
-			 <rich:dataTable style="width:100%" rendered="#{not empty articulosController.articuloDTOCols}" value="#{articulosController.articuloDTOCols}" var="art" iterationStatusVar="it" id="tableArticle" rows="15">
+			 <rich:dataTable style="width:100%" rendered="#{not empty articulosController.articuloDTOCols}" value="#{articulosController.articuloDTOCols}" var="art" iterationStatusVar="it" id="tableArticle" rows="14">
 	            <rich:column>
 	                <f:facet name="header">Nro.</f:facet>
 	                #{it.index+1}

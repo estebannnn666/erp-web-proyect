@@ -4,11 +4,15 @@ package ec.com.erp.web.vendedor.controller;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.sql.Timestamp;
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Map;
 
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
@@ -30,12 +34,12 @@ import ec.com.erp.cliente.mdl.dto.PersonaDTO;
 import ec.com.erp.cliente.mdl.dto.VendedorDTO;
 import ec.com.erp.cliente.mdl.vo.ReporteVentasFacturasVO;
 import ec.com.erp.cliente.mdl.vo.ReporteVentasVO;
-import ec.com.erp.utilitario.commons.util.HtmlPdf;
 import ec.com.erp.web.commons.controller.CommonsController;
 import ec.com.erp.web.commons.controller.MensajesController;
 import ec.com.erp.web.commons.datamanager.CommonDataManager;
 import ec.com.erp.web.commons.login.controller.LoginController;
 import ec.com.erp.web.commons.utils.ERPWebResources;
+import ec.com.erp.web.commons.utils.UtilitarioReportesWeb;
 import ec.com.erp.web.commons.utils.UtilitarioWeb;
 import ec.com.erp.web.vendedor.datamanager.VendedorDataManager;
 
@@ -288,17 +292,40 @@ public class VendedorController extends CommonsController implements Serializabl
 	 * Metodo para imprimir lista de facturas
 	 */
 	public String imprimirReporteVentas() {
-		if(CollectionUtils.isNotEmpty(this.reporteVentasCols)){
-			HtmlPdf htmltoPDF;
+		if(this.tipoReporte != null && (CollectionUtils.isNotEmpty(this.reporteVentasCols) || CollectionUtils.isNotEmpty(this.reporteVentasFacturaCols))){
 			try {
-				// Plantilla rpincipal que permite la conversion de xsl a pdf
-				htmltoPDF = new HtmlPdf(ERPConstantes.PLANTILLA_XSL_FOPRINCIPAL);
-				HashMap<String , String> parametros = new HashMap<String, String>();
-				byte contenido[] = htmltoPDF.convertir(ERPFactory.facturas.getFacturaCabeceraServicio().findObtenerXMLReporteVentas(fechaInicio, fechaFin, this.reporteVentasCols).replace("<?xml version=\"1.0\" encoding=\"UTF-8\"?>", ""), "", "",	parametros,	null);
+				// Convertidor de decimales
+				DecimalFormatSymbols decimalSymbols = DecimalFormatSymbols.getInstance();
+			    decimalSymbols.setDecimalSeparator('.');
+				DecimalFormat formatoDecimales = new DecimalFormat("#.##", decimalSymbols);
+				formatoDecimales.setMinimumFractionDigits(2);
+				SimpleDateFormat formatoFecha = new SimpleDateFormat("YYYY-MM-dd HH:mm:ss");
+				Map<String, Object> params = new HashMap<>();
+				params.put("FECHA_INICIO", formatoFecha.format(fechaInicio));
+				params.put("FECHA_FIN", formatoFecha.format(fechaFin));
+				byte[] contenido = null;
+				if(this.tipoReporte.equals("VPA")){
+					params.put("CANTIDAD_TOTAL", ""+this.totalVendido);
+					params.put("VENTA_TOTAL", formatoDecimales.format(this.totalVenta));
+					params.put("COMISION_TOTAL", formatoDecimales.format(this.comisionTotal));
+					params.put("VENDEDOR", this.reporteVentasCols.iterator().next().getNombreCompleto());
+					contenido = UtilitarioReportesWeb.generarReporteVentasArticulo(this.reporteVentasCols, params);
+				}
+				
+				if(this.tipoReporte.equals("VPF")){
+					params.put("TOTAL_SUBTOTAL", formatoDecimales.format(this.totalSubTotal));
+					params.put("TOTAL_DESCUENTO", formatoDecimales.format(this.totalDescuento));
+					params.put("TOTAL_TARIFACERO", formatoDecimales.format(this.totalSinImpuesto));
+					params.put("TOTAL_IMPUESTOS", formatoDecimales.format(this.totalImpuesto));
+					params.put("TOTAL_IVA", formatoDecimales.format(this.totalIva));
+					params.put("TOTAL_VENTA", formatoDecimales.format(this.totalTotal));
+					params.put("VENDEDOR", this.reporteVentasFacturaCols.iterator().next().getNombreVendedor());
+					contenido = UtilitarioReportesWeb.generarReporteVentasFactura(reporteVentasFacturaCols, params);
+				}
 				UtilitarioWeb.mostrarPDF(contenido);
 			} catch (Exception e) {
 				this.setShowMessagesBar(Boolean.TRUE);
-				MensajesController.addError(null, "Error al imprimir");
+				MensajesController.addError(null, "Error al imprimir reporte");
 			}
 		}else {
 			this.setShowMessagesBar(Boolean.TRUE);
