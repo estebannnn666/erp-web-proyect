@@ -838,6 +838,11 @@ public class CuentasController extends CommonsController implements Serializable
 			if(xmlDocument == null){
 				ERPFactory.facturas.getFacturaCabeceraServicio().transEnviarFirmarAutorizar(this.facturaCabeceraDTO);
 			    MensajesController.addInfo(null, ERPWebResources.getString("ec.com.erp.etiqueta.mensaje.informacion.factura.electrinoca"));
+			    // Enviar notificacion por mail
+			    if(StringUtils.isNotBlank(this.facturaCabeceraDTO.getEmail())){
+			    	byte[] factura = FacturaElectronocaUtil.imprimirRideFactura(xmlDocument);
+					ERPFactory.notificacion.getNotificacionMailServicio().findEnviarFacturaMail(this.facturaCabeceraDTO.getEmail(), factura);
+			    }
 			    this.facturaCabeceraDTOCols = ERPFactory.facturas.getFacturaCabeceraServicio().findObtenerListaFacturas(Integer.parseInt(ERPConstantes.ESTADO_ACTIVO_NUMERICO), numeroFactura, null, null, docClienteProveedor, nombClienteProveedor, pagado, tiposDocumentos, this.codigoVendedor);
 			}else{
 		        MensajesController.addError(null, ERPWebResources.getString("ec.com.erp.etiqueta.mensaje.informacion.factura.creada"));
@@ -1437,6 +1442,7 @@ public class CuentasController extends CommonsController implements Serializable
 		this.facturaCabeceraDTO.setNombreClienteProveedor(this.clienteDTO.getPersonaDTO() == null ? this.clienteDTO.getEmpresaDTO().getRazonSocial() : this.clienteDTO.getPersonaDTO().getNombreCompleto());
 		this.facturaCabeceraDTO.setDireccion(this.clienteDTO.getPersonaDTO() == null ? this.clienteDTO.getEmpresaDTO().getContactoEmpresaDTO().getDireccionPrincipal() : this.clienteDTO.getPersonaDTO().getContactoPersonaDTO().getDireccionPrincipal());
 		this.facturaCabeceraDTO.setTelefono(this.clienteDTO.getPersonaDTO() == null ? this.clienteDTO.getEmpresaDTO().getContactoEmpresaDTO().getTelefonoPrincipal() : this.clienteDTO.getPersonaDTO().getContactoPersonaDTO().getTelefonoPrincipal());
+		this.facturaCabeceraDTO.setEmail(this.clienteDTO.getPersonaDTO() == null ? this.clienteDTO.getEmpresaDTO().getContactoEmpresaDTO().getEmail() : this.clienteDTO.getPersonaDTO().getContactoPersonaDTO().getEmail());
 		this.facturaCabeceraDTO.setTipoCliente(this.clienteDTO.getCodigoValorTipoCompra());
 		if(CollectionUtils.isNotEmpty(this.facturaDetalleDTOCols)) {
 			this.facturaDetalleDTOCols.stream().forEach(detalleFact ->{
@@ -1498,6 +1504,7 @@ public class CuentasController extends CommonsController implements Serializable
 				this.facturaCabeceraDTO.setNombreClienteProveedor(this.clienteDTO.getPersonaDTO() == null ? this.clienteDTO.getEmpresaDTO().getRazonSocial() : this.clienteDTO.getPersonaDTO().getNombreCompleto());
 				this.facturaCabeceraDTO.setDireccion(this.clienteDTO.getPersonaDTO() == null ? this.clienteDTO.getEmpresaDTO().getContactoEmpresaDTO().getDireccionPrincipal() : this.clienteDTO.getPersonaDTO().getContactoPersonaDTO().getDireccionPrincipal());
 				this.facturaCabeceraDTO.setTelefono(this.clienteDTO.getPersonaDTO() == null ? this.clienteDTO.getEmpresaDTO().getContactoEmpresaDTO().getTelefonoPrincipal() : this.clienteDTO.getPersonaDTO().getContactoPersonaDTO().getTelefonoPrincipal());
+				this.facturaCabeceraDTO.setEmail(this.clienteDTO.getPersonaDTO() == null ? this.clienteDTO.getEmpresaDTO().getContactoEmpresaDTO().getEmail() : this.clienteDTO.getPersonaDTO().getContactoPersonaDTO().getEmail());
 				this.facturaCabeceraDTO.setTipoCliente(this.clienteDTO.getCodigoValorTipoCompra());
 				this.setShowMessagesBar(Boolean.FALSE);
 				if(CollectionUtils.isNotEmpty(this.facturaDetalleDTOCols)) {
