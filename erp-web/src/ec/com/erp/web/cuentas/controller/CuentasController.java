@@ -1865,7 +1865,13 @@ public class CuentasController extends CommonsController implements Serializable
 //				byte[] contenido = ERPFactory.facturas.getFacturaCabeceraServicio().findObtenerNotaVenta(facturaCabeceraDTO);
 //				byte[] xmlDocument = ERPFactory.facturas.getFacturaCabeceraServicio().findObtenerXmlDocumentoFactura(ERPConstantes.CODIGO_COMPANIA, this.facturaCabeceraDTO.getId().getCodigoFactura());
 //				byte[] contenido = FacturaElectronocaUtil.imprimirFacturaFormato(xmlDocument);
-				byte[] contenido = NotaVentaUtil.generarNotaVenta(facturaCabeceraDTO);
+				byte[] contenido;
+				byte[] xmlDocument = ERPFactory.facturas.getFacturaCabeceraServicio().findObtenerXmlDocumentoFactura(ERPConstantes.CODIGO_COMPANIA, this.facturaCabeceraDTO.getId().getCodigoFactura());
+				if(xmlDocument != null){
+					contenido = FacturaElectronocaUtil.imprimirFacturaFormato(xmlDocument);
+				}else{
+					contenido = NotaVentaUtil.generarNotaVenta(facturaCabeceraDTO);
+				}
 				UtilitarioWeb.mostrarPDF(contenido);
 			}
 		} catch (Exception e) {
