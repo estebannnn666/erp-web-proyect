@@ -20,11 +20,13 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import ec.com.erp.cliente.common.exception.ERPException;
+import ec.com.erp.cliente.mdl.dto.FacturaCabeceraDTO;
 import ec.com.erp.cliente.mdl.dto.InventarioDTO;
 import ec.com.erp.cliente.mdl.vo.ReporteVentasFacturasVO;
 import ec.com.erp.cliente.mdl.vo.ReporteVentasVO;
 import ec.com.erp.facturacion.electronica.ws.FacturaWS;
 import ec.com.erp.firebase.model.ImageItem;
+import ec.com.erp.web.reportes.response.ReporteCuentasResponse;
 import ec.com.erp.web.reportes.response.ReporteExistenciaResponse;
 import ec.com.erp.web.reportes.response.ReporteVentasFacturasResponse;
 import ec.com.erp.web.reportes.response.ReporteVentasResponse;
@@ -112,6 +114,31 @@ public class UtilitarioReportesWeb {
 		}
 	}
 	
+	public static byte[] generarReporteVentas(Collection<FacturaCabeceraDTO> facturaCabeceraDTOCols, Map<String, Object> params) throws JRException, IOException {
+		try {
+			JRDataSource dataSource = new JRBeanCollectionDataSource(obtenerDatosReporteVentas(facturaCabeceraDTOCols));
+			params.put(JRParameter.REPORT_LOCALE, Locale.US);
+			try {
+				params.put("LOGO", new FileInputStream("C:\\ErpLibreries\\imagenes\\probersa.jpeg"));
+			} catch (FileNotFoundException ex) {
+				try {
+					params.put("LOGO", new FileInputStream("C:\\ErpLibreries\\imagenes\\logo.jpeg"));
+					Logger.getLogger(FacturaWS.class.getName()).log(Level.SEVERE, null, ex);
+				} catch (FileNotFoundException ex1) {
+					Logger.getLogger(FacturaWS.class.getName()).log(Level.SEVERE, null, ex1);
+				}
+			}
+			JasperFillManager.fillReportToFile("C:\\ErpLibreries\\reportes\\facturas_ventas.jasper", params, dataSource);
+			String filePdf = JasperExportManager.exportReportToPdfFile("C:\\ErpLibreries\\reportes\\facturas_ventas.jrprint");
+			File file = new File(filePdf);
+			return Files.readAllBytes(file.toPath());
+		}catch (JRException e) {
+			throw new ERPException("Error", e.getMessage()) ;
+		}catch (Exception e) {
+			throw new ERPException("Error", e.getMessage()) ;
+		}
+	}
+	
 	public static Collection<ReporteVentasResponse> obtenerDetalleReporte(Collection<ReporteVentasVO> reporteVentasCols){
 		// Convertidor de decimales
 		DecimalFormatSymbols decimalSymbols = DecimalFormatSymbols.getInstance();
@@ -184,6 +211,33 @@ public class UtilitarioReportesWeb {
 			reporteExistencia.setValorUnidadExistencia(formatoDecimales.format(inventarioDTO.getValorUnidadExistencia().doubleValue()));
 			reporteExistencia.setValorTotalExistencia(formatoDecimales.format(inventarioDTO.getValorTotalExistencia().doubleValue()));
 			response.add(reporteExistencia);
+		});		
+		return response;
+	}
+	
+	public static Collection<ReporteCuentasResponse> obtenerDatosReporteVentas(Collection<FacturaCabeceraDTO> reporteVentasCols){
+		// Convertir fechas
+		SimpleDateFormat formatoFecha = new SimpleDateFormat("YYYY-MM-dd");
+		// Convertidor de decimales
+		DecimalFormatSymbols decimalSymbols = DecimalFormatSymbols.getInstance();
+	    decimalSymbols.setDecimalSeparator('.');
+		DecimalFormat formatoDecimales = new DecimalFormat("#.##", decimalSymbols);
+		formatoDecimales.setMinimumFractionDigits(2);
+		Collection<ReporteCuentasResponse> response = new ArrayList<>();
+		reporteVentasCols.stream().forEach(facturaCabeceraDTO ->{
+			ReporteCuentasResponse reporteVentas = new ReporteCuentasResponse();
+			reporteVentas.setNumeroDocumento(facturaCabeceraDTO.getNumeroDocumento());
+			reporteVentas.setRucDocumentoCliente(facturaCabeceraDTO.getRucDocumento());
+			reporteVentas.setRazonSocialCliente(facturaCabeceraDTO.getNombreClienteProveedor());
+			reporteVentas.setVendedor(facturaCabeceraDTO.getVendedorDTO() != null ? facturaCabeceraDTO.getVendedorDTO().getPersonaDTO().getPrimerNombre() +" "+facturaCabeceraDTO.getVendedorDTO().getPersonaDTO().getPrimerApellido() : "N/D");
+			reporteVentas.setPagada(facturaCabeceraDTO.getPagado() ? "SI":"NO");
+			reporteVentas.setFechaVenta(formatoFecha.format(facturaCabeceraDTO.getFechaDocumento()));
+			reporteVentas.setSubTotal(formatoDecimales.format(facturaCabeceraDTO.getSubTotal()));
+			reporteVentas.setAbonos(formatoDecimales.format(facturaCabeceraDTO.getTotalPagos()));
+			reporteVentas.setSaldos(formatoDecimales.format(facturaCabeceraDTO.getTotalCuenta().subtract(facturaCabeceraDTO.getTotalPagos())));
+			reporteVentas.setTotalVenta(formatoDecimales.format(facturaCabeceraDTO.getTotalCuenta()));
+			reporteVentas.setTotalDescuento(formatoDecimales.format(facturaCabeceraDTO.getDescuento()));
+			response.add(reporteVentas);
 		});		
 		return response;
 	}

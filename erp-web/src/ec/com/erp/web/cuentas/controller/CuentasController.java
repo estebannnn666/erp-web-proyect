@@ -9,6 +9,9 @@ import java.io.InputStream;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.sql.Timestamp;
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
@@ -16,6 +19,7 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
@@ -55,12 +59,12 @@ import ec.com.erp.cliente.mdl.dto.VendedorDTO;
 import ec.com.erp.cliente.mdl.dto.id.FacturaCabeceraID;
 import ec.com.erp.facturacion.electronica.ws.FacturaElectronocaUtil;
 import ec.com.erp.facturacion.electronica.ws.NotaVentaUtil;
-import ec.com.erp.utilitario.commons.util.HtmlPdf;
 import ec.com.erp.web.commons.controller.CommonsController;
 import ec.com.erp.web.commons.controller.MensajesController;
 import ec.com.erp.web.commons.datamanager.CommonDataManager;
 import ec.com.erp.web.commons.login.controller.LoginController;
 import ec.com.erp.web.commons.utils.ERPWebResources;
+import ec.com.erp.web.commons.utils.UtilitarioReportesWeb;
 import ec.com.erp.web.commons.utils.UtilitarioWeb;
 import ec.com.erp.web.cuentas.datamanager.CuentasDataManager;
 import ec.com.erp.web.pedidos.controller.ArticuloService;
@@ -123,6 +127,8 @@ public class CuentasController extends CommonsController implements Serializable
 	private Boolean crearNuevaFila;
 	private BigDecimal totalCuenta;
 	private BigDecimal totalPagos;
+	private BigDecimal totalSubTotal;
+	private BigDecimal totalDescuento;
 	private String tipoRuc;
 	private String numeroDocumentoBusqueda;
 	private String nombreVendedorBusqueda;
@@ -145,6 +151,8 @@ public class CuentasController extends CommonsController implements Serializable
 		this.totalPendiente = BigDecimal.ZERO;
 		this.totalCuenta = BigDecimal.ZERO;
 		this.totalPagos = BigDecimal.ZERO;
+		this.totalSubTotal = BigDecimal.ZERO;
+		this.totalDescuento = BigDecimal.ZERO;
 		this.loginController.activarMenusSeleccionado();
 		this.documentoCreado = Boolean.FALSE;
 		this.facturaCabeceraDTO = new FacturaCabeceraDTO();
@@ -241,6 +249,8 @@ public class CuentasController extends CommonsController implements Serializable
 					this.totalPagos = this.totalPagos.add(factura.getTotalPagos());
 				}
 				this.totalCuenta =  this.totalCuenta.add(factura.getTotalCuenta());
+				this.totalSubTotal = this.totalSubTotal.add(factura.getSubTotal());
+				this.totalDescuento = this.totalDescuento.add(factura.getDescuento());
 			});
 		}
 	}
@@ -269,6 +279,8 @@ public class CuentasController extends CommonsController implements Serializable
 		if(CollectionUtils.isNotEmpty(this.facturaCabeceraDTOCols)) {
 			this.totalCuenta = BigDecimal.ZERO;
 			this.totalPagos = BigDecimal.ZERO;
+			this.totalSubTotal = BigDecimal.ZERO;
+			this.totalDescuento = BigDecimal.ZERO;
 			this.facturaCabeceraDTOCols.stream().forEach(factura ->{
 				if(factura.getPagado()) {
 					factura.setTotalPagos(factura.getTotalCuenta());
@@ -277,6 +289,8 @@ public class CuentasController extends CommonsController implements Serializable
 					this.totalPagos = this.totalPagos.add(factura.getTotalPagos());
 				}
 				this.totalCuenta =  this.totalCuenta.add(factura.getTotalCuenta());
+				this.totalSubTotal = this.totalSubTotal.add(factura.getSubTotal());
+				this.totalDescuento = this.totalDescuento.add(factura.getDescuento());
 			});
 		}
 	}
@@ -684,6 +698,8 @@ public class CuentasController extends CommonsController implements Serializable
 				this.setShowMessagesBar(Boolean.FALSE);
 				this.totalCuenta = BigDecimal.ZERO;
 				this.totalPagos = BigDecimal.ZERO;
+				this.totalSubTotal = BigDecimal.ZERO;
+				this.totalDescuento = BigDecimal.ZERO;
 				this.facturaCabeceraDTOCols.stream().forEach(factura ->{
 					if(factura.getPagado()) {
 						factura.setTotalPagos(factura.getTotalCuenta());
@@ -692,6 +708,8 @@ public class CuentasController extends CommonsController implements Serializable
 						this.totalPagos = this.totalPagos.add(factura.getTotalPagos());
 					}
 					this.totalCuenta =  this.totalCuenta.add(factura.getTotalCuenta());
+					this.totalSubTotal = this.totalSubTotal.add(factura.getSubTotal());
+					this.totalDescuento = this.totalDescuento.add(factura.getDescuento());
 				});
 			}
 		} catch (ERPException e1) {
@@ -1752,14 +1770,25 @@ public class CuentasController extends CommonsController implements Serializable
 	 * Metodo para imprimir lista de facturas
 	 */
 	public String imprimirListaFacturas() {
-		HtmlPdf htmltoPDF;
 		try {
-			String tipoReporte = FacesContext.getCurrentInstance().getExternalContext().getRequestParameterMap().get("tipoReporte");
+			// Convertidor de decimales
+			DecimalFormatSymbols decimalSymbols = DecimalFormatSymbols.getInstance();
+		    decimalSymbols.setDecimalSeparator('.');
+			DecimalFormat formatoDecimales = new DecimalFormat("#.##", decimalSymbols);
+			formatoDecimales.setMinimumFractionDigits(2);
+			SimpleDateFormat formatoFecha = new SimpleDateFormat("YYYY-MM-dd HH:mm:ss");
+			Map<String, Object> params = new HashMap<>();
+			params.put("FECHA_INICIO", formatoFecha.format(fechaFacturaInicio));
+			params.put("FECHA_FIN", formatoFecha.format(fechaFacturaFin));
+			byte[] contenido = null;
+			params.put("TOTAL_SUBTOTAL", formatoDecimales.format(this.totalSubTotal));
+			params.put("TOTAL_DESCUENTO", formatoDecimales.format(this.totalDescuento));
+			params.put("TOTAL_ABONOS", formatoDecimales.format(this.totalPagos));
+			params.put("TOTAL_SALDOS", formatoDecimales.format(this.totalCuenta.subtract(this.totalPagos)));
+			params.put("TOTAL_VENTA", formatoDecimales.format(this.totalCuenta));
 			String tituloReporte = FacesContext.getCurrentInstance().getExternalContext().getRequestParameterMap().get("tituloReporte");
-			// Plantilla rpincipal que permite la conversion de xsl a pdf
-			htmltoPDF = new HtmlPdf(ERPConstantes.PLANTILLA_XSL_FOPRINCIPAL);
-			HashMap<String , String> parametros = new HashMap<String, String>();
-			byte contenido[] = htmltoPDF.convertir(ERPFactory.facturas.getFacturaCabeceraServicio().finObtenerXMLReporteFacturas(facturaCabeceraDTOCols, tituloReporte, tipoReporte).replace("<?xml version=\"1.0\" encoding=\"UTF-8\"?>", ""), "", "",	parametros,	null);
+			params.put("TITULO", tituloReporte);
+			contenido = UtilitarioReportesWeb.generarReporteVentas(this.facturaCabeceraDTOCols, params);
 			UtilitarioWeb.mostrarPDF(contenido);
 		} catch (Exception e) {
 			this.setShowMessagesBar(Boolean.TRUE);
@@ -1779,7 +1808,6 @@ public class CuentasController extends CommonsController implements Serializable
 	
 	public void impresionComprobante(byte[] contenido) {
 		try{
-//			byte[] contenido = ERPFactory.facturas.getFacturaCabeceraServicio().findObtenerNotaVenta(facturaCabeceraDTO);
 			imprimirFormatoNotaVenta(contenido);
 		} catch (Exception e) {
 			this.setShowMessagesBar(Boolean.TRUE);
@@ -2227,5 +2255,21 @@ public class CuentasController extends CommonsController implements Serializable
 
 	public void setDocumentoVendedorBusqueda(String documentoVendedorBusqueda) {
 		this.documentoVendedorBusqueda = documentoVendedorBusqueda;
+	}
+
+	public BigDecimal getTotalSubTotal() {
+		return totalSubTotal;
+	}
+
+	public void setTotalSubTotal(BigDecimal totalSubTotal) {
+		this.totalSubTotal = totalSubTotal;
+	}
+
+	public BigDecimal getTotalDescuento() {
+		return totalDescuento;
+	}
+
+	public void setTotalDescuento(BigDecimal totalDescuento) {
+		this.totalDescuento = totalDescuento;
 	}
 }
