@@ -349,6 +349,9 @@ public class CuentasController extends CommonsController implements Serializable
 		}else {
 			secuenciaPedido = ERPFactory.secuencias.getSecuenciaServicio().findObtenerSecuenciaByNombre(FacturaCabeceraID.NOMBRE_SECUENCIA_NOTA_VENTA);
 			this.facturaCabeceraDTO.setCodigoReferenciaFactura("NOT-"+secuenciaPedido.getValorSecuencia());
+			SecuenciaDTO secuencia = ERPFactory.secuencias.getSecuenciaServicio().findObtenerSecuenciaByNombre(FacturaCabeceraID.NOMBRE_SECUENCIA_FACTURA_RUC_UNO);
+			String numeroFactura = ValidationUtils.obtenerSecuencialFactura(5, String.valueOf(secuencia.getValorSecuencia()));
+			this.facturaCabeceraDTO.setNumeroDocumento(numeroFactura);
 		}
 	}
 	
