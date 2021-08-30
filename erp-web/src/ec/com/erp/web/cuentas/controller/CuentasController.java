@@ -346,12 +346,14 @@ public class CuentasController extends CommonsController implements Serializable
 		if(tipoVenta.equals(ERPConstantes.CODIGO_CATALOGO_VALOR_DOCUMENTO_VENTAS)) {
 			secuenciaPedido = ERPFactory.secuencias.getSecuenciaServicio().findObtenerSecuenciaByNombre(FacturaCabeceraID.NOMBRE_SECUENCIA_VENTA);
 			this.facturaCabeceraDTO.setCodigoReferenciaFactura("FAC-"+secuenciaPedido.getValorSecuencia());
+			this.facturaCabeceraDTO.setActualizarSecuencia(Boolean.FALSE);
 		}else {
 			secuenciaPedido = ERPFactory.secuencias.getSecuenciaServicio().findObtenerSecuenciaByNombre(FacturaCabeceraID.NOMBRE_SECUENCIA_NOTA_VENTA);
 			this.facturaCabeceraDTO.setCodigoReferenciaFactura("NOT-"+secuenciaPedido.getValorSecuencia());
 			SecuenciaDTO secuencia = ERPFactory.secuencias.getSecuenciaServicio().findObtenerSecuenciaByNombre(FacturaCabeceraID.NOMBRE_SECUENCIA_FACTURA_RUC_UNO);
 			String numeroFactura = ValidationUtils.obtenerSecuencialFactura(5, String.valueOf(secuencia.getValorSecuencia()));
 			this.facturaCabeceraDTO.setNumeroDocumento(numeroFactura);
+			this.facturaCabeceraDTO.setActualizarSecuencia(Boolean.TRUE);
 		}
 	}
 	
@@ -1041,6 +1043,7 @@ public class CuentasController extends CommonsController implements Serializable
 		this.nombreVendedor = null;
 		this.documentoVendedorBusqueda = null;
 		this.facturaCabeceraDTO = new FacturaCabeceraDTO();
+		this.facturaCabeceraDTO.setCodigoValorTipoDocumento(ERPConstantes.CODIGO_CATALOGO_VALOR_DOCUMENTO_VENTAS);
 		this.facturaDetalleDTO = new FacturaDetalleDTO();
 		this.cuentasDataManager.setFacturaCabeceraDTOEditar(new FacturaCabeceraDTO());
 		this.facturaDetalleDTOCols = new ArrayList<FacturaDetalleDTO>();
