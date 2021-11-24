@@ -1465,6 +1465,7 @@ public class CuentasController extends CommonsController implements Serializable
 		this.facturaCabeceraDTO.setRucDocumento(this.clienteDTO.getPersonaDTO() == null ? this.clienteDTO.getEmpresaDTO().getNumeroRuc() : this.clienteDTO.getPersonaDTO().getNumeroDocumento());
 		this.facturaCabeceraDTO.setNombreClienteProveedor(this.clienteDTO.getPersonaDTO() == null ? this.clienteDTO.getEmpresaDTO().getRazonSocial() : this.clienteDTO.getPersonaDTO().getNombreCompleto());
 		this.facturaCabeceraDTO.setDireccion(this.clienteDTO.getPersonaDTO() == null ? this.clienteDTO.getEmpresaDTO().getContactoEmpresaDTO().getDireccionPrincipal() : this.clienteDTO.getPersonaDTO().getContactoPersonaDTO().getDireccionPrincipal());
+		this.facturaCabeceraDTO.setCiudad(this.clienteDTO.getPersonaDTO() == null ? this.clienteDTO.getEmpresaDTO().getContactoEmpresaDTO().getCiudad() : this.clienteDTO.getPersonaDTO().getContactoPersonaDTO().getCiudad());
 		this.facturaCabeceraDTO.setTelefono(this.clienteDTO.getPersonaDTO() == null ? this.clienteDTO.getEmpresaDTO().getContactoEmpresaDTO().getTelefonoPrincipal() : this.clienteDTO.getPersonaDTO().getContactoPersonaDTO().getTelefonoPrincipal());
 		this.facturaCabeceraDTO.setEmail(this.clienteDTO.getPersonaDTO() == null ? this.clienteDTO.getEmpresaDTO().getContactoEmpresaDTO().getEmail() : this.clienteDTO.getPersonaDTO().getContactoPersonaDTO().getEmail());
 		this.facturaCabeceraDTO.setTipoCliente(this.clienteDTO.getCodigoValorTipoCompra());
@@ -1527,6 +1528,7 @@ public class CuentasController extends CommonsController implements Serializable
 				this.facturaCabeceraDTO.setRucDocumento(this.clienteDTO.getPersonaDTO() == null ? this.clienteDTO.getEmpresaDTO().getNumeroRuc() : this.clienteDTO.getPersonaDTO().getNumeroDocumento());
 				this.facturaCabeceraDTO.setNombreClienteProveedor(this.clienteDTO.getPersonaDTO() == null ? this.clienteDTO.getEmpresaDTO().getRazonSocial() : this.clienteDTO.getPersonaDTO().getNombreCompleto());
 				this.facturaCabeceraDTO.setDireccion(this.clienteDTO.getPersonaDTO() == null ? this.clienteDTO.getEmpresaDTO().getContactoEmpresaDTO().getDireccionPrincipal() : this.clienteDTO.getPersonaDTO().getContactoPersonaDTO().getDireccionPrincipal());
+				this.facturaCabeceraDTO.setCiudad(this.clienteDTO.getPersonaDTO() == null ? this.clienteDTO.getEmpresaDTO().getContactoEmpresaDTO().getCiudad() : this.clienteDTO.getPersonaDTO().getContactoPersonaDTO().getCiudad());
 				this.facturaCabeceraDTO.setTelefono(this.clienteDTO.getPersonaDTO() == null ? this.clienteDTO.getEmpresaDTO().getContactoEmpresaDTO().getTelefonoPrincipal() : this.clienteDTO.getPersonaDTO().getContactoPersonaDTO().getTelefonoPrincipal());
 				this.facturaCabeceraDTO.setEmail(this.clienteDTO.getPersonaDTO() == null ? this.clienteDTO.getEmpresaDTO().getContactoEmpresaDTO().getEmail() : this.clienteDTO.getPersonaDTO().getContactoPersonaDTO().getEmail());
 				this.facturaCabeceraDTO.setTipoCliente(this.clienteDTO.getCodigoValorTipoCompra());
