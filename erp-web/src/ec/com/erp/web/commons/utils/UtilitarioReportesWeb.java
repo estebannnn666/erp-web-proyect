@@ -24,7 +24,6 @@ import ec.com.erp.cliente.mdl.dto.FacturaCabeceraDTO;
 import ec.com.erp.cliente.mdl.dto.InventarioDTO;
 import ec.com.erp.cliente.mdl.vo.ReporteVentasFacturasVO;
 import ec.com.erp.cliente.mdl.vo.ReporteVentasVO;
-import ec.com.erp.facturacion.electronica.ws.FacturaWS;
 import ec.com.erp.firebase.model.ImageItem;
 import ec.com.erp.web.reportes.response.ReporteCuentasResponse;
 import ec.com.erp.web.reportes.response.ReporteExistenciaResponse;
@@ -48,9 +47,9 @@ public class UtilitarioReportesWeb {
 			} catch (FileNotFoundException ex) {
 				try {
 					params.put("LOGO", new FileInputStream("C:\\ErpLibreries\\imagenes\\logo.jpeg"));
-					Logger.getLogger(FacturaWS.class.getName()).log(Level.SEVERE, null, ex);
+					Logger.getLogger(UtilitarioReportesWeb.class.getName()).log(Level.SEVERE, null, ex);
 				} catch (FileNotFoundException ex1) {
-					Logger.getLogger(FacturaWS.class.getName()).log(Level.SEVERE, null, ex1);
+					Logger.getLogger(UtilitarioReportesWeb.class.getName()).log(Level.SEVERE, null, ex1);
 				}
 			}
 			JasperFillManager.fillReportToFile("C:\\ErpLibreries\\reportes\\ventas_articulo.jasper", params, dataSource);
@@ -73,9 +72,9 @@ public class UtilitarioReportesWeb {
 			} catch (FileNotFoundException ex) {
 				try {
 					params.put("LOGO", new FileInputStream("C:\\ErpLibreries\\imagenes\\logo.jpeg"));
-					Logger.getLogger(FacturaWS.class.getName()).log(Level.SEVERE, null, ex);
+					Logger.getLogger(UtilitarioReportesWeb.class.getName()).log(Level.SEVERE, null, ex);
 				} catch (FileNotFoundException ex1) {
-					Logger.getLogger(FacturaWS.class.getName()).log(Level.SEVERE, null, ex1);
+					Logger.getLogger(UtilitarioReportesWeb.class.getName()).log(Level.SEVERE, null, ex1);
 				}
 			}
 			JasperFillManager.fillReportToFile("C:\\ErpLibreries\\reportes\\ventas_factura.jasper", params, dataSource);
@@ -98,9 +97,9 @@ public class UtilitarioReportesWeb {
 			} catch (FileNotFoundException ex) {
 				try {
 					params.put("LOGO", new FileInputStream("C:\\ErpLibreries\\imagenes\\logo.jpeg"));
-					Logger.getLogger(FacturaWS.class.getName()).log(Level.SEVERE, null, ex);
+					Logger.getLogger(UtilitarioReportesWeb.class.getName()).log(Level.SEVERE, null, ex);
 				} catch (FileNotFoundException ex1) {
-					Logger.getLogger(FacturaWS.class.getName()).log(Level.SEVERE, null, ex1);
+					Logger.getLogger(UtilitarioReportesWeb.class.getName()).log(Level.SEVERE, null, ex1);
 				}
 			}
 			JasperFillManager.fillReportToFile("C:\\ErpLibreries\\reportes\\reporte_existencia.jasper", params, dataSource);
@@ -123,9 +122,9 @@ public class UtilitarioReportesWeb {
 			} catch (FileNotFoundException ex) {
 				try {
 					params.put("LOGO", new FileInputStream("C:\\ErpLibreries\\imagenes\\logo.jpeg"));
-					Logger.getLogger(FacturaWS.class.getName()).log(Level.SEVERE, null, ex);
+					Logger.getLogger(UtilitarioReportesWeb.class.getName()).log(Level.SEVERE, null, ex);
 				} catch (FileNotFoundException ex1) {
-					Logger.getLogger(FacturaWS.class.getName()).log(Level.SEVERE, null, ex1);
+					Logger.getLogger(UtilitarioReportesWeb.class.getName()).log(Level.SEVERE, null, ex1);
 				}
 			}
 			JasperFillManager.fillReportToFile("C:\\ErpLibreries\\reportes\\facturas_ventas.jasper", params, dataSource);

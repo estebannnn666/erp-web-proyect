@@ -57,7 +57,7 @@ import ec.com.erp.cliente.mdl.dto.ProveedorDTO;
 import ec.com.erp.cliente.mdl.dto.SecuenciaDTO;
 import ec.com.erp.cliente.mdl.dto.VendedorDTO;
 import ec.com.erp.cliente.mdl.dto.id.FacturaCabeceraID;
-import ec.com.erp.facturacion.electronica.ws.FacturaElectronocaUtil;
+import ec.com.erp.facturacion.electronica.ws.FacturaElectronicaUtil;
 import ec.com.erp.facturacion.electronica.ws.NotaVentaUtil;
 import ec.com.erp.web.commons.controller.CommonsController;
 import ec.com.erp.web.commons.controller.MensajesController;
@@ -863,7 +863,7 @@ public class CuentasController extends CommonsController implements Serializable
 			    MensajesController.addInfo(null, ERPWebResources.getString("ec.com.erp.etiqueta.mensaje.informacion.factura.electrinoca"));
 			    // Enviar notificacion por mail
 			    if(StringUtils.isNotBlank(this.facturaCabeceraDTO.getEmail())){
-			    	byte[] factura = FacturaElectronocaUtil.imprimirRideFactura(xmlDocument);
+			    	byte[] factura = FacturaElectronicaUtil.imprimirRideFactura(xmlDocument);
 					ERPFactory.notificacion.getNotificacionMailServicio().findEnviarFacturaMail(this.facturaCabeceraDTO.getEmail(), factura);
 			    }
 			    this.facturaCabeceraDTOCols = ERPFactory.facturas.getFacturaCabeceraServicio().findObtenerListaFacturas(Integer.parseInt(ERPConstantes.ESTADO_ACTIVO_NUMERICO), numeroFactura, null, null, docClienteProveedor, nombClienteProveedor, pagado, tiposDocumentos, this.codigoVendedor);
@@ -1843,7 +1843,7 @@ public class CuentasController extends CommonsController implements Serializable
 			}else if(this.facturaCabeceraDTO.getCodigoValorTipoDocumento().equals(ERPConstantes.CODIGO_CATALOGO_VALOR_DOCUMENTO_VENTAS)){
 				byte[] xmlDocument = ERPFactory.facturas.getFacturaCabeceraServicio().findObtenerXmlDocumentoFactura(ERPConstantes.CODIGO_COMPANIA, this.facturaCabeceraDTO.getId().getCodigoFactura());
 				if(xmlDocument != null){
-					byte[] contenido = FacturaElectronocaUtil.imprimirFacturaFormato(xmlDocument);
+					byte[] contenido = FacturaElectronicaUtil.imprimirFacturaFormato(xmlDocument);
 					impresionComprobante(contenido);
 					MensajesController.addInfo(null, ERPWebResources.getString("ec.com.erp.etiqueta.pantall.despacho.mensaje.impresion.correcta"));
 				}else{
@@ -1876,7 +1876,7 @@ public class CuentasController extends CommonsController implements Serializable
 				byte[] contenido;
 				byte[] xmlDocument = ERPFactory.facturas.getFacturaCabeceraServicio().findObtenerXmlDocumentoFactura(ERPConstantes.CODIGO_COMPANIA, this.facturaCabeceraDTO.getId().getCodigoFactura());
 				if(xmlDocument != null){
-					contenido = FacturaElectronocaUtil.imprimirFacturaFormato(xmlDocument);
+					contenido = FacturaElectronicaUtil.imprimirFacturaFormato(xmlDocument);
 				}else{
 					contenido = NotaVentaUtil.generarNotaVenta(facturaCabeceraDTO);
 				}
