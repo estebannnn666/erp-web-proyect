@@ -213,6 +213,13 @@ public class CuentasController extends CommonsController implements Serializable
 			this.setFacturaDetalleDTOCols(cuentasDataManager.getFacturaCabeceraDTOEditar().getFacturaDetalleDTOCols());
 		}
 		
+		if(FacesContext.getCurrentInstance().getViewRoot().getViewId().equals("/modules/facturas/adminBusquedaFacturas.xhtml")) {
+			tipoDocumento = ERPConstantes.CODIGO_CATALOGO_VALOR_DOCUMENTO_VENTAS;
+			tiposDocumentos.add(ERPConstantes.CODIGO_CATALOGO_VALOR_DOCUMENTO_VENTAS);
+			tiposDocumentos.add(ERPConstantes.CODIGO_CATALOGO_VALOR_DOCUMENTO_NOTA_VENTA);
+			this.facturaCabeceraDTOCols = ERPFactory.facturas.getFacturaCabeceraServicio().findObtenerListaFacturasCanceladas(Integer.parseInt(ERPConstantes.ESTADO_ACTIVO_NUMERICO), numeroFactura, null, null, docClienteProveedor, nombClienteProveedor, pagado, tiposDocumentos, this.codigoVendedor);
+		}
+		
 		if(FacesContext.getCurrentInstance().getViewRoot().getViewId().equals("/modules/ventas/adminBusquedaVentas.xhtml")) {
 			tipoDocumento = ERPConstantes.CODIGO_CATALOGO_VALOR_DOCUMENTO_VENTAS;
 			tiposDocumentos.add(ERPConstantes.CODIGO_CATALOGO_VALOR_DOCUMENTO_VENTAS);
@@ -246,7 +253,9 @@ public class CuentasController extends CommonsController implements Serializable
 					factura.setTotalPagos(factura.getTotalCuenta());
 					this.totalPagos = this.totalPagos.add(factura.getTotalCuenta());
 				}else {
-					this.totalPagos = this.totalPagos.add(factura.getTotalPagos());
+					if(factura.getTotalPagos() != null){
+						this.totalPagos = this.totalPagos.add(factura.getTotalPagos());
+					}
 				}
 				this.totalCuenta =  this.totalCuenta.add(factura.getTotalCuenta());
 				this.totalSubTotal = this.totalSubTotal.add(factura.getSubTotal());
@@ -711,6 +720,102 @@ public class CuentasController extends CommonsController implements Serializable
 						this.totalPagos = this.totalPagos.add(factura.getTotalCuenta());
 					}else {
 						this.totalPagos = this.totalPagos.add(factura.getTotalPagos());
+					}
+					this.totalCuenta =  this.totalCuenta.add(factura.getTotalCuenta());
+					this.totalSubTotal = this.totalSubTotal.add(factura.getSubTotal());
+					this.totalDescuento = this.totalDescuento.add(factura.getDescuento());
+				});
+			}
+		} catch (ERPException e1) {
+			this.setShowMessagesBar(Boolean.TRUE);
+			FacesMessage msg = new FacesMessage(e1.getMessage(), "ERROR MSG");
+	        msg.setSeverity(FacesMessage.SEVERITY_ERROR);
+	        FacesContext.getCurrentInstance().addMessage(null, msg);
+		} catch (Exception e2) {
+			this.setShowMessagesBar(Boolean.TRUE);
+			FacesMessage msg = new FacesMessage(e2.getMessage(), "ERROR MSG");
+	        msg.setSeverity(FacesMessage.SEVERITY_ERROR);
+	        FacesContext.getCurrentInstance().addMessage(null, msg);
+		}
+	}
+	
+	
+	/**
+	 * Metodo para buscar facturas en venta
+	 * @param e
+	 */
+	public void busquedaFacturasCanceladas(ActionEvent e){
+		String tipoFactura = ERPConstantes.CODIGO_CATALOGO_VALOR_DOCUMENTO_VENTAS;
+		this.buscarFacturasCanceladas(tipoFactura);
+	}
+	
+	/**
+	 * Metodo para buscar facturas en venta por filtros de busqueda al dar enter
+	 * @param e
+	 */
+	public void busquedaFacturasCanceladasEnter(AjaxBehaviorEvent e){
+		String tipoFactura = ERPConstantes.CODIGO_CATALOGO_VALOR_DOCUMENTO_VENTAS;
+		this.buscarFacturasCanceladas(tipoFactura);
+	}
+	
+	/**
+	 * Metodo para buscar cuentas o facturas por filtros de busqueda
+	 * @param e
+	 */
+	public void buscarFacturasCanceladas(String tipoFactura){
+		try {
+			Long codigoVendedorBuscado = this.codigoVendedor;
+			if(this.codigoVendedor == null && StringUtils.isNotBlank(documentoVendedorBusqueda)){
+				this.vendedorDTOCols = ERPFactory.vendedor.getVendedorServicio().findObtenerListaVendedores(Integer.parseInt(ERPConstantes.ESTADO_ACTIVO_NUMERICO), this.documentoVendedorBusqueda, null);
+				if(CollectionUtils.isNotEmpty(this.vendedorDTOCols) && this.vendedorDTOCols.size() == 1){
+					codigoVendedorBuscado = this.vendedorDTOCols.iterator().next().getId().getCodigoVendedor();
+				}else {
+					codigoVendedorBuscado = 0L;
+				}
+			}
+			
+			
+			Calendar fechaInicio = Calendar.getInstance();
+			Calendar fechaFin = Calendar.getInstance();
+			fechaInicio.setTime(fechaFacturaInicio);
+			fechaFin.setTime(fechaFacturaFin);
+			UtilitarioWeb.cleanDate(fechaInicio);
+			UtilitarioWeb.cleanDate(fechaFin);
+			fechaFin.add(Calendar.DATE, 1);
+			if(this.pagadoBusqueda != null && this.pagadoBusqueda.length > 0){
+				if(this.pagadoBusqueda.length == 2) {
+					this.pagado = null; 
+				}else {
+					if(this.pagadoBusqueda[0].equals(ERPConstantes.ESTADO_ACTIVO_NUMERICO)) {
+						this.pagado = Boolean.TRUE;
+					}else {
+						this.pagado = Boolean.FALSE;
+					}
+				}
+			}else {
+				this.pagado = null; 
+			}
+			
+			this.facturaCabeceraDTOCols = ERPFactory.facturas.getFacturaCabeceraServicio().findObtenerListaFacturasCanceladas(Integer.parseInt(ERPConstantes.ESTADO_ACTIVO_NUMERICO), numeroFactura, new Timestamp(fechaInicio.getTime().getTime()), new Timestamp(fechaFin.getTime().getTime()), docClienteProveedor, nombClienteProveedor, pagado, tiposDocumentos, codigoVendedorBuscado);
+			if(CollectionUtils.isEmpty(this.facturaCabeceraDTOCols)){
+				this.setShowMessagesBar(Boolean.TRUE);
+				FacesMessage msg = new FacesMessage("No se encontraron resultados para la b\u00FAsqueda realizada.", "ERROR MSG");
+		        msg.setSeverity(FacesMessage.SEVERITY_INFO);
+		        FacesContext.getCurrentInstance().addMessage(null, msg);
+			}else {
+				this.setShowMessagesBar(Boolean.FALSE);
+				this.totalCuenta = BigDecimal.ZERO;
+				this.totalPagos = BigDecimal.ZERO;
+				this.totalSubTotal = BigDecimal.ZERO;
+				this.totalDescuento = BigDecimal.ZERO;
+				this.facturaCabeceraDTOCols.stream().forEach(factura ->{
+					if(factura.getPagado()) {
+						factura.setTotalPagos(factura.getTotalCuenta());
+						this.totalPagos = this.totalPagos.add(factura.getTotalCuenta());
+					}else {
+						if(factura.getTotalPagos() != null){
+							this.totalPagos = this.totalPagos.add(factura.getTotalPagos());
+						}
 					}
 					this.totalCuenta =  this.totalCuenta.add(factura.getTotalCuenta());
 					this.totalSubTotal = this.totalSubTotal.add(factura.getSubTotal());

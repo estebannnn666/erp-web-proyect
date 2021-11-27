@@ -220,6 +220,10 @@ body {
 	background-image: url("#{resource['images/notacredito.png']}");
 }
 
+.styleFacturas{
+	background-image: url("#{resource['images/facturascanceladas.png']}");
+}
+
 /*Estilos menu centro*/
 .styleArticle a:hover {
 	background-image: url("#{resource['images/articulos_over.png']}");
@@ -536,6 +540,11 @@ body {
 
 .botonComun a.botonVentas {
     background-image: url("#{resource['images/btnVentas.png']}");
+    width: 45px;
+}
+
+.botonComun a.botonNotasCredito {
+    background-image: url("#{resource['images/btnNotasCredito.png']}");
     width: 45px;
 }
 

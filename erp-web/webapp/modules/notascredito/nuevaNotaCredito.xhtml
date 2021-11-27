@@ -47,19 +47,6 @@
 					<rich:calendar value="#{notasCreditoController.notaCreditoDTO.fechaDocumento}" datePattern="yyyy-MM-dd"></rich:calendar>
 					<h:outputText value="" />
 					
-					<h:outputText class="styleNegritas" value="#{msg_erpweb['ec.com.erp.etiqueta.label.lista.cabecera.factura.ruc.documento']}: *" />
-					<h:inputText style="width:200px" value="#{notasCreditoController.notaCreditoDTO.rucCliente}" id="docClienteProveedor" maxlength="13" onkeypress="if (event.keyCode == 13) return false; return validarEnteros(event);">
-						<a4j:ajax event="keyup" execute="pnlGridVentas pnlGridDetalleFactura" listener="#{notasCreditoController.realizarConsultaClientes}" onbeforesubmit="return verifyKeyEnter(event);" render="pnlGridVentas, pnlMensajes"/>
-					</h:inputText>
-					<h:panelGroup layout="block" styleClass="botonB" style="margin-top:5px;">
-						<a4j:commandLink oncomplete="#{rich:component('mpClientes')}.show(); " styleClass="botonBuscar" actionListener="#{notasCreditoController.busquedaClientes}" render="pnlListaClientes tableClientes filtrosClientes pnlMensajes" execute="@this, pnlGridVentas" title="Click para buscar clientes">							
-						</a4j:commandLink>	
-					</h:panelGroup>	
-					<div style="width: 30px"></div>
-					<h:outputText class="styleNegritas" value="#{msg_erpweb['ec.com.erp.etiqueta.label.lista.cabecera.factura.razonSocial']}:" />
-					<h:inputText styleClass="styleUpperCase" style="width:200px" value="#{notasCreditoController.notaCreditoDTO.razonSocial}" id="razonSocialVen" maxlength="32" onkeypress="if (event.keyCode == 13) return false;"/>
-					<h:outputText value="" />
-					
 					<h:outputText class="styleNegritas" value="#{msg_erpweb['ec.com.erp.etiqueta.label.lista.nota.credito.etiqueta.numero.factura']}: *" />
 					<h:inputText style="width:200px" value="#{notasCreditoController.notaCreditoDTO.numeroComprobante}" maxlength="13" onkeypress="if (event.keyCode == 13) return false; return validarEnteros(event);">
 						<a4j:ajax event="keyup" execute="pnlGridVentas pnlGridDetalleFactura" listener="#{notasCreditoController.realizarConsultaFacturas}" onbeforesubmit="return verifyKeyEnter(event);" render="pnlGridVentas, pnlMensajes"/>
@@ -73,8 +60,21 @@
 					<rich:calendar value="#{notasCreditoController.notaCreditoDTO.fechaEmisionFactura}" datePattern="yyyy-MM-dd"></rich:calendar>
 					<h:outputText value="" />
 					
+					<h:outputText class="styleNegritas" value="#{msg_erpweb['ec.com.erp.etiqueta.label.lista.cabecera.factura.ruc.documento']}: *" />
+					<h:inputText style="width:200px" value="#{notasCreditoController.notaCreditoDTO.rucCliente}" id="docClienteProveedor" maxlength="13" onkeypress="if (event.keyCode == 13) return false; return validarEnteros(event);">
+						<a4j:ajax event="keyup" execute="pnlGridVentas pnlGridDetalleFactura" listener="#{notasCreditoController.realizarConsultaClientes}" onbeforesubmit="return verifyKeyEnter(event);" render="pnlGridVentas, pnlMensajes"/>
+					</h:inputText>
+					<h:panelGroup layout="block" styleClass="botonB" style="margin-top:5px;">
+						<a4j:commandLink oncomplete="#{rich:component('mpClientes')}.show(); " styleClass="botonBuscar" actionListener="#{notasCreditoController.busquedaClientes}" render="pnlListaClientes tableClientes filtrosClientes pnlMensajes" execute="@this, pnlGridVentas" title="Click para buscar clientes">							
+						</a4j:commandLink>	
+					</h:panelGroup>	
+					<div style="width: 30px"></div>
+					<h:outputText class="styleNegritas" value="#{msg_erpweb['ec.com.erp.etiqueta.label.lista.cabecera.factura.razonSocial']}:" />
+					<h:inputText styleClass="styleUpperCase" disabled="true" style="width:200px" value="#{notasCreditoController.notaCreditoDTO.razonSocial}" id="razonSocialVen" maxlength="32" onkeypress="if (event.keyCode == 13) return false;"/>
+					<h:outputText value="" />
+					
 					<h:outputText class="styleNegritas" value="#{msg_erpweb['ec.com.erp.etiqueta.label.lista.nota.credito.etiqueta.motivo']}: *" />
-					<h:inputTextarea style="width:200px; height: 30px;" value="#{notasCreditoController.notaCreditoDTO.motivo}" maxlength="13">
+					<h:inputTextarea class="styleUpperCase"  style="width:200px; height: 30px;" value="#{notasCreditoController.notaCreditoDTO.motivo}" maxlength="13">
 					</h:inputTextarea>
 				</h:panelGrid>
 			</fieldset>
@@ -320,7 +320,7 @@
 		</rich:popupPanel>
 		
 		<!--  Pop Up para agregar datos de facturas -->
-		<rich:popupPanel id="mpFacturas" styleClass="panelPedidos" header="#{msg_erpweb['ec.com.erp.etiqueta.label.lista.factura.etiqueta.seleccion.nota.credito']}" width="1000" height="425" modal="true" domElementAttachment="form">
+		<rich:popupPanel id="mpFacturas" styleClass="panelPedidos" header="#{msg_erpweb['ec.com.erp.etiqueta.label.lista.factura.etiqueta.seleccion.nota.credito']}" width="1100" height="425" modal="true" domElementAttachment="form">
 			<f:facet name="controls">
 				<h:outputLink value="#"	onclick="#{rich:component('mpFacturas')}.hide();">
 					<h:graphicImage library="images" name="close.png" style="border:0px" id="closePopUpFactura" />
@@ -368,6 +368,10 @@
 			            <rich:column>
 			                <f:facet name="header">Nro.</f:facet>
 			                #{it.index+1}
+			            </rich:column>
+			            <rich:column width="60px">
+			                <f:facet name="header"><h:outputText title="Tipo de factura" value="T. FACT."/></f:facet>
+			                <h:outputText value="#{fact.tipoRuc == null ? 'N/D' : fact.tipoRuc eq 'FA1' ? 'HOM' : 'PAM'}" />
 			            </rich:column>
 			            <rich:column>
 			                <f:facet name="header"><h:outputText value="#{msg_erpweb['ec.com.erp.etiqueta.label.lista.cabecera.factura.numero.documento']}"/></f:facet>
