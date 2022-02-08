@@ -232,6 +232,12 @@
 						<h:outputText class="styleNegritas" value="#{msg_erpweb['ec.com.erp.etiqueta.header.nueva.pagos.valorpago']}: *" />
 				 		<h:inputText  style="width:159px" value="#{cuentasController.pagosFacturaDTO.valorPago}" id="precio" onkeypress="return validarDecimal(event);"/>
 				 		
+				 		<h:outputText class="styleNegritas" value="Tipo pago *" />
+				 		<h:selectOneMenu id="tipoPago" tabindex="1" value="#{cuentasController.pagosFacturaDTO.codigoValorPago}" style="background-color:#f9f9d5; background-image: none; width: 165px" onkeypress="if (event.keyCode == 13) return false;">
+							<f:selectItem itemLabel="SELECCIONE"/>
+							<f:selectItems value="#{cuentasController.tipoPagosCatalogoValorDTOCols}" var="tipoPago" itemValue = "#{tipoPago.id.codigoCatalogoValor}" itemLabel = "#{tipoPago.nombreCatalogoValor}" />
+						</h:selectOneMenu>
+						
 				 		<h:outputText class="styleNegritas" value="#{msg_erpweb['ec.com.erp.etiqueta.header.nueva.pagos.descripcion']}: *" />
 				 		<h:inputTextarea id="txtObservacion" maxlength="100" styleClass="styleUpperCase estiloTextArea" value="#{cuentasController.pagosFacturaDTO.descripcion}"/>
 				 	</h:panelGrid>

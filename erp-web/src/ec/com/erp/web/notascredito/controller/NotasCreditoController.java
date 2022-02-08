@@ -624,7 +624,7 @@ public class NotasCreditoController extends CommonsController implements Seriali
 	
 	
 	/**
-	 * Metodo borrar pantalla y crear una nueva factura en venta
+	 * Metodo borrar pantalla y crear una nueva nota de credito
 	 * @param e
 	 */
 	public void clearNuevaNotaCredito(ActionEvent e){
@@ -637,6 +637,16 @@ public class NotasCreditoController extends CommonsController implements Seriali
 		this.documentoClienteBusqueda = null;
 		this.nombreClienteBusqueda = null;
 		this.notaCreditoDTO = new NotaCreditoDTO();
+		Collection<String> codigosParametros = new ArrayList<>();
+		codigosParametros.add(ERPConstantes.PARAMETRO_NOMBRE_ESTABLECIMIENTO);
+		codigosParametros.add(ERPConstantes.PARAMETRO_NOMBRE_PUNTO_EMISION);
+		Collection<ParametroDTO> parametrosFactura = ERPFactory.parametro.getParametroServicio().findObtenerParametrosByCodigos(codigosParametros);
+		ParametroDTO parametroDTOEsta = parametrosFactura.stream().filter(param -> param.getId().getCodigoParametro().equals(ERPConstantes.PARAMETRO_NOMBRE_ESTABLECIMIENTO)).findFirst().orElse(null);
+		ParametroDTO parametroDTOPunt = parametrosFactura.stream().filter(param -> param.getId().getCodigoParametro().equals(ERPConstantes.PARAMETRO_NOMBRE_PUNTO_EMISION)).findFirst().orElse(null);
+		SecuenciaDTO secuenciaPedido = new SecuenciaDTO();
+		secuenciaPedido = ERPFactory.secuencias.getSecuenciaServicio().findObtenerSecuenciaByNombre(NotaCreditoID.NTC_ELECTRONICA_RUC_UNO);
+		String numeroFactura = ValidationUtils.obtenerSecuencialNotaCredito(9, parametroDTOEsta.getValorParametro(), parametroDTOPunt.getValorParametro(), String.valueOf(secuenciaPedido.getValorSecuencia()));
+		this.notaCreditoDTO.setNumeroDocumento(numeroFactura);
 		this.notaCreditoDetalleDTO = new NotaCreditoDetalleDTO();
 		this.notasCreditoDataManager.setNotaCreditoDTOEditar(new NotaCreditoDTO());
 		this.notaCreditoDetalleDTOCols = new ArrayList<>();

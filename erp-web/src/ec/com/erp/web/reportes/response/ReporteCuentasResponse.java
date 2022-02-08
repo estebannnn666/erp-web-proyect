@@ -32,6 +32,18 @@ public class ReporteCuentasResponse implements Serializable{
 	private String totalVenta ;
 	
 	private String totalDescuento ;
+	
+	private String tarifa0;
+	
+	private String tarifa12;
+	
+	private String iva12;
+	
+	private String retencion30;
+	
+	private String retencion70;
+	
+	private String renta1;
 
 	public String getNumeroDocumento() {
 		return numeroDocumento;
@@ -119,5 +131,53 @@ public class ReporteCuentasResponse implements Serializable{
 
 	public void setTotalDescuento(String totalDescuento) {
 		this.totalDescuento = totalDescuento;
+	}
+
+	public String getTarifa0() {
+		return tarifa0;
+	}
+
+	public void setTarifa0(String tarifa0) {
+		this.tarifa0 = tarifa0;
+	}
+
+	public String getTarifa12() {
+		return tarifa12;
+	}
+
+	public void setTarifa12(String tarifa12) {
+		this.tarifa12 = tarifa12;
+	}
+
+	public String getIva12() {
+		return iva12;
+	}
+
+	public void setIva12(String iva12) {
+		this.iva12 = iva12;
+	}
+
+	public String getRetencion30() {
+		return retencion30;
+	}
+
+	public void setRetencion30(String retencion30) {
+		this.retencion30 = retencion30;
+	}
+
+	public String getRetencion70() {
+		return retencion70;
+	}
+
+	public void setRetencion70(String retencion70) {
+		this.retencion70 = retencion70;
+	}
+
+	public String getRenta1() {
+		return renta1;
+	}
+
+	public void setRenta1(String renta1) {
+		this.renta1 = renta1;
 	}
 }

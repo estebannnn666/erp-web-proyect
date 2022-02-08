@@ -127,6 +127,9 @@ public class CuentasController extends CommonsController implements Serializable
 	private Boolean crearNuevaFila;
 	private BigDecimal totalCuenta;
 	private BigDecimal totalPagos;
+	private BigDecimal totalRetencion30;
+	private BigDecimal totalRetencion70;
+	private BigDecimal totalRenta1;
 	private BigDecimal totalSubTotal;
 	private BigDecimal totalDescuento;
 	private String tipoRuc;
@@ -138,6 +141,7 @@ public class CuentasController extends CommonsController implements Serializable
 	private String nombreVendedor;
 	private Collection<String> tiposDocumentos;
 	private Long codigoVendedor;
+	private Collection<CatalogoValorDTO> tipoPagosCatalogoValorDTOCols;
 
 	@PostConstruct
 	public void postConstruct() {
@@ -146,11 +150,14 @@ public class CuentasController extends CommonsController implements Serializable
 		}
 		this.crearFacturaElectronica = Boolean.FALSE;
 		this.tipoRuc = ERPConstantes.ESTADO_INACTIVO_NUMERICO;
-		this.tamanioPopUp = 510;
+		this.tamanioPopUp = 530;
 		this.totalPagado = BigDecimal.ZERO;
 		this.totalPendiente = BigDecimal.ZERO;
 		this.totalCuenta = BigDecimal.ZERO;
 		this.totalPagos = BigDecimal.ZERO;
+		this.totalRetencion30 = BigDecimal.ZERO;
+		this.totalRetencion70 = BigDecimal.ZERO;
+		this.totalRenta1 = BigDecimal.ZERO;
 		this.totalSubTotal = BigDecimal.ZERO;
 		this.totalDescuento = BigDecimal.ZERO;
 		this.loginController.activarMenusSeleccionado();
@@ -257,6 +264,9 @@ public class CuentasController extends CommonsController implements Serializable
 						this.totalPagos = this.totalPagos.add(factura.getTotalPagos());
 					}
 				}
+				this.totalRetencion30 = factura.getRetencion30() != null ? this.totalRetencion30.add(factura.getRetencion30()) : BigDecimal.ZERO;
+				this.totalRetencion70 = factura.getRetencion70() != null ? this.totalRetencion70.add(factura.getRetencion70()) : BigDecimal.ZERO;
+				this.totalRenta1 = factura.getRenta1() != null ? this.totalRenta1.add(factura.getRenta1()) : BigDecimal.ZERO;
 				this.totalCuenta =  this.totalCuenta.add(factura.getTotalCuenta());
 				this.totalSubTotal = this.totalSubTotal.add(factura.getSubTotal());
 				this.totalDescuento = this.totalDescuento.add(factura.getDescuento());
@@ -288,6 +298,9 @@ public class CuentasController extends CommonsController implements Serializable
 		if(CollectionUtils.isNotEmpty(this.facturaCabeceraDTOCols)) {
 			this.totalCuenta = BigDecimal.ZERO;
 			this.totalPagos = BigDecimal.ZERO;
+			this.totalRetencion30 = BigDecimal.ZERO;
+			this.totalRetencion70 = BigDecimal.ZERO;
+			this.totalRenta1 = BigDecimal.ZERO;
 			this.totalSubTotal = BigDecimal.ZERO;
 			this.totalDescuento = BigDecimal.ZERO;
 			this.facturaCabeceraDTOCols.stream().forEach(factura ->{
@@ -297,6 +310,9 @@ public class CuentasController extends CommonsController implements Serializable
 				}else {
 					this.totalPagos = this.totalPagos.add(factura.getTotalPagos());
 				}
+				this.totalRetencion30 = this.totalRetencion30.add(factura.getRetencion30());
+				this.totalRetencion70 = this.totalRetencion70.add(factura.getRetencion70());
+				this.totalRenta1 = this.totalRenta1.add(factura.getRenta1());
 				this.totalCuenta =  this.totalCuenta.add(factura.getTotalCuenta());
 				this.totalSubTotal = this.totalSubTotal.add(factura.getSubTotal());
 				this.totalDescuento = this.totalDescuento.add(factura.getDescuento());
@@ -519,7 +535,7 @@ public class CuentasController extends CommonsController implements Serializable
 
 	public void guardarPagoCompra(ActionEvent e){
 		try {
-			if(this.validarInformacionRequeridaPago()) {
+			if(this.validarInformacionRequeridaPago(Boolean.FALSE)) {
 				this.pagosFacturaDTO.setCodigoFactura(this.facturaCabeceraDTO.getId().getCodigoFactura());
 				this.pagosFacturaDTO.getId().setCodigoCompania(Integer.parseInt(ERPConstantes.ESTADO_ACTIVO_NUMERICO));
 				this.pagosFacturaDTO.setDescripcion(this.pagosFacturaDTO.getDescripcion().toUpperCase());
@@ -533,9 +549,9 @@ public class CuentasController extends CommonsController implements Serializable
 				this.pagosFacturaDTO.setFechaPago(new Date());
 				if(this.totalPendiente.intValue() <= 0) {
 					this.facturaCabeceraDTO.setPagado(Boolean.TRUE);
-					this.tamanioPopUp = 310;
+					this.tamanioPopUp = 340;
 				}else {
-					this.tamanioPopUp = 510;
+					this.tamanioPopUp = 530;
 				}
 		        MensajesController.addInfo(null, ERPWebResources.getString("ec.com.erp.etiqueta.label.lista.pago.factura.mensaje.pago"));
 			}else{
@@ -554,11 +570,12 @@ public class CuentasController extends CommonsController implements Serializable
 	
 	public void guardarPagoVenta(ActionEvent e){
 		try {
-			if(this.validarInformacionRequeridaPago()) {
+			if(this.validarInformacionRequeridaPago(Boolean.TRUE)) {
 				this.pagosFacturaDTO.setCodigoFactura(this.facturaCabeceraDTO.getId().getCodigoFactura());
 				this.pagosFacturaDTO.setDescripcion(this.pagosFacturaDTO.getDescripcion().toUpperCase());
 				this.pagosFacturaDTO.getId().setCodigoCompania(Integer.parseInt(ERPConstantes.ESTADO_ACTIVO_NUMERICO));
 				this.pagosFacturaDTO.setUsuarioRegistro(loginController.getUsuariosDTO().getId().getUserId());
+				this.pagosFacturaDTO.setCodigoTipoPago(ERPConstantes.CODIGO_CATALOGO_TIPOS_PAGOS);
 				ERPFactory.transaccion.getTransaccionServicio().transGuardarPago(ERPConstantes.CODIGO_CATALOGO_VALOR_TRANSACCION_INGRESO, this.pagosFacturaDTO);
 				this.pagosFacturaDTOCols.add(this.pagosFacturaDTO);
 				this.setShowMessagesBar(Boolean.TRUE);
@@ -568,9 +585,9 @@ public class CuentasController extends CommonsController implements Serializable
 				this.pagosFacturaDTO.setFechaPago(new Date());
 				if(this.totalPendiente.intValue() <= 0) {
 					this.facturaCabeceraDTO.setPagado(Boolean.TRUE);
-					this.tamanioPopUp = 310;
+					this.tamanioPopUp = 340;
 				}else {
-					this.tamanioPopUp = 510;
+					this.tamanioPopUp = 540;
 				}
 		        MensajesController.addInfo(null, ERPWebResources.getString("ec.com.erp.etiqueta.label.lista.pago.factura.mensaje.pago"));
 			}else{
@@ -590,7 +607,7 @@ public class CuentasController extends CommonsController implements Serializable
 	/**
 	 * Metodo para validar la informacion requerida de la pantalla
 	 */
-	private Boolean validarInformacionRequeridaPago() {
+	private Boolean validarInformacionRequeridaPago(Boolean esVenta) {
 		Boolean valido = Boolean.TRUE;
 		if(this.pagosFacturaDTO.getValorPago() == null) {
 			valido = Boolean.FALSE;
@@ -599,6 +616,10 @@ public class CuentasController extends CommonsController implements Serializable
 		if(this.pagosFacturaDTO.getValorPago() != null && this.pagosFacturaDTO.getValorPago().doubleValue() == 0.0) {
 			valido = Boolean.FALSE;
 			MensajesController.addError(null, ERPWebResources.getString("ec.com.erp.etiqueta.mensaje.campo.requerido.pago.valorencero"));
+		}
+		if(esVenta && StringUtils.isBlank(this.pagosFacturaDTO.getCodigoValorPago())) {
+			valido = Boolean.FALSE;
+			MensajesController.addError(null, ERPWebResources.getString("ec.com.erp.etiqueta.mensaje.campo.requerido.tipo.pago"));
 		}
 		if(StringUtils.isEmpty(this.pagosFacturaDTO.getDescripcion())) {
 			valido = Boolean.FALSE;
@@ -712,6 +733,9 @@ public class CuentasController extends CommonsController implements Serializable
 				this.setShowMessagesBar(Boolean.FALSE);
 				this.totalCuenta = BigDecimal.ZERO;
 				this.totalPagos = BigDecimal.ZERO;
+				this.totalRetencion30 = BigDecimal.ZERO;
+				this.totalRetencion70 = BigDecimal.ZERO;
+				this.totalRenta1 = BigDecimal.ZERO;
 				this.totalSubTotal = BigDecimal.ZERO;
 				this.totalDescuento = BigDecimal.ZERO;
 				this.facturaCabeceraDTOCols.stream().forEach(factura ->{
@@ -721,6 +745,9 @@ public class CuentasController extends CommonsController implements Serializable
 					}else {
 						this.totalPagos = this.totalPagos.add(factura.getTotalPagos());
 					}
+					this.totalRetencion30 = this.totalRetencion30.add(factura.getRetencion30());
+					this.totalRetencion70 = this.totalRetencion70.add(factura.getRetencion70());
+					this.totalRenta1 = this.totalRenta1.add(factura.getRenta1());
 					this.totalCuenta =  this.totalCuenta.add(factura.getTotalCuenta());
 					this.totalSubTotal = this.totalSubTotal.add(factura.getSubTotal());
 					this.totalDescuento = this.totalDescuento.add(factura.getDescuento());
@@ -806,6 +833,9 @@ public class CuentasController extends CommonsController implements Serializable
 				this.setShowMessagesBar(Boolean.FALSE);
 				this.totalCuenta = BigDecimal.ZERO;
 				this.totalPagos = BigDecimal.ZERO;
+				this.totalRetencion30 = BigDecimal.ZERO;
+				this.totalRetencion70 = BigDecimal.ZERO;
+				this.totalRenta1 = BigDecimal.ZERO;
 				this.totalSubTotal = BigDecimal.ZERO;
 				this.totalDescuento = BigDecimal.ZERO;
 				this.facturaCabeceraDTOCols.stream().forEach(factura ->{
@@ -817,6 +847,9 @@ public class CuentasController extends CommonsController implements Serializable
 							this.totalPagos = this.totalPagos.add(factura.getTotalPagos());
 						}
 					}
+					this.totalRetencion30 = this.totalRetencion30.add(factura.getRetencion30());
+					this.totalRetencion70 = this.totalRetencion70.add(factura.getRetencion70());
+					this.totalRenta1 = this.totalRenta1.add(factura.getRenta1());
 					this.totalCuenta =  this.totalCuenta.add(factura.getTotalCuenta());
 					this.totalSubTotal = this.totalSubTotal.add(factura.getSubTotal());
 					this.totalDescuento = this.totalDescuento.add(factura.getDescuento());
@@ -1116,6 +1149,7 @@ public class CuentasController extends CommonsController implements Serializable
 		this.totalPagado = BigDecimal.ZERO;
 		this.pagosFacturaDTO = new PagosFacturaDTO();
 		this.pagosFacturaDTO.setFechaPago(new Date());
+		this.tipoPagosCatalogoValorDTOCols = ERPFactory.catalogos.getCatalogoServicio().findObtenerCatalogoByTipo(ERPConstantes.CODIGO_CATALOGO_TIPOS_PAGOS);
 		this.pagosFacturaDTOCols = ERPFactory.transaccion.getTransaccionServicio().findObtenerListaPagosFactura(1, facturaCabeceraDTO.getId().getCodigoFactura());
 		if(CollectionUtils.isNotEmpty(this.pagosFacturaDTOCols)) {
 			this.pagosFacturaDTOCols.stream().forEach(pago ->{
@@ -1124,9 +1158,9 @@ public class CuentasController extends CommonsController implements Serializable
 		}
 		this.totalPendiente = this.facturaCabeceraDTO.getTotalCuenta().subtract(this.totalPagado);
 		if(this.facturaCabeceraDTO.getPagado()) {
-			this.tamanioPopUp = 310;
+			this.tamanioPopUp = 340;
 		}else {
-			this.tamanioPopUp = 510;
+			this.tamanioPopUp = 540;
 		}
 	}
 	
@@ -1897,6 +1931,9 @@ public class CuentasController extends CommonsController implements Serializable
 			params.put("TOTAL_SUBTOTAL", formatoDecimales.format(this.totalSubTotal));
 			params.put("TOTAL_DESCUENTO", formatoDecimales.format(this.totalDescuento));
 			params.put("TOTAL_ABONOS", formatoDecimales.format(this.totalPagos));
+			params.put("TOTAL_RETENCION30", formatoDecimales.format(this.totalRetencion30));
+			params.put("TOTAL_RETENCION70", formatoDecimales.format(this.totalRetencion70));
+			params.put("TOTAL_RENTAUNO", formatoDecimales.format(this.totalRenta1));
 			params.put("TOTAL_SALDOS", formatoDecimales.format(this.totalCuenta.subtract(this.totalPagos)));
 			params.put("TOTAL_VENTA", formatoDecimales.format(this.totalCuenta));
 			String tituloReporte = FacesContext.getCurrentInstance().getExternalContext().getRequestParameterMap().get("tituloReporte");
@@ -2390,5 +2427,37 @@ public class CuentasController extends CommonsController implements Serializable
 
 	public void setTotalDescuento(BigDecimal totalDescuento) {
 		this.totalDescuento = totalDescuento;
+	}
+
+	public Collection<CatalogoValorDTO> getTipoPagosCatalogoValorDTOCols() {
+		return tipoPagosCatalogoValorDTOCols;
+	}
+
+	public void setTipoPagosCatalogoValorDTOCols(Collection<CatalogoValorDTO> tipoPagosCatalogoValorDTOCols) {
+		this.tipoPagosCatalogoValorDTOCols = tipoPagosCatalogoValorDTOCols;
+	}
+
+	public BigDecimal getTotalRetencion30() {
+		return totalRetencion30;
+	}
+
+	public void setTotalRetencion30(BigDecimal totalRetencion30) {
+		this.totalRetencion30 = totalRetencion30;
+	}
+
+	public BigDecimal getTotalRetencion70() {
+		return totalRetencion70;
+	}
+
+	public void setTotalRetencion70(BigDecimal totalRetencion70) {
+		this.totalRetencion70 = totalRetencion70;
+	}
+
+	public BigDecimal getTotalRenta1() {
+		return totalRenta1;
+	}
+
+	public void setTotalRenta1(BigDecimal totalRenta1) {
+		this.totalRenta1 = totalRenta1;
 	}
 }

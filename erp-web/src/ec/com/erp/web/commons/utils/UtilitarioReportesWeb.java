@@ -236,6 +236,12 @@ public class UtilitarioReportesWeb {
 			reporteVentas.setSaldos(formatoDecimales.format(facturaCabeceraDTO.getTotalCuenta().subtract(facturaCabeceraDTO.getTotalPagos())));
 			reporteVentas.setTotalVenta(formatoDecimales.format(facturaCabeceraDTO.getTotalCuenta()));
 			reporteVentas.setTotalDescuento(formatoDecimales.format(facturaCabeceraDTO.getDescuento()));
+			reporteVentas.setTarifa0(formatoDecimales.format(facturaCabeceraDTO.getTotalSinImpuestos()));
+			reporteVentas.setTarifa12(formatoDecimales.format(facturaCabeceraDTO.getTotalImpuestos()));
+			reporteVentas.setIva12(formatoDecimales.format(facturaCabeceraDTO.getTotalIva()));
+			reporteVentas.setRetencion30(formatoDecimales.format(facturaCabeceraDTO.getRetencion30()));
+			reporteVentas.setRetencion70(formatoDecimales.format(facturaCabeceraDTO.getRetencion70()));
+			reporteVentas.setRenta1(formatoDecimales.format(facturaCabeceraDTO.getRenta1()));
 			response.add(reporteVentas);
 		});		
 		return response;

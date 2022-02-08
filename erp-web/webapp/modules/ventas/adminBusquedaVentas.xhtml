@@ -173,9 +173,21 @@
 	                	<f:convertNumber pattern="0.00"/>
 	                </h:outputText>
 	            </rich:column>
-	             <rich:column  width="75px" style="text-align: right;">
+	            <rich:column  width="75px" style="text-align: right;">
 	                <f:facet name="header"><h:outputText value="Total pagos" title="#{msg_erpweb['ec.com.erp.etiqueta.label.lista.cabecera.factura.total.factura']}"/></f:facet>
 	                <h:outputText value="#{cuenta.totalPagos}" >
+	                	<f:convertNumber pattern="0.00"/>
+	                </h:outputText>
+	            </rich:column>
+	            <rich:column  width="75px" style="text-align: right;">
+	                <f:facet name="header"><h:outputText value="Ret. 30%" title="Retenciones del 30%"/></f:facet>
+	                <h:outputText value="#{cuenta.retencion30}" >
+	                	<f:convertNumber pattern="0.00"/>
+	                </h:outputText>
+	            </rich:column>
+	            <rich:column  width="75px" style="text-align: right;">
+	                <f:facet name="header"><h:outputText value="Renta 1%" title="Renta del 1%"/></f:facet>
+	                <h:outputText value="#{cuenta.renta1}" >
 	                	<f:convertNumber pattern="0.00"/>
 	                </h:outputText>
 	            </rich:column>
@@ -238,11 +250,11 @@
 	            <f:facet name="footer">
 	            	<table style="width: 100%;">
 	            		<tr>
-	            			<td style="width: 50%;"></td>
+	            			<td style="width: 20%;"></td>
 	            			<th style="width: 50px; text-align: right; color: blue;">
 	            				Total ventas:
 	            			</th>
-	            			<td style="width: 50px; text-align: right; ">
+	            			<td style="width: 40px; text-align: right; ">
 	            				<h:outputText value="#{cuentasController.totalCuenta}">
 		                    		<f:convertNumber pattern="0.00"/>
 		                    	</h:outputText>
@@ -250,15 +262,31 @@
 	            			<th style="width: 50px; text-align: right; color: blue;">
 	            				Total pagos:
 	            			</th>
-	            			<td style="width: 50px; text-align: right; ">
+	            			<td style="width: 40px; text-align: right; ">
 	            				<h:outputText value="#{cuentasController.totalPagos}">
+			                    	<f:convertNumber pattern="0.00"/>
+			                    </h:outputText>
+	            			</td>
+	            			<th style="width: 70px; text-align: right; color: blue;">
+	            				Total retencion 30%:
+	            			</th>
+	            			<td style="width: 35px; text-align: right; ">
+	            				<h:outputText value="#{cuentasController.totalRetencion30}">
+			                    	<f:convertNumber pattern="0.00"/>
+			                    </h:outputText>
+	            			</td>
+	            			<th style="width: 50px; text-align: right; color: blue;">
+	            				Total renta 1%:
+	            			</th>
+	            			<td style="width: 30px; text-align: right; ">
+	            				<h:outputText value="#{cuentasController.totalRenta1}">
 			                    	<f:convertNumber pattern="0.00"/>
 			                    </h:outputText>
 	            			</td>
 	            			<th style="width: 50px; text-align: right; color: blue;">
 	            				Total saldos:
 	            			</th>
-	            			<td style="width: 50px; text-align: right; ">
+	            			<td style="width: 40px; text-align: right; ">
 	            				<h:outputText value="#{cuentasController.totalCuenta - cuentasController.totalPagos}">
 			                    	<f:convertNumber pattern="0.00"/>
 			                    </h:outputText>
@@ -340,6 +368,12 @@
 						
 						<h:outputText class="styleNegritas" value="#{msg_erpweb['ec.com.erp.etiqueta.header.nueva.pagos.valorpago']}: *" />
 				 		<h:inputText  style="width:159px" value="#{cuentasController.pagosFacturaDTO.valorPago}" id="precio" onkeypress="return validarDecimal(event);"/>
+				 		
+				 		<h:outputText class="styleNegritas" value="Tipo pago *" />
+				 		<h:selectOneMenu id="tipoPago" tabindex="1" value="#{cuentasController.pagosFacturaDTO.codigoValorPago}" style="background-color:#f9f9d5; background-image: none; width: 165px" onkeypress="if (event.keyCode == 13) return false;">
+							<f:selectItem itemLabel="SELECCIONE"/>
+							<f:selectItems value="#{cuentasController.tipoPagosCatalogoValorDTOCols}" var="tipoPago" itemValue = "#{tipoPago.id.codigoCatalogoValor}" itemLabel = "#{tipoPago.nombreCatalogoValor}" />
+						</h:selectOneMenu>
 				 		
 				 		<h:outputText class="styleNegritas" value="#{msg_erpweb['ec.com.erp.etiqueta.header.nueva.pagos.descripcion']}: *" />
 				 		<h:inputTextarea id="txtObservacion" maxlength="100" styleClass="styleUpperCase estiloTextArea" value="#{cuentasController.pagosFacturaDTO.descripcion}"/>
